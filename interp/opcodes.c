@@ -5,107 +5,121 @@
 
 void Execute(Machine_State *cpu)
 {
-    while (cpu->mem[cpu->IP] != HALT)
+    int temp;
+    while (cpu->mem[cpu->IP] != HALT_OP)
     {
         switch (cpu->mem[cpu->IP])
         {
             case NOP:
                 cpu->IP++;
                 break;
-            case PLUS:
+            case PLUS_OP:
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] + cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case MINUS:
+            case MINUS_OP:
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] - cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case TIMES:
+            case TIMES_OP:
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] * cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case DIVIDE:
+            case DIVIDE_OP:
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] / cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case MOD:
+            case MOD_OP:
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] % cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case EQUAL:
+            case EQ_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] == cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case NOT_EQUAL:
+            case NE_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] != cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case GREATER:
+            case GT_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] > cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case LESS:
+            case LT_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] < cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case GREATER_EQ:
+            case GE_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] >= cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case LESS_EQ:
+            case LE_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] <= cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case LOG_AND:
+            case AND_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] && cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case LOG_OR:
+            case OR_OP:
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] || cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
-            case PRINT:
+            case PRINT_OP:
                 printf("%d\n", cpu->mem[cpu->SP-1]);
+                cpu->SP--;
                 cpu->IP++;
                 break;
-            case PRINTS:
+            case PRINTS_OP:
                 //printf("%s", (char *)cpu->mem[cpu->SP-1]);
                 cpu->IP++;
                 break;
-            case DUP:
+            case DUP_OP:
                 cpu->mem[cpu->SP] = cpu->mem[cpu->SP-1];
                 cpu->SP++;
                 cpu->IP++;
                 break;
-            case HALT:
-                cpu->IP++;
+            case HALT_OP:
                 break;
-            case POP:
+            case POP_OP:
                 cpu->SP--;
                 break;
-            case PUSH:
+            case CALL_OP:
+                temp = cpu->mem[cpu->SP - 1];
+                cpu->mem[cpu->SP - 1] = cpu->IP+1;
+                cpu->mem[cpu->SP] = cpu->FP;
+                cpu->SP++;
+                cpu->FP = cpu->SP;
+                cpu->IP = temp;
+                break;
+            case RETURN_OP:
+                cpu->SP = cpu->FP - 2;
+                cpu->IP = cpu->mem[cpu->FP -2];
+                cpu->FP = cpu->mem[cpu->FP - 1];
+                break;
+            case PUSH_OP:
                 cpu->IP++;
                 cpu->mem[cpu->SP] = cpu->mem[cpu->IP];
                 cpu->SP++;
                 cpu->IP++;
                 break;
-            case JUMP:
+            case JUMP_OP:
                 cpu->IP++;
                 break;
-            case JUMPE:
+            case JUMPE_OP:
                 cpu->IP++;
                 break;
         }

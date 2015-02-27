@@ -2,27 +2,30 @@
 #include "machine.h"
 
 #define NOP         0
-#define PLUS        1
-#define MINUS       2
-#define TIMES       3
-#define DIVIDE      4
-#define MOD         5
-#define EQUAL       6
-#define NOT_EQUAL   7
-#define GREATER     8
-#define LESS        9
-#define GREATER_EQ  10
-#define LESS_EQ     11
-#define LOG_AND     12
-#define LOG_OR      13
-#define PRINT       14
-#define PRINTS      15
-#define DUP         16
-#define HALT        17
-#define POP         18
-#define PUSH        -1
-#define JUMP        -2
-#define JUMPE       -3
+#define PLUS_OP     1
+#define MINUS_OP    2
+#define TIMES_OP    3
+#define DIVIDE_OP   4
+#define MOD_OP      5
+#define EQ_OP       6
+#define NE_OP       7
+#define GT_OP       8
+#define LT_OP       9
+#define GE_OP       10
+#define LE_OP       11
+#define AND_OP      12
+#define OR_OP       13
+#define PRINT_OP    14
+#define PRINTS_OP   15
+#define DUP_OP      16
+#define HALT_OP     17
+#define POP_OP      18
+#define CALL_OP     19
+#define RETURN_OP   20
+#define ILLEGAL_OP  127
+#define PUSH_OP     -1
+#define JUMP_OP     -2
+#define JUMPE_OP    -3
 
 void Execute(Machine_State *machine);
 

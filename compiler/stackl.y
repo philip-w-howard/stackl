@@ -37,7 +37,7 @@
     int yyerror(const char *msg);
     int semantic_error(std::string msg);
 
-    cBlockNode *yyast_root;
+    cAstNode *yyast_root;
 %}
 
 %start  program
@@ -56,7 +56,7 @@
 %token  EQ NE LT GT GE LE
 %token  AND OR
 
-%type <block> program
+%type <decls> program
 %type <block> block
 %type <sym_table> open
 %type <sym_table> close
@@ -65,6 +65,7 @@
 %type <varDecl> var_decl
 %type <structDecl> struct_decl
 %type <arrayDecl> array_decl
+%type <decls> func_decls
 %type <funcDecl> func_decl
 %type <funcDecl> func_header
 %type <funcDecl> func_prefix
@@ -88,9 +89,9 @@
 
 %%
 
-program: block                  { $$ = $1;
+program: func_decls             { $$ = $1; 
                                   yyast_root = $$;
-                                  if (yynerrs == 0) 
+                                  if (yynerrs == 0)
                                       YYACCEPT;
                                   else
                                       YYABORT;
@@ -108,7 +109,6 @@ decls:      decls decl          { $$ = $1;
 
 decl:       var_decl ';'        { $$ = $1; }
         |   struct_decl ';'     { $$ = $1; }
-        |   func_decl           { $$ = $1; }
         |   array_decl ';'      { $$ = $1; }
         |   error ';'           { $$ = NULL; }
 
@@ -118,6 +118,12 @@ struct_decl:  STRUCT open decls close IDENTIFIER
                                 { $$ = new cStructDeclNode($2, $3, $5); }
 array_decl:   ARRAY  TYPE_ID IDENTIFIER arrayspec
                                 { $$ = new cArrayDeclNode($2, $3, $4); }
+func_decls: func_decls func_decl { 
+                                   $$ = $1;
+                                   $$->AddNode($2);
+                                }
+        |   func_decl           { $$ = new cDeclsNode($1); 
+                                }
 func_decl:  func_header ';'
                           {
                             symbolTableRoot->DecreaseScope();

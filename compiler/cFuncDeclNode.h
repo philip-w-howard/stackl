@@ -116,19 +116,8 @@ class cFuncDeclNode : public cDeclNode
     {
         if (mStmts != NULL)
         {
-            StartFunctionOutput();
-            EmitString("int ");
-            EmitString(mId->Name() + "_");
-            EmitInt(mId->Id());
-            EmitString("()\n");
-            EmitString("{\nStack_Pointer += ");
-            EmitInt(mDeclsSize);
-            EmitString(";\n");
             mStmts->GenerateCode();
-            EmitString("Stack_Pointer -= ");
-            EmitInt(mDeclsSize);
-            EmitString(";\n}\n");
-            EndFunctionOutput();
+            EmitInt(RETURN_OP);
         }
     }
   protected:

@@ -38,20 +38,8 @@ class cPrintNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        if (mExpr->GetType()->IsFloat())
-        {
-            EmitString("Temp_F = ");
-            mExpr->GenerateCode();
-            EmitString(";\n");
-            EmitPrintTemp_F();
-        }
-        else
-        {
-            EmitString("Temp = ");
-            mExpr->GenerateCode();
-            EmitString(";\n");
-            EmitPrintTemp();
-        }
+        mExpr->GenerateCode();
+        EmitInt(PRINT_OP);
     }
   protected:
     cExprNode *mExpr;       // expression to be printed

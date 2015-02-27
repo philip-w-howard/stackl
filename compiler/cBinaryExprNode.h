@@ -60,16 +60,15 @@ class cBinaryExprNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        EmitString("(");
         mLeftExpr->GenerateCode();
-        EmitString(StrOp());
         mRightExpr->GenerateCode();
-        EmitString(")");
+        EmitInt(IntOp());
     }
   protected:
     cExprNode *mLeftExpr;       // left expression
     cExprNode *mRightExpr;      // right expression
     int mOperator;              // operator: '+', '-', '*', '/', '%'
     std::string StrOp();
+    int IntOp();
 };
 

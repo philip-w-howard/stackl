@@ -34,4 +34,25 @@ std::string cBinaryExprNode::StrOp()
     return (" UnrecognizedOperator "); 
 }
 
+int cBinaryExprNode::IntOp()
+{
+    switch (mOperator)
+    {
+        case '+': return PLUS_OP;
+        case '-': return MINUS_OP;
+        case '*': return TIMES_OP;
+        case '/': return DIVIDE_OP;
+        case '%': return MOD_OP;
+        case AND: return AND_OP;
+        case OR:  return OR_OP;
+        case EQ:  return EQ_OP;
+        case NE:  return NE_OP;
+        case GE:  return GE_OP;
+        case LE:  return LE_OP;
+        case LT:  return LT_OP;
+        case GT:  return GT_OP;
+    }
+    return ILLEGAL_OP;
+}
+
 

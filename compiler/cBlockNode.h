@@ -51,15 +51,19 @@ class cBlockNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        /*
         // adjust the stack pointer for local vars
         EmitString("Stack_Pointer += ");
         EmitInt(mSize);
         EmitString(";\n");
+        */
         if (mDecls != NULL) mDecls->GenerateCode();
         if (mStmts != NULL) mStmts->GenerateCode();
+        /*
         EmitString("Stack_Pointer -= ");
         EmitInt(mSize);
         EmitString(";\n");
+        */
     }
   protected:
     cDeclsNode *mDecls;     // declarations

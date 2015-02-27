@@ -47,7 +47,8 @@ class cIntExprNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        EmitString(std::to_string(mIntVal));
+        EmitInt(PUSH_OP);
+        EmitInt(mIntVal);
     }
   protected:
     int mIntVal;        // value of integer constant

@@ -10,6 +10,7 @@
 //*******************************************************
 
 #include <string>
+#include "../interp/opcodes.h"
 
 bool InitOutput(const char *outfileName);
 bool FinalizeOutput();

@@ -75,6 +75,7 @@ class cParamNode: public cAstNode
 
     virtual void GenerateCode()
     {
+        /*
         for (list<cExprNode *>::iterator it = mList->begin(); 
                 it != mList->end(); it++)
         {
@@ -91,6 +92,7 @@ class cParamNode: public cAstNode
             else
                 EmitPushTemp();
         }
+        */
     }
 
   protected:

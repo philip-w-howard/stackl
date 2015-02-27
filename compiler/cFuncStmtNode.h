@@ -45,6 +45,7 @@ class cFuncStmtNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        /*
         mCall->GenerateCode();
         if (mLval != NULL)
         {
@@ -54,6 +55,7 @@ class cFuncStmtNode : public cStmtNode
             else
                 EmitString(" = Temp;\n");
         }
+        */
 
     }
   protected:

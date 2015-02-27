@@ -58,6 +58,7 @@ class cFuncCallNode : public cExprNode
 
     virtual void GenerateCode()
     {
+        /*
         EmitPushFP();
         // need to add params
         if (mParams != NULL) 
@@ -83,6 +84,7 @@ class cFuncCallNode : public cExprNode
             EmitString(";\n");
         }
         EmitPopFP();
+        */
     }
   protected:
     cSymbol *mId;           // name of the function

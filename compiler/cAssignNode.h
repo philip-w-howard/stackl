@@ -50,10 +50,12 @@ class cAssignNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        /*
         mLval->GenerateCode();
         EmitString(" = ");
         mExpr->GenerateCode();
         EmitString(";\n");
+        */
     }
 
   protected:

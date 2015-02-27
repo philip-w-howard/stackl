@@ -47,9 +47,6 @@ identifier      {letter}({letter}|{digit}|"_")*
 "int"                       { yylval.symbol = symbolTableRoot->Lookup("int");
                               RETURN(TYPE_ID);
                             }
-"float"                     { yylval.symbol = symbolTableRoot->Lookup("float");
-                              RETURN(TYPE_ID);
-                            }
 "char"                      { yylval.symbol = symbolTableRoot->Lookup("char");
                               RETURN(TYPE_ID);
                             }

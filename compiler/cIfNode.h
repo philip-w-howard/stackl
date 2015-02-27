@@ -46,6 +46,7 @@ class cIfNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        /*
         std::string if_label = GenerateLabel();
         EmitString("if (!(");
         mExpr->GenerateCode();
@@ -64,6 +65,7 @@ class cIfNode : public cStmtNode
         {
             EmitString(if_label + ":\n");
         }
+        */
     }
 
   protected:
