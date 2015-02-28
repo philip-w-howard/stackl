@@ -17,15 +17,13 @@
 class cBaseDeclNode : public cDeclNode
 {
   public:
-    cBaseDeclNode(cSymbol *id, int size, int isFloat) : cDeclNode()
+    cBaseDeclNode(cSymbol *id, int size) : cDeclNode()
     {
         mId = id;
         mSize = size;
-        mIsFloat = isFloat;
     }
 
-    virtual bool IsInt()   { return !mIsFloat; }
-    virtual bool IsFloat() { return mIsFloat; }
+    virtual bool IsInt()   { return true; }
     virtual bool IsType()  { return true; }
 
     virtual int ComputeOffsets(int base) { return base; }
@@ -36,7 +34,6 @@ class cBaseDeclNode : public cDeclNode
     }
 
   protected:
-    bool mIsFloat;      // flag indicating a floating point primitive type
     // int mSize;       // declared in cDeclNode base class
 };
 

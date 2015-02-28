@@ -26,6 +26,9 @@
 #define PUSH_OP     -1
 #define JUMP_OP     -2
 #define JUMPE_OP    -3
+#define PUSHVAR_OP  -4
+#define POPVAR_OP   -5
+#define ADJSP_OP    -6
 
 void Execute(Machine_State *machine);
 

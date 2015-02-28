@@ -1,0 +1,10 @@
+./lang test/$1.lang out
+# RETVAL=$?
+# [ $RETVAL -ne 0 ] && exit $RETVAL
+
+diff -qbwB out test/$1.correct
+RETVAL=$?
+[ $RETVAL -eq 0 ] && echo $1 PASSED
+[ $RETVAL -ne 0 ] && echo $1 FAILED
+[ $RETVAL -ne 0 ] && diff -bwB out test/$1.correct
+exit $RETVAL

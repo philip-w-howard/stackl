@@ -10,7 +10,6 @@
 
 %union{
     int                 int_val;
-    double              float_val;
     cSymbol*            symbol;
     cScope*             sym_table;
     cAstNode*           ast_node;
@@ -45,7 +44,6 @@
 %token <symbol>    IDENTIFIER
 %token <symbol>    TYPE_ID
 %token <int_val>    INT_VAL
-%token <float_val>  FLOAT_VAL
 
 %token  ARRAY
 %token  SCAN PRINT
@@ -249,7 +247,6 @@ term:       term '*' fact       { $$ = new cBinaryExprNode($1, '*', $3); }
 
 fact:        '(' expr ')'       { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
-        |   FLOAT_VAL           { $$ = new cFloatExprNode($1); }
         |   varref              { $$ = $1; }
         // |   func_call           { $$ = $1; }
 

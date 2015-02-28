@@ -49,21 +49,10 @@ class cVarDeclNode : public cDeclNode
 
     virtual bool IsArray()  { return mType->IsArray(); }
     virtual bool IsStruct() { return mType->IsStruct(); }
-    virtual bool IsFloat()  { return mType->IsFloat(); }
     virtual bool IsInt()    { return mType->IsInt(); }
 
     virtual int ComputeOffsets(int base)
     {
-        if (mType->Size() >= WORD_SIZE)
-        {
-            // word align the data
-            if (base % WORD_SIZE != 0)
-            {
-                base = (base + WORD_SIZE)/WORD_SIZE;
-                base *= WORD_SIZE;
-            }
-        }
-
         mOffset = base;
         mSize = mType->Size();
 

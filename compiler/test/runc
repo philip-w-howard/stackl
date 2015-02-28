@@ -1,0 +1,14 @@
+./stacklc test/$1.s test/$1.sl
+RETVAL=$?
+[ $RETVAL -ne 0 ] && echo $1 FAILED
+[ $RETVAL -ne 0 ] && exit $RETVAL
+
+../interp/stackl test/$1.sl > out
+RETVAL=$?
+[ $RETVAL -ne 0 ] && echo $1 FAILED && exit $RETVAL
+
+diff -qbwB out test/$1.correct
+RETVAL=$?
+[ $RETVAL -eq 0 ] && echo $1 PASSED
+[ $RETVAL -ne 0 ] && echo $1 FAILED
+exit $RETVAL

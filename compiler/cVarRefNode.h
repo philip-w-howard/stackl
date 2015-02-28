@@ -75,6 +75,8 @@ class cVarRefNode : public cExprNode
         return mDepthDecl;
     }
 
+    int GetOffset() { return mOffset; }
+
     std::string Name() { return mName; }
 
     virtual int ComputeOffsets(int base)
@@ -86,6 +88,7 @@ class cVarRefNode : public cExprNode
         {
             mOffset += (*it)->GetField()->GetOffset();
         }
+        assert(!mDepthDecl->IsArray());
         if (mDepthDecl->IsArray())
             mSize = mDepthDecl->GetBaseType()->Size();
         else
@@ -116,15 +119,8 @@ class cVarRefNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        if (mDepthDecl->IsFloat())
-            EmitString("(*(double *)&");
-        else if (mDepthDecl->IsInt() && mSize == 4) 
-            EmitString("(*(int *)&");
-        else
-            EmitString("(");
-        EmitString("Memory[Frame_Pointer + ");
+        EmitInt(PUSHVAR_OP);
         EmitInt(mOffset);
-        EmitString("])");
     }
 
   protected:

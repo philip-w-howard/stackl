@@ -63,11 +63,9 @@ class cParamNode: public cAstNode
         for (list<cExprNode *>::iterator it = mList->begin(); 
                 it != mList->end(); it++)
         {
-            if ( (*it)->GetType()->IsFloat())
-                mSize += 8;
-            else
-                mSize += 4;
-
+            // actual params take no space, so don't update base
+            // but we do need to keep track of how much stack space we use
+            mSize += 4;
             (*it)->ComputeOffsets(base);
         }
         return base;
@@ -79,18 +77,12 @@ class cParamNode: public cAstNode
         for (list<cExprNode *>::iterator it = mList->begin(); 
                 it != mList->end(); it++)
         {
-            if ( (*it)->GetType()->IsFloat())
-                EmitString("Temp_F = ");
-            else
-                EmitString("Temp = ");
+            EmitString("Temp = ");
 
             (*it)->GenerateCode();
             EmitString(";\n");
 
-            if ( (*it)->GetType()->IsFloat())
-                EmitPushTemp_F();
-            else
-                EmitPushTemp();
+            EmitPushTemp();
         }
         */
     }

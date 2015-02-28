@@ -50,7 +50,6 @@ class cFuncStmtNode : public cStmtNode
         if (mLval != NULL)
         {
             mLval->GenerateCode();
-            if (mCall->GetType()->IsFloat())
                 EmitString(" = Temp_F;\n");
             else
                 EmitString(" = Temp;\n");

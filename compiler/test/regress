@@ -1,0 +1,5 @@
+#!/bin/bash
+for test in 1 2 3; do
+    test/runc test$test
+done
+

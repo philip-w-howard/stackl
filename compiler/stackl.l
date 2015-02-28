@@ -22,8 +22,6 @@ digit           [0-9]
 punctuation     [(){}\[\];,\.]
 operator        [+\-*/%=]
 integer         -?0|(-?[1-9][0-9]*)
-float           {integer}|({integer}\.{digit}+)
-xfloat           (0{period}0)|(0{period}{digit}*[1-9])|([1-9]{digit}*{period}{digit}*[1-9])
 identifier      {letter}({letter}|{digit}|"_")*
 %%
 
@@ -54,7 +52,6 @@ identifier      {letter}({letter}|{digit}|"_")*
 "array"                     RETURN(ARRAY);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
-{integer}|({integer}\.{digit}+) yylval.float_val = atof(yytext); RETURN(FLOAT_VAL);
 {identifier}                RETURN(proc_identifier(yytext));
 .                           RETURN(JUNK_TOKEN);   // discard anything not recognized
 

@@ -38,10 +38,7 @@ class cReturnNode : public cStmtNode
     virtual void GenerateCode()
     {
         /*
-        if (mExpr->GetType()->IsFloat())
-            EmitString("Temp_F = ");
-        else
-            EmitString("Temp = ");
+        EmitString("Temp = ");
 
         mExpr->GenerateCode();
         EmitString(";\n");

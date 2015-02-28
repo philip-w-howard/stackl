@@ -50,12 +50,9 @@ class cAssignNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        /*
-        mLval->GenerateCode();
-        EmitString(" = ");
         mExpr->GenerateCode();
-        EmitString(";\n");
-        */
+        EmitInt(POPVAR_OP);
+        EmitInt(mLval->GetOffset());
     }
 
   protected:

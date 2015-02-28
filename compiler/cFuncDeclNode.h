@@ -89,6 +89,7 @@ class cFuncDeclNode : public cDeclNode
         // function decls start at offset 0 relative to function
         // functions take no space in outer scope, so leave base alone
         int offset = 0;
+        assert(mParams == NULL);
         if (mParams != NULL) offset = mParams->ComputeOffsets(offset);
         if (mDecls != NULL) offset = mDecls->ComputeOffsets(offset);
         if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
@@ -114,6 +115,12 @@ class cFuncDeclNode : public cDeclNode
 
     virtual void GenerateCode()
     {
+        if (mDeclsSize != 0)
+        {
+            EmitInt(ADJSP_OP);
+            EmitInt(mDeclsSize);
+        }
+
         if (mStmts != NULL)
         {
             mStmts->GenerateCode();

@@ -20,7 +20,6 @@ class cDeclNode : public cAstNode
     virtual bool IsType()   { return false; }
     virtual bool IsFunc()   { return false; }
     virtual bool IsInt()    { return false; }
-    virtual bool IsFloat()  { return false; }
     virtual bool IsStruct() { return false; }
     virtual bool IsArray()  { return false; }
     virtual int Size() { return mSize; }
@@ -34,7 +33,6 @@ class cDeclNode : public cAstNode
         cDeclNode *right = other->GetBaseType();
 
         if (left == right) return true;
-        if (left->IsFloat() && right->IsInt()) return true;
         if (left->IsInt() && right->IsInt() && left->Size() >= right->Size()) 
             return true;
 

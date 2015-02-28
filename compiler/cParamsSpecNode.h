@@ -45,6 +45,7 @@ class cParamsSpecNode: public cAstNode
 
     virtual int ComputeOffsets(int base)
     {
+        // FIX THIS: params are negative offsets from FP
         for (list<cVarDeclNode *>::iterator it = mList->begin(); 
             it != mList->end(); it++)
         {

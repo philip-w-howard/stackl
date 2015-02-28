@@ -9,21 +9,12 @@
 //
 //*******************************************************
 
+#include <fstream>
 #include <string>
 #include "../interp/opcodes.h"
 
-bool InitOutput(const char *outfileName);
+bool InitOutput(const char *filename);
 bool FinalizeOutput();
-void StartFunctionOutput();
-void EndFunctionOutput();
 void EmitString(std::string str);
 void EmitInt(int val);
-void EmitFloat(double val);
-void EmitPrintTemp();
-void EmitPrintTemp_F();
-void EmitPushTemp();
-void EmitPushTemp_F();
-void EmitPushFP();
-void EmitPopFP();
-void RewriteFunctions();
 std::string GenerateLabel();
