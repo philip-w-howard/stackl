@@ -4,10 +4,14 @@
 #include "opcodes.h"
 #include "machine.h"
 
+int Do_Debug = 0;
+
 // set DEBUG to "//" to turn off DEBUG
 #define DEBUG(...) DebugPrint(cpu,__VA_ARGS__);
 void DebugPrint(Machine_State *cpu, const char *fmt, ...)
 {
+    if (!Do_Debug) return;
+
     va_list args;
     va_start(args, fmt);
 
@@ -53,46 +57,55 @@ void Execute(Machine_State *cpu)
                 cpu->IP++;
                 break;
             case MOD_OP:
+                DEBUG("DIVIDE");
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] % cpu->mem[cpu->SP-1];
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case EQ_OP:
+                DEBUG("EQ");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] == cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case NE_OP:
+                DEBUG("NE");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] != cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case GT_OP:
+                DEBUG("GT");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] > cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case LT_OP:
+                DEBUG("LT");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] < cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case GE_OP:
+                DEBUG("GE");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] >= cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case LE_OP:
+                DEBUG("LE");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] <= cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case AND_OP:
+                DEBUG("AND");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] && cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
                 break;
             case OR_OP:
+                DEBUG("OR");
                 cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] || cpu->mem[cpu->SP-1]);
                 cpu->SP--;
                 cpu->IP++;
@@ -145,7 +158,6 @@ void Execute(Machine_State *cpu)
             case JUMP_OP:
                 DEBUG("JUMP %d", cpu->mem[cpu->IP+1]);
                 cpu->IP++;
-                cpu->SP--;
                 cpu->IP = cpu->mem[cpu->IP];
                 break;
             case JUMPE_OP:

@@ -18,7 +18,7 @@ extern cAstNode *yyast_root;
 
 int main(int argc, char **argv)
 {
-    std::cout << "Philip Howard" << std::endl;
+    std::cout << "stackl " << __DATE__ << " " << __TIME__ << std::endl;
 
     const char *outfile_name;
     int result = 0;

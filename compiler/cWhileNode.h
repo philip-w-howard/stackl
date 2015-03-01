@@ -42,18 +42,17 @@ class cWhileNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        /*
         std::string start_loop = GenerateLabel();
         std::string end_loop = GenerateLabel();
 
-        EmitString(start_loop + ":\n");
-        EmitString("if (!(");
+        SetJumpDest(start_loop);
         mExpr->GenerateCode();
-        EmitString(")) goto " + end_loop + ";\n");
+        EmitInt(JUMPE_OP);
+        SetJumpSource(end_loop);
         mStmt->GenerateCode();
-        EmitString("goto " + start_loop + ";\n");
-        EmitString(end_loop + ":\n");
-        */
+        EmitInt(JUMP_OP);
+        SetJumpSource(start_loop);
+        SetJumpDest(end_loop);
     }
 
   protected:
