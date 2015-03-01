@@ -6,6 +6,11 @@
 
 int Do_Debug = 0;
 
+void Enable_Debug()
+{
+    Do_Debug = 1;
+}
+
 // set DEBUG to "//" to turn off DEBUG
 #define DEBUG(...) DebugPrint(cpu,__VA_ARGS__);
 void DebugPrint(Machine_State *cpu, const char *fmt, ...)
@@ -134,11 +139,11 @@ void Execute(Machine_State *cpu)
                 cpu->SP--;
                 break;
             case CALL_OP:
-                DEBUG("CALL %d", cpu->mem[cpu->SP - 1]);
-                temp = cpu->mem[cpu->SP - 1];
-                cpu->mem[cpu->SP - 1] = cpu->IP+1;
-                cpu->mem[cpu->SP] = cpu->FP;
-                cpu->SP++;
+                DEBUG("CALL %d", cpu->mem[cpu->IP + 1]);
+                temp = cpu->mem[cpu->IP + 1];
+                cpu->mem[cpu->SP] = cpu->IP+2;
+                cpu->mem[cpu->SP+1] = cpu->FP;
+                cpu->SP += 2;
                 cpu->FP = cpu->SP;
                 cpu->IP = temp;
                 break;

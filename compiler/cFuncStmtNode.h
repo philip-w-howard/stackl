@@ -45,17 +45,8 @@ class cFuncStmtNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        /*
         mCall->GenerateCode();
-        if (mLval != NULL)
-        {
-            mLval->GenerateCode();
-                EmitString(" = Temp_F;\n");
-            else
-                EmitString(" = Temp;\n");
-        }
-        */
-
+        assert(mLval == NULL);
     }
   protected:
     cVarRefNode   *mLval;

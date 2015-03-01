@@ -115,6 +115,8 @@ class cFuncDeclNode : public cDeclNode
 
     virtual void GenerateCode()
     {
+        SetJumpDest(mId->Name());
+
         if (mDeclsSize != 0)
         {
             EmitInt(ADJSP_OP);

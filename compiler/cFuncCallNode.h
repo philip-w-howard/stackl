@@ -58,6 +58,10 @@ class cFuncCallNode : public cExprNode
 
     virtual void GenerateCode()
     {
+        assert(mParams == NULL);
+        EmitInt(CALL_OP);
+        SetJumpSource(mId->Name());
+
         /*
         EmitPushFP();
         // need to add params

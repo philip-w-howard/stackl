@@ -20,8 +20,7 @@
 #define DUP_OP      16
 #define HALT_OP     17
 #define POP_OP      18
-#define CALL_OP     19
-#define RETURN_OP   20
+#define RETURN_OP   19
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2
@@ -29,6 +28,8 @@
 #define PUSHVAR_OP  -4
 #define POPVAR_OP   -5
 #define ADJSP_OP    -6
+#define CALL_OP     -7
 
 void Execute(Machine_State *machine);
+void Enable_Debug();
 

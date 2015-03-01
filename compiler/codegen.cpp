@@ -32,9 +32,8 @@ bool InitOutput(const char *filename)
         return false;
     }
 
-    EmitInt(PUSH_OP);
-    EmitInt(4);
     EmitInt(CALL_OP);
+    SetJumpSource("main");
     EmitInt(HALT_OP);
 
     return true;
