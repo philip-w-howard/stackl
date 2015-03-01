@@ -143,10 +143,20 @@ void Execute(Machine_State *cpu)
                 cpu->IP++;
                 break;
             case JUMP_OP:
+                DEBUG("JUMP %d", cpu->mem[cpu->IP+1]);
                 cpu->IP++;
+                cpu->SP--;
+                cpu->IP = cpu->mem[cpu->IP];
                 break;
             case JUMPE_OP:
+                DEBUG("JUMPE %d %d", cpu->mem[cpu->SP-1], 
+                        cpu->mem[cpu->IP+1]);
                 cpu->IP++;
+                cpu->SP--;
+                if (!cpu->mem[cpu->SP])
+                    cpu->IP = cpu->mem[cpu->IP];
+                else
+                    cpu->IP++;
                 break;
             case PUSHVAR_OP:
                 temp = cpu->FP + cpu->mem[cpu->IP+1];

@@ -46,26 +46,25 @@ class cIfNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        /*
         std::string if_label = GenerateLabel();
-        EmitString("if (!(");
         mExpr->GenerateCode();
-        EmitString(")) goto " + if_label + ";\n");
+        EmitInt(JUMPE_OP);
+        SetJumpSource(if_label);
         mStmt->GenerateCode();
 
         if (mElse != NULL)
         {
             std::string else_label = GenerateLabel();
-            EmitString("goto " + else_label + ";\n");
-            EmitString(if_label + ":\n");
+            EmitInt(JUMP_OP);
+            SetJumpSource(else_label);
+            SetJumpDest(if_label);
             mElse->GenerateCode();
-            EmitString(else_label + ":\n");
+            SetJumpDest(else_label);
         }
         else
         {
-            EmitString(if_label + ":\n");
+            SetJumpDest(if_label);
         }
-        */
     }
 
   protected:

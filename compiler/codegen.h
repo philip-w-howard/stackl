@@ -15,6 +15,8 @@
 
 bool InitOutput(const char *filename);
 bool FinalizeOutput();
-void EmitString(std::string str);
 void EmitInt(int val);
+void EmitFixup(int loc, int dest);
+void SetJumpSource(std::string label);
+void SetJumpDest(std::string label);
 std::string GenerateLabel();

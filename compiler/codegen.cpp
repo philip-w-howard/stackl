@@ -12,10 +12,14 @@
 #include <fstream>
 #include <string>
 #include "codegen.h"
+#include "cFixupTable.h"
 
 // Output files
 static std::ofstream Output;
 static int  Next_Label = 1;
+
+static cFixupTable FixupTable;
+static int Location = 0;
 
 //*****************************************
 // Open output files and write the prefix
@@ -39,20 +43,18 @@ bool InitOutput(const char *filename)
 // output postfix, copy functions to tail of main file and close files
 bool FinalizeOutput()
 {
+    FixupTable.FixupOutput(Output);
+
+    Output << "X\n";
     Output.close();
     return true;
-}
-//*****************************************
-// write a string to the output
-void EmitString(std::string str)
-{
-    Output << str.c_str();
 }
 //*****************************************
 // write an integer constant to the output
 void EmitInt(int val)
 {
-    Output << "\n" << val;
+    Output << "D " << val << "\n";
+    Location++;
 }
 //*****************************************
 // Generate a unique label for GOTO statements
@@ -62,4 +64,20 @@ std::string GenerateLabel()
     std::string label("LABEL_");
     label += std::to_string(Next_Label);
     return label;
+}
+//*****************************************
+void EmitFixup(int loc, int dest)
+{
+    Output << "F " << loc << " " << dest << "\n";
+}
+//*****************************************
+void SetJumpSource(std::string label)
+{
+    FixupTable.AddJumpSource(label, Location);
+    EmitInt(-99);
+}
+//*****************************************
+void SetJumpDest(std::string label)
+{
+    FixupTable.AddJumpDest(label, Location);
 }
