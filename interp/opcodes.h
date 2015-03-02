@@ -21,6 +21,7 @@
 #define HALT_OP     17
 #define POP_OP      18
 #define RETURN_OP   19
+#define RETURNV_OP  20
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2
@@ -32,4 +33,4 @@
 
 void Execute(Machine_State *machine);
 void Enable_Debug();
-
+void Set_Max_Instr(int max);

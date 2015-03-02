@@ -1,14 +1,21 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "opcodes.h"
 #include "machine.h"
 
 int Do_Debug = 0;
+int Max_Instructions = INT_MAX;
 
 void Enable_Debug()
 {
     Do_Debug = 1;
+}
+
+void Set_Max_Instr(int max)
+{
+    Max_Instructions = max;
 }
 
 // set DEBUG to "//" to turn off DEBUG
@@ -29,8 +36,11 @@ void DebugPrint(Machine_State *cpu, const char *fmt, ...)
 void Execute(Machine_State *cpu)
 {
     int temp;
+    int num_instructions = 0;
     while (cpu->mem[cpu->IP] != HALT_OP)
     {
+        if (++num_instructions >= Max_Instructions) break;
+
         switch (cpu->mem[cpu->IP])
         {
             case NOP:
@@ -137,6 +147,7 @@ void Execute(Machine_State *cpu)
             case POP_OP:
                 DEBUG("POP");
                 cpu->SP--;
+                cpu->IP++;
                 break;
             case CALL_OP:
                 DEBUG("CALL %d", cpu->mem[cpu->IP + 1]);
@@ -152,6 +163,14 @@ void Execute(Machine_State *cpu)
                 cpu->SP = cpu->FP - 2;
                 cpu->IP = cpu->mem[cpu->FP -2];
                 cpu->FP = cpu->mem[cpu->FP - 1];
+                break;
+            case RETURNV_OP:
+                DEBUG("RETURNV");
+                temp = cpu->mem[cpu->SP - 1];
+                cpu->SP = cpu->FP - 1;
+                cpu->IP = cpu->mem[cpu->FP -2];
+                cpu->FP = cpu->mem[cpu->FP - 1];
+                cpu->mem[cpu->SP - 1] = temp;
                 break;
             case PUSH_OP:
                 DEBUG("PUSH %d", cpu->mem[cpu->IP+1]);

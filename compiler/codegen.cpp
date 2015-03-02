@@ -34,6 +34,7 @@ bool InitOutput(const char *filename)
 
     EmitInt(CALL_OP);
     SetJumpSource("main");
+    EmitInt(POP_OP);            // need to throw away the return value
     EmitInt(HALT_OP);
 
     return true;

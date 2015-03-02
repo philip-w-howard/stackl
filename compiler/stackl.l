@@ -15,6 +15,8 @@ static int proc_identifier(const char *name);
 %option yylineno
 
 
+quote           [\"]
+not_quote       [^\"]
 period          ['.']
 whitespace      [' ''\t''\n']
 letter          [A-Za-z]
@@ -27,6 +29,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "//"(.)+$                   {}
 {whitespace}+               {}
+{quote}{not_quote}*{quote}  RETURN(STRING_LIT);
 {punctuation}               RETURN(yytext[0]);
 {operator}                  RETURN(yytext[0]);
 "&&"                        RETURN(AND);
@@ -59,7 +62,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 static int Return(int val)
 {
-    //printf("Scanned '%s': %d\n", yytext, val);
+    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

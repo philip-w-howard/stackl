@@ -1,0 +1,20 @@
+TODO
+
+function parameters
+strings
+Unary minus
+++ -- <op>=
+for loops
+arrays
+full semantic checks
+make opcodes an enum?
+proper command line argument processing for stackl
+
+WORKS
+
+expressions
+if statements (including else)
+while statements
+rudimentary function calls
+function return values
+functions in expressions

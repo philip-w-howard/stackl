@@ -10,6 +10,7 @@
 
 %union{
     int                 int_val;
+    char*               string;
     cSymbol*            symbol;
     cScope*             sym_table;
     cAstNode*           ast_node;
@@ -43,7 +44,8 @@
 
 %token <symbol>    IDENTIFIER
 %token <symbol>    TYPE_ID
-%token <int_val>    INT_VAL
+%token <int_val>   INT_VAL
+%token <strint>    STRING_LIT
 
 %token  ARRAY
 %token  SCAN PRINT
@@ -182,12 +184,12 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cWhileNode($3, $5); }
         |   PRINT '(' expr ')' ';'
                                 { $$ = new cPrintNode($3); }
+        |   PRINT '(' STRING_LIT ')' ';'
+                                { $$ = new cPrintsNode($3); }
         |   SCAN '(' lval ')' ';'
                                 { $$ = new cScanNode($3); }
         |   lval '=' expr ';'   { $$ = new cAssignNode($1, $3); }
-        |   lval '=' func_call ';'
-                                { $$ = new cFuncStmtNode($1, $3); }
-        |   func_call ';'       { $$ = new cFuncStmtNode(NULL, $1); }
+        |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   error ';'           { $$ = NULL; }
@@ -248,7 +250,7 @@ term:       term '*' fact       { $$ = new cBinaryExprNode($1, '*', $3); }
 fact:        '(' expr ')'       { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
         |   varref              { $$ = $1; }
-        // |   func_call           { $$ = $1; }
+        |   func_call           { $$ = $1; }
 
 %%
 

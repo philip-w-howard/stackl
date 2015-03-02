@@ -1,6 +1,6 @@
 #pragma once
 //*******************************************************
-// Purpose: Class for a function call as a statement
+// Purpose: Class for a prints statement
 //
 // Author: Philip Howard
 // Email:  phil.howard@oit.edu
@@ -12,35 +12,35 @@
 #include <string>
 
 #include "cStmtNode.h"
+#include "cExprNode.h"
+#include "codegen.h"
 
-class cFuncStmtNode : public cStmtNode
+class cPrintsNode : public cStmtNode
 {
   public:
-    cFuncStmtNode(cFuncCallNode *call) : cStmtNode()
+    cPrintsNode(char *str) : cStmtNode() mStr(str)
     {
-        mCall = call;
     }
 
     virtual std::string toString()
     {
-        std::string result("");
-        result += mCall->toString();
-
+        std::string result("PRINT: ");
+        result += mExpr->toString();
         return result;
     }
 
     virtual int ComputeOffsets(int base)
     {
-        mCall->ComputeOffsets(base);
+        mExpr->ComputeOffsets(base);
         return base;
     }
 
     virtual void GenerateCode()
     {
-        mCall->GenerateCode();
-        EmitInt(POP_OP);        // need to throw away the return value
+        mExpr->GenerateCode();
+        EmitInt(PRINT_OP);
     }
   protected:
-    cFuncCallNode *mCall;
+    std::string mStr;       // string to be printed
 };
 

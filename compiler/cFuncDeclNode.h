@@ -126,7 +126,8 @@ class cFuncDeclNode : public cDeclNode
         if (mStmts != NULL)
         {
             mStmts->GenerateCode();
-            EmitInt(RETURN_OP);
+            cReturnNode *ret = new cReturnNode(new cIntExprNode(0));
+            ret->GenerateCode();
         }
     }
   protected:

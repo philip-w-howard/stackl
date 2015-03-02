@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include "machine.h"
@@ -13,6 +14,8 @@ int main(int argc, char **argv)
         return 1;
     } else {
         if (argc > 2 && strcmp(argv[2], "debug") == 0) Enable_Debug();
+        if (argc > 3) Set_Max_Instr(atoi(argv[3]));
+
         result = Load_And_Go(argv[1]);
         if (result != 0) 
         {

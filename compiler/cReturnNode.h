@@ -37,12 +37,13 @@ class cReturnNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        /*
-        EmitString("Temp = ");
-
-        mExpr->GenerateCode();
-        EmitString(";\n");
-        */
+        if (mExpr == NULL)
+            EmitInt(RETURN_OP);
+        else
+        {
+            mExpr->GenerateCode();
+            EmitInt(RETURNV_OP);
+        }
     }
 
   protected:

@@ -10,7 +10,8 @@ class cFixupTable
 
     void AddJumpSource(std::string label, int loc)
     {
-        mSource[label] = loc;
+        std::pair<std::string,int> mypair (label, loc);
+        mSource.insert(mypair);
     }
     void AddJumpDest(std::string label, int loc)
     {
@@ -21,24 +22,25 @@ class cFixupTable
     {
         std::string name;
 
+        std::unordered_multimap<std::string, int>::iterator it;
         std::unordered_map<std::string, int>::const_iterator found;
-        std::unordered_map<std::string, int>::iterator it;
         for (it=mSource.begin(); it!=mSource.end(); it++)
         {
             name = (*it).first;
 
             found = mDest.find(name);
-            if (found == mDest.end())
+            if (found != mDest.end())
             {
-                std::cerr << "Internal compiler error: no destination for " 
-                          << name << " in fixup table" << std::endl;
+                output << "F " << (*it).second << " " 
+                    << (*found).second << "\n";
             } else {
-                output << "F " << (*it).second << " " << found->second << "\n";
+                std::cerr << "Internal compiler error: no destination for "
+                    << name << " in fixup table" << std::endl;
             }
         }
     }
 
   protected:
-    std::unordered_map<std::string, int> mSource;
+    std::unordered_multimap<std::string, int> mSource;
     std::unordered_map<std::string, int> mDest;
 };
