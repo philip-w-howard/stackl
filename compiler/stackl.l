@@ -42,6 +42,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 ">"                         RETURN(GT);
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
+"for"                       RETURN(FOR);
 "while"                     RETURN(WHILE);
 "print"                     RETURN(PRINT);
 "scan"                      RETURN(SCAN);
@@ -62,7 +63,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 static int Return(int val)
 {
-    printf("Scanned '%s': %d\n", yytext, val);
+//    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

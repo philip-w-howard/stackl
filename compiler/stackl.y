@@ -45,11 +45,11 @@
 %token <symbol>    IDENTIFIER
 %token <symbol>    TYPE_ID
 %token <int_val>   INT_VAL
-%token <strint>    STRING_LIT
+%token <string>    STRING_LIT
 
 %token  ARRAY
 %token  SCAN PRINT
-%token  WHILE IF ELSE 
+%token  FOR WHILE IF ELSE 
 %token  STRUCT
 %token  RETURN
 %token  JUNK_TOKEN
@@ -75,6 +75,7 @@
 %type <arraySpec> arrayspec
 %type <stmts> stmts
 %type <stmt> stmt
+%type <stmt> assign
 %type <varRef> lval
 %type <arrayVal> arrayval
 %type <param> params
@@ -180,6 +181,8 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cIfNode($3, $5, $7); }
         |   IF '(' ccomp ')' stmt
                                 { $$ = new cIfNode($3, $5, NULL); }
+        |   FOR '(' assign ';' ccomp ';' assign ')' stmt
+                                { $$ = new cForNode($3, $5, $7, $9); }
         |   WHILE '(' ccomp ')' stmt
                                 { $$ = new cWhileNode($3, $5); }
         |   PRINT '(' expr ')' ';'
@@ -188,12 +191,13 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cPrintsNode($3); }
         |   SCAN '(' lval ')' ';'
                                 { $$ = new cScanNode($3); }
-        |   lval '=' expr ';'   { $$ = new cAssignNode($1, $3); }
+        |   assign ';'          { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   error ';'           { $$ = NULL; }
 
+assign: lval '=' expr           { $$ = new cAssignNode($1, $3); }
 func_call:  IDENTIFIER '(' params ')' 
                                 { $$ = new cFuncCallNode($1, $3); }
         |   IDENTIFIER '(' ')' 

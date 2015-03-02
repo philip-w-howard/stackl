@@ -4,7 +4,6 @@ function parameters
 strings
 Unary minus
 ++ -- <op>=
-for loops
 arrays
 full semantic checks
 make opcodes an enum?
@@ -12,9 +11,12 @@ proper command line argument processing for stackl
 
 WORKS
 
+print statements
 expressions
 if statements (including else)
 while statements
+for loops
 rudimentary function calls
+return statements
 function return values
 functions in expressions
