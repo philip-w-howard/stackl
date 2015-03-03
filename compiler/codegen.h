@@ -13,9 +13,12 @@
 #include <string>
 #include "../interp/opcodes.h"
 
+static const int STACK_FRAME_SIZE = 2;
+
 bool InitOutput(const char *filename);
 bool FinalizeOutput();
 void EmitInt(int val);
+void EmitString(std::string str);
 void EmitFixup(int loc, int dest);
 void SetJumpSource(std::string label);
 void SetJumpDest(std::string label);

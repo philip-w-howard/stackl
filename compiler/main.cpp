@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     {
         //std::cout << yyast_root->toString() << std::endl;
         yyast_root->ComputeOffsets(0);
-        //output << yyast_root->toString() << std::endl;
+        output << yyast_root->toString() << std::endl;
 
         output.close();
 

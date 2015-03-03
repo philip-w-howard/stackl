@@ -35,6 +35,7 @@
 #include "cParamNode.h"
 #include "cArraySpecNode.h"
 #include "cArrayValNode.h"
+#include "cStringLitNode.h"
 
 #include "parser.h"
 

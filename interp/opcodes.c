@@ -132,8 +132,10 @@ void Execute(Machine_State *cpu)
                 cpu->IP++;
                 break;
             case PRINTS_OP:
-                //printf("%s", (char *)cpu->mem[cpu->SP-1]);
-                cpu->IP++;
+                temp = cpu->mem[cpu->IP+1];
+                DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
+                printf("%s", (char *)(&cpu->mem[temp]));
+                cpu->IP += 2;
                 break;
             case DUP_OP:
                 DEBUG("DUP");

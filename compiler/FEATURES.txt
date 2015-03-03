@@ -1,13 +1,15 @@
 TODO
 
-function parameters
-strings
+strings: StringFixup
 Unary minus
 ++ -- <op>=
 arrays
 full semantic checks
 make opcodes an enum?
 proper command line argument processing for stackl
+
+makefile in stackl directory
+tests in stackl directory
 
 WORKS
 
@@ -20,3 +22,4 @@ rudimentary function calls
 return statements
 function return values
 functions in expressions
+function parameters

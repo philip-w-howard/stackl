@@ -73,18 +73,12 @@ class cParamNode: public cAstNode
 
     virtual void GenerateCode()
     {
-        /*
-        for (list<cExprNode *>::iterator it = mList->begin(); 
-                it != mList->end(); it++)
+        // need to push args in reverse order
+        for (list<cExprNode *>::reverse_iterator it = mList->rbegin(); 
+                it != mList->rend(); it++)
         {
-            EmitString("Temp = ");
-
             (*it)->GenerateCode();
-            EmitString(";\n");
-
-            EmitPushTemp();
         }
-        */
     }
 
   protected:

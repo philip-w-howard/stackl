@@ -23,6 +23,7 @@ class cFuncDeclNode : public cDeclNode
     // return type and name of function
     cFuncDeclNode(cSymbol *type, cSymbol *id)
     {
+        /*
         cSymbol *existingSymbol = symbolTableRoot->LocalLookup(id->Name());
         if (existingSymbol != NULL && existingSymbol->GetType()->IsFunc())
         {
@@ -36,7 +37,10 @@ class cFuncDeclNode : public cDeclNode
             mStmts = fDecl->mStmts;
             mParamsSet = fDecl->mParamsSet;
             mId->SetType(this);
-        } else {
+        } 
+        else 
+        */
+        {
             symbolTableRoot->Insert(id);
             mReturnType = type;
             mId = id;
@@ -89,8 +93,7 @@ class cFuncDeclNode : public cDeclNode
         // function decls start at offset 0 relative to function
         // functions take no space in outer scope, so leave base alone
         int offset = 0;
-        assert(mParams == NULL);
-        if (mParams != NULL) offset = mParams->ComputeOffsets(offset);
+        if (mParams != NULL) mParams->ComputeOffsets(-STACK_FRAME_SIZE);
         if (mDecls != NULL) offset = mDecls->ComputeOffsets(offset);
         if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
         if (mDecls != NULL) mDeclsSize = mDecls->Size();

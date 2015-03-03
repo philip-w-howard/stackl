@@ -12,19 +12,20 @@
 #include <string>
 
 #include "cStmtNode.h"
-#include "cExprNode.h"
+#include "cStringLitNode.h"
 #include "codegen.h"
 
 class cPrintsNode : public cStmtNode
 {
   public:
-    cPrintsNode(char *str) : cStmtNode() , mStr(str)
+    cPrintsNode(cStringLitNode *str) : cStmtNode() , mStr(str)
     {
     }
 
     virtual std::string toString()
     {
-        std::string result("PRINTS: <<NOT IMPLEMENTED>>");
+        std::string result("PRINTS: ");
+        result += mStr->toString();
         return result;
     }
 
@@ -35,9 +36,10 @@ class cPrintsNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        //EmitInt(PRINT_OP);
+        EmitInt(PRINTS_OP);
+        mStr->GenerateCode();
     }
   protected:
-    std::string mStr;       // string to be printed
+    cStringLitNode *mStr;       // string to be printed
 };
 

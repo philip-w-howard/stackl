@@ -31,6 +31,7 @@
     cArrayValNode*      arrayVal;
     cParamNode*         param;
     cExprNode*          expr;
+    cStringLitNode*     string_lit;
     }
 
 %{
@@ -87,6 +88,7 @@
 %type <expr> fact
 %type <varRef> varref
 %type <varPart> varpart
+%type <string_lit> string_lit
 
 %%
 
@@ -187,7 +189,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cWhileNode($3, $5); }
         |   PRINT '(' expr ')' ';'
                                 { $$ = new cPrintNode($3); }
-        |   PRINT '(' STRING_LIT ')' ';'
+        |   PRINT '(' string_lit ')' ';'
                                 { $$ = new cPrintsNode($3); }
         |   SCAN '(' lval ')' ';'
                                 { $$ = new cScanNode($3); }
@@ -256,6 +258,7 @@ fact:        '(' expr ')'       { $$ = $2; }
         |   varref              { $$ = $1; }
         |   func_call           { $$ = $1; }
 
+string_lit: STRING_LIT          { $$ = new cStringLitNode($1); }
 %%
 
 int yyerror(const char *msg)

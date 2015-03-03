@@ -59,6 +59,14 @@ class cVarDeclNode : public cDeclNode
         return mOffset+mSize;
     }
 
+    virtual int ComputeNegOffsets(int base)
+    {
+        mSize = mType->Size();
+        mOffset = base - mSize;
+
+        return mOffset;
+    }
+
     virtual std::string toString()
     {
         std::string result("VAR: ");

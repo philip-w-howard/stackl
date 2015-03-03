@@ -29,7 +29,10 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "//"(.)+$                   {}
 {whitespace}+               {}
-{quote}{not_quote}*{quote}  RETURN(STRING_LIT);
+{quote}{not_quote}*{quote}  {
+                                yylval.string = yytext;
+                                RETURN(STRING_LIT);
+                            }
 {punctuation}               RETURN(yytext[0]);
 {operator}                  RETURN(yytext[0]);
 "&&"                        RETURN(AND);

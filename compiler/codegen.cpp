@@ -71,6 +71,11 @@ void EmitFixup(int loc, int dest)
     Output << "F " << loc << " " << dest << "\n";
 }
 //*****************************************
+void EmitString(std::string str)
+{
+    Output << "S " << str << "\n";
+}
+//*****************************************
 void SetJumpSource(std::string label)
 {
     FixupTable.AddJumpSource(label, Location);
