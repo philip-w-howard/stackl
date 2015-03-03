@@ -1,6 +1,14 @@
-3
-4
-5
-6
-7
-
+EQ works
+NE works
+AND works
+OR works
+GT works
+LT works
+GE works
+LE works
+PLUS works
+MINUS works
+TIMES works
+DIVIDE works
+MOD works
+NEG works

@@ -22,6 +22,7 @@
 #define POP_OP      18
 #define RETURN_OP   19
 #define RETURNV_OP  20
+#define NEG_OP      21
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2

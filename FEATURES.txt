@@ -1,20 +1,19 @@
 TODO
 
-strings: StringFixup
-Unary minus
+char * variables
 ++ -- <op>=
+initialization on decls
 arrays
 full semantic checks
 make opcodes an enum?
 proper command line argument processing for stackl
 
-makefile in stackl directory
-tests in stackl directory
-
 WORKS
 
 print statements
 expressions
+Unary minus
+Test of all operators
 if statements (including else)
 while statements
 for loops
@@ -23,3 +22,6 @@ return statements
 function return values
 functions in expressions
 function parameters
+strings literals
+prints
+

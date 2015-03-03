@@ -85,6 +85,7 @@
 %type <expr> comp
 %type <expr> expr
 %type <expr> term
+%type <expr> value
 %type <expr> fact
 %type <varRef> varref
 %type <varPart> varpart
@@ -234,8 +235,8 @@ params:     params',' param
 
 param:      expr                { $$ = $1; }
 
-ccomp:      ccomp AND comp      { $$ = new cBinaryExprNode($1, AND, $3); }
-        |   ccomp OR comp       { $$ = new cBinaryExprNode($1, OR, $3); }
+ccomp:      ccomp OR comp       { $$ = new cBinaryExprNode($1, OR, $3); }
+        |   ccomp AND comp      { $$ = new cBinaryExprNode($1, AND, $3); }
         |   comp                { $$ = $1; }
 comp:       comp EQ expr        { $$ = new cBinaryExprNode($1, EQ, $3); }
         |   comp NE expr        { $$ = new cBinaryExprNode($1, NE, $3); }
@@ -248,12 +249,15 @@ expr:       expr '+' term       { $$ = new cBinaryExprNode($1, '+', $3); }
         |   expr '-' term       { $$ = new cBinaryExprNode($1, '-', $3); }
         |   term                { $$ = $1; }
 
-term:       term '*' fact       { $$ = new cBinaryExprNode($1, '*', $3); }
-        |   term '/' fact       { $$ = new cBinaryExprNode($1, '/', $3); }
-        |   term '%' fact       { $$ = new cBinaryExprNode($1, '%', $3); }
-        |   fact                { $$ = $1; }
+term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
+        |   term '/' value      { $$ = new cBinaryExprNode($1, '/', $3); }
+        |   term '%' value      { $$ = new cBinaryExprNode($1, '%', $3); }
+        |   value               { $$ = $1; }
 
-fact:        '(' expr ')'       { $$ = $2; }
+value:  fact                    { $$ = $1; }
+        | '-' fact              { $$ = new cUnaryMinusNode($2); }
+
+fact:        '(' ccomp ')'      { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
         |   varref              { $$ = $1; }
         |   func_call           { $$ = $1; }

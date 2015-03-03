@@ -23,11 +23,11 @@ letter          [A-Za-z]
 digit           [0-9]
 punctuation     [(){}\[\];,\.]
 operator        [+\-*/%=]
-integer         -?0|(-?[1-9][0-9]*)
+integer         0|([1-9][0-9]*)
 identifier      {letter}({letter}|{digit}|"_")*
 %%
 
-"//"(.)+$                   {}
+"//"(.)*$                   {}
 {whitespace}+               {}
 {quote}{not_quote}*{quote}  {
                                 yylval.string = yytext;

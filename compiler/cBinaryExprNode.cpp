@@ -23,7 +23,7 @@ std::string cBinaryExprNode::StrOp()
         case '/': return ("/");
         case '%': return ("%");
         case AND: return ("&&");
-        case OR: return ("||");
+        case OORR: return ("||");
         case EQ: return ("==");
         case NE: return ("!=");
         case GE: return (">=");
@@ -44,7 +44,7 @@ int cBinaryExprNode::IntOp()
         case '/': return DIVIDE_OP;
         case '%': return MOD_OP;
         case AND: return AND_OP;
-        case OR:  return OR_OP;
+        case OORR:  return OR_OP;
         case EQ:  return EQ_OP;
         case NE:  return NE_OP;
         case GE:  return GE_OP;

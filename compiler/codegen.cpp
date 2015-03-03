@@ -74,6 +74,7 @@ void EmitFixup(int loc, int dest)
 void EmitString(std::string str)
 {
     Output << "S " << str << "\n";
+    Location++;
 }
 //*****************************************
 void SetJumpSource(std::string label)

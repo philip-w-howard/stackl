@@ -1,3 +1,4 @@
+// test simple variables and assignment
 int main()
 {
     int x;

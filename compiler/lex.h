@@ -13,6 +13,7 @@
 #include "cBlockNode.h"
 #include "cIntExprNode.h"
 #include "cBinaryExprNode.h"
+#include "cUnaryMinusNode.h"
 #include "cPrintNode.h"
 #include "cPrintsNode.h"
 #include "cScanNode.h"

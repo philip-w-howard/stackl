@@ -72,9 +72,14 @@ void Execute(Machine_State *cpu)
                 cpu->IP++;
                 break;
             case MOD_OP:
-                DEBUG("DIVIDE");
+                DEBUG("MOD");
                 cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] % cpu->mem[cpu->SP-1];
                 cpu->SP--;
+                cpu->IP++;
+                break;
+            case NEG_OP:
+                DEBUG("NEG");
+                cpu->mem[cpu->SP-1] = - cpu->mem[cpu->SP-1];
                 cpu->IP++;
                 break;
             case EQ_OP:
