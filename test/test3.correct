@@ -12,3 +12,11 @@ TIMES works
 DIVIDE works
 MOD works
 NEG works
+PLUS_EQ works
+MINUS_EQ works
+TIMES_EQ works
+DIVIDE_EQ works
+post INC works
+pre INC works
+post DEC works
+pre DEC works

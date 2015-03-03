@@ -43,6 +43,12 @@ identifier      {letter}({letter}|{digit}|"_")*
 "<="                        RETURN(LE);
 "<"                         RETURN(LT);
 ">"                         RETURN(GT);
+"++"                        RETURN(INC);
+"--"                        RETURN(DEC);
+"+="                        RETURN(PLUS_EQ);
+"-="                        RETURN(MINUS_EQ);
+"*="                        RETURN(TIMES_EQ);
+"/="                        RETURN(DIVIDE_EQ);
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
 "for"                       RETURN(FOR);

@@ -56,6 +56,8 @@
 %token  JUNK_TOKEN
 %token  EQ NE LT GT GE LE
 %token  AND OR
+%token  INC DEC
+%token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
 
 %type <decls> program
 %type <block> block
@@ -201,8 +203,37 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   error ';'           { $$ = NULL; }
 
 assign: lval '=' expr           { $$ = new cAssignNode($1, $3); }
+        | lval PLUS_EQ expr     { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '+', $3));
+                                }
+        | lval MINUS_EQ expr    { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '-', $3));
+                                }
+        | lval TIMES_EQ expr    { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '*', $3));
+                                }
+        | lval DIVIDE_EQ expr   { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '/', $3));
+                                }
+        | lval INC              { $$ = new cAssignNode($1,
+                                        new cBinaryExprNode($1, '+',
+                                            new cIntExprNode(1)));
+                                }
+        | INC lval              { $$ = new cAssignNode($2,
+                                        new cBinaryExprNode($2, '+',
+                                            new cIntExprNode(1)));
+                                }
+        | lval DEC              { $$ = new cAssignNode($1,
+                                        new cBinaryExprNode($1, '-',
+                                            new cIntExprNode(1)));
+                                }
+        | DEC lval              { $$ = new cAssignNode($2,
+                                        new cBinaryExprNode($2, '-',
+                                            new cIntExprNode(1)));
+                                }
 func_call:  IDENTIFIER '(' params ')' 
                                 { $$ = new cFuncCallNode($1, $3); }
+
         |   IDENTIFIER '(' ')' 
                                 { $$ = new cFuncCallNode($1, NULL); }
 varref:   varref '.' varpart    { $$ = $1;

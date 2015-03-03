@@ -126,5 +126,66 @@ int main()
     else
         print("NEG broken\n");
 
+    // PLUS_EQ
+    z = 5;
+    z += 7;
+    if (z == 12)
+        print("PLUS_EQ works\n");
+    else
+        print("PLUS_EQ broken\n");
+
+    // MINUS_EQ
+    z = 5;
+    z -= 7;
+    if (z == -2)
+        print("MINUS_EQ works\n");
+    else
+        print("MINUS_EQ broken\n");
+
+    // TIMES_EQ
+    z = 5;
+    z *= 7;
+    if (z == 35)
+        print("TIMES_EQ works\n");
+    else
+        print("TIMES_EQ broken\n");
+
+    // DIVIDE_EQ
+    z = 35;
+    z /= 7;
+    if (z == 5)
+        print("DIVIDE_EQ works\n");
+    else
+        print("DIVIDE_EQ broken\n");
+
+    // post INC
+    z = 35;
+    z++;
+    if (z == 36)
+        print("post INC works\n");
+    else
+        print("post INC broken\n");
+
+    // pre INC
+    ++z;
+    if (z == 37)
+        print("pre INC works\n");
+    else
+        print("pre INC broken\n");
+
+    // post DEC
+    z--;
+    if (z == 36)
+        print("post DEC works\n");
+    else
+        print("post DEC broken\n");
+
+    // pre DEC
+    --z;
+    if (z == 35)
+        print("pre DEC works\n");
+    else
+        print("pre DEC broken\n");
+
     return 0;
 }
