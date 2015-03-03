@@ -1,9 +1,9 @@
-./stacklc test/$1.s test/$1.sl
+./stacklc test/$1.c test/$1.sl
 RETVAL=$?
 [ $RETVAL -ne 0 ] && echo $1 FAILED
 [ $RETVAL -ne 0 ] && exit $RETVAL
 
-../interp/stackl test/$1.sl > out
+stackl test/$1.sl > out
 RETVAL=$?
 [ $RETVAL -ne 0 ] && echo $1 FAILED && exit $RETVAL
 

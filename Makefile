@@ -1,4 +1,4 @@
-.PHONY compiler interp
+.PHONY: compiler interp
 
 all: compiler interp execs
 
