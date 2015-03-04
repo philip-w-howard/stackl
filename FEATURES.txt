@@ -1,6 +1,5 @@
 TODO
 
-character literals
 isPtr in cDeclNode
 short circuit of && and ||
 char * variables
@@ -12,6 +11,8 @@ proper command line argument processing for stackl
 
 WORKS
 
+can declare char * vars and char[] vars, but can't do anything with them yet
+character literals
 print statements
 expressions
 Unary minus

@@ -88,7 +88,7 @@ class cVarRefNode : public cExprNode
         {
             mOffset += (*it)->GetField()->GetOffset();
         }
-        assert(!mDepthDecl->IsArray());
+
         if (mDepthDecl->IsArray())
             mSize = mDepthDecl->GetBaseType()->Size();
         else

@@ -66,14 +66,14 @@ identifier      {letter}({letter}|{digit}|"_")*
                               RETURN(TYPE_ID);
                             }
 "char"                      { yylval.symbol = symbolTableRoot->Lookup("char");
-                              RETURN(TYPE_ID);
+                              RETURN(CHAR);
                             }
 "struct"                    RETURN(STRUCT);
 "array"                     RETURN(ARRAY);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
-"'q'"                       yylval.int_val = yytext[1]; RETURN(INT_VAL); 
-"'\n'"                      yylval.int_val = '\n'; RETURN(INT_VAL);
+"'"."'"                       yylval.int_val = yytext[1]; RETURN(INT_VAL); 
+"'\\n'"                      yylval.int_val = '\n'; RETURN(INT_VAL);
  /* 
 L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
  */
@@ -84,7 +84,7 @@ L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
 
 static int Return(int val)
 {
-//    printf("Scanned '%s': %d\n", yytext, val);
+    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 
