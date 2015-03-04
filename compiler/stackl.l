@@ -84,7 +84,7 @@ L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
 
 static int Return(int val)
 {
-    printf("Scanned '%s': %d\n", yytext, val);
+//    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

@@ -5,6 +5,11 @@
 #include "opcodes.h"
 #include "machine.h"
 
+#define INTVAL(reg, offset) (cpu->mem[cpu-> reg + (offset)])
+#define INTABS(loc)         (cpu->mem[(loc)])
+#define INC(reg, amount)    cpu-> reg += amount;
+#define OFFSET(v)           (v)
+
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
 
@@ -37,193 +42,191 @@ void Execute(Machine_State *cpu)
 {
     int temp;
     int num_instructions = 0;
-    while (cpu->mem[cpu->IP] != HALT_OP)
+    while (INTVAL(IP,0) != HALT_OP)
     {
         if (++num_instructions >= Max_Instructions) break;
 
-        switch (cpu->mem[cpu->IP])
+        switch (INTVAL(IP, 0))
         {
             case NOP:
                 DEBUG("NOP");
-                cpu->IP++;
+                INC(IP, 1);
                 break;
             case PLUS_OP:
                 DEBUG("PLUS");
-                cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] + cpu->mem[cpu->SP-1];
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) + INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case MINUS_OP:
                 DEBUG("MINUS");
-                cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] - cpu->mem[cpu->SP-1];
-                cpu->SP--;
-                cpu->IP++;
+
+                INTVAL(SP, -2) = INTVAL(SP, -2) - INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case TIMES_OP:
                 DEBUG("TIMES");
-                cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] * cpu->mem[cpu->SP-1];
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) * INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case DIVIDE_OP:
                 DEBUG("DIVIDE");
-                cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] / cpu->mem[cpu->SP-1];
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) / INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case MOD_OP:
                 DEBUG("MOD");
-                cpu->mem[cpu->SP-2] = cpu->mem[cpu->SP-2] % cpu->mem[cpu->SP-1];
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) % INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case NEG_OP:
                 DEBUG("NEG");
-                cpu->mem[cpu->SP-1] = - cpu->mem[cpu->SP-1];
-                cpu->IP++;
+                INTVAL(SP, -1) = - INTVAL(SP, -1);
+                INC(IP, 1);
                 break;
             case EQ_OP:
                 DEBUG("EQ");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] == cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = (INTVAL(SP, -2) == INTVAL(SP, -1));
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case NE_OP:
                 DEBUG("NE");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] != cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) != INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case GT_OP:
                 DEBUG("GT");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] > cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) > INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case LT_OP:
                 DEBUG("LT");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] < cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) < INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case GE_OP:
                 DEBUG("GE");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] >= cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) >= INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case LE_OP:
                 DEBUG("LE");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] <= cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) <= INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case AND_OP:
                 DEBUG("AND");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] && cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) && INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case OR_OP:
                 DEBUG("OR");
-                cpu->mem[cpu->SP-2] = (cpu->mem[cpu->SP-2] || cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                INTVAL(SP, -2) = INTVAL(SP, -2) || INTVAL(SP, -1);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case PRINT_OP:
-                DEBUG("PRINT %d", cpu->mem[cpu->SP-1]);
-                printf("%d\n", cpu->mem[cpu->SP-1]);
-                cpu->SP--;
-                cpu->IP++;
+                DEBUG("PRINT %d", INTVAL(SP, -1));
+                printf("%d\n", INTVAL(SP, -1));
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case PRINTS_OP:
-                temp = cpu->mem[cpu->IP+1];
+                temp = INTVAL(IP, 1);
                 DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
                 printf("%s", (char *)(&cpu->mem[temp]));
-                cpu->IP += 2;
+                INC(IP, 2);
                 break;
             case DUP_OP:
                 DEBUG("DUP");
-                cpu->mem[cpu->SP] = cpu->mem[cpu->SP-1];
-                cpu->SP++;
-                cpu->IP++;
+                INTVAL(SP, 0) = INTVAL(SP, -1);
+                INC(SP, 1);
+                INC(IP, 1);
                 break;
             case HALT_OP:
                 DEBUG("HALT");
                 break;
             case POP_OP:
                 DEBUG("POP");
-                cpu->SP--;
-                cpu->IP++;
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case CALL_OP:
-                DEBUG("CALL %d", cpu->mem[cpu->IP + 1]);
-                temp = cpu->mem[cpu->IP + 1];
-                cpu->mem[cpu->SP] = cpu->IP+2;
-                cpu->mem[cpu->SP+1] = cpu->FP;
-                cpu->SP += 2;
+                DEBUG("CALL %d", INTVAL(IP, 1));
+                temp = INTVAL(IP, 1);
+                INTVAL(SP, 0) = cpu->IP + OFFSET(2);
+                INTVAL(SP, 1) = cpu->FP;
+                INC(SP, 2);
                 cpu->FP = cpu->SP;
                 cpu->IP = temp;
                 break;
             case RETURN_OP:
                 DEBUG("RETURN");
-                cpu->SP = cpu->FP - 2;
-                cpu->IP = cpu->mem[cpu->FP -2];
-                cpu->FP = cpu->mem[cpu->FP - 1];
+                cpu->SP = cpu->FP - OFFSET(2);
+                cpu->IP = INTVAL(FP, -2);
+                cpu->FP = INTVAL(FP, -1);
                 break;
             case RETURNV_OP:
                 DEBUG("RETURNV");
-                temp = cpu->mem[cpu->SP - 1];
-                cpu->SP = cpu->FP - 1;
-                cpu->IP = cpu->mem[cpu->FP -2];
-                cpu->FP = cpu->mem[cpu->FP - 1];
-                cpu->mem[cpu->SP - 1] = temp;
+                temp = INTVAL(SP, -1);
+                cpu->SP = cpu->FP - OFFSET(1);
+                cpu->IP = INTVAL(FP, -2);
+                cpu->FP = INTVAL(FP, -1);
+                INTVAL(SP, -1) = temp;
                 break;
             case PUSH_OP:
-                DEBUG("PUSH %d", cpu->mem[cpu->IP+1]);
-                cpu->IP++;
-                cpu->mem[cpu->SP] = cpu->mem[cpu->IP];
-                cpu->SP++;
-                cpu->IP++;
+                DEBUG("PUSH %d", INTVAL(IP, 1));
+                INC(IP, 1);
+                INTVAL(SP, 0) = INTVAL(IP, 0);
+                INC(SP, 1);
+                INC(IP, 1);
                 break;
             case JUMP_OP:
-                DEBUG("JUMP %d", cpu->mem[cpu->IP+1]);
-                cpu->IP++;
-                cpu->IP = cpu->mem[cpu->IP];
+                DEBUG("JUMP %d", INTVAL(IP, 1));
+                cpu->IP = INTVAL(IP, 1);
                 break;
             case JUMPE_OP:
-                DEBUG("JUMPE %d %d", cpu->mem[cpu->SP-1], 
-                        cpu->mem[cpu->IP+1]);
-                cpu->IP++;
-                cpu->SP--;
-                if (!cpu->mem[cpu->SP])
-                    cpu->IP = cpu->mem[cpu->IP];
+                DEBUG("JUMPE %d %d", INTVAL(SP, -1), INTVAL(IP, 1));
+                INC(IP, 1);
+                INC(SP, -1);
+                if (!INTVAL(SP, 0))
+                    cpu->IP = INTVAL(IP,0);
                 else
-                    cpu->IP++;
+                    INC(IP, 1);
                 break;
             case PUSHVAR_OP:
-                temp = cpu->FP + cpu->mem[cpu->IP+1];
-                DEBUG("PUSHVAR %d %d", cpu->mem[cpu->IP+1], cpu->mem[temp]);
-                cpu->IP++;
-                cpu->mem[cpu->SP] = cpu->mem[temp];
-                cpu->SP++;
-                cpu->IP++;
+                temp = cpu->FP + INTVAL(IP, 1);
+                DEBUG("PUSHVAR %d %d", INTVAL(IP, 1), INTABS(temp));
+                INC(IP, 1);
+                INTVAL(SP,0) = INTABS(temp);
+                INC(SP, 1);
+                INC(IP, 1);
                 break;
             case POPVAR_OP:
-                DEBUG("POPVAR %d", cpu->mem[cpu->IP+1]);
-                cpu->IP++;
-                temp = cpu->FP + cpu->mem[cpu->IP];
-                cpu->SP--;
-                cpu->mem[temp] = cpu->mem[cpu->SP];
-                cpu->IP++;
+                DEBUG("POPVAR %d", INTVAL(IP,1));
+                INC(IP, 1);
+                temp = cpu->FP + INTVAL(IP, 0);
+                INC(SP, -1);
+                INTABS(temp) = INTVAL(SP,0);
+                INC(IP,1);
                 break;
             case ADJSP_OP:
-                DEBUG("ADJSP %d", cpu->mem[cpu->IP+1]);
-                cpu->IP++;
-                cpu->SP += cpu->mem[cpu->IP];
-                cpu->IP++;
+                DEBUG("ADJSP %d", INTVAL(IP,1));
+                INC(IP,1);
+                cpu->SP += INTVAL(IP,0);
+                INC(IP,1);
                 break;
-#define ADJSP_OP    -6
         }
     }
 }
