@@ -1,7 +1,9 @@
 TODO
 
+character literals
+isPtr in cDeclNode
+short circuit of && and ||
 char * variables
-++ -- <op>=
 initialization on decls
 arrays
 full semantic checks
@@ -13,6 +15,7 @@ WORKS
 print statements
 expressions
 Unary minus
+++ -- <op>=
 Test of all operators
 if statements (including else)
 while statements

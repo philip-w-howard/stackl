@@ -15,10 +15,11 @@ static int proc_identifier(const char *name);
 %option yylineno
 
 
+apost           [']
 quote           [\"]
 not_quote       [^\"]
 period          ['.']
-whitespace      [' ''\t''\n']
+whitespace      [ \t\n]
 letter          [A-Za-z]
 digit           [0-9]
 punctuation     [(){}\[\];,\.]
@@ -49,6 +50,12 @@ identifier      {letter}({letter}|{digit}|"_")*
 "-="                        RETURN(MINUS_EQ);
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
+"static"                    { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"const"                     { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"volatile"                  { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"break"                     { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"switch"                    { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"case"                      { yylval.string = yytext; RETURN(UNSUPPORTED); }
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
 "for"                       RETURN(FOR);
@@ -65,6 +72,11 @@ identifier      {letter}({letter}|{digit}|"_")*
 "array"                     RETURN(ARRAY);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
+"'q'"                       yylval.int_val = yytext[1]; RETURN(INT_VAL); 
+"'\n'"                      yylval.int_val = '\n'; RETURN(INT_VAL);
+ /* 
+L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
+ */
 {identifier}                RETURN(proc_identifier(yytext));
 .                           RETURN(JUNK_TOKEN);   // discard anything not recognized
 

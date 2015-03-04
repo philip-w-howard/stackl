@@ -92,6 +92,7 @@
 %type <varRef> varref
 %type <varPart> varpart
 %type <string_lit> string_lit
+%token  <string> UNSUPPORTED
 
 %%
 
@@ -116,6 +117,9 @@ decls:      decls decl          { $$ = $1;
 decl:       var_decl ';'        { $$ = $1; }
         |   struct_decl ';'     { $$ = $1; }
         |   array_decl ';'      { $$ = $1; }
+        |   UNSUPPORTED         { semantic_error(std::string($1) + " is not supported");
+                                  YYERROR;
+                                }
         |   error ';'           { $$ = NULL; }
 
 var_decl:   TYPE_ID IDENTIFIER 
