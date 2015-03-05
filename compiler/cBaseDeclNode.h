@@ -17,14 +17,16 @@
 class cBaseDeclNode : public cDeclNode
 {
   public:
-    cBaseDeclNode(cSymbol *id, int size) : cDeclNode()
+    cBaseDeclNode(cSymbol *id, int size, bool isPointer) : cDeclNode()
     {
         mId = id;
         mSize = size;
+        mIsPointer = isPointer;
     }
 
     virtual bool IsInt()   { return true; }
     virtual bool IsType()  { return true; }
+    virtual bool IsPointer() { return mIsPointer; }
 
     virtual int ComputeOffsets(int base) { return base; }
 
@@ -35,5 +37,6 @@ class cBaseDeclNode : public cDeclNode
 
   protected:
     // int mSize;       // declared in cDeclNode base class
+    bool mIsPointer;
 };
 

@@ -106,11 +106,15 @@ cSymbolTable *cSymbolTable::CreateDefaultTable()
 
     sym = new cSymbol("char");
     defaultTable->Insert(sym);
-    sym->SetType(new cBaseDeclNode(sym, 2));
+    sym->SetType(new cBaseDeclNode(sym, 1, false));
+
+    sym = new cSymbol("charp");
+    defaultTable->Insert(sym);
+    sym->SetType(new cBaseDeclNode(sym, 4, true));
 
     sym = new cSymbol("int");
     defaultTable->Insert(sym);
-    sym->SetType(new cBaseDeclNode(sym, 1));
+    sym->SetType(new cBaseDeclNode(sym, 4, false));
 
     return defaultTable;
 }

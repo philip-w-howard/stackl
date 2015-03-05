@@ -5,5 +5,4 @@ int main()
 
     carr[0] = 'x';
     carr[1] = '\n';
-    carr[2] = 300;
 }

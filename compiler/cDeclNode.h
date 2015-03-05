@@ -17,13 +17,14 @@ class cDeclNode : public cAstNode
 
     virtual cDeclNode *GetBaseType() { return this; }
 
-    virtual bool IsType()   { return false; }
-    virtual bool IsFunc()   { return false; }
-    virtual bool IsInt()    { return false; }
-    virtual bool IsStruct() { return false; }
-    virtual bool IsArray()  { return false; }
-    virtual int Size() { return mSize; }
-    virtual int GetOffset() { return mOffset; }
+    virtual bool IsType()       { return false; }
+    virtual bool IsFunc()       { return false; }
+    virtual bool IsInt()        { return false; }
+    virtual bool IsStruct()     { return false; }
+    virtual bool IsArray()      { return false; }
+    virtual bool IsPointer()    { return false; }
+    virtual int Size()          { return mSize; }
+    virtual int GetOffset()     { return mOffset; }
 
     virtual int ComputeOffsets(int base) { return base; }
 

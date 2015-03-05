@@ -30,7 +30,10 @@ class cIntExprNode : public cExprNode
     // The types are found in the symbol table
     virtual cDeclNode *GetType()
     {
-        return symbolTableRoot->Lookup("int")->GetType();
+        if (mIntVal >= -128 && mIntVal <= 127)
+            return symbolTableRoot->Lookup("char")->GetType();
+        else
+            return symbolTableRoot->Lookup("int")->GetType();
     }
 
     virtual std::string toString()

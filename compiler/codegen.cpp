@@ -19,6 +19,7 @@ static std::ofstream Output;
 static int  Next_Label = 1;
 
 static cFixupTable FixupTable;
+#define WORD_SIZE 4
 static int Location = 0;
 
 //*****************************************
@@ -54,7 +55,7 @@ bool FinalizeOutput()
 void EmitInt(int val)
 {
     Output << "D " << val << "\n";
-    Location++;
+    Location += WORD_SIZE;
 }
 //*****************************************
 // Generate a unique label for GOTO statements
@@ -74,7 +75,7 @@ void EmitFixup(int loc, int dest)
 void EmitString(std::string str)
 {
     Output << "S " << str << "\n";
-    Location++;
+    Location += WORD_SIZE;
 }
 //*****************************************
 void SetJumpSource(std::string label)

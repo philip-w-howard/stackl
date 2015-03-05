@@ -2,7 +2,7 @@
 
 typedef struct
 {
-    int *mem;
+    char *mem;
     int IP;
     int SP;
     int FP;

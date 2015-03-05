@@ -5,10 +5,18 @@
 #include "opcodes.h"
 #include "machine.h"
 
+#define WORD_SIZE 4
+#define INTVAL(reg, offset) (*(int *)&(cpu->mem[cpu-> reg + OFFSET(offset)]))
+#define INTABS(loc)         (*(int *)&(cpu->mem[(loc)]))
+#define INC(reg, amount)    cpu-> reg += amount*WORD_SIZE;
+#define OFFSET(v)           (v*WORD_SIZE)
+
+/*
 #define INTVAL(reg, offset) (cpu->mem[cpu-> reg + (offset)])
 #define INTABS(loc)         (cpu->mem[(loc)])
 #define INC(reg, amount)    cpu-> reg += amount;
 #define OFFSET(v)           (v)
+*/
 
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;

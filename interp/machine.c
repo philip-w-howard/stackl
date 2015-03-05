@@ -4,7 +4,8 @@
 #include "opcodes.h"
 
 #define MEMORY_SIZE  10000
-int Memory[MEMORY_SIZE];
+#define WORD_SIZE 4
+char Memory[MEMORY_SIZE];
 Machine_State Regs;
 
 char *format_string(char *str)
@@ -74,7 +75,8 @@ int Load_And_Go(const char *filename)
         {
             case 'D':
                 fscanf(input, "%d", &value);
-                Memory[byte++] = value;
+                *(int *)(&Memory[byte]) = value;
+                byte += WORD_SIZE;
                 break;
             case 'F':
                 fscanf(input, "%d %d", &loc, &value);
@@ -82,7 +84,7 @@ int Load_And_Go(const char *filename)
                 {
                     fprintf(stderr, "File format error: fixup record precedes data\n");
                 }
-                Memory[loc] = value;
+                *(int *)(&Memory[loc]) = value;
                 break;
             case 'S':
                 fgets(string, sizeof(string), input);
@@ -97,11 +99,11 @@ int Load_And_Go(const char *filename)
                 slen = strlen(sptr);
 
                 // +4 instead of +3 to accomodate the null byte
-                heap_top -= ((slen+4)/4 + 1);
+                heap_top -= ((slen+4)/4)*WORD_SIZE;
 
                 strcpy((char *)&Memory[heap_top], sptr);
-                Memory[byte] = heap_top;
-                byte++;
+                *(int *)(&Memory[byte]) = heap_top;
+                byte += WORD_SIZE;
                 break;
             default:
                 fprintf(stderr, "File format error: Unrecognized record type\n");
