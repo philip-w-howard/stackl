@@ -19,7 +19,6 @@
     cDeclNode*          decl;
     cVarDeclNode*       varDecl;
     cStructDeclNode*    structDecl;
-    cArrayDeclNode*     arrayDecl;
     cFuncDeclNode*      funcDecl;
     cParamsSpecNode*    paramsSpec;
     cArraySpecNode*     arraySpec;
@@ -68,7 +67,6 @@
 %type <decl> decl
 %type <varDecl> var_decl
 %type <structDecl> struct_decl
-%type <arrayDecl> array_decl
 %type <decls> func_decls
 %type <funcDecl> func_decl
 %type <funcDecl> func_header
@@ -117,7 +115,6 @@ decls:      decls decl          { $$ = $1;
 
 decl:       var_decl ';'        { $$ = $1; }
         |   struct_decl ';'     { $$ = $1; }
-        |   array_decl ';'      { $$ = $1; }
         |   UNSUPPORTED         { semantic_error(std::string($1) + " is not supported");
                                   YYERROR;
                                 }
@@ -125,7 +122,9 @@ decl:       var_decl ';'        { $$ = $1; }
 
 var_decl:   TYPE_ID IDENTIFIER 
                                 { $$ = new cVarDeclNode($1, $2); }
-        |   CHAR '*' IDENTIFIER { $$ = new cVarDeclNode($1, $3); }
+        |   CHAR '*' IDENTIFIER { $$ = new cVarDeclNode(
+                                        symbolTableRoot->Lookup("charp"),
+                                        $3); }
         |   CHAR IDENTIFIER arrayspec
                                 { 
                                     cSymbol *sym = new cSymbol("carray");
@@ -137,8 +136,6 @@ var_decl:   TYPE_ID IDENTIFIER
 
 struct_decl:  STRUCT open decls close IDENTIFIER    
                                 { $$ = new cStructDeclNode($2, $3, $5); }
-array_decl:   ARRAY  TYPE_ID IDENTIFIER arrayspec
-                                { $$ = new cArrayDeclNode($2, $3, $4); }
 func_decls: func_decls func_decl { 
                                    $$ = $1;
                                    $$->AddNode($2);
@@ -185,11 +182,13 @@ paramsspec:
 
 paramspec:  var_decl            { $$ = $1;}
 
+ /*
 arrayspec:  arrayspec '[' INT_VAL ']'
                             {
                                 $$ = $1;
                                 $1->AddNode($3);
                             }
+ */
 arrayspec:  '[' INT_VAL ']' { $$ = new cArraySpecNode($2); }
 
 stmts:      stmts stmt          { $$ = $1; 

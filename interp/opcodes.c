@@ -151,10 +151,11 @@ void Execute(Machine_State *cpu)
                 INC(IP, 1);
                 break;
             case PRINTS_OP:
-                temp = INTVAL(IP, 1);
+                temp = INTVAL(SP, -1);
                 DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
                 printf("%s", (char *)(&cpu->mem[temp]));
-                INC(IP, 2);
+                INC(SP, -1);
+                INC(IP, 1);
                 break;
             case DUP_OP:
                 DEBUG("DUP");

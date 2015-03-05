@@ -1,10 +1,17 @@
 TODO
 
+arrays
+    compute offset and codegen to handle arrayref
+assignment to charp vars
+    string_lit
+    arrays
+    array cell address
+pointer arithmetic
+address-of operator
+
+initialization on decls
 isPtr in cDeclNode
 short circuit of && and ||
-char * variables
-initialization on decls
-arrays
 full semantic checks
 make opcodes an enum?
 proper command line argument processing for stackl

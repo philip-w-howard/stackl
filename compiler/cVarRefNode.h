@@ -119,8 +119,12 @@ class cVarRefNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        EmitInt(PUSHVAR_OP);
-        EmitInt(mOffset);
+        if (mDepthDecl->IsArray())
+        {
+        } else {
+            EmitInt(PUSHVAR_OP);
+            EmitInt(mOffset);
+        }
     }
 
   protected:

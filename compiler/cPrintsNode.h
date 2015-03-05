@@ -36,8 +36,9 @@ class cPrintsNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        EmitInt(PRINTS_OP);
+        EmitInt(PUSH_OP);
         mStr->GenerateCode();
+        EmitInt(PRINTS_OP);
     }
   protected:
     cStringLitNode *mStr;       // string to be printed

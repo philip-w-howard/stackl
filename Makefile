@@ -7,6 +7,7 @@ clean:
 	$(MAKE) -C interp clean
 	rm -f stackl
 	rm -f stacklc
+	rm -f out
 
 compiler:
 	$(MAKE) -C compiler
