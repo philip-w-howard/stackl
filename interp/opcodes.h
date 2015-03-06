@@ -23,6 +23,9 @@
 #define RETURN_OP   19
 #define RETURNV_OP  20
 #define NEG_OP      21
+#define PUSHCVARIND_OP  22
+#define POPCVARIND_OP   23
+#define PRINTC_OP   24
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2
@@ -31,6 +34,8 @@
 #define POPVAR_OP   -5
 #define ADJSP_OP    -6
 #define CALL_OP     -7
+#define PUSHCVAR_OP -8
+#define POPCVAR_OP  -9
 
 void Execute(Machine_State *machine);
 void Enable_Debug();

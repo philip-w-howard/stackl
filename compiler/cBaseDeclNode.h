@@ -24,6 +24,7 @@ class cBaseDeclNode : public cDeclNode
         mIsPointer = isPointer;
     }
 
+    virtual bool IsChar()  { return (mSize==1); }
     virtual bool IsInt()   { return true; }
     virtual bool IsType()  { return true; }
     virtual bool IsPointer() { return mIsPointer; }

@@ -117,11 +117,38 @@ class cVarRefNode : public cExprNode
         return result;
     }
 
+    void EmitOffset()
+    {
+        cVarPartNode *last = mList->back();
+
+        if (last->IsArrayRef())
+        {
+            cArrayValNode *index = last->GetArrayVal();
+            EmitInt(PUSH_OP);
+            EmitInt(mSize);
+            index->GetIndex(0)->GenerateCode();
+            EmitInt(TIMES_OP);
+            EmitInt(PUSH_OP);
+            EmitInt(mOffset);
+            EmitInt(PLUS_OP);
+        }
+        else
+        {
+            EmitInt(mOffset);
+        }
+    }
+
     virtual void GenerateCode()
     {
-        if (mDepthDecl->IsArray())
+        cVarPartNode *last = mList->back();
+
+        if (last->IsArrayRef())
         {
-        } else {
+            EmitOffset();
+            EmitInt(PUSHCVARIND_OP);
+        } 
+        else 
+        {
             EmitInt(PUSHVAR_OP);
             EmitInt(mOffset);
         }

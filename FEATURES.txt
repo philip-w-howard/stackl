@@ -1,7 +1,5 @@
 TODO
 
-arrays
-    compute offset and codegen to handle arrayref
 assignment to charp vars
     string_lit
     arrays
@@ -18,7 +16,8 @@ proper command line argument processing for stackl
 
 WORKS
 
-can declare char * vars and char[] vars, but can't do anything with them yet
+can declare char * vars and char[] 
+can access individual chars in a char array
 character literals
 print statements
 expressions

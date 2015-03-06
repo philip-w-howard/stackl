@@ -51,6 +51,11 @@ class cArrayDeclNode : public cDeclNode
         return base;
     }
 
+    virtual int NumElements()
+    {
+        return mArraySpec->NumElements();
+    }
+
     virtual std::string toString()
     {
         std::string result("ARRAY: ");

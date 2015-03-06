@@ -49,7 +49,7 @@
 %token <symbol>    CHAR
 
 %token  ARRAY
-%token  SCAN PRINT
+%token  SCAN PRINT PRINTC
 %token  FOR WHILE IF ELSE 
 %token  STRUCT
 %token  RETURN
@@ -208,6 +208,8 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cPrintNode($3); }
         |   PRINT '(' string_lit ')' ';'
                                 { $$ = new cPrintsNode($3); }
+        |   PRINTC '(' expr ')' ';'
+                                { $$ = new cPrintcNode($3); }
         |   SCAN '(' lval ')' ';'
                                 { $$ = new cScanNode($3); }
         |   assign ';'          { $$ = $1; }

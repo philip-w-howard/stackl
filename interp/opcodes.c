@@ -14,7 +14,7 @@
 /*
 #define INTVAL(reg, offset) (cpu->mem[cpu-> reg + (offset)])
 #define INTABS(loc)         (cpu->mem[(loc)])
-#define INC(reg, amount)    cpu-> reg += amount;
+#define INC(reg, amount)    cpu-> reg += amount
 #define OFFSET(v)           (v)
 */
 
@@ -157,6 +157,12 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
+            case PRINTC_OP:
+                DEBUG("PRINTC %s", INTVAL(SP, -1));
+                printf("%c", INTVAL(SP, -1));
+                INC(SP, -1);
+                INC(IP, 1);
+                break;
             case DUP_OP:
                 DEBUG("DUP");
                 INTVAL(SP, 0) = INTVAL(SP, -1);
@@ -214,6 +220,19 @@ void Execute(Machine_State *cpu)
                 else
                     INC(IP, 1);
                 break;
+            case PUSHCVARIND_OP:
+                temp = cpu->FP + INTVAL(SP, -1);
+                DEBUG("PUSHCVARIND %d %d", INTVAL(SP, -1), cpu->mem[temp]);
+                cpu->mem[cpu->SP-OFFSET(1)] = cpu->mem[temp];
+                INC(IP, 1);
+                break;
+            case POPCVARIND_OP:
+                temp = cpu->FP + INTVAL(SP, -1);
+                DEBUG("POPCVARIND %d %d", INTVAL(SP, -2), INTVAL(SP, -1));
+                cpu->mem[temp] = INTVAL(SP, -2);
+                INC(SP, -2);
+                INC(IP, 1);
+                break;
             case PUSHVAR_OP:
                 temp = cpu->FP + INTVAL(IP, 1);
                 DEBUG("PUSHVAR %d %d", INTVAL(IP, 1), INTABS(temp));
@@ -229,6 +248,20 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INTABS(temp) = INTVAL(SP,0);
                 INC(IP,1);
+                break;
+            case PUSHCVAR_OP:
+                temp = cpu->FP + INTVAL(IP, 1);
+                DEBUG("PUSHCVAR %d %d", INTVAL(IP, 1), cpu->mem[temp]);
+                cpu->mem[cpu->SP] = cpu->mem[temp];
+                INC(SP, 1);
+                INC(IP, 2);
+                break;
+            case POPCVAR_OP:
+                DEBUG("POPVVAR %d", INTVAL(IP,1));
+                temp = cpu->FP + INTVAL(IP, 1);
+                INC(SP, -1);
+                cpu->mem[temp] = cpu->mem[cpu->SP];
+                INC(IP,2);
                 break;
             case ADJSP_OP:
                 DEBUG("ADJSP %d", INTVAL(IP,1));

@@ -51,12 +51,25 @@ class cAssignNode : public cStmtNode
     virtual void GenerateCode()
     {
         mExpr->GenerateCode();
-        EmitInt(POPVAR_OP);
-        EmitInt(mLval->GetOffset());
+        if (mLval->GetType()->IsArray())
+        {
+            mLval->EmitOffset();
+            // we can only do char arrays at this point
+            assert (mLval->GetType()->GetBaseType()->IsChar());
+            EmitInt(POPCVARIND_OP);
+        }
+        else
+        {
+            if (mLval->GetType()->GetBaseType()->IsChar())
+                EmitInt(POPCVAR_OP);
+            else
+                EmitInt(POPVAR_OP);
+            mLval->EmitOffset();
+        }
     }
 
   protected:
     cExprNode *mExpr;       // the rhs of the assignment
-    cVarRefNode *mLval;     // the lhs of the assignment`
+    cVarRefNode *mLval;     // the lhs of the assignment
 };
 

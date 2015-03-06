@@ -50,6 +50,7 @@ class cVarPartNode : public cAstNode
     cDeclNode *GetField() { return mFieldDecl; }
 
     bool IsArrayRef() { return mArrayPart != NULL; }
+    cArrayValNode *GetArrayVal() { return mArrayPart; }
 
     std::string Name() { return mId->Name(); }
 

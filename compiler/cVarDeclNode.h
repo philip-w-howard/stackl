@@ -14,6 +14,7 @@
 #include "cAstNode.h"
 #include "cDeclNode.h"
 #include "cStructDeclNode.h"
+#include "cArrayDeclNode.h"
 #include "cSymbol.h"
 
 #include "parse.h"
@@ -54,14 +55,14 @@ class cVarDeclNode : public cDeclNode
     virtual int ComputeOffsets(int base)
     {
         mOffset = base;
-        mSize = mType->Size();
+        mSize = ComputeSize();
 
         return mOffset+mSize;
     }
 
     virtual int ComputeNegOffsets(int base)
     {
-        mSize = mType->Size();
+        mSize = ComputeSize();
         mOffset = base - mSize;
 
         return mOffset;
@@ -84,5 +85,23 @@ class cVarDeclNode : public cDeclNode
   protected:
     cDeclNode *mType;   // the type for the decl
                         // NOTE: this class inherits members from cDeclNode
+
+    int ComputeSize()
+    {
+        int size;
+
+        if (mType->IsArray())
+        {
+            size = mType->GetBaseType()->Size();
+            cArrayDeclNode *array = dynamic_cast<cArrayDeclNode *>(mType);
+            size *= array->NumElements();
+            size = ((size + WORD_SIZE - 1)/WORD_SIZE) * WORD_SIZE;
+        }
+        else
+        {
+            size = mType->Size();
+        }
+        return size;
+    }
 };
 

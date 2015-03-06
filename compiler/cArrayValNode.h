@@ -39,6 +39,11 @@ class cArrayValNode: public cAstNode
         return mList->size();
     }
 
+    cExprNode *GetIndex(int index)
+    {
+        return mList->front();
+    }
+
     virtual std::string toString()
     {
         std::string result("(ARRAYVAL:");
