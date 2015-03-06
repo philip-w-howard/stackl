@@ -29,6 +29,9 @@ class cBaseDeclNode : public cDeclNode
     virtual bool IsType()  { return true; }
     virtual bool IsPointer() { return mIsPointer; }
 
+    // NOTE charp is only pointer for now
+    virtual bool IsString() { return IsPointer(); }
+
     virtual int ComputeOffsets(int base) { return base; }
 
     virtual std::string toString()

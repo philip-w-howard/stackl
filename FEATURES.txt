@@ -1,10 +1,8 @@
 TODO
 
 assignment to charp vars
-    string_lit
     arrays
     array cell address
-pointer arithmetic
 address-of operator
 
 initialization on decls
@@ -16,8 +14,10 @@ proper command line argument processing for stackl
 
 WORKS
 
+assign cptr to string_lit
 can declare char * vars and char[] 
 can access individual chars in a char array
+pointer arithmetic
 character literals
 print statements
 expressions

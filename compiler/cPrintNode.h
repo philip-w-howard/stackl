@@ -39,7 +39,12 @@ class cPrintNode : public cStmtNode
     virtual void GenerateCode()
     {
         mExpr->GenerateCode();
-        EmitInt(PRINT_OP);
+        if (mExpr->GetType()->IsChar())
+            EmitInt(PRINTC_OP);
+        else if (mExpr->GetType()->IsString())
+            EmitInt(PRINTS_OP);
+        else
+            EmitInt(PRINT_OP);
     }
   protected:
     cExprNode *mExpr;       // expression to be printed

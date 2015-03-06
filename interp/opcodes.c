@@ -158,7 +158,7 @@ void Execute(Machine_State *cpu)
                 INC(IP, 1);
                 break;
             case PRINTC_OP:
-                DEBUG("PRINTC %s", INTVAL(SP, -1));
+                DEBUG("PRINTC %c", INTVAL(SP, -1));
                 printf("%c", INTVAL(SP, -1));
                 INC(SP, -1);
                 INC(IP, 1);

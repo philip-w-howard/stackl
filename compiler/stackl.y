@@ -207,7 +207,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   PRINT '(' expr ')' ';'
                                 { $$ = new cPrintNode($3); }
         |   PRINT '(' string_lit ')' ';'
-                                { $$ = new cPrintsNode($3); }
+                                { $$ = new cPrintNode($3); }
         |   PRINTC '(' expr ')' ';'
                                 { $$ = new cPrintcNode($3); }
         |   SCAN '(' lval ')' ';'
@@ -218,7 +218,8 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   error ';'           { $$ = NULL; }
 
-assign: lval '=' expr           { $$ = new cAssignNode($1, $3); }
+assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
+        | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }
         | lval PLUS_EQ expr     { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '+', $3));
                                 }

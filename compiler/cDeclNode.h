@@ -21,6 +21,7 @@ class cDeclNode : public cAstNode
     virtual bool IsFunc()       { return false; }
     virtual bool IsChar()       { return false; }
     virtual bool IsInt()        { return false; }
+    virtual bool IsString()     { return false; }
     virtual bool IsStruct()     { return false; }
     virtual bool IsArray()      { return false; }
     virtual bool IsPointer()    { return false; }

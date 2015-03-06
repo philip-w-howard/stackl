@@ -13,4 +13,10 @@ int main()
     printc(carr[0]);
     printc(carr[1]);
     print("The end\n");
+
+    cptr = "this is a cptr\n";
+    print(cptr);
+
+    cptr += 5;
+    print(cptr);
 }
