@@ -25,6 +25,7 @@ class cDeclNode : public cAstNode
     virtual bool IsStruct()     { return false; }
     virtual bool IsArray()      { return false; }
     virtual bool IsPointer()    { return false; }
+    virtual bool IsAbsolute()   { return false; }
     virtual int Size()          { return mSize; }
     virtual int GetOffset()     { return mOffset; }
 
@@ -36,6 +37,7 @@ class cDeclNode : public cAstNode
         cDeclNode *right = other->GetBaseType();
 
         if (left == right) return true;
+        if (left->IsPointer() && right->IsArray()) return true;
         if (left->IsInt() && right->IsInt() && left->Size() >= right->Size()) 
             return true;
 

@@ -151,6 +151,13 @@ void Execute(Machine_State *cpu)
                 INC(IP, 1);
                 break;
             case PRINTS_OP:
+                temp = cpu->FP + INTVAL(SP, -1);
+                DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
+                printf("%s", (char *)(&cpu->mem[temp]));
+                INC(SP, -1);
+                INC(IP, 1);
+                break;
+            case PRINTSA_OP:
                 temp = INTVAL(SP, -1);
                 DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
                 printf("%s", (char *)(&cpu->mem[temp]));
@@ -204,6 +211,12 @@ void Execute(Machine_State *cpu)
                 DEBUG("PUSH %d", INTVAL(IP, 1));
                 INC(IP, 1);
                 INTVAL(SP, 0) = INTVAL(IP, 0);
+                INC(SP, 1);
+                INC(IP, 1);
+                break;
+            case PUSHFP_OP:
+                DEBUG("PUSHFP %d", cpu->FP);
+                INTVAL(SP, 0) = cpu->FP;
                 INC(SP, 1);
                 INC(IP, 1);
                 break;

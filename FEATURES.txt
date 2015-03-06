@@ -1,7 +1,12 @@
 TODO
 
+type taxonomy
+    int
+    char *       isPointer
+    char []      isArray
+    string_lit   isAbsolute
+
 assignment to charp vars
-    arrays
     array cell address
 address-of operator
 

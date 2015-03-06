@@ -15,7 +15,7 @@ class cStringLitNode : public cExprNode
 
     virtual cDeclNode *GetType()
     {
-        return symbolTableRoot->Lookup("charp")->GetType();
+        return symbolTableRoot->Lookup("cconst")->GetType();
     }
 
     void GenerateCode()

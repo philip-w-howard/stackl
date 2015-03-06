@@ -13,6 +13,7 @@
 
 #include "cStmtNode.h"
 #include "cExprNode.h"
+#include "cDeclNode.h"
 #include "codegen.h"
 
 class cPrintNode : public cStmtNode
@@ -38,10 +39,12 @@ class cPrintNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        cDeclNode *type = mExpr->GetType();
+
         mExpr->GenerateCode();
-        if (mExpr->GetType()->IsChar())
-            EmitInt(PRINTC_OP);
-        else if (mExpr->GetType()->IsString())
+        if (type->IsAbsolute() || type->IsPointer())
+            EmitInt(PRINTSA_OP);
+        else if (type->IsArray())
             EmitInt(PRINTS_OP);
         else
             EmitInt(PRINT_OP);

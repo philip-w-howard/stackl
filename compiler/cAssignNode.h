@@ -50,7 +50,19 @@ class cAssignNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        mExpr->GenerateCode();
+        if (mLval->GetType()->IsPointer() && mExpr->GetType()->IsArray())
+        {
+            EmitInt(PUSH_OP);
+            cVarRefNode *var = dynamic_cast<cVarRefNode *>(mExpr);
+            var->EmitOffset();
+            EmitInt(PUSHFP_OP);
+            EmitInt(PLUS_OP);
+        }
+        else
+        {
+            mExpr->GenerateCode();
+        }
+
         if (mLval->GetType()->IsArray())
         {
             mLval->EmitOffset();

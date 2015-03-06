@@ -26,6 +26,8 @@
 #define PUSHCVARIND_OP  22
 #define POPCVARIND_OP   23
 #define PRINTC_OP   24
+#define PRINTSA_OP  25
+#define PUSHFP_OP   26
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2

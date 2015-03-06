@@ -19,4 +19,15 @@ int main()
 
     cptr += 5;
     print(cptr);
+
+    cptr = carr1;
+    carr1[0] = 'h';
+    carr1[1] = 'e';
+    carr1[2] = 'l';
+    carr1[3] = 'l';
+    carr1[4] = 'o';
+    carr1[5] = '\n';
+    carr1[6] = 0;
+
+    print(cptr);
 }
