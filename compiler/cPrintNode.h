@@ -45,7 +45,7 @@ class cPrintNode : public cStmtNode
         if (type->IsAbsolute() || type->IsPointer())
             EmitInt(PRINTSA_OP);
         else if (type->IsArray())
-            EmitInt(PRINTS_OP);
+            EmitInt(PRINTSA_OP);
         else
             EmitInt(PRINT_OP);
     }

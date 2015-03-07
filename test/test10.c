@@ -1,7 +1,3 @@
-// strcpy
-// strncpy
-// strchr
-//
 int strlen(char *str)
 {
     int count;
@@ -15,7 +11,7 @@ int strlen(char *str)
     return count;
 }
 
-int strcpy(char *dest, char *src)
+char * strcpy(char *dest, char *src)
 {
     int count;
     count = 0;
@@ -29,7 +25,7 @@ int strcpy(char *dest, char *src)
     return dest;
 }
 
-int strncpy(char *dest, char *src, int size)
+char * strncpy(char *dest, char *src, int size)
 {
     int count;
     count = 0;
@@ -46,7 +42,7 @@ int strncpy(char *dest, char *src, int size)
     return dest;
 }
 
-int strchr(char *haystack, int needle)
+char * strchr(char *haystack, int needle)
 {
     while (haystack[0] != needle)
     {
@@ -60,20 +56,17 @@ int main()
 {
     char *ptr;
     char array[10];
-    ptr = "12345";
+    ptr = "1234\n";
 
     print( strlen(ptr) );
     strcpy(array, ptr);
-    print( strlen(array) );
+    print( array );
 
     array[6] = '\n';
     array[7] = 0;
     ptr = "this is a test";
     strncpy(array, ptr, 6);
-    print(ptr);
     print(array);
-    ptr = array;
-    print(ptr);
 
     ptr = "abcdefghij\n";
     ptr = strchr(ptr, 'f');

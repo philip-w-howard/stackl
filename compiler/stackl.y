@@ -48,7 +48,6 @@
 %token <string>    STRING_LIT
 %token <symbol>    CHAR
 
-%token  ARRAY
 %token  SCAN PRINT PRINTC
 %token  FOR WHILE IF ELSE 
 %token  STRUCT
@@ -171,6 +170,12 @@ func_header:  func_prefix paramsspec ')'
                           }
 func_prefix: TYPE_ID IDENTIFIER '('
                           { $$ = new cFuncDeclNode($1, $2);
+                            symbolTableRoot->IncreaseScope(); 
+                          }
+func_prefix: CHAR '*' IDENTIFIER '('
+                          { $$ = new cFuncDeclNode(
+                                        symbolTableRoot->Lookup("charp"),
+                                        $3);
                             symbolTableRoot->IncreaseScope(); 
                           }
 paramsspec:     

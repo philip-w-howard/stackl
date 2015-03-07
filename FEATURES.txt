@@ -1,8 +1,5 @@
 TODO
 
-print(array) seems broken
-char * functions
-
 charp vars as arrays
 
 assignment to charp vars
