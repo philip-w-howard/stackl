@@ -159,7 +159,7 @@ void Execute(Machine_State *cpu)
                 break;
             case PRINTSA_OP:
                 temp = INTVAL(SP, -1);
-                DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
+                DEBUG("PRINTSA %s", (char *)(&cpu->mem[temp]));
                 printf("%s", (char *)(&cpu->mem[temp]));
                 INC(SP, -1);
                 INC(IP, 1);
@@ -234,14 +234,15 @@ void Execute(Machine_State *cpu)
                     INC(IP, 1);
                 break;
             case PUSHCVARIND_OP:
-                temp = cpu->FP + INTVAL(SP, -1);
+                temp = INTVAL(SP, -1);
                 DEBUG("PUSHCVARIND %d %d", INTVAL(SP, -1), cpu->mem[temp]);
-                cpu->mem[cpu->SP-OFFSET(1)] = cpu->mem[temp];
+                INTVAL(SP,-1) = cpu->mem[temp];
+                //cpu->mem[cpu->SP-OFFSET(1)] = cpu->mem[temp];
                 INC(IP, 1);
                 break;
             case POPCVARIND_OP:
-                temp = cpu->FP + INTVAL(SP, -1);
                 DEBUG("POPCVARIND %d %d", INTVAL(SP, -2), INTVAL(SP, -1));
+                temp = INTVAL(SP, -1);
                 cpu->mem[temp] = INTVAL(SP, -2);
                 INC(SP, -2);
                 INC(IP, 1);

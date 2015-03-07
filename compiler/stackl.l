@@ -70,7 +70,6 @@ identifier      {letter}({letter}|{digit}|"_")*
                               RETURN(CHAR);
                             }
 "struct"                    RETURN(STRUCT);
-"array"                     RETURN(ARRAY);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
 "'"."'"                       yylval.int_val = yytext[1]; RETURN(INT_VAL); 

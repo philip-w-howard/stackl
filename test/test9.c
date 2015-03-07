@@ -4,14 +4,15 @@ int main()
     char carr[20];
     char carr1[51];
 
+    cptr = carr;
     carr[0] = 'x';
-    carr[1] = '\n';
-    printc(carr[0]);
-    printc(carr[0]);
-    printc(carr[1]);
-    printc(carr[0]);
+    cptr[1] = 'x';
+    carr[2] = '\n';
+    carr[3] = 0;
     printc(carr[0]);
     printc(carr[1]);
+    printc(carr[2]);
+    print(cptr);
     print("The end\n");
 
     cptr = "this is a cptr\n";

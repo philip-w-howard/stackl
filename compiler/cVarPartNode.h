@@ -27,7 +27,7 @@ class cVarPartNode : public cAstNode
         mDecl = mId->GetType();
     }
 
-    // return the declaration for this item`
+    // return the declaration for this item
     virtual cDeclNode *GetDecl()
     {
         return mDecl;

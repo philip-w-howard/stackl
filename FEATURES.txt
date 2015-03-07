@@ -1,17 +1,15 @@
 TODO
 
-type taxonomy
-    int
-    char *       isPointer
-    char []      isArray
-    string_lit   isAbsolute
+print(array) seems broken
+char * functions
+
+charp vars as arrays
 
 assignment to charp vars
     array cell address
 address-of operator
 
 initialization on decls
-isPtr in cDeclNode
 short circuit of && and ||
 full semantic checks
 make opcodes an enum?
@@ -39,4 +37,10 @@ functions in expressions
 function parameters
 strings literals
 prints
+
+type taxonomy
+    int
+    char *       isPointer
+    char []      isArray
+    string_lit   isAbsolute
 
