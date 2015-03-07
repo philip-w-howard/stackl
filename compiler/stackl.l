@@ -7,6 +7,7 @@
 #define RETURN(a) return Return(a);
 static int Return(int val);
 static int proc_identifier(const char *name);
+static void open_input(char *name);
 
 %}
 
@@ -14,6 +15,10 @@ static int proc_identifier(const char *name);
 %option nounput
 %option yylineno
 
+/* the "incl" state is used for picking up the name
+   * of an include file
+   */
+%x incl
 
 apost           [']
 quote           [\"]
@@ -30,6 +35,22 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "//"(.)*$                   {}
 {whitespace}+               {}
+"#include"          BEGIN(incl);
+<incl>[ \t]*      /* eat the whitespace */
+<incl>[^ \t\n]+   { /* got the include file name */
+                    open_input(yytext);
+                    BEGIN(INITIAL);
+                  }
+
+<<EOF>>           {
+                    yypop_buffer_state();
+
+                    if ( !YY_CURRENT_BUFFER )
+                    {
+                        yyterminate();
+                    }
+                  }
+
 {quote}{not_quote}*{quote}  {
                                 yylval.string = yytext;
                                 RETURN(STRING_LIT);
@@ -98,4 +119,29 @@ static int proc_identifier(const char *name)
     if (yylval.symbol->GetType()->IsType()) RETURN(TYPE_ID);
 
     RETURN(IDENTIFIER);
+}
+static void open_input(char *name)
+{
+    char *ptr;
+    if (*name == '"')
+    {
+        ptr = strrchr(name, '"');
+        if (ptr != NULL) *ptr = 0;
+        name++;
+    }
+    else if (*name == '<')
+    {
+        ptr = strrchr(name, '>');
+        if (ptr != NULL) *ptr = 0;
+        name++;
+    }
+
+    yyin = fopen( name, "r" );
+
+    if ( ! yyin )
+    {
+        printf("Error opening %s\n", yytext);
+    } else {
+        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+    }
 }

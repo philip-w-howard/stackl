@@ -1,5 +1,7 @@
 TODO
 
+string_lit as function arg
+
 charp vars as arrays
 
 assignment to charp vars
@@ -14,6 +16,7 @@ proper command line argument processing for stackl
 
 WORKS
 
+include files
 assign cptr to string_lit
 can declare char * vars and char[] 
 can access individual chars in a char array
