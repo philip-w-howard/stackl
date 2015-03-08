@@ -48,7 +48,8 @@
 %token <string>    STRING_LIT
 %token <symbol>    CHAR
 
-%token  SCAN PRINT PRINTC
+%token  PRINT PRINTC
+%token  GETS GETL GETI
 %token  FOR WHILE IF ELSE 
 %token  STRUCT
 %token  RETURN
@@ -215,8 +216,12 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cPrintNode($3); }
         |   PRINTC '(' expr ')' ';'
                                 { $$ = new cPrintcNode($3); }
-        |   SCAN '(' lval ')' ';'
-                                { $$ = new cScanNode($3); }
+        |   GETS '(' lval ')' ';'
+                                { $$ = new cScanNode($3, 'S'); }
+        |   GETL '(' lval ')' ';'
+                                { $$ = new cScanNode($3, 'L'); }
+        |   GETI '(' lval ')' ';'
+                                { $$ = new cScanNode($3, 'I'); }
         |   assign ';'          { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }

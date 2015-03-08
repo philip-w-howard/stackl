@@ -16,7 +16,7 @@
 #define AND_OP      12
 #define OR_OP       13
 #define PRINT_OP    14
-#define PRINTS_OP   15
+//#define PRINTS_OP   15
 #define DUP_OP      16
 #define HALT_OP     17
 #define POP_OP      18
@@ -28,6 +28,9 @@
 #define PRINTC_OP   24
 #define PRINTSA_OP  25
 #define PUSHFP_OP   26
+#define GETS_OP     27
+#define GETL_OP     28
+#define GETI_OP     29
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2

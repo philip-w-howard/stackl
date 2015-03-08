@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -150,6 +151,7 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
+    /*
             case PRINTS_OP:
                 temp = cpu->FP + INTVAL(SP, -1);
                 DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
@@ -157,6 +159,7 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
+    */
             case PRINTSA_OP:
                 temp = INTVAL(SP, -1);
                 DEBUG("PRINTSA %s", (char *)(&cpu->mem[temp]));
@@ -282,6 +285,28 @@ void Execute(Machine_State *cpu)
                 INC(IP,1);
                 cpu->SP += INTVAL(IP,0);
                 INC(IP,1);
+                break;
+            case GETS_OP:
+                DEBUG("GETS %d", INTVAL(SP,-1));
+                scanf("%s", &cpu->mem[INTVAL(SP,-1)]);
+                INC(SP, -1);
+                INC(IP,1);
+                break;
+            case GETL_OP:
+                DEBUG("GETL %d", INTVAL(SP,-1));
+                gets(&cpu->mem[INTVAL(SP,-1)]);
+                INC(SP, -1);
+                INC(IP,1);
+                break;
+            case GETI_OP:
+                DEBUG("GETI %d", INTVAL(SP,-1));
+                scanf("%d", (int *)&cpu->mem[INTVAL(SP,-1)]);
+                INC(SP, -1);
+                INC(IP,1);
+                break;
+            default:
+                printf("Illegal instruction at %d\n", cpu->IP);
+                exit(-1);
                 break;
         }
     }

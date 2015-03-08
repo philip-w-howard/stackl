@@ -1,5 +1,8 @@
 TODO
 
+ComputeOffsets doesn't seem to be invoked on carray's
+geti
+
 string_lit as function arg
 
 charp vars as arrays
@@ -13,9 +16,11 @@ short circuit of && and ||
 full semantic checks
 make opcodes an enum?
 proper command line argument processing for stackl
+file extension processing for stacklc
 
 WORKS
 
+gets getl
 include files
 assign cptr to string_lit
 can declare char * vars and char[] 

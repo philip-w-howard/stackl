@@ -8,6 +8,8 @@ int main(int argc, char **argv)
 {
     int result;
 
+    //printf("stackl Beta %s %s\n", __DATE__, __TIME__);
+
     if (argc < 2) 
     {
         printf("Need to specify an executable file\n");

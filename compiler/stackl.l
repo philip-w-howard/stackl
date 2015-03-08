@@ -83,7 +83,9 @@ identifier      {letter}({letter}|{digit}|"_")*
 "while"                     RETURN(WHILE);
 "print"                     RETURN(PRINT);
 "printc"                    RETURN(PRINTC);
-"scan"                      RETURN(SCAN);
+"gets"                      RETURN(GETS);
+"getl"                      RETURN(GETL);
+"geti"                      RETURN(GETI);
 "int"                       { yylval.symbol = symbolTableRoot->Lookup("int");
                               RETURN(TYPE_ID);
                             }

@@ -79,6 +79,10 @@ class cVarRefNode : public cExprNode
 
     std::string Name() { return mName; }
 
+    virtual bool IsArrayRef()
+    {
+        return mList->back()->IsArrayRef();
+    }
     virtual int ComputeOffsets(int base)
     {
         list<cVarPartNode *>::iterator it = mList->begin();
