@@ -1,7 +1,8 @@
 TODO
 
+Undetected syntax errors
+
 ComputeOffsets doesn't seem to be invoked on carray's
-geti
 
 string_lit as function arg
 
@@ -20,7 +21,7 @@ file extension processing for stacklc
 
 WORKS
 
-gets getl
+gets getl geti
 include files
 assign cptr to string_lit
 can declare char * vars and char[] 

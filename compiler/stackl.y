@@ -37,7 +37,7 @@
     int yyerror(const char *msg);
     int semantic_error(std::string msg);
 
-    cAstNode *yyast_root;
+    cAstNode *yyast_root = NULL;
 %}
 
 %start  program
@@ -58,6 +58,7 @@
 %token  AND OR
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
+%token  END
 
 %type <decls> program
 %type <block> block
@@ -95,12 +96,16 @@
 
 %%
 
-program: func_decls             { $$ = $1; 
-                                  yyast_root = $$;
+program: func_decls END         { $$ = $1; 
                                   if (yynerrs == 0)
+                                  {
+                                      yyast_root = $$;
                                       YYACCEPT;
+                                  }
                                   else
+                                  {
                                       YYABORT;
+                                  }
                                 }
 block:   open decls stmts close { $$ = new cBlockNode($2, $3); }
        | open stmts close       { $$ = new cBlockNode(NULL, $2); }
@@ -141,6 +146,11 @@ func_decls: func_decls func_decl {
                                    $$->AddNode($2);
                                 }
         |   func_decl           { $$ = new cDeclsNode($1); 
+                                }
+        |   UNSUPPORTED         { 
+                                    semantic_error(std::string($1) + 
+                                            " is not supported");
+                                    YYERROR;
                                 }
 func_decl:  func_header ';'
                           {
@@ -226,7 +236,9 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
+        /*
         |   error ';'           { $$ = NULL; }
+        */
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }

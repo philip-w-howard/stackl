@@ -7,3 +7,4 @@ int main()
     print(6);
     return 0;
 }
+/*END*/

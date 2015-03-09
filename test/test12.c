@@ -15,9 +15,10 @@ int main()
     print("\n");
 
     //ptr = "Enter '55': ";
-    //geti(value);
+    geti(value);
     print(value);
     print("\n");
 
     return 0;
 }
+/*END*/

@@ -20,3 +20,4 @@ int f2()
     print(2);
     return 4;
 }
+/*END*/

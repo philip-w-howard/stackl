@@ -52,25 +52,16 @@ char * strchr(char *haystack, int needle)
     return haystack;
 }
 
-int main()
+int strcmp(char *str1, char *str2)
 {
-    char *ptr;
-    char array[10];
-    ptr = "1234\n";
-
-    print( strlen(ptr) );
-    strcpy(array, ptr);
-    print( array );
-
-    array[6] = '\n';
-    array[7] = 0;
-    ptr = "this is a test";
-    strncpy(array, ptr, 6);
-    print(array);
-
-    ptr = "abcdefghij\n";
-    ptr = strchr(ptr, 'f');
-    print(ptr);
+    int index;
+    int result;
+    index = 0;
+    while (str1[index] != 0 || str2[index] != 0)
+    {
+        result = str1[index] - str2[index];
+        if (result != 0) return result;
+        index++;
+    }
     return 0;
 }
-/*END*/

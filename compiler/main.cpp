@@ -55,12 +55,17 @@ int main(int argc, char **argv)
 
     symbolTableRoot = cSymbolTable::CreateDefaultTable();
     result = yyparse();
-    if (result == 0)
+    if (result == 0 && yynerrs == 0)
     {
+        if (yyast_root == NULL)
+        {
+            semantic_error("Unknown compiler error ");
+            exit(-2);
+        }
+
         //std::cout << yyast_root->toString() << std::endl;
         yyast_root->ComputeOffsets(0);
         output << yyast_root->toString() << std::endl;
-
         output.close();
 
         InitOutput(outfile_name);

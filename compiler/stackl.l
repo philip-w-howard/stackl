@@ -7,8 +7,10 @@
 #define RETURN(a) return Return(a);
 static int Return(int val);
 static int proc_identifier(const char *name);
+static int proc_unsupported();
 static void open_input(char *name);
-
+static int Main_lineno = 0;
+static int File_Depth = 0;
 %}
 
 %option noyywrap
@@ -44,6 +46,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 <<EOF>>           {
                     yypop_buffer_state();
+                    if (--File_Depth == 0) yylineno = Main_lineno;
 
                     if ( !YY_CURRENT_BUFFER )
                     {
@@ -71,12 +74,14 @@ identifier      {letter}({letter}|{digit}|"_")*
 "-="                        RETURN(MINUS_EQ);
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
-"static"                    { yylval.string = yytext; RETURN(UNSUPPORTED); }
-"const"                     { yylval.string = yytext; RETURN(UNSUPPORTED); }
-"volatile"                  { yylval.string = yytext; RETURN(UNSUPPORTED); }
-"break"                     { yylval.string = yytext; RETURN(UNSUPPORTED); }
-"switch"                    { yylval.string = yytext; RETURN(UNSUPPORTED); }
-"case"                      { yylval.string = yytext; RETURN(UNSUPPORTED); }
+"/*END*/"                   RETURN(END);
+"static"                    { RETURN(proc_unsupported()); }
+"const"                     { RETURN(proc_unsupported()); }
+"volatile"                  { RETURN(proc_unsupported()); }
+"break"                     { RETURN(proc_unsupported()); }
+"switch"                    { RETURN(proc_unsupported()); }
+"case"                      { RETURN(proc_unsupported()); }
+"void"                      { RETURN(proc_unsupported()); }
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
 "for"                       RETURN(FOR);
@@ -101,13 +106,16 @@ identifier      {letter}({letter}|{digit}|"_")*
 L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
  */
 {identifier}                RETURN(proc_identifier(yytext));
+  /* doesn't work
+<<EOF>>                     { strcpy(yytext, "End of File"); RETURN(0); }
+  */
 .                           RETURN(JUNK_TOKEN);   // discard anything not recognized
 
 %%
 
 static int Return(int val)
 {
-//    printf("Scanned '%s': %d\n", yytext, val);
+    //printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 
@@ -118,9 +126,15 @@ static int proc_identifier(const char *name)
     yylval.symbol = symbolTableRoot->Lookup(name);
     if (yylval.symbol == NULL) yylval.symbol = new cSymbol(name);
     if (yylval.symbol->GetType() == NULL) return IDENTIFIER;
-    if (yylval.symbol->GetType()->IsType()) RETURN(TYPE_ID);
+    if (yylval.symbol->GetType()->IsType()) return TYPE_ID;
 
-    RETURN(IDENTIFIER);
+    return IDENTIFIER;
+}
+static int proc_unsupported()
+{
+    semantic_error(std::string(yytext) + " is not supported");
+    std::cerr << "Compiler is aborting." << std::endl;
+    exit(-1);
 }
 static void open_input(char *name)
 {
@@ -144,6 +158,7 @@ static void open_input(char *name)
     {
         printf("Error opening %s\n", yytext);
     } else {
+        if (File_Depth++ == 0) Main_lineno = yylineno;
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
 }

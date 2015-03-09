@@ -36,6 +36,7 @@ class cFixupTable
             } else {
                 std::cerr << "Internal compiler error: no destination for "
                     << name << " in fixup table" << std::endl;
+                exit(-1);
             }
         }
     }
