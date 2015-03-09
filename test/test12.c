@@ -7,7 +7,7 @@ int main()
     //ptr = "Enter 'this is a test': ";
     //print(ptr);
     ptr = stuff;
-    gets(ptr);
+    gets(stuff);
     print(stuff);
 
     getl(ptr);

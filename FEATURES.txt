@@ -1,7 +1,5 @@
 TODO
 
-Undetected syntax errors
-
 ComputeOffsets doesn't seem to be invoked on carray's
 
 string_lit as function arg
@@ -18,9 +16,11 @@ full semantic checks
 make opcodes an enum?
 proper command line argument processing for stackl
 file extension processing for stacklc
+remove the requirement for /*END*/
 
 WORKS
 
+-ast command line argument to stacklc
 gets getl geti
 include files
 assign cptr to string_lit

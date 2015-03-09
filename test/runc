@@ -1,4 +1,4 @@
-./stacklc test/$1.c test/$1.sl
+./stacklc test/$1.c 
 RETVAL=$?
 [ $RETVAL -ne 0 ] && echo $1 FAILED
 [ $RETVAL -ne 0 ] && exit $RETVAL

@@ -7,6 +7,7 @@
 %}
 
 %locations
+%error-verbose
 
 %union{
     int                 int_val;
