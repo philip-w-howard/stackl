@@ -1,5 +1,9 @@
 TODO
 
+syscall
+   remove print and get from language and move to syscalls
+command line args
+
 assignment to charp vars
     array cell address
 address-of operator

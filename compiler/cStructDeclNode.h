@@ -58,6 +58,11 @@ class cStructDeclNode : public cDeclNode
         return result;
     }
 
+    virtual void GenerateCode()
+    {
+        mDecls->GenerateCode();
+    }
+
   protected:
     cScope *mSymTab;        // symbol table for this struct
     cDeclsNode *mDecls;     // list of fields

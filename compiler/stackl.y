@@ -237,9 +237,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
-        /*
         |   error ';'           { $$ = NULL; }
-        */
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }
