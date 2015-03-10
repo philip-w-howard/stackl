@@ -126,6 +126,7 @@ class cFuncDeclNode : public cDeclNode
             EmitInt(mDeclsSize);
         }
 
+        if (mDecls != NULL) mDecls->GenerateCode();
         if (mStmts != NULL)
         {
             mStmts->GenerateCode();

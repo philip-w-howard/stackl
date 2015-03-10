@@ -48,7 +48,7 @@ class cScanNode : public cStmtNode
         }
         else
         {
-            if ( ! mLval->IsArrayRef()) EmitInt(PUSHVAR_OP);
+            //if ( ! mLval->IsArrayRef()) EmitInt(PUSHVAR_OP);
             //if (mLval->GetType()->IsPointer()) EmitInt(PUSHVAR_OP);
             mLval->EmitOffset();
 

@@ -86,10 +86,14 @@ class cVarRefNode : public cExprNode
     virtual int ComputeOffsets(int base)
     {
         list<cVarPartNode *>::iterator it = mList->begin();
+
+        (*it)->ComputeOffsets(base);
+
         mOffset = (*it)->GetDecl()->GetOffset();
 
         for ( it++; it != mList->end(); it++)
         {
+            (*it)->ComputeOffsets(base);
             mOffset += (*it)->GetField()->GetOffset();
         }
 
@@ -127,18 +131,18 @@ class cVarRefNode : public cExprNode
 
         if (last->IsArrayRef())
         {
-            if (last->GetDecl()->GetBaseType()->IsPointer())
-            {
+            //if (last->GetDecl()->GetBaseType()->IsPointer())
+            //{
                 EmitInt(PUSHVAR_OP);
                 EmitInt(mOffset);
-            }
-            else
-            {
-                EmitInt(PUSH_OP);
-                EmitInt(mOffset);
-                EmitInt(PUSHFP_OP);
-                EmitInt(PLUS_OP);
-            }
+            //}
+            //else
+            //{
+                //EmitInt(PUSH_OP);
+                //EmitInt(mOffset);
+                //EmitInt(PUSHFP_OP);
+                //EmitInt(PLUS_OP);
+            //}
             cArrayValNode *index = last->GetArrayVal();
             EmitInt(PUSH_OP);
             EmitInt(1);  // FIX THIS: assumint only char arrays EmitInt(mSize);
@@ -146,7 +150,13 @@ class cVarRefNode : public cExprNode
             EmitInt(TIMES_OP);
             EmitInt(PLUS_OP);
         } 
-        else 
+        else if (last->GetDecl()->GetBaseType()->IsPointer() ||
+                 last->GetDecl()->GetBaseType()->IsArray())
+        {
+            EmitInt(PUSHVAR_OP);
+            EmitInt(mOffset);
+        }
+        else
         {
             EmitInt(mOffset);
         }
@@ -161,13 +171,13 @@ class cVarRefNode : public cExprNode
             EmitOffset();
             EmitInt(PUSHCVARIND_OP);
         } 
-        else if (last->GetDecl()->IsArray())
-        {
-            EmitInt(PUSH_OP);
-            EmitInt(mOffset);
-            EmitInt(PUSHFP_OP);
-            EmitInt(PLUS_OP);
-        }
+        //else if (last->GetDecl()->IsArray())
+        //{
+            //EmitInt(PUSH_OP);
+            //EmitInt(mOffset);
+            //EmitInt(PUSHFP_OP);
+            //EmitInt(PLUS_OP);
+        //}
         else 
         {
             EmitInt(PUSHVAR_OP);
