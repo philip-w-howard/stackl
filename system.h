@@ -32,5 +32,10 @@ int scanl(char *string)
     syscall(3, 5, string);
     return 0;
 }
-// #define GETI_CALL       6
+
+int scani(int string)
+{
+    syscall(3, 6, string);
+    return 0;
+}
 

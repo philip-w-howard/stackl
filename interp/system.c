@@ -24,6 +24,7 @@ void syscall(Machine_State *cpu, int *args)
             gets(&cpu->mem[args[2]]);
             break;
         case GETI_CALL:
+            scanf("%d", (int *)&cpu->mem[args[2]]);
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);

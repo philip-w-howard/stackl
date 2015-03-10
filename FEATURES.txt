@@ -16,6 +16,8 @@ remove the requirement for /*END*/
 
 WORKS
 
+syscalls for print, scan
+address of in params
 string_lit as function arg
 -ast command line argument to stacklc
 gets getl geti

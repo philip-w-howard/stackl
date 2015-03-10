@@ -24,6 +24,7 @@
 #include "cVarDeclNode.h"
 #include "cStructDeclNode.h"
 #include "cArrayDeclNode.h"
+#include "cVarAddrNode.h"
 #include "cVarRefNode.h"
 #include "cVarPartNode.h"
 #include "cIfNode.h"

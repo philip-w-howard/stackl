@@ -3,6 +3,7 @@
 int main()
 {
     char arr[50];
+    int val;
 
     prints("prints works\n");
     prints("print the number 88: ");
@@ -14,6 +15,10 @@ int main()
     scanl(arr);
     prints(arr);
     prints("\n");
+
+    scani(&val);
+    prints("entered: ");
+    printi(val);
 
     print("Testing exit\n");
     exit(0);

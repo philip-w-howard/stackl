@@ -30,7 +30,7 @@ whitespace      [ \t\n]
 letter          [A-Za-z]
 digit           [0-9]
 punctuation     [(){}\[\];,\.]
-operator        [+\-*/%=]
+operator        [+\-*/%=&]
 integer         0|([1-9][0-9]*)
 identifier      {letter}({letter}|{digit}|"_")*
 %%
