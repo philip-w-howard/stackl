@@ -31,6 +31,7 @@
 #define GETS_OP     27
 #define GETL_OP     28
 #define GETI_OP     29
+#define TRAP_OP     30
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2

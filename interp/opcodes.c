@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <limits.h>
 
+#include "system.h"
 #include "opcodes.h"
 #include "machine.h"
 
@@ -10,7 +11,7 @@
 #define INTVAL(reg, offset) (*(int *)&(cpu->mem[cpu-> reg + OFFSET(offset)]))
 #define INTABS(loc)         (*(int *)&(cpu->mem[(loc)]))
 #define INC(reg, amount)    cpu-> reg += amount*WORD_SIZE;
-#define OFFSET(v)           (v*WORD_SIZE)
+#define OFFSET(v)           ((v)*WORD_SIZE)
 
 /*
 #define INTVAL(reg, offset) (cpu->mem[cpu-> reg + (offset)])
@@ -222,6 +223,21 @@ void Execute(Machine_State *cpu)
                 INTVAL(SP, 0) = cpu->FP;
                 INC(SP, 1);
                 INC(IP, 1);
+                break;
+            case TRAP_OP:
+                DEBUG("TRAP %d %d", INTVAL(FP,0), INTVAL(FP,1));
+                {
+                    int args[20];
+                    int ii;
+                    args[0] = INTVAL(FP, -3);
+                    for (ii=1; ii<args[0]; ii++)
+                    {
+                        args[ii] = INTVAL(FP, -ii-3);
+                    }
+                    INC(SP, -args[0]);
+                    INC(IP, 1);
+                    syscall(cpu, args);
+                }
                 break;
             case JUMP_OP:
                 DEBUG("JUMP %d", INTVAL(IP, 1));

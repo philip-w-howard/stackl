@@ -2,6 +2,7 @@ COPTS=-Wall -g -c  -O0 -Wno-deprecated-declarations
 OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
+	 system.o \
 
 all: stackl
 

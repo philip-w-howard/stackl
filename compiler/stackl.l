@@ -75,6 +75,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
 "/*END*/"                   RETURN(END);
+"trap"                      RETURN(TRAP);
 "static"                    { RETURN(proc_unsupported()); }
 "const"                     { RETURN(proc_unsupported()); }
 "volatile"                  { RETURN(proc_unsupported()); }

@@ -60,6 +60,7 @@
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
 %token  END
+%token  TRAP
 
 %type <decls> program
 %type <block> block
@@ -237,6 +238,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
+        |   TRAP '(' ')' ';'    { $$ = new cTrapNode(); }
         |   error ';'           { $$ = NULL; }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
