@@ -305,6 +305,7 @@ params:     params',' param
         |   param               { $$ = new cParamNode($1); }
 
 param:      expr                { $$ = $1; }
+        |   string_lit          { $$ = $1; }
 
 ccomp:      ccomp OR comp       { $$ = new cBinaryExprNode($1, OR, $3); }
         |   ccomp AND comp      { $$ = new cBinaryExprNode($1, AND, $3); }

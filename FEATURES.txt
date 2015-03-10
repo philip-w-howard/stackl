@@ -1,7 +1,5 @@
 TODO
 
-string_lit as function arg
-
 assignment to charp vars
     array cell address
 address-of operator
@@ -14,6 +12,7 @@ remove the requirement for /*END*/
 
 WORKS
 
+string_lit as function arg
 -ast command line argument to stacklc
 gets getl geti
 charp vars as arrays

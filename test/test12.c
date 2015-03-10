@@ -1,23 +1,13 @@
+#include "string.h"
 int main()
 {
     char *ptr;
-    char stuff[100];
-    int value;
+    char arr[100];
 
-    //ptr = "Enter 'this is a test': ";
-    //print(ptr);
-    ptr = stuff;
-    gets(stuff);
-    print(stuff);
-
-    getl(ptr);
-    print(stuff);
-    print("\n");
-
-    //ptr = "Enter '55': ";
-    geti(value);
-    print(value);
-    print("\n");
+    ptr = "stuff";
+    if (strcmp(ptr, "stuff") == 0) print("strcmp worked\n");
+    strcpy(arr, "stuff");
+    if (strcmp(ptr, arr) == 0) print("strcpy worked\n");
 
     return 0;
 }
