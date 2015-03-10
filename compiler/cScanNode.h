@@ -38,6 +38,8 @@ class cScanNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        EmitInt(ILLEGAL_OP);
+        /*
         if (mInputType == 'I')
         {
             EmitInt(PUSH_OP);
@@ -59,6 +61,7 @@ class cScanNode : public cStmtNode
             else
                 EmitInt(ILLEGAL_OP);
         }
+        */
     }
 
   protected:

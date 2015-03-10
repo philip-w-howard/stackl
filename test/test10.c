@@ -1,3 +1,4 @@
+#include "system.h"
 int strlen(char *str)
 {
     int count;
@@ -58,19 +59,19 @@ int main()
     char array[10];
     ptr = "1234\n";
 
-    print( strlen(ptr) );
+    printi( strlen(ptr) );
     strcpy(array, ptr);
-    print( array );
+    prints( array );
 
     array[6] = '\n';
     array[7] = 0;
     ptr = "this is a test";
     strncpy(array, ptr, 6);
-    print(array);
+    prints(array);
 
     ptr = "abcdefghij\n";
     ptr = strchr(ptr, 'f');
-    print(ptr);
+    prints(ptr);
     return 0;
 }
 /*END*/

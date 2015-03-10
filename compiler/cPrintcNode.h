@@ -38,8 +38,11 @@ class cPrintcNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        EmitInt(ILLEGAL_OP);
+        /*
         mExpr->GenerateCode();
         EmitInt(PRINTC_OP);
+        */
     }
   protected:
     cExprNode *mExpr;       // expression to be printed

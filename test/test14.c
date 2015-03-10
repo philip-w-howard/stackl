@@ -20,9 +20,9 @@ int main()
     prints("entered: ");
     printi(val);
 
-    print("Testing exit\n");
+    prints("Testing exit\n");
     exit(0);
-    print("Exit did not work\n");
+    prints("Exit did not work\n");
 
     return 0;
 }

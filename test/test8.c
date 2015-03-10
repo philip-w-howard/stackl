@@ -1,6 +1,7 @@
+#include "system.h"
 int main()
 {
-    print("this is a test\n");
+    prints("this is a test\n");
     return 0;
 }
 /*END*/

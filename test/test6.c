@@ -1,23 +1,24 @@
+#include "system.h"
 int f2();
 int f1(int a, int b);
 int f1(int a, int b)
 {
-    print(a + b);
+    printi(a + b);
 }
 int main()
 {
     int ret;
-    print(0);
+    printi(0);
     f1(5, 8);
     ret = f2();
-    print(3);
-    print(ret);
+    printi(3);
+    printi(ret);
     ret = 2*f2() - 3;
-    print(ret);
+    printi(ret);
 }
 int f2()
 {
-    print(2);
+    printi(2);
     return 4;
 }
 /*END*/

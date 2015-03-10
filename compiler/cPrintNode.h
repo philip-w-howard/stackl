@@ -39,6 +39,8 @@ class cPrintNode : public cStmtNode
 
     virtual void GenerateCode()
     {
+        EmitInt(ILLEGAL_OP);
+        /*
         cDeclNode *type = mExpr->GetType();
 
         mExpr->GenerateCode();
@@ -48,6 +50,7 @@ class cPrintNode : public cStmtNode
             EmitInt(PRINTSA_OP);
         else
             EmitInt(PRINT_OP);
+        */
     }
   protected:
     cExprNode *mExpr;       // expression to be printed

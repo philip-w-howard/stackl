@@ -1,3 +1,4 @@
+#include "system.h"
 // test simple variables and assignment
 int main()
 {
@@ -5,9 +6,9 @@ int main()
     int y;
     y = 5;
     x = 2;
-    print(x);
-    print(y);
+    printi(x);
+    printi(y);
     y = x;
-    print(y);
+    printi(y);
 }
 /*END*/

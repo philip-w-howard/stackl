@@ -146,13 +146,13 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
+                /*
             case PRINT_OP:
                 DEBUG("PRINT %d", INTVAL(SP, -1));
                 printf("%d\n", INTVAL(SP, -1));
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
-    /*
             case PRINTS_OP:
                 temp = cpu->FP + INTVAL(SP, -1);
                 DEBUG("PRINTS %s", (char *)(&cpu->mem[temp]));
@@ -160,7 +160,6 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
-    */
             case PRINTSA_OP:
                 temp = INTVAL(SP, -1);
                 DEBUG("PRINTSA %s", (char *)(&cpu->mem[temp]));
@@ -174,6 +173,7 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP, 1);
                 break;
+    */
             case DUP_OP:
                 DEBUG("DUP");
                 INTVAL(SP, 0) = INTVAL(SP, -1);
@@ -302,6 +302,7 @@ void Execute(Machine_State *cpu)
                 cpu->SP += INTVAL(IP,0);
                 INC(IP,1);
                 break;
+                /*
             case GETS_OP:
                 DEBUG("GETS %d", INTVAL(SP,-1));
                 scanf("%s", &cpu->mem[INTVAL(SP,-1)]);
@@ -320,6 +321,7 @@ void Execute(Machine_State *cpu)
                 INC(SP, -1);
                 INC(IP,1);
                 break;
+                */
             default:
                 printf("Illegal instruction at %d\n", cpu->IP);
                 exit(-1);

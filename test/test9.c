@@ -1,3 +1,4 @@
+#include "system.h"
 int main()
 {
     char *cptr;
@@ -12,14 +13,14 @@ int main()
     printc(carr[0]);
     printc(carr[1]);
     printc(carr[2]);
-    print(cptr);
-    print("The end\n");
+    prints(cptr);
+    prints("The end\n");
 
     cptr = "this is a cptr\n";
-    print(cptr);
+    prints(cptr);
 
     cptr += 5;
-    print(cptr);
+    prints(cptr);
 
     cptr = carr1;
     carr1[0] = 'h';
@@ -30,6 +31,6 @@ int main()
     carr1[5] = '\n';
     carr1[6] = 0;
 
-    print(cptr);
+    prints(cptr);
 }
 /*END*/

@@ -1,10 +1,11 @@
+#include "system.h"
 int main()
 {
     int ii;
     ii = 0;
     while (ii < 3)
     {
-        print(ii);
+        printi(ii);
         ii = ii + 1;
     }
 }

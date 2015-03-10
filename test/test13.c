@@ -1,4 +1,5 @@
-#include "test/string.h"
+#include "system.h"
+#include "string.h"
 
 int main()
 {
@@ -17,10 +18,10 @@ int main()
     strcpy(stuff.cc, "some text\n");
     stuff.dd = "this is a test\n";
 
-    print(stuff.aa);
-    print(stuff.bb);
-    print(stuff.cc);
-    print(stuff.dd);
+    printi(stuff.aa);
+    printi(stuff.bb);
+    prints(stuff.cc);
+    prints(stuff.dd);
 
     return 0;
 }

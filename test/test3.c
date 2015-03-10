@@ -1,3 +1,5 @@
+#include "system.h"
+
 // test expressions and all operators
 //
 int main()
@@ -9,11 +11,11 @@ int main()
     // EQUAL
     if (5 == 5)
         if (5 == 6)
-            print("EQ broken\n");
+            prints("EQ broken\n");
         else
-            print("EQ works\n");
+            prints("EQ works\n");
     else
-        print("EQ broken\n");
+        prints("EQ broken\n");
 
     // NE
     x = 5;
@@ -21,171 +23,171 @@ int main()
     z = 5;
     if (x != y)
         if (x != z)
-            print("NE broken\n");
+            prints("NE broken\n");
         else
-            print("NE works\n");
+            prints("NE works\n");
     else
-        print("NE broken\n");
+        prints("NE broken\n");
 
     // AND
     if (5 && 4)
         if (4 && 0)
-           print("AND broken\n");
+           prints("AND broken\n");
        else
-           print("AND works\n");
+           prints("AND works\n");
     else
-        print("AND broken\n");
+        prints("AND broken\n");
 
     // OR
     if ( (0 || 1) && (1 || 0) && (1 || 1))
         if (0 || 0)
-           print("OR broken\n");
+           prints("OR broken\n");
        else
-           print("OR works\n");
+           prints("OR works\n");
     else
-        print("OR broken\n");
+        prints("OR broken\n");
 
     // GT
     if (5 > 4)
         if (4 > 4 || 4 > 5)
-           print("GT broken\n");
+           prints("GT broken\n");
        else
-           print("GT works\n");
+           prints("GT works\n");
     else
-        print("GT broken\n");
+        prints("GT broken\n");
 
     // LT
     if (4 < 5)
         if (4 < 4 || 5 < 4)
-           print("LT broken\n");
+           prints("LT broken\n");
        else
-           print("LT works\n");
+           prints("LT works\n");
     else
-        print("LT broken\n");
+        prints("LT broken\n");
 
     // GE
     if (5 >=4 && 4 >= 4)
         if (4 >= 5)
-           print("GE broken\n");
+           prints("GE broken\n");
        else
-           print("GE works\n");
+           prints("GE works\n");
     else
-        print("GE broken\n");
+        prints("GE broken\n");
 
     // LE
     if (4 <= 5 && 4 <= 4)
         if (5 < 4)
-           print("LE broken\n");
+           prints("LE broken\n");
        else
-           print("LE works\n");
+           prints("LE works\n");
     else
-        print("LE broken\n");
+        prints("LE broken\n");
 
     // PLUS
     x = 2;
     y = x + 1;
     if (y == 3)
-        print("PLUS works\n");
+        prints("PLUS works\n");
     else
-        print("PLUS broken\n");
+        prints("PLUS broken\n");
 
     // MINUS
     z = 11-y;
     if (z == 8)
-        print("MINUS works\n");
+        prints("MINUS works\n");
     else
-        print("MINUS broken\n");
+        prints("MINUS broken\n");
 
     // TIMES
     z = x*3;
     if (z == 6)
-        print("TIMES works\n");
+        prints("TIMES works\n");
     else
-        print("TIMES broken\n");
+        prints("TIMES broken\n");
 
     // DIVIDE
     x = 2;
     y = 11/x;
     if (y == 5)
-        print("DIVIDE works\n");
+        prints("DIVIDE works\n");
     else
-        print("DIVIDE broken\n");
+        prints("DIVIDE broken\n");
 
     // MOD
     z = 13;
     x = z % 5;
     if (x == 3)
-        print("MOD works\n");
+        prints("MOD works\n");
     else
-        print("MOD broken\n");
+        prints("MOD broken\n");
 
     // NEG
     z = -11 + 20;
     if (z == 9)
-        print("NEG works\n");
+        prints("NEG works\n");
     else
-        print("NEG broken\n");
+        prints("NEG broken\n");
 
     // PLUS_EQ
     z = 5;
     z += 7;
     if (z == 12)
-        print("PLUS_EQ works\n");
+        prints("PLUS_EQ works\n");
     else
-        print("PLUS_EQ broken\n");
+        prints("PLUS_EQ broken\n");
 
     // MINUS_EQ
     z = 5;
     z -= 7;
     if (z == -2)
-        print("MINUS_EQ works\n");
+        prints("MINUS_EQ works\n");
     else
-        print("MINUS_EQ broken\n");
+        prints("MINUS_EQ broken\n");
 
     // TIMES_EQ
     z = 5;
     z *= 7;
     if (z == 35)
-        print("TIMES_EQ works\n");
+        prints("TIMES_EQ works\n");
     else
-        print("TIMES_EQ broken\n");
+        prints("TIMES_EQ broken\n");
 
     // DIVIDE_EQ
     z = 35;
     z /= 7;
     if (z == 5)
-        print("DIVIDE_EQ works\n");
+        prints("DIVIDE_EQ works\n");
     else
-        print("DIVIDE_EQ broken\n");
+        prints("DIVIDE_EQ broken\n");
 
     // post INC
     z = 35;
     z++;
     if (z == 36)
-        print("post INC works\n");
+        prints("post INC works\n");
     else
-        print("post INC broken\n");
+        prints("post INC broken\n");
 
     // pre INC
     ++z;
     if (z == 37)
-        print("pre INC works\n");
+        prints("pre INC works\n");
     else
-        print("pre INC broken\n");
+        prints("pre INC broken\n");
 
     // post DEC
     z--;
     if (z == 36)
-        print("post DEC works\n");
+        prints("post DEC works\n");
     else
-        print("post DEC broken\n");
+        prints("post DEC broken\n");
 
     // pre DEC
     --z;
     if (z == 35)
-        print("pre DEC works\n");
+        prints("pre DEC works\n");
     else
-        print("pre DEC broken\n");
+        prints("pre DEC broken\n");
 
     return 0;
 }

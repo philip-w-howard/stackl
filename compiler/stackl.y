@@ -222,6 +222,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cForNode($3, $5, $7, $9); }
         |   WHILE '(' ccomp ')' stmt
                                 { $$ = new cWhileNode($3, $5); }
+        /*
         |   PRINT '(' expr ')' ';'
                                 { $$ = new cPrintNode($3); }
         |   PRINT '(' string_lit ')' ';'
@@ -234,6 +235,7 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cScanNode($3, 'L'); }
         |   GETI '(' lval ')' ';'
                                 { $$ = new cScanNode($3, 'I'); }
+        */
         |   assign ';'          { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }

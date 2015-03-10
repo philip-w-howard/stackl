@@ -17,6 +17,9 @@ void syscall(Machine_State *cpu, int *args)
         case PRINTSA_CALL:
             printf("%s", &cpu->mem[args[2]]);
             break;
+        case PRINTC_CALL:
+            printf("%c", args[2]);
+            break;
         case GETS_CALL:
             scanf("%s", &cpu->mem[args[2]]);
             break;

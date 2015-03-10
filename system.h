@@ -21,21 +21,27 @@ int prints(char *string)
     return 0;
 }
 
-int scans(char *string)
+int printc(int string)
 {
     syscall(3, 4, string);
     return 0;
 }
 
-int scanl(char *string)
+int scans(char *string)
 {
     syscall(3, 5, string);
     return 0;
 }
 
-int scani(int string)
+int scanl(char *string)
 {
     syscall(3, 6, string);
+    return 0;
+}
+
+int scani(int string)
+{
+    syscall(3, 7, string);
     return 0;
 }
 
