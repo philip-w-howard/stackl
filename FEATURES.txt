@@ -1,7 +1,7 @@
 TODO
 
-syscall
-   remove print and get from language and move to syscalls
+seems to be a problem in string.h and system.h are included in some orders
+
 command line args
 
 assignment to charp vars
@@ -16,7 +16,7 @@ remove the requirement for /*END*/
 
 WORKS
 
-syscalls for print, scan
+syscalls for print, scan, exit, exec
 address of in params
 string_lit as function arg
 -ast command line argument to stacklc

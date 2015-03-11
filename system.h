@@ -45,3 +45,8 @@ int scani(int string)
     return 0;
 }
 
+int exec(char *file)
+{
+    syscall(3, 8, file);
+    return 0;
+}

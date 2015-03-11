@@ -8,5 +8,6 @@
 #define GETS_CALL       5
 #define GETL_CALL       6
 #define GETI_CALL       7
+#define EXEC_CALL       8
 
 void syscall(Machine_State *cpu, int *args);

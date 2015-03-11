@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <limits.h>
 
-#include "system.h"
+#include "syscall.h"
 #include "opcodes.h"
 #include "machine.h"
 

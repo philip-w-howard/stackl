@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "machine.h"
-#include "system.h"
+#include "syscall.h"
 
 void syscall(Machine_State *cpu, int *args)
 {
@@ -28,6 +28,9 @@ void syscall(Machine_State *cpu, int *args)
             break;
         case GETI_CALL:
             scanf("%d", (int *)&cpu->mem[args[2]]);
+            break;
+        case EXEC_CALL:
+            Load(cpu, &cpu->mem[args[2]]);
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);

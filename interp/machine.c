@@ -53,7 +53,8 @@ char *format_string(char *str)
 
     return str;
 }
-int Load_And_Go(const char *filename)
+//***************************************
+int Load(Machine_State *cpu, const char *filename)
 {
     int byte = 0;
     int heap_top = MEMORY_SIZE;
@@ -112,11 +113,16 @@ int Load_And_Go(const char *filename)
         fscanf(input, "%s", record_type);
     }
 
-    Regs.mem = Memory;
-    Regs.IP = 0;
-    Regs.FP = byte;
-    Regs.SP = byte;
+    cpu->mem = Memory;
+    cpu->IP = 0;
+    cpu->FP = byte;
+    cpu->SP = byte;
 
+    return 0;
+}
+int Load_And_Go(const char *filename)
+{
+    Load(&Regs, filename);
     Execute(&Regs);
 
     return 0;
