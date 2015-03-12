@@ -1,6 +1,11 @@
-TODO
+BUGS
 
-seems to be a problem in string.h and system.h are included in some orders
+
+TODO
+Machine executes one instruction per Execute call
+Return from main calls exit() not HALT_OP
+Rudimentary scheduler
+Fork does malloc to get memory, exit() does free
 
 command line args
 
@@ -20,7 +25,6 @@ syscalls for print, scan, exit, exec
 address of in params
 string_lit as function arg
 -ast command line argument to stacklc
-gets getl geti
 charp vars as arrays
 include files
 assign cptr to string_lit
@@ -28,7 +32,6 @@ can declare char * vars and char[]
 can access individual chars in a char array
 pointer arithmetic
 character literals
-print statements
 expressions
 Unary minus
 ++ -- <op>=
