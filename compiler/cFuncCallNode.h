@@ -29,10 +29,19 @@ class cFuncCallNode : public cExprNode
 
         if (func != NULL)
         {
+            if (!func->GetType()->IsFunc())
+            {
+                semantic_error(id->Name() + " is not a function");
+            }
+
             id = func;
 
             mId = id;
             mParams = params;
+        }
+        else
+        {
+            semantic_error(id->Name() + " is not defined");
         }
     }
 

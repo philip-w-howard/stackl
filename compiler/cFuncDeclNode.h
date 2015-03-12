@@ -23,6 +23,7 @@ class cFuncDeclNode : public cDeclNode
     // return type and name of function
     cFuncDeclNode(cSymbol *type, cSymbol *id) : cDeclNode()
     {
+        mDeclsSize = 0;
         /*
         cSymbol *existingSymbol = symbolTableRoot->LocalLookup(id->Name());
         if (existingSymbol != NULL && existingSymbol->GetType()->IsFunc())
@@ -49,7 +50,6 @@ class cFuncDeclNode : public cDeclNode
             mStmts = NULL;
             mParamsSet = false;
             mId->SetType(this);
-            mDeclsSize = 0;
         }
     }
 
