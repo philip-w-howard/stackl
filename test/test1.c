@@ -8,4 +8,3 @@ int main()
     printi(6);
     return 0;
 }
-/*END*/

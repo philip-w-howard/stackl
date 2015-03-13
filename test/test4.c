@@ -9,4 +9,3 @@ int main()
         printi(2);
     printi(3);
 }
-/*END*/

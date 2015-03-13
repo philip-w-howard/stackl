@@ -15,7 +15,7 @@
 #include "lex.h"
 #include "codegen.h"
 
-extern cAstNode *yyast_root;
+extern cDeclsNode *yyast_root;
 
 char Input_File[200] = "";
 int  Do_Debug = 0;
@@ -73,17 +73,33 @@ int main(int argc, char **argv)
     //std::cerr.rdbuf(output.rdbuf());
 
     symbolTableRoot = cSymbolTable::CreateDefaultTable();
+    cDeclsNode *program = NULL;
+    int total_errors = 0;
+
     result = yyparse();
-    if (result == 0 && yynerrs == 0)
+    while (yyast_root != NULL)
     {
-        if (yyast_root == NULL)
+        total_errors += yynerrs;
+        if (result == 0 && total_errors == 0)
+        {
+            if (program == NULL)
+                program = yyast_root;
+            else
+                program->AddList(yyast_root);
+        }
+        result = yyparse();
+    }
+
+    if (result == 0 && total_errors == 0)
+    {
+        if (program == NULL)
         {
             semantic_error("Unknown compiler error ");
             exit(-2);
         }
 
-        //std::cout << yyast_root->toString() << std::endl;
-        yyast_root->ComputeOffsets(0);
+        //std::cout << program->toString() << std::endl;
+        program->ComputeOffsets(0);
         if (Do_Ast)
         {
             strcpy(outfile_name, Input_File);
@@ -98,7 +114,7 @@ int main(int argc, char **argv)
                 exit(-1);
             }
 
-            output << yyast_root->toString() << std::endl;
+            output << program->toString() << std::endl;
             output.close();
         }
 
@@ -107,7 +123,7 @@ int main(int argc, char **argv)
         if (ptr != NULL) *ptr = 0;
         strcat(outfile_name, ".sl");
         InitOutput(outfile_name);
-        yyast_root->GenerateCode();
+        program->GenerateCode();
         FinalizeOutput();
     } else {
         std::cerr << yynerrs << " Errors in compile" << std::endl;

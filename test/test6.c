@@ -21,4 +21,3 @@ int f2()
     printi(2);
     return 4;
 }
-/*END*/

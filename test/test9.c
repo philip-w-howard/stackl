@@ -33,4 +33,3 @@ int main()
 
     prints(cptr);
 }
-/*END*/

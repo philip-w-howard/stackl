@@ -38,7 +38,7 @@
     int yyerror(const char *msg);
     int semantic_error(std::string msg);
 
-    cAstNode *yyast_root = NULL;
+    cDeclsNode *yyast_root = NULL;
 %}
 
 %start  program
@@ -59,7 +59,6 @@
 %token  AND OR
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
-%token  END
 %token  TRAP
 %token  DEFINE CONST
 
@@ -100,7 +99,7 @@
 
 %%
 
-program: global_decls END       { $$ = $1; 
+program: global_decls           { $$ = $1; 
                                   if (yynerrs == 0)
                                   {
                                       yyast_root = $$;
@@ -111,6 +110,8 @@ program: global_decls END       { $$ = $1;
                                       YYABORT;
                                   }
                                 }
+    | /* empty */               { yyast_root = NULL; YYACCEPT; }
+
 block:      open stmts close    { $$ = new cBlockNode(NULL, $2); }
 open:   '{'                     { $$ = symbolTableRoot->IncreaseScope(); }
 
@@ -156,7 +157,7 @@ global_decl: func_decl          { $$ = $1; }
         | DEFINE IDENTIFIER INT_VAL
                                 { $$ = new cConstDeclNode($2, $3); }
         | UNSUPPORTED           { 
-                                    semantic_error(std::string($1) + 
+                                    semantic_error(std::string(yytext) + 
                                             " is not supported");
                                     YYERROR;
                                 }

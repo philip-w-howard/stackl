@@ -74,4 +74,3 @@ int main()
     prints(ptr);
     return 0;
 }
-/*END*/

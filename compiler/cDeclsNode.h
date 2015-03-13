@@ -36,6 +36,16 @@ class cDeclsNode : public cAstNode
         mList->push_back(decl);
     }
 
+    // add a list of decls to this list
+    void AddList(cDeclsNode *decls)
+    {
+        for (list<cDeclNode *>::iterator it = decls->mList->begin(); 
+            it != decls->mList->end(); it++)
+        {
+            AddNode( (*it) );
+        }
+    }
+
     // return total size of all decls.
     // ComputeOffsets must be called before this has meaning
     int Size() { return mSize; }

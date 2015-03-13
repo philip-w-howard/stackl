@@ -45,12 +45,14 @@ identifier      {letter}({letter}|{digit}|"_")*
                   }
 
 <<EOF>>           {
-                    yypop_buffer_state();
                     if (--File_Depth == 0) yylineno = Main_lineno;
 
-                    if ( !YY_CURRENT_BUFFER )
+                    //if ( !YY_CURRENT_BUFFER )
+                    if (File_Depth < 0)
                     {
                         yyterminate();
+                    } else {
+                        yypop_buffer_state();
                     }
                   }
 
@@ -74,7 +76,6 @@ identifier      {letter}({letter}|{digit}|"_")*
 "-="                        RETURN(MINUS_EQ);
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
-"/*END*/"                   RETURN(END);
 "trap"                      RETURN(TRAP);
 "static"                    { RETURN(proc_unsupported()); }
 "const"                     { RETURN(CONST); }
@@ -136,9 +137,13 @@ static int proc_identifier(const char *name)
 }
 static int proc_unsupported()
 {
+    yylval.string = yytext;
+    return UNSUPPORTED;
+    /*
     semantic_error(std::string(yytext) + " is not supported");
     std::cerr << "Compiler is aborting." << std::endl;
     exit(-1);
+    */
 }
 static void open_input(char *name)
 {

@@ -11,4 +11,3 @@ int main()
     y = x;
     printi(y);
 }
-/*END*/
