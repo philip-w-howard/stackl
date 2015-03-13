@@ -71,3 +71,29 @@ void *Get_Addr(int address)
 
     return &Memory[address];
 }
+//***************************************
+void Init_Machine()
+{
+    Regs.IP = 0;
+    Regs.FP = 0;
+    Regs.SP = 0;
+    Regs.halted = 0;
+}
+//***************************************
+void Get_Machine_State(Machine_State *cpu)
+{
+    memcpy(cpu, &Regs, sizeof(Regs));
+}
+//***************************************
+void Set_Machine_State(Machine_State *cpu)
+{
+    memcpy(&Regs, cpu, sizeof(Regs));
+}
+//***************************************
+void Machine_Execute()
+{
+    while (!Regs.halted)
+    {
+        Execute(&Regs);
+    }
+}

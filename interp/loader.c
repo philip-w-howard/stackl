@@ -126,13 +126,3 @@ int Load(Machine_State *cpu, const char *filename)
 
     return 0;
 }
-//***************************************
-int Load_And_Go(const char *filename)
-{
-    Machine_State regs;
-
-    Load(&regs, filename);
-    Execute(&regs);
-
-    return 0;
-}
