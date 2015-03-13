@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "machine.h"
 #include "syscall.h"
+#include "loader.h"
 
 void syscall(Machine_State *cpu, int *args)
 {
@@ -15,22 +16,22 @@ void syscall(Machine_State *cpu, int *args)
             printf("%d\n", args[2]);
             break;
         case PRINTSA_CALL:
-            printf("%s", &cpu->mem[args[2]]);
+            printf("%s", (char *)Get_Addr(args[2]));
             break;
         case PRINTC_CALL:
             printf("%c", args[2]);
             break;
         case GETS_CALL:
-            scanf("%s", &cpu->mem[args[2]]);
+            scanf("%s", (char *)Get_Addr(args[2]));
             break;
         case GETL_CALL:
-            gets(&cpu->mem[args[2]]);
+            gets(Get_Addr(args[2]));
             break;
         case GETI_CALL:
-            scanf("%d", (int *)&cpu->mem[args[2]]);
+            scanf("%d", (int *)Get_Addr(args[2]));
             break;
         case EXEC_CALL:
-            Load(cpu, &cpu->mem[args[2]]);
+            Load(cpu, Get_Addr(args[2]));
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);

@@ -3,6 +3,7 @@ OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
 	 syscall.o \
+	 loader.o \
 
 all: stackl
 

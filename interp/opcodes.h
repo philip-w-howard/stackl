@@ -17,7 +17,7 @@
 #define OR_OP       13
 //#define PRINT_OP    14
 //#define PRINTS_OP   15
-#define DUP_OP      16
+//#define DUP_OP      16
 #define HALT_OP     17
 #define POP_OP      18
 #define RETURN_OP   19

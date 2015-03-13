@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "machine.h"
+#include "loader.h"
 #include "opcodes.h"
 
 int main(int argc, char **argv)

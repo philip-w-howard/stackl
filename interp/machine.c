@@ -3,127 +3,71 @@
 #include <string.h>
 #include "opcodes.h"
 
-#define MEMORY_SIZE  10000
-#define WORD_SIZE 4
 char Memory[MEMORY_SIZE];
 Machine_State Regs;
 
-char *format_string(char *str)
+//***************************************
+int Get_Word(int address)
 {
-    char *sptr;
-
-    sptr = strrchr(str, '"');
-    if (sptr == NULL)
+    if (address < 0 || (address+WORD_SIZE) >= MEMORY_SIZE)
     {
-        fprintf(stderr, "File format error: invalid string\n");
-        return str;
+        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        exit(-1);
+    } 
+    else if (address & 0x0003)
+    {
+        fprintf(stderr, "Machine check: misalligned address 0x%08X out of bounds\n", address);
+        exit(-1);
     }
 
-    // eliminate trailing "
-    *sptr = 0;
-
-    sptr = strchr(str, '"');
-    if (sptr == NULL)
-    {
-        fprintf(stderr, "File format error: invalid string\n");
-        return str;
-    }
-
-    // eliminate leading "
-    sptr++;
-
-    // Handle escape sequences
-    str = sptr;
-    sptr = strchr(str, '\\');
-    while (sptr != NULL)
-    {
-        if (sptr[1] == 'n')
-        {
-            *sptr = '\n';
-            sptr++;
-            *sptr = 0;
-            sptr++;
-            strcat(str, sptr);
-        } else {
-            fprintf(stderr, "Unrecognized escape sequence in string\n");
-            sptr += 2;
-        }
-        sptr = strchr(sptr, '\\');
-    }
-
-    return str;
+    return *(int *)&Memory[address];
 }
 //***************************************
-int Load(Machine_State *cpu, const char *filename)
+void Set_Word(int address, int value)
 {
-    int byte = 0;
-    int heap_top = MEMORY_SIZE;
-    int loc;
-    int value;
-    char record_type[20];
-    char string[256];
-    char *sptr;
-    int  slen;
-    FILE *input = fopen(filename, "r");
-
-    if (input == NULL) return 1;
-
-    fscanf(input, "%s", record_type);
-
-    while (!feof(input) && record_type[0] != 'X')
+    if (address < 0 || (address+WORD_SIZE) >= MEMORY_SIZE)
     {
-        switch (record_type[0])
-        {
-            case 'D':
-                fscanf(input, "%d", &value);
-                *(int *)(&Memory[byte]) = value;
-                byte += WORD_SIZE;
-                break;
-            case 'F':
-                fscanf(input, "%d %d", &loc, &value);
-                if (loc >= byte)
-                {
-                    fprintf(stderr, "File format error: fixup record precedes data\n");
-                }
-                *(int *)(&Memory[loc]) = value;
-                break;
-            case 'S':
-                fgets(string, sizeof(string), input);
-                slen = strlen(string);
-                if (string[slen - 1] != '\n')
-                {
-                    fprintf(stderr, "File format error: string longer than MAX string size\n");
-                    exit(-1);
-                }
-
-                sptr = format_string(string);
-                slen = strlen(sptr);
-
-                // +4 instead of +3 to accomodate the null byte
-                heap_top -= ((slen+4)/4)*WORD_SIZE;
-
-                strcpy((char *)&Memory[heap_top], sptr);
-                *(int *)(&Memory[byte]) = heap_top;
-                byte += WORD_SIZE;
-                break;
-            default:
-                fprintf(stderr, "File format error: Unrecognized record type\n");
-                break;
-        }
-        fscanf(input, "%s", record_type);
+        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        exit(-1);
+    } 
+    else if (address & 0x0003)
+    {
+        fprintf(stderr, "Machine check: misalligned address 0x%08X out of bounds\n", address);
+        exit(-1);
     }
 
-    cpu->mem = Memory;
-    cpu->IP = 0;
-    cpu->FP = byte;
-    cpu->SP = byte;
-
-    return 0;
+    *(int *)&Memory[address] = value;
 }
-int Load_And_Go(const char *filename)
+//***************************************
+int Get_Byte(int address)
 {
-    Load(&Regs, filename);
-    Execute(&Regs);
+    if (address < 0 || address >= MEMORY_SIZE)
+    {
+        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        exit(-1);
+    } 
 
-    return 0;
+    return Memory[address];
+}
+//***************************************
+void Set_Byte(int address, int value)
+{
+    if (address < 0 || address >= MEMORY_SIZE)
+    {
+        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        exit(-1);
+    } 
+
+    Memory[address] = value;
+}
+//***************************************
+void *Get_Addr(int address)
+{
+    if (address < 0 || address >= MEMORY_SIZE)
+    {
+        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        exit(-1);
+    } 
+
+    return &Memory[address];
 }
