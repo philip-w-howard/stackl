@@ -10,6 +10,7 @@ using std::list;
 #include "cStructDeclNode.h"
 #include "cArrayValNode.h"
 #include "cVarDeclNode.h"
+#include "cConstDeclNode.h"
 #include "cSymbolTable.h"
 #include "cVarPartNode.h"
 
@@ -166,7 +167,13 @@ class cVarRefNode : public cExprNode
     {
         cVarPartNode *last = mList->back();
 
-        if (last->IsArrayRef())
+        if (last->GetDecl()->IsConst())
+        {
+            cConstDeclNode *val=dynamic_cast<cConstDeclNode *>(last->GetDecl());
+            EmitInt(PUSH_OP);
+            EmitInt(val->GetValue());
+        }
+        else if (last->IsArrayRef())
         {
             EmitOffset();
             EmitInt(PUSHCVARIND_OP);

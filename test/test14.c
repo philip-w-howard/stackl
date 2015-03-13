@@ -1,28 +1,18 @@
 #include "system.h"
 
+const int ONE = 1;
+#define TWO 2
+
 int main()
 {
-    char arr[50];
-    int val;
+    int aa;
+    aa = 5;
+    char *ptr;
+    ptr = "mixing decls and statements works\n";
+    if (aa) prints(ptr);
 
-    prints("prints works\n");
-    prints("print the number 88: ");
-    printi(88);
-
-    scans(arr);
-    prints(arr);
-    prints("\n");
-    scanl(arr);
-    prints(arr);
-    prints("\n");
-
-    scani(&val);
-    prints("entered: ");
-    printi(val);
-
-    prints("Testing exit\n");
-    exit(0);
-    prints("Exit did not work\n");
+    printi(ONE);
+    printi(TWO);
 
     return 0;
 }

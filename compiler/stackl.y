@@ -61,6 +61,7 @@
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
 %token  END
 %token  TRAP
+%token  DEFINE CONST
 
 %type <decls> program
 %type <block> block
@@ -70,7 +71,8 @@
 %type <decl> decl
 %type <varDecl> var_decl
 %type <structDecl> struct_decl
-%type <decls> func_decls
+%type <decls> global_decls
+%type <decl> global_decl
 %type <funcDecl> func_decl
 %type <funcDecl> func_header
 %type <funcDecl> func_prefix
@@ -98,7 +100,7 @@
 
 %%
 
-program: func_decls END         { $$ = $1; 
+program: global_decls END       { $$ = $1; 
                                   if (yynerrs == 0)
                                   {
                                       yyast_root = $$;
@@ -109,17 +111,15 @@ program: func_decls END         { $$ = $1;
                                       YYABORT;
                                   }
                                 }
-block:   open decls stmts close { $$ = new cBlockNode($2, $3); }
-       | open stmts close       { $$ = new cBlockNode(NULL, $2); }
+block:      open stmts close    { $$ = new cBlockNode(NULL, $2); }
 open:   '{'                     { $$ = symbolTableRoot->IncreaseScope(); }
 
 close:  '}'                     { $$ = symbolTableRoot->DecreaseScope(); }
 
-decls:      decls decl          { $$ = $1; 
-                                  $1->AddNode($2); 
+decls:      decls decl          { $$ = $1;
+                                  $$->AddNode($2);
                                 }
         |   decl                { $$ = new cDeclsNode($1); }
-
 decl:       var_decl ';'        { $$ = $1; }
         |   struct_decl ';'     { $$ = $1; }
         |   UNSUPPORTED         { semantic_error(std::string($1) + " is not supported");
@@ -143,13 +143,19 @@ var_decl:   TYPE_ID IDENTIFIER
 
 struct_decl:  STRUCT open decls close IDENTIFIER    
                                 { $$ = new cStructDeclNode($2, $3, $5); }
-func_decls: func_decls func_decl { 
-                                   $$ = $1;
-                                   $$->AddNode($2);
+global_decls: global_decls global_decl  
+                                {
+                                    $$ = $1;
+                                    $$->AddNode($2);
                                 }
-        |   func_decl           { $$ = new cDeclsNode($1); 
-                                }
-        |   UNSUPPORTED         { 
+        | global_decl           { $$ = new cDeclsNode($1); }
+global_decl: func_decl          { $$ = $1; }
+        | struct_decl           { $$ = $1; }
+        | CONST TYPE_ID IDENTIFIER '=' INT_VAL ';'
+                                { $$ = new cConstDeclNode($3, $5); }
+        | DEFINE IDENTIFIER INT_VAL
+                                { $$ = new cConstDeclNode($2, $3); }
+        | UNSUPPORTED           { 
                                     semantic_error(std::string($1) + 
                                             " is not supported");
                                     YYERROR;
@@ -159,17 +165,11 @@ func_decl:  func_header ';'
                             symbolTableRoot->DecreaseScope();
                             $$ = $1;
                           }
-        |   func_header '{' decls stmts '}'
-                          {
-                            symbolTableRoot->DecreaseScope();
-                            $$ = $1;
-                            $1->SetBody($3,$4);
-                          }
         |   func_header '{' stmts '}'
                           {
                             symbolTableRoot->DecreaseScope();
                             $$ = $1;
-                            $1->SetBody(NULL,$3);
+                            $1->SetBody($3);
                           }
 
 func_header:  func_prefix paramsspec ')' 
@@ -214,7 +214,8 @@ stmts:      stmts stmt          { $$ = $1;
                                 }
         |   stmt                { $$ = new cStmtsNode($1); }
 
-stmt:       IF '(' ccomp ')' stmt ELSE stmt
+stmt:       decl                { $$ = $1; }
+        |   IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cIfNode($3, $5, $7); }
         |   IF '(' ccomp ')' stmt
                                 { $$ = new cIfNode($3, $5, NULL); }
@@ -241,7 +242,6 @@ stmt:       IF '(' ccomp ')' stmt ELSE stmt
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   TRAP '(' ')' ';'    { $$ = new cTrapNode(); }
-        |   error ';'           { $$ = NULL; }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }

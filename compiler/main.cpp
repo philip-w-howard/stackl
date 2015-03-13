@@ -32,6 +32,9 @@ void Process_Args(int argc, char **argv)
                 Do_Debug = 1;
             else if (strcmp(arg, "ast") == 0)
                 Do_Ast = 1;
+            else if (strcmp(arg, "version") == 0)
+                std::cout << "stacklc Beta " << __DATE__ << " " 
+                    << __TIME__ << std::endl;
             else
                 std::cerr << "Unrecognized option " << argv[ii] << std::endl;
         }
@@ -45,8 +48,6 @@ void Process_Args(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    std::cout << "stacklc Beta " << __DATE__ << " " << __TIME__ << std::endl;
-
     char outfile_name[200];
     int result = 0;
 

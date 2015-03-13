@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include "cAstNode.h"
+#include "cStmtNode.h"
 
 class cSymbol;
 
-class cDeclNode : public cAstNode
+class cDeclNode : public cStmtNode
 {
   public:
-    cDeclNode() : cAstNode()
+    cDeclNode() : cStmtNode()
     {}
 
     std::string TypeId();
@@ -25,7 +25,8 @@ class cDeclNode : public cAstNode
     virtual bool IsStruct()     { return false; }
     virtual bool IsArray()      { return false; }
     virtual bool IsPointer()    { return false; }
-    virtual bool IsAbsolute()   { return false; }
+    //virtual bool IsAbsolute()   { return false; }
+    virtual bool IsConst()      { return false; }
     virtual int Size()          { return mSize; }
     virtual int GetOffset()     { return mOffset; }
 

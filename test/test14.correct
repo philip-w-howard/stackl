@@ -1,7 +1,3 @@
-prints works
-print the number 88: 88
-this
- is a test
-entered: 77
-Testing exit
-Exiting with status 0
+mixing decls and statements works
+1
+2

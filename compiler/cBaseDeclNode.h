@@ -33,7 +33,7 @@ class cBaseDeclNode : public cDeclNode
     virtual bool IsType()       { return true; }
     virtual bool IsPointer()    { return mIsPointer; }
     virtual bool IsArray()      { return mIsArray; }
-    virtual bool IsAbsolute()   { return mIsAbsolute; }
+    //virtual bool IsAbsolute()   { return mIsAbsolute; }
 
     // NOTE strings are the only pointers or arrays for now
     virtual bool IsString() { return (IsPointer() || (IsChar() && IsArray())); }

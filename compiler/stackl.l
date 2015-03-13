@@ -77,7 +77,8 @@ identifier      {letter}({letter}|{digit}|"_")*
 "/*END*/"                   RETURN(END);
 "trap"                      RETURN(TRAP);
 "static"                    { RETURN(proc_unsupported()); }
-"const"                     { RETURN(proc_unsupported()); }
+"const"                     { RETURN(CONST); }
+"#define"                   { RETURN(DEFINE); }
 "volatile"                  { RETURN(proc_unsupported()); }
 "break"                     { RETURN(proc_unsupported()); }
 "switch"                    { RETURN(proc_unsupported()); }

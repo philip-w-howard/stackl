@@ -22,6 +22,7 @@
 #include "cDeclsNode.h"
 #include "cStmtsNode.h"
 #include "cVarDeclNode.h"
+#include "cConstDeclNode.h"
 #include "cStructDeclNode.h"
 #include "cArrayDeclNode.h"
 #include "cVarAddrNode.h"

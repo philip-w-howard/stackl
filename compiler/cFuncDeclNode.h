@@ -34,7 +34,6 @@ class cFuncDeclNode : public cDeclNode
             mId = existingSymbol;
             mReturnType = fDecl->mReturnType;
             mParams = fDecl->mParams;
-            mDecls = fDecl->mDecls;
             mStmts = fDecl->mStmts;
             mParamsSet = fDecl->mParamsSet;
             mId->SetType(this);
@@ -46,7 +45,6 @@ class cFuncDeclNode : public cDeclNode
             mReturnType = type;
             mId = id;
             mParams = NULL;
-            mDecls = NULL;
             mStmts = NULL;
             mParamsSet = false;
             mId->SetType(this);
@@ -83,9 +81,8 @@ class cFuncDeclNode : public cDeclNode
     { return mParams; }
 
     // set the local var delcs and the statments
-    void SetBody(cDeclsNode *decls, cStmtsNode *stmts)
+    void SetBody(cStmtsNode *stmts)
     {
-        mDecls = decls;
         mStmts = stmts;
     }
 
@@ -95,9 +92,8 @@ class cFuncDeclNode : public cDeclNode
         // functions take no space in outer scope, so leave base alone
         int offset = 0;
         if (mParams != NULL) mParams->ComputeOffsets(-STACK_FRAME_SIZE);
-        if (mDecls != NULL) offset = mDecls->ComputeOffsets(offset);
         if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
-        if (mDecls != NULL) mDeclsSize = mDecls->Size();
+        mDeclsSize = offset - base; 
 
         return base;
     }
@@ -110,7 +106,6 @@ class cFuncDeclNode : public cDeclNode
             result += mParams->toString();
         else
             result += "()";
-        if (mDecls != NULL) result += "\n" + mDecls->toString();
         if (mStmts != NULL) result += "\n" + mStmts->toString();
         if (mDeclsSize != 0) result += "\nsize: " + std::to_string(mDeclsSize);
         result += "\n)";
@@ -127,7 +122,6 @@ class cFuncDeclNode : public cDeclNode
             EmitInt(mDeclsSize);
         }
 
-        if (mDecls != NULL) mDecls->GenerateCode();
         if (mStmts != NULL)
         {
             mStmts->GenerateCode();
@@ -138,7 +132,6 @@ class cFuncDeclNode : public cDeclNode
   protected:
     cSymbol *mReturnType;       // return type of function
     cParamsSpecNode *mParams;   // formal parameter list
-    cDeclsNode *mDecls;         // local variables
     cStmtsNode *mStmts;         // executable statements
     bool mParamsSet;            // indicates parameters have been set
     int mDeclsSize;             // size of the declarations. Needed to

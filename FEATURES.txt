@@ -2,6 +2,7 @@ BUGS
 
 
 TODO
+
 Machine executes one instruction per Execute call
 Return from main calls exit() not HALT_OP
 Rudimentary scheduler
@@ -21,6 +22,7 @@ remove the requirement for /*END*/
 
 WORKS
 
+allow global decls include consts
 validate that a Function Call is a function
 syscalls for print, scan, exit, exec
 address of in params
