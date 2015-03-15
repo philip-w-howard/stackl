@@ -1,40 +1,60 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "loader.h"
+#include "sched.h"
 #include "opcodes.h"
 
+char Input_File[200] = "";
+
+void Process_Args(int argc, char **argv)
+{
+    int ii;
+    for (ii=1; ii<argc; ii++)
+    {
+        if (argv[ii][0] == '-')
+        {
+            char *arg = &argv[ii][1];
+            if (strcmp(arg, "debug") == 0)
+                Enable_Debug();
+            else if (argv[ii][1] == 'N')
+                Set_Max_Instr(atoi(&argv[ii][2]));
+            else if (strcmp(arg, "version") == 0)
+                printf("stackl Beta %s %s\n", __DATE__, __TIME__);
+            else
+                printf("Unrecognized option %s\n", argv[ii]);
+        }
+        else
+        {
+            // assume input file name
+            strcpy(Input_File, argv[ii]);
+        }
+    }
+}
 int main(int argc, char **argv)
 {
     int result;
-    Machine_State cpu;
 
-    Init_Machine();
+    Process_Args(argc, argv);
 
-    //printf("stackl Beta %s %s\n", __DATE__, __TIME__);
-
-    if (argc < 2) 
+    if (strlen(Input_File) == 0)
     {
         printf("Need to specify an executable file\n");
         return 1;
-    } else {
-        if (argc > 2 && strcmp(argv[2], "debug") == 0) Enable_Debug();
-        if (argc > 3) Set_Max_Instr(atoi(argv[3]));
+    } 
 
+    Init_Machine();
+    Sched_Init();
 
-        Get_Machine_State(&cpu);
-
-        result = Load(&cpu, argv[1]);
-        if (result != 0) 
-        {
-            printf("Unable to execute %s\n", argv[1]);
-            return 2;
-        }
-
-        Set_Machine_State(&cpu);
-
-        Machine_Execute();
+    result = Create(argv[1]);
+    if (result != 0) 
+    {
+        printf("Unable to execute %s\n", argv[1]);
+        return 2;
     }
+
+    Schedule();
+
+    Machine_Execute();
 
     return 0;
 }

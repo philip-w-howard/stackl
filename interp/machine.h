@@ -1,6 +1,6 @@
 #pragma once
 
-#define MEMORY_SIZE  10000
+#define MEMORY_SIZE  20000
 #define WORD_SIZE 4
 
 typedef struct

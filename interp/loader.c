@@ -61,10 +61,10 @@ char *format_string(char *str)
     return str;
 }
 //***************************************
-int Load(Machine_State *cpu, const char *filename)
+int Load(Machine_State *cpu, const char *filename, int base, int top)
 {
-    int byte = 0;
-    int heap_top = MEMORY_SIZE;
+    int byte = base;
+    int heap_top = top;
     int loc;
     int value;
     char record_type[20];
@@ -120,7 +120,7 @@ int Load(Machine_State *cpu, const char *filename)
         fscanf(input, "%s", record_type);
     }
 
-    cpu->IP = 0;
+    cpu->IP = base;
     cpu->FP = byte;
     cpu->SP = byte;
 

@@ -1,23 +1,30 @@
 BUGS
 
+Exit fails after return from main
 
 TODO
 
-Machine executes one instruction per Execute call
+include files from proper directories
+
+library code included by default (e.g. syscal and halt)
+
 Return from main calls exit() not HALT_OP
 Rudimentary scheduler
-Fork does malloc to get memory, exit() does free
+Fork loads at different addr
 
-command line args
+command line args to main
 
 assignment to charp vars
     array cell address
 address-of operator
 
 short circuit of && and ||
+proper implementation of structs
+
 full semantic checks
 make opcodes an enum?
-proper command line argument processing for stackl
+
+-help for stackl and stacklc
 
 WORKS
 

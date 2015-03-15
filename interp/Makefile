@@ -4,6 +4,7 @@ OBJS=stackl.o \
 	 machine.o \
 	 syscall.o \
 	 loader.o \
+	 sched.o \
 
 all: stackl
 
