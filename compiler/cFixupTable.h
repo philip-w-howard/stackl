@@ -31,6 +31,8 @@ class cFixupTable
             found = mDest.find(name);
             if (found != mDest.end())
             {
+                output << "C " << (*it).first << " " 
+                    << (*found).first << "\n";
                 output << "F " << (*it).second << " " 
                     << (*found).second << "\n";
             } else {

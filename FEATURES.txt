@@ -4,11 +4,7 @@ TODO
 
 include files from proper directories
 
-library code included by default (e.g. syscal and halt)
-
-Return from main calls exit() not HALT_OP
 Rudimentary scheduler
-Fork loads at different addr
 
 command line args to main
 
@@ -26,6 +22,9 @@ make opcodes an enum?
 
 WORKS
 
+Fork loads at different addr
+Return from main calls exit() not HALT_OP
+library code is included by default (e.g. syscal and halt)
 allow global decls include consts
 validate that a Function Call is a function
 syscalls for print, scan, exit, exec

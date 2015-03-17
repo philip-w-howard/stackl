@@ -29,6 +29,8 @@ class cFuncDeclNode : public cDeclNode
         if (existingSymbol != NULL && existingSymbol->GetType()->IsFunc())
         {
             // we already have a declaration, so make this one match
+            // FIX THIS: should do semantic checks instead of blindly
+            // accepting the old def
             cFuncDeclNode *fDecl = 
                 dynamic_cast<cFuncDeclNode *>(existingSymbol->GetType());
             mId = existingSymbol;
@@ -114,6 +116,10 @@ class cFuncDeclNode : public cDeclNode
 
     virtual void GenerateCode()
     {
+        // if no statements, this is a prototype and we don't gen code
+        if (mStmts == NULL) return;
+
+        EmitComment(mId->Name() + "\n");
         SetJumpDest(mId->Name());
 
         if (mDeclsSize != 0)

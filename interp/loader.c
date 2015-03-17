@@ -90,7 +90,7 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
                 fscanf(input, "%d %d", &loc, &value);
                 if (loc >= byte)
                 {
-                    fprintf(stderr, "File format error: fixup record precedes data\n");
+                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, byte);
                 }
                 Set_Word(loc, value);
                 break;
@@ -113,6 +113,10 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
                 Set_Word(byte, heap_top);
                 byte += WORD_SIZE;
                 break;
+            case 'C':
+                fgets(string, sizeof(string), input);
+                break;
+
             default:
                 fprintf(stderr, "File format error: Unrecognized record type\n");
                 break;

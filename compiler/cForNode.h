@@ -40,8 +40,10 @@ class cForNode : public cStmtNode
 
     virtual int ComputeOffsets(int base)
     {
-        mExpr->ComputeOffsets(base);
-        mStmt->ComputeOffsets(base);
+        if (mInit != NULL) mInit->ComputeOffsets(base);
+        if (mExpr != NULL) mExpr->ComputeOffsets(base);
+        if (mUpdate != NULL) mUpdate->ComputeOffsets(base);
+        if (mStmt != NULL) mStmt->ComputeOffsets(base);
         return base;
     }
 

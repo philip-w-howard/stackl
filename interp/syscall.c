@@ -10,7 +10,7 @@ void syscall(Machine_State *cpu, int *args)
     switch (args[1])
     {
         case EXIT_CALL:
-            printf("Exiting with status %d\n", args[2]);
+            //printf("Exiting with status %d\n", args[2]);
             exit(args[2]);
             break;
         case PRINTI_CALL:

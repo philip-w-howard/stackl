@@ -35,18 +35,9 @@ bool InitOutput(const char *filename)
     }
 
     EmitInt(CALL_OP);
-    SetJumpSource("main");
+    SetJumpSource("startup__");
     EmitInt(POP_OP);            // need to throw away the return value
     EmitInt(HALT_OP);
-    /*
-    EmitInt(PUSH_OP);
-    EmitInt(3);
-    EmitInt(PUSH_OP);
-    EmitInt(EXIT_CALL);
-    EmitInt(PUSH_OP);
-    EmitInt(0);
-    EmitInt(TRAP_OP);
-    */
 
     return true;
 }
@@ -86,6 +77,11 @@ void EmitString(std::string str)
 {
     Output << "S " << str << "\n";
     Location += WORD_SIZE;
+}
+//*****************************************
+void EmitComment(std::string str)
+{
+    Output << "C " << Location << " " << str << "\n";
 }
 //*****************************************
 void SetJumpSource(std::string label)

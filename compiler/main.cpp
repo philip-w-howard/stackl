@@ -46,6 +46,40 @@ void Process_Args(int argc, char **argv)
     }
 }
 
+//****************************************
+int process_file(const char *filename, cDeclsNode **program, int *total_errors)
+{
+    int result;
+
+    yyin = fopen(filename, "r");
+    if (yyin == NULL)
+    {
+        std::cerr << "ERROR: Unable to open file " << filename << std::endl;
+        exit(-1);
+    }
+
+    result = yyparse();
+    while (yyast_root != NULL)
+    {
+        *total_errors += yynerrs;
+        if (result == 0 && *total_errors == 0)
+        {
+            if (*program == NULL)
+                *program = yyast_root;
+            else
+                (*program)->AddList(yyast_root);
+        }
+        result = yyparse();
+    }
+
+    fclose(yyin);
+
+    if (result != 0) return result;
+    if (*total_errors != 0) return 1;
+    return 0;
+}
+
+//****************************************
 int main(int argc, char **argv)
 {
     char outfile_name[200];
@@ -61,34 +95,12 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    yyin = fopen(Input_File, "r");
-    if (yyin == NULL)
-    {
-        std::cerr << "ERROR: Unable to open file " << Input_File << std::endl;
-        exit(-1);
-    }
-
-
-    // redirect cout to the output file
-    //std::cerr.rdbuf(output.rdbuf());
-
     symbolTableRoot = cSymbolTable::CreateDefaultTable();
     cDeclsNode *program = NULL;
     int total_errors = 0;
 
-    result = yyparse();
-    while (yyast_root != NULL)
-    {
-        total_errors += yynerrs;
-        if (result == 0 && total_errors == 0)
-        {
-            if (program == NULL)
-                program = yyast_root;
-            else
-                program->AddList(yyast_root);
-        }
-        result = yyparse();
-    }
+    result = process_file("startup.h", &program, &total_errors);
+    if (result ==0) process_file(Input_File, &program, &total_errors);
 
     if (result == 0 && total_errors == 0)
     {
@@ -98,7 +110,6 @@ int main(int argc, char **argv)
             exit(-2);
         }
 
-        //std::cout << program->toString() << std::endl;
         program->ComputeOffsets(0);
         if (Do_Ast)
         {
@@ -126,7 +137,7 @@ int main(int argc, char **argv)
         program->GenerateCode();
         FinalizeOutput();
     } else {
-        std::cerr << yynerrs << " Errors in compile" << std::endl;
+        std::cerr << total_errors << " Errors in compile" << std::endl;
     }
 
     return result;

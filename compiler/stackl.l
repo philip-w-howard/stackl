@@ -50,6 +50,7 @@ identifier      {letter}({letter}|{digit}|"_")*
                     //if ( !YY_CURRENT_BUFFER )
                     if (File_Depth < 0)
                     {
+                        File_Depth = 0;
                         yyterminate();
                     } else {
                         yypop_buffer_state();
@@ -118,12 +119,6 @@ L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
 
 %%
 
-static int Return(int val)
-{
-    //printf("Scanned '%s': %d\n", yytext, val);
-    return val;
-}
-
 // process identifiers: 
 // determine if it is a type, var, or new
 static int proc_identifier(const char *name)
@@ -171,3 +166,9 @@ static void open_input(char *name)
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
 }
+static int Return(int val)
+{
+    //printf("Scanned '%s': %d\n", yytext, val);
+    return val;
+}
+
