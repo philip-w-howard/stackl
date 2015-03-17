@@ -224,20 +224,6 @@ stmt:       decl                { $$ = $1; }
                                 { $$ = new cForNode($3, $5, $7, $9); }
         |   WHILE '(' ccomp ')' stmt
                                 { $$ = new cWhileNode($3, $5); }
-        /*
-        |   PRINT '(' expr ')' ';'
-                                { $$ = new cPrintNode($3); }
-        |   PRINT '(' string_lit ')' ';'
-                                { $$ = new cPrintNode($3); }
-        |   PRINTC '(' expr ')' ';'
-                                { $$ = new cPrintcNode($3); }
-        |   GETS '(' lval ')' ';'
-                                { $$ = new cScanNode($3, 'S'); }
-        |   GETL '(' lval ')' ';'
-                                { $$ = new cScanNode($3, 'L'); }
-        |   GETI '(' lval ')' ';'
-                                { $$ = new cScanNode($3, 'I'); }
-        */
         |   assign ';'          { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
@@ -246,6 +232,7 @@ stmt:       decl                { $$ = $1; }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }
+        | lval '=' TRAP '(' ')' { $$ = new cAssignTrapNode($1); }
         | lval PLUS_EQ expr     { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '+', $3));
                                 }

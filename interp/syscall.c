@@ -5,8 +5,9 @@
 #include "loader.h"
 #include "sched.h"
 
-void syscall(Machine_State *cpu, int *args)
+int syscall(Machine_State *cpu, int *args)
 {
+    int temp = 0;
     switch (args[1])
     {
         case EXIT_CALL:
@@ -32,8 +33,13 @@ void syscall(Machine_State *cpu, int *args)
             scanf("%d", (int *)Get_Addr(args[2]));
             break;
         case EXEC_CALL:
-            // Need to load in current memory
-            Load(cpu, Get_Addr(args[2]), 0, MEMORY_SIZE);
+            temp = Sched_Load(Get_Addr(args[2]));
+            break;
+        case FORK_CALL:
+            temp = Fork();
+            break;
+        case WAIT_CALL:
+            Wait(args[2]);
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);
@@ -42,4 +48,5 @@ void syscall(Machine_State *cpu, int *args)
             break;
     }
     Schedule();
+    return temp;
 }

@@ -39,3 +39,14 @@ int exec(char *file)
     syscall(3, EXEC_CALL, file);
     return 0;
 }
+
+int fork()
+{
+    return syscall(2, FORK_CALL);
+}
+
+int wait(int process)
+{
+    syscall(3, WAIT_CALL, process);
+    return 0;
+}

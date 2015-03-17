@@ -32,6 +32,7 @@
 #include "cForNode.h"
 #include "cWhileNode.h"
 #include "cAssignNode.h"
+#include "cAssignTrapNode.h"
 #include "cFuncDeclNode.h"
 #include "cFuncCallNode.h"
 #include "cParamsSpecNode.h"

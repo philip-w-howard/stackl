@@ -188,7 +188,7 @@ void Execute(Machine_State *cpu)
             INC(IP, 1);
             break;
         case TRAP_OP:
-            DEBUG("TRAP %d %d", GET_INTVAL(FP,0), GET_INTVAL(FP,1));
+            DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             {
                 int args[20];
                 int ii;
@@ -199,7 +199,9 @@ void Execute(Machine_State *cpu)
                 }
                 INC(SP, -args[0]);
                 INC(IP, 1);
-                syscall(cpu, args);
+                temp = syscall(cpu, args);
+                SET_INTVAL(SP, 0, temp);
+                INC(SP, 1);
             }
             break;
         case JUMP_OP:

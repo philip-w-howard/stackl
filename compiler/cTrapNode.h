@@ -35,6 +35,7 @@ class cTrapNode : public cStmtNode
     virtual void GenerateCode()
     {
         EmitInt(TRAP_OP);
+        EmitInt(POP_OP);
     }
 };
 

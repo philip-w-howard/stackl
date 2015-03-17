@@ -25,6 +25,22 @@ typedef struct
 static Process_State_t Process_State[NUM_PROCESSES];
 static int Current_Process;
 //*************************************
+static void duplicate_memory(int to_proc, int from_proc)
+{
+    int from;
+    int to;
+    from = Process_State[from_proc].base;
+    to = Process_State[to_proc].base;
+
+    while (from < Process_State[from_proc].top &&
+           to   < Process_State[to_proc].top)
+    {
+        Set_Word(to, Get_Word(from));
+        to += WORD_SIZE;
+        from += WORD_SIZE;
+    }
+}
+//*************************************
 void Sched_Init()
 {
     int ii;
@@ -105,32 +121,54 @@ void Exit(int status)
     return;
 }
 //*************************************
-int  Create(char *filename)
+int  Fork()
 {
     int ii;
     int status;
 
     Get_Machine_State(&Process_State[Current_Process].cpu);
+    status = Process_State[Current_Process].state;
 
     // Find some empty slot to use
     for (ii=0; ii<NUM_PROCESSES; ii++)
     {
         if (Process_State[ii].state == EMPTY)
         {
-            Current_Process = ii;
-            status = Sched_Load(filename);
-
-            if (status != 0)
+            if (status != EMPTY)
             {
-                Process_State[ii].state = EMPTY;
-                return status;
+                int mem_diff = Process_State[ii].base - 
+                    Process_State[Current_Process].base;
+
+                duplicate_memory(ii, Current_Process);
+                Get_Machine_State(&Process_State[ii].cpu);
+                Process_State[ii].cpu.IP += mem_diff;
+                Process_State[ii].cpu.SP += mem_diff;
+                Process_State[ii].cpu.FP += mem_diff;
+            }
+            else
+            {
+                // no point duplicating memory. 
+                // Set regs to point at start of memory
+                Process_State[ii].cpu.IP = Process_State[ii].base;
+                Process_State[ii].cpu.SP = Process_State[ii].base;
+                Process_State[ii].cpu.FP = Process_State[ii].base;
             }
 
-            return 0;
+            Process_State[ii].state = RUNABLE;
+            
+            // In the child, we need to simulate the pushing of a zero
+            // because the syscall code that handles the return value 
+            // will not execute in the child
+            Set_Word(Process_State[ii].cpu.SP, 0);
+            Process_State[ii].cpu.SP += WORD_SIZE;
+            
+            Current_Process = ii;
+
+            return Current_Process+1;;
         }
     }
 
-    return 1;
+    return -1;
 }
 //*************************************
 int  Sched_Load(char *filename)
@@ -158,7 +196,7 @@ void  Wait(int process)
 {
     Get_Machine_State(&Process_State[Current_Process].cpu);
     Process_State[Current_Process].state = WAITING;
-    Process_State[Current_Process].waiting_for = process;
+    Process_State[Current_Process].waiting_for = process - 1;
     Schedule();
 }
 

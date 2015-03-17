@@ -45,11 +45,18 @@ int main(int argc, char **argv)
     Init_Machine();
     Sched_Init();
 
-    result = Create(argv[1]);
+    result = Fork();
+    if (result == -1)
+    {
+        printf("Unable to fork initial process\n");
+        return 2;
+    }
+
+    result = Sched_Load(argv[1]);
     if (result != 0) 
     {
         printf("Unable to execute %s\n", argv[1]);
-        return 2;
+        return 3;
     }
 
     Schedule();
