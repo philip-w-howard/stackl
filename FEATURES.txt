@@ -1,7 +1,5 @@
 BUGS
 
-Exit fails after return from main
-
 TODO
 
 include files from proper directories

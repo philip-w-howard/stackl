@@ -13,6 +13,7 @@
 #include <string>
 #include "codegen.h"
 #include "cFixupTable.h"
+#include "../interp/system.h"
 
 // Output files
 static std::ofstream Output;
@@ -37,6 +38,15 @@ bool InitOutput(const char *filename)
     SetJumpSource("main");
     EmitInt(POP_OP);            // need to throw away the return value
     EmitInt(HALT_OP);
+    /*
+    EmitInt(PUSH_OP);
+    EmitInt(3);
+    EmitInt(PUSH_OP);
+    EmitInt(EXIT_CALL);
+    EmitInt(PUSH_OP);
+    EmitInt(0);
+    EmitInt(TRAP_OP);
+    */
 
     return true;
 }

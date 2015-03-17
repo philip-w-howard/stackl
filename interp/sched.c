@@ -3,6 +3,7 @@
 
 #include "machine.h"
 #include "loader.h"
+#include "sched.h"
 
 #define NUM_PROCESSES 2
 
@@ -116,17 +117,15 @@ int  Create(char *filename)
     {
         if (Process_State[ii].state == EMPTY)
         {
-            status = Load(&Process_State[ii].cpu, filename, 
-                Process_State[ii].base, Process_State[ii].top);
+            Current_Process = ii;
+            status = Sched_Load(filename);
 
             if (status != 0)
             {
-                Process_State[Current_Process].state = EMPTY;
+                Process_State[ii].state = EMPTY;
                 return status;
             }
 
-            Process_State[ii].state = RUNABLE;
-            
             return 0;
         }
     }
@@ -149,6 +148,7 @@ int  Sched_Load(char *filename)
     }
 
     Process_State[Current_Process].state = RUNABLE;
+    Set_Machine_State(&Process_State[Current_Process].cpu);
 
     return 0;
 }
