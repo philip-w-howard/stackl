@@ -13,7 +13,7 @@
 #include <string>
 #include "codegen.h"
 #include "cFixupTable.h"
-#include "../interp/system.h"
+#include "../interp/syscodes.h"
 
 // Output files
 static std::ofstream Output;

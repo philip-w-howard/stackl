@@ -2,7 +2,10 @@
 // Calc Parser
 // Phil Howard
 
+#include <limits.h>     // for include path
 #include "lex.h"
+
+extern char Include_Path[PATH_MAX];
 
 #define RETURN(a) return Return(a);
 static int Return(int val);
@@ -134,15 +137,12 @@ static int proc_unsupported()
 {
     yylval.string = yytext;
     return UNSUPPORTED;
-    /*
-    semantic_error(std::string(yytext) + " is not supported");
-    std::cerr << "Compiler is aborting." << std::endl;
-    exit(-1);
-    */
 }
 static void open_input(char *name)
 {
     char *ptr;
+    char path[PATH_MAX] = "";
+
     if (*name == '"')
     {
         ptr = strrchr(name, '"');
@@ -154,9 +154,11 @@ static void open_input(char *name)
         ptr = strrchr(name, '>');
         if (ptr != NULL) *ptr = 0;
         name++;
+        strcpy(path, Include_Path);
     }
 
-    yyin = fopen( name, "r" );
+    strcat(path, name);
+    yyin = fopen( path, "r" );
 
     if ( ! yyin )
     {

@@ -15,6 +15,29 @@
 #include "lex.h"
 #include "codegen.h"
 
+#include <unistd.h>     // for include path
+#include <limits.h>     // for include path
+
+char Include_Path[PATH_MAX] = "";
+
+// set the include path to be the same as the directory where the EXE is.
+void set_include_path()
+{
+    char *ptr;
+
+    if (readlink("/proc/self/exe", Include_Path, PATH_MAX) == -1)
+    {
+        strcpy(Include_Path, "");
+    }
+
+    ptr = strrchr(Include_Path, '/');
+    if (ptr != NULL)
+    {
+        ptr++;
+        *ptr = 0;
+    }
+}
+
 extern cDeclsNode *yyast_root;
 
 char Input_File[200] = "";
@@ -51,6 +74,8 @@ int process_file(const char *filename, cDeclsNode **program, int *total_errors)
 {
     int result;
 
+    // KLUDGE: should be handled within the scanner
+    yylineno = 0;
     yyin = fopen(filename, "r");
     if (yyin == NULL)
     {
@@ -85,6 +110,7 @@ int main(int argc, char **argv)
     char outfile_name[200];
     int result = 0;
 
+    set_include_path();
     Process_Args(argc, argv);
 
 //    std::streambuf *cout_buf = std::cout.rdbuf();
@@ -99,7 +125,10 @@ int main(int argc, char **argv)
     cDeclsNode *program = NULL;
     int total_errors = 0;
 
-    result = process_file("startup.h", &program, &total_errors);
+    char startup[PATH_MAX];
+    strcpy(startup, Include_Path);
+    strcat(startup, "startup.h");
+    result = process_file(startup, &program, &total_errors);
     if (result ==0) process_file(Input_File, &program, &total_errors);
 
     if (result == 0 && total_errors == 0)

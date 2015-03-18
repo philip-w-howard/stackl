@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "sched.h"
 #include "opcodes.h"
+#include "syscall.h"
 
 char Input_File[200] = "";
 
@@ -14,8 +15,12 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "debug") == 0)
-                Enable_Debug();
+            if (strcmp(arg, "opcodes") == 0)
+                Opcodes_Debug();
+            else if (strcmp(arg, "sched") == 0)
+                Sched_Debug();
+            else if (strcmp(arg, "syscall") == 0)
+                Syscall_Debug();
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
@@ -52,10 +57,10 @@ int main(int argc, char **argv)
         return 2;
     }
 
-    result = Sched_Load(argv[1]);
+    result = Sched_Load(Input_File);
     if (result != 0) 
     {
-        printf("Unable to execute %s\n", argv[1]);
+        printf("Unable to execute %s\n", Input_File);
         return 3;
     }
 

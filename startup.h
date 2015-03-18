@@ -1,4 +1,4 @@
-#include "interp/system.h"
+#include <syscodes.h>
 
 int main();
 

@@ -100,9 +100,9 @@
 %%
 
 program: global_decls           { $$ = $1; 
+                                  yyast_root = $$;
                                   if (yynerrs == 0)
                                   {
-                                      yyast_root = $$;
                                       YYACCEPT;
                                   }
                                   else

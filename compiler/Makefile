@@ -1,5 +1,5 @@
 COPTS=-Wall -g -c  -O0 -std=c++0x
-OBJS=main.o \
+OBJS=stacklc.o \
 	 scanner.o \
 	 cSymbolTable.o \
 	 cDeclNode.o \
@@ -23,8 +23,8 @@ clean:
 .c.o:
 	g++ $(COPTS) $? -o $@
 
-main.o: main.cpp parser.c scanner.c 
-	g++ $(COPTS) main.cpp -o $@
+stacklc.o: stacklc.cpp parser.c scanner.c 
+	g++ $(COPTS) stacklc.cpp -o $@
 
 scanner.c: stackl.l parser.c
 	flex -o scanner.c stackl.l

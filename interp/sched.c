@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -24,6 +25,32 @@ typedef struct
 
 static Process_State_t Process_State[NUM_PROCESSES];
 static int Current_Process;
+
+static int Sched_Do_Debug = 0;
+
+//***************************************
+void Sched_Debug()
+{
+    Sched_Do_Debug = 1;
+}
+
+//***************************************
+// set DEBUG to "//" to turn off DEBUG
+#define DEBUG(fmt, ...) debug_print(fmt,## __VA_ARGS__);
+static void debug_print(const char *fmt, ...)
+{
+    if (!Sched_Do_Debug) return;
+
+    va_list args;
+    va_start(args, fmt);
+
+    char format[200];
+
+    sprintf(format, "Sched: %d: %s\n", Current_Process, fmt);
+
+    vfprintf(stderr, format, args);
+    va_end(args);
+}
 //*************************************
 static void duplicate_memory(int to_proc, int from_proc)
 {
@@ -61,6 +88,7 @@ void Schedule()
 {
     int ii;
 
+    DEBUG("Schedule");
     Get_Machine_State(&Process_State[Current_Process].cpu);
     if (Process_State[Current_Process].state == RUNNING)
     {
@@ -75,6 +103,7 @@ void Schedule()
         {
             Process_State[Current_Process].state = RUNNING;
             Set_Machine_State( &Process_State[Current_Process].cpu );
+            DEBUG("switch to %d", Current_Process);
             return;
         }
         Current_Process++;
@@ -88,6 +117,7 @@ void Exit(int status)
 {
     int ii;
 
+    DEBUG("stopping %d", Current_Process);
     Get_Machine_State(&Process_State[Current_Process].cpu);
     Process_State[Current_Process].state = EMPTY;
 
@@ -100,6 +130,7 @@ void Exit(int status)
             Process_State[ii].state = RUNNING;
             Current_Process = ii;
             Set_Machine_State( &Process_State[ii].cpu );
+            DEBUG("resuming %d", Current_Process);
             return;
         }
     }
@@ -112,6 +143,7 @@ void Exit(int status)
             Process_State[ii].state = RUNNING;
             Current_Process = ii;
             Set_Machine_State( &Process_State[ii].cpu );
+            DEBUG("restarting %d", Current_Process);
             return;
         }
     }
@@ -134,6 +166,7 @@ int  Fork()
     {
         if (Process_State[ii].state == EMPTY)
         {
+            DEBUG("FORK: %d", ii);
             if (status != EMPTY)
             {
                 int mem_diff = Process_State[ii].base - 
@@ -162,7 +195,10 @@ int  Fork()
             Set_Word(Process_State[ii].cpu.SP, 0);
             Process_State[ii].cpu.SP += WORD_SIZE;
             
-            Current_Process = ii;
+            // Current_Process = ii;
+
+            // Set_Machine_State( &Process_State[ii].cpu );
+            // DEBUG("starting %d", Current_Process);
 
             return Current_Process+1;;
         }
@@ -174,6 +210,9 @@ int  Fork()
 int  Sched_Load(char *filename)
 {
     int status;
+
+    DEBUG("load: %s", filename);
+
     Get_Machine_State(&Process_State[Current_Process].cpu);
     status = Load(&Process_State[Current_Process].cpu, filename, 
         Process_State[Current_Process].base, 
@@ -194,6 +233,7 @@ int  Sched_Load(char *filename)
 //*************************************
 void  Wait(int process)
 {
+    DEBUG("wait: %d", process);
     Get_Machine_State(&Process_State[Current_Process].cpu);
     Process_State[Current_Process].state = WAITING;
     Process_State[Current_Process].waiting_for = process - 1;

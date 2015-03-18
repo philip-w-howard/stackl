@@ -1,6 +1,7 @@
 #pragma once
 #include "machine.h"
 
+void Sched_Debug();
 void Sched_Init();
 void Schedule();
 void Exit();

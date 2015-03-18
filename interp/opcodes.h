@@ -44,5 +44,5 @@
 #define POPCVAR_OP  -9
 
 void Execute(Machine_State *machine);
-void Enable_Debug();
+void Opcodes_Debug();
 void Set_Max_Instr(int max);

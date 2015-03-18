@@ -16,7 +16,7 @@
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
 
-void Enable_Debug()
+void Opcodes_Debug()
 {
     Do_Debug = 1;
 }
@@ -27,8 +27,8 @@ void Set_Max_Instr(int max)
 }
 
 // set DEBUG to "//" to turn off DEBUG
-#define DEBUG(...) DebugPrint(cpu,__VA_ARGS__);
-void DebugPrint(Machine_State *cpu, const char *fmt, ...)
+#define DEBUG(...) debug_print(cpu,__VA_ARGS__);
+static void debug_print(Machine_State *cpu, const char *fmt, ...)
 {
     if (!Do_Debug) return;
 

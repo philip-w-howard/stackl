@@ -1,7 +1,17 @@
+RELEASE  = ~/bin
+INCLUDES = startup.h \
+	   system.h \
+	   string.h \
+	   syscodes.h \
+
 .PHONY: compiler interp
 
 all: compiler interp execs
 
+release: all
+	cp stackl $(RELEASE)
+	cp stacklc $(RELEASE)
+	cp $(INCLUDES) $(RELEASE)
 clean:
 	$(MAKE) -C compiler clean
 	$(MAKE) -C interp clean
@@ -15,6 +25,7 @@ compiler:
 interp: 
 	$(MAKE) -C interp
 
-execs: compiler interp
+execs: compiler interp 
 	cp compiler/stacklc .
 	cp interp/stackl .
+	cp interp/syscodes.h .
