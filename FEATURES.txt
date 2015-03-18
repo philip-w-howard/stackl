@@ -2,9 +2,9 @@ BUGS
 
 TODO
 
-include files from proper directories
+Have I/O happen in separate thread so that a GET does not block all threads.
 
-Rudimentary scheduler
+Include files for "regular" C code to mimic stackl C code.
 
 command line args to main
 
@@ -22,6 +22,8 @@ make opcodes an enum?
 
 WORKS
 
+Rudimentary scheduler
+include files from proper directories
 Fork loads at different addr
 Return from main calls exit() not HALT_OP
 library code is included by default (e.g. syscal and halt)

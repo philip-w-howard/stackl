@@ -40,14 +40,17 @@ int syscall(Machine_State *cpu, int *args)
         case PRINTI_CALL:
             DEBUG("PRINTI: %d\n", args[2]);
             printf("%d\n", args[2]);
+            fflush(stdout);
             break;
         case PRINTS_CALL:
             DEBUG("PRINTS: %s\n", (char *)Get_Addr(args[2]));
             printf("%s", (char *)Get_Addr(args[2]));
+            fflush(stdout);
             break;
         case PRINTC_CALL:
             DEBUG("PRINTC: %c\n", args[2]);
             printf("%c", args[2]);
+            fflush(stdout);
             break;
         case GETS_CALL:
             DEBUG("GETS:\n");
