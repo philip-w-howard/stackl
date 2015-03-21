@@ -4,7 +4,9 @@ int main();
 
 int syscall(int size, int op)
 {
-    trap();
+    int result;
+    result = trap();
+    return result;
 }
 
 int exit(int status)

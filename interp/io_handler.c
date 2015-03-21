@@ -68,7 +68,7 @@ static void *IO_Processor(void *arg)
                     break;
             }
 
-            Reschedule(proc);
+            Sched_Reschedule(proc);
         }
 
     }

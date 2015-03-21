@@ -5,10 +5,12 @@
 
 typedef struct
 {
-    int IP;
-    int SP;
-    int FP;
-    int halted;
+    int BP;         // Base Pointer: base addr for mem
+    int LP;         // Limit Pointer: high water mark for mem
+    int IP;         // Instructino Pionter
+    int SP;         // Stack Pointer
+    int FP;         // Frame Pointer
+    int halted;     // CPU halted
 } Machine_State;
 
 int Get_Word(int address);

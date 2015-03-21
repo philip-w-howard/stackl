@@ -48,18 +48,24 @@ static void debug_print(const char *fmt, ...)
 //*************************************
 static void duplicate_memory(int to_proc, int from_proc)
 {
-    int from;
-    int to;
-    from = Process_State[from_proc].base;
-    to = Process_State[to_proc].base;
+    int index;
+    int from_size;
+    int to_size;
+    int value;
 
-    while (from < Process_State[from_proc].top &&
-           to   < Process_State[to_proc].top)
+    from_size =Process_State[from_proc].cpu.LP-Process_State[from_proc].cpu.BP;
+    to_size = Process_State[to_proc].cpu.LP - Process_State[to_proc].cpu.BP;
+    index = 0;
+
+    while (index < from_size && index < to_size)
     {
-        Set_Word(to, Get_Word(from));
-        to += WORD_SIZE;
-        from += WORD_SIZE;
+        Set_Machine_State(&Process_State[from_proc].cpu);
+        value = Get_Word(index);
+        Set_Machine_State(&Process_State[to_proc].cpu);
+        Set_Word(index, value);
+        index += WORD_SIZE;
     }
+    Set_Machine_State(&Process_State[Current_Process].cpu);
 }
 //*************************************
 void Sched_Init()
@@ -70,12 +76,13 @@ void Sched_Init()
 
     for (ii=0; ii<NUM_PROCESSES; ii++)
     {
-        Process_State[ii].process_id = ii+1;
-        Process_State[ii].base = ii * MEMORY_SIZE/NUM_PROCESSES;
-        Process_State[ii].top = (ii+1)*MEMORY_SIZE/NUM_PROCESSES - WORD_SIZE;
         Get_Machine_State(&Process_State[ii].cpu);
+        Process_State[ii].process_id = ii+1;
+        Process_State[ii].cpu.BP = ii * MEMORY_SIZE/NUM_PROCESSES;
+        Process_State[ii].cpu.LP = (ii+1)*MEMORY_SIZE/NUM_PROCESSES;
         Process_State[ii].state = EMPTY;
     }
+    Set_Machine_State(&Process_State[Current_Process].cpu);
 }
 //*************************************
 void Schedule()
@@ -121,7 +128,7 @@ void Schedule()
     }
 }
 //*************************************
-void Exit(int status)
+void Sched_Exit(int status)
 {
     int ii;
 
@@ -158,10 +165,11 @@ void Exit(int status)
 
     // No runable processes, so HALT the system
     Process_State[ii].cpu.halted = 1;
+    exit(status);
     return;
 }
 //*************************************
-int  Fork()
+int  Sched_Fork()
 {
     int ii;
     int status;
@@ -177,31 +185,28 @@ int  Fork()
             DEBUG("FORK: %d", ii);
             if (status != EMPTY)
             {
-                int mem_diff = Process_State[ii].base - 
-                    Process_State[Current_Process].base;
-
-                duplicate_memory(ii, Current_Process);
-                Get_Machine_State(&Process_State[ii].cpu);
-                Process_State[ii].cpu.IP += mem_diff;
-                Process_State[ii].cpu.SP += mem_diff;
-                Process_State[ii].cpu.FP += mem_diff;
+              duplicate_memory(ii, Current_Process);
+              Process_State[ii].cpu.IP = Process_State[Current_Process].cpu.IP;
+              Process_State[ii].cpu.SP = Process_State[Current_Process].cpu.SP;
+              Process_State[ii].cpu.FP = Process_State[Current_Process].cpu.FP;
+              
+              // In the child, we need to simulate the pushing of a zero
+              // because the syscall code that handles the return value 
+              // will not execute in the child
+              Set_Word(Process_State[ii].cpu.SP - WORD_SIZE, 0);
+              //Process_State[ii].cpu.SP += WORD_SIZE;
             }
             else
             {
-                // no point duplicating memory. 
-                // Set regs to point at start of memory
-                Process_State[ii].cpu.IP = Process_State[ii].base;
-                Process_State[ii].cpu.SP = Process_State[ii].base;
-                Process_State[ii].cpu.FP = Process_State[ii].base;
+              // no point duplicating memory. 
+              // Set regs to point at start of memory
+              Process_State[ii].cpu.IP = 0;
+              Process_State[ii].cpu.SP = 0;
+              Process_State[ii].cpu.FP = 0;
             }
 
             Process_State[ii].state = RUNABLE;
             
-            // In the child, we need to simulate the pushing of a zero
-            // because the syscall code that handles the return value 
-            // will not execute in the child
-            Set_Word(Process_State[ii].cpu.SP, 0);
-            Process_State[ii].cpu.SP += WORD_SIZE;
             
             // Current_Process = ii;
 
@@ -223,8 +228,9 @@ int  Sched_Load(char *filename)
 
     Get_Machine_State(&Process_State[Current_Process].cpu);
     status = Load(&Process_State[Current_Process].cpu, filename, 
-        Process_State[Current_Process].base, 
-        Process_State[Current_Process].top);
+            0,
+            Process_State[Current_Process].cpu.LP -  
+                Process_State[Current_Process].cpu.BP);
 
     if (status != 0)
     {
@@ -239,17 +245,17 @@ int  Sched_Load(char *filename)
 }
 
 //*************************************
-void  WaitProc(int process)
+void  Sched_WaitProc(int process)
 {
     DEBUG("wait: %d", process);
     Get_Machine_State(&Process_State[Current_Process].cpu);
     Process_State[Current_Process].state = WAITING_PROC;
-    Process_State[Current_Process].waiting_for = process - 1;
+    Process_State[Current_Process].waiting_for = process;
     Schedule();
 }
 
 //*************************************
-void  WaitIO(int io_op, void *addr)
+void  Sched_WaitIO(int io_op, void *addr)
 {
     DEBUG("wait IO: %d", io_op);
     Get_Machine_State(&Process_State[Current_Process].cpu);
@@ -258,7 +264,7 @@ void  WaitIO(int io_op, void *addr)
     Schedule();
 }
 //*************************************
-void Reschedule(Process_State_t *proc)
+void Sched_Reschedule(Process_State_t *proc)
 {
     DEBUG("Reschedule %d", proc->process_id);
     proc->state = RUNABLE;

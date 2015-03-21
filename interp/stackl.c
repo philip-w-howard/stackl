@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     Init_Machine();
     Sched_Init();
 
-    result = Fork();
+    result = Sched_Fork();
     if (result == -1)
     {
         printf("Unable to fork initial process\n");

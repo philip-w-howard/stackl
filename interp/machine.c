@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,74 +7,88 @@
 char Memory[MEMORY_SIZE];
 Machine_State Regs;
 
+//**************************************
+static void machine_check(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    char format[200];
+    sprintf(format, "Machine check: %s\n", fmt);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    exit(-1);
+}
 //***************************************
 int Get_Word(int address)
 {
-    if (address < 0 || (address+WORD_SIZE) >= MEMORY_SIZE)
+    if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
     {
-        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        machine_check("address %d out of bounds\n", address);
         exit(-1);
     } 
     else if (address & 0x0003)
     {
-        fprintf(stderr, "Machine check: misalligned address 0x%08X out of bounds\n", address);
+        machine_check("misaligned address %d\n", address);
         exit(-1);
     }
 
-    return *(int *)&Memory[address];
+    return *(int *)&Memory[Regs.BP+address];
 }
 //***************************************
 void Set_Word(int address, int value)
 {
-    if (address < 0 || (address+WORD_SIZE) >= MEMORY_SIZE)
+    if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
     {
-        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        machine_check("address %d out of bounds\n", address);
         exit(-1);
     } 
     else if (address & 0x0003)
     {
-        fprintf(stderr, "Machine check: misalligned address 0x%08X out of bounds\n", address);
+        machine_check("misaligned address %d\n", address);
         exit(-1);
     }
 
-    *(int *)&Memory[address] = value;
+    *(int *)&Memory[Regs.BP+address] = value;
 }
 //***************************************
 int Get_Byte(int address)
 {
-    if (address < 0 || address >= MEMORY_SIZE)
+    if (address < 0 || address >= Regs.LP - Regs.BP)
     {
-        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        machine_check("address %d out of bounds\n", address);
         exit(-1);
     } 
 
-    return Memory[address];
+    return Memory[Regs.BP+address];
 }
 //***************************************
 void Set_Byte(int address, int value)
 {
-    if (address < 0 || address >= MEMORY_SIZE)
+    if (address < 0 || address >= Regs.LP - Regs.BP)
     {
-        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        machine_check("address %d out of bounds\n", address);
         exit(-1);
     } 
 
-    Memory[address] = value;
+    Memory[Regs.BP+address] = value;
 }
 //***************************************
 void *Get_Addr(int address)
 {
-    if (address < 0 || address >= MEMORY_SIZE)
+    if (address < 0 || address >= Regs.LP - Regs.BP)
     {
-        fprintf(stderr, "Machine check: address 0x%08X out of bounds\n", address);
+        machine_check("address %d out of bounds\n", address);
         exit(-1);
     } 
 
-    return &Memory[address];
+    return &Memory[Regs.BP+address];
 }
 //***************************************
 void Init_Machine()
 {
+    Regs.BP = 0;
+    Regs.LP = MEMORY_SIZE;
     Regs.IP = 0;
     Regs.FP = 0;
     Regs.SP = 0;

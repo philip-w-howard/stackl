@@ -36,7 +36,8 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
     va_start(args, fmt);
 
     char format[200];
-    sprintf(format, "%d %d %d %s\n", cpu->IP, cpu->SP, cpu->FP, fmt);
+    sprintf(format, "%d %d %d %d %s\n", 
+            cpu->BP, cpu->IP, cpu->SP, cpu->FP, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
 }
@@ -197,7 +198,7 @@ void Execute(Machine_State *cpu)
                 {
                     args[ii] = GET_INTVAL(FP, -ii-3);
                 }
-                INC(SP, -args[0]);
+                //INC(SP, -args[0]);
                 INC(IP, 1);
                 temp = syscall(cpu, args);
                 SET_INTVAL(SP, 0, temp);

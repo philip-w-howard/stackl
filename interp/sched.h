@@ -14,9 +14,9 @@ typedef struct
 void Sched_Debug();
 void Sched_Init();
 void Schedule();
-void Exit();
-int  Fork();
+void Sched_Exit();
+int  Sched_Fork();
 int  Sched_Load(char *filename);
-void WaitProc(int process);
-void WaitIO(int io_op, void *addr);
-void Reschedule(Process_State_t *proc);
+void Sched_WaitProc(int process);
+void Sched_WaitIO(int io_op, void *addr);
+void Sched_Reschedule(Process_State_t *proc);

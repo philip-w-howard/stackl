@@ -36,7 +36,7 @@ int syscall(Machine_State *cpu, int *args)
     {
         case EXIT_CALL:
             DEBUG("EXIT: %d\n", args[2]);
-            exit(args[2]);
+            Sched_Exit(args[2]);
             break;
         case PRINTI_CALL:
             DEBUG("PRINTI: %d\n", args[2]);
@@ -55,17 +55,17 @@ int syscall(Machine_State *cpu, int *args)
             break;
         case GETS_CALL:
             DEBUG("GETS:\n");
-            WaitIO(GETS_CALL, Get_Addr(args[2]));
+            Sched_WaitIO(GETS_CALL, Get_Addr(args[2]));
             //scanf("%s", (char *)Get_Addr(args[2]));
             break;
         case GETL_CALL:
             DEBUG("GETL:\n");
-            WaitIO(GETL_CALL, Get_Addr(args[2]));
+            Sched_WaitIO(GETL_CALL, Get_Addr(args[2]));
             //gets(Get_Addr(args[2]));
             break;
         case GETI_CALL:
             DEBUG("GETI:\n");
-            WaitIO(GETI_CALL, Get_Addr(args[2]));
+            Sched_WaitIO(GETI_CALL, Get_Addr(args[2]));
             //scanf("%d", (int *)Get_Addr(args[2]));
             break;
         case EXEC_CALL:
@@ -74,11 +74,11 @@ int syscall(Machine_State *cpu, int *args)
             break;
         case FORK_CALL:
             DEBUG("FORK:\n");
-            temp = Fork();
+            temp = Sched_Fork();
             break;
         case WAIT_CALL:
             DEBUG("WAIT: %d\n", args[2]);
-            WaitProc(args[2]);
+            Sched_WaitProc(args[2]);
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);
@@ -86,7 +86,10 @@ int syscall(Machine_State *cpu, int *args)
             exit(-1);
             break;
     }
-    Schedule();
+
+    // do NOT schedule on fork. 
+    // The is necessary to get the two processes to return the right values
+    if (args[1] != FORK_CALL) Schedule();
     DEBUG("Syscall returning: %d\n", temp);
     return temp;
 }
