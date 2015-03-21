@@ -1,10 +1,11 @@
-COPTS=-Wall -g -c  -O0 -Wno-deprecated-declarations
+COPTS=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
 	 syscall.o \
 	 loader.o \
 	 sched.o \
+	 io_handler.o \
 
 all: stackl
 
@@ -16,5 +17,5 @@ clean:
 	gcc $(COPTS) $? -o $@
 
 stackl: $(OBJS)
-	gcc $(OBJS) -o stackl
+	gcc $(OBJS) -o stackl -lpthread
 

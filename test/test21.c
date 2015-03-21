@@ -1,4 +1,4 @@
-#include "system.h"
+#include <system.h>
 
 int main()
 {
@@ -26,4 +26,3 @@ int main()
 
     return 0;
 }
-/*END*/

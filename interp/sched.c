@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -5,23 +6,16 @@
 #include "machine.h"
 #include "loader.h"
 #include "sched.h"
+#include "io_handler.h"
 
 #define NUM_PROCESSES 2
 
-#define EMPTY       0
-#define RUNNING     1
-#define RUNABLE     2
-#define WAITING     3
+#define EMPTY           0
+#define RUNNING         1
+#define RUNABLE         2
+#define WAITING_PROC    3
+#define WAITING_IO      4
 
-typedef struct
-{
-    int process_id;
-    int base;
-    int top;
-    Machine_State cpu;
-    int state;
-    int waiting_for;
-} Process_State_t;
 
 static Process_State_t Process_State[NUM_PROCESSES];
 static int Current_Process;
@@ -87,6 +81,7 @@ void Sched_Init()
 void Schedule()
 {
     int ii;
+    int found_io = 0;
 
     DEBUG("Schedule");
     Get_Machine_State(&Process_State[Current_Process].cpu);
@@ -95,22 +90,35 @@ void Schedule()
         Process_State[Current_Process].state = RUNABLE;
     }
 
-    Current_Process++;
-    for (ii=0; ii<NUM_PROCESSES; ii++)
+    while (1)
     {
-        if (Current_Process >= NUM_PROCESSES) Current_Process = 0;
-        if (Process_State[Current_Process].state == RUNABLE)
-        {
-            Process_State[Current_Process].state = RUNNING;
-            Set_Machine_State( &Process_State[Current_Process].cpu );
-            DEBUG("switch to %d", Current_Process);
-            return;
-        }
+        // repeat until we find a process to schedule
         Current_Process++;
-    }
+        for (ii=0; ii<NUM_PROCESSES; ii++)
+        {
+            if (Current_Process >= NUM_PROCESSES) Current_Process = 0;
+            if (Process_State[Current_Process].state == WAITING_IO) found_io++;
+            if (Process_State[Current_Process].state == RUNABLE)
+            {
+                Process_State[Current_Process].state = RUNNING;
+                Set_Machine_State( &Process_State[Current_Process].cpu );
+                DEBUG("switch to %d", Current_Process);
+                return;
+            }
+            Current_Process++;
+        }
 
-    fprintf(stderr, "Machine halting: there are no runable processes\n");
-    exit(-1);
+        if (!found_io)
+        {
+            fprintf(stderr, "Machine halting: no runable processes\n");
+            exit(-1);
+        }
+        else
+        {
+            // wait for IO to complete
+            usleep(10000);
+        }
+    }
 }
 //*************************************
 void Exit(int status)
@@ -124,7 +132,7 @@ void Exit(int status)
     // if somebody was waiting for us, set them to running and run them
     for (ii=0; ii<NUM_PROCESSES; ii++)
     {
-        if (Process_State[ii].state == WAITING &&
+        if (Process_State[ii].state == WAITING_PROC &&
             Process_State[ii].waiting_for == Current_Process)
         {
             Process_State[ii].state = RUNNING;
@@ -231,12 +239,27 @@ int  Sched_Load(char *filename)
 }
 
 //*************************************
-void  Wait(int process)
+void  WaitProc(int process)
 {
     DEBUG("wait: %d", process);
     Get_Machine_State(&Process_State[Current_Process].cpu);
-    Process_State[Current_Process].state = WAITING;
+    Process_State[Current_Process].state = WAITING_PROC;
     Process_State[Current_Process].waiting_for = process - 1;
     Schedule();
 }
 
+//*************************************
+void  WaitIO(int io_op, void *addr)
+{
+    DEBUG("wait IO: %d", io_op);
+    Get_Machine_State(&Process_State[Current_Process].cpu);
+    Process_State[Current_Process].state = WAITING_IO;
+    Schedule_IO(io_op, addr, &Process_State[Current_Process]);
+    Schedule();
+}
+//*************************************
+void Reschedule(Process_State_t *proc)
+{
+    DEBUG("Reschedule %d", proc->process_id);
+    proc->state = RUNABLE;
+}

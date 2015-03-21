@@ -4,6 +4,7 @@
 #include "sched.h"
 #include "opcodes.h"
 #include "syscall.h"
+#include "io_handler.h"
 
 char Input_File[200] = "";
 
@@ -47,6 +48,7 @@ int main(int argc, char **argv)
         return 1;
     } 
 
+    Init_IO();
     Init_Machine();
     Sched_Init();
 
@@ -67,6 +69,8 @@ int main(int argc, char **argv)
     Schedule();
 
     Machine_Execute();
+
+    Finish_IO();
 
     return 0;
 }

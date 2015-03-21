@@ -6,6 +6,7 @@
 #include "syscall.h"
 #include "loader.h"
 #include "sched.h"
+#include "io_handler.h"
 
 static int Syscall_Do_Debug = 0;
 
@@ -54,15 +55,18 @@ int syscall(Machine_State *cpu, int *args)
             break;
         case GETS_CALL:
             DEBUG("GETS:\n");
-            scanf("%s", (char *)Get_Addr(args[2]));
+            WaitIO(GETS_CALL, Get_Addr(args[2]));
+            //scanf("%s", (char *)Get_Addr(args[2]));
             break;
         case GETL_CALL:
             DEBUG("GETL:\n");
-            gets(Get_Addr(args[2]));
+            WaitIO(GETL_CALL, Get_Addr(args[2]));
+            //gets(Get_Addr(args[2]));
             break;
         case GETI_CALL:
             DEBUG("GETI:\n");
-            scanf("%d", (int *)Get_Addr(args[2]));
+            WaitIO(GETI_CALL, Get_Addr(args[2]));
+            //scanf("%d", (int *)Get_Addr(args[2]));
             break;
         case EXEC_CALL:
             DEBUG("EXEC: %s\n", Get_Addr(args[2]));
@@ -74,7 +78,7 @@ int syscall(Machine_State *cpu, int *args)
             break;
         case WAIT_CALL:
             DEBUG("WAIT: %d\n", args[2]);
-            Wait(args[2]);
+            WaitProc(args[2]);
             break;
         default:
             printf("Unknown system call: %d %d\n", args[0], args[1]);
