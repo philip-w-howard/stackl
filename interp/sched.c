@@ -234,7 +234,11 @@ int  Sched_Load(char *filename)
 
     if (status != 0)
     {
-        Process_State[Current_Process].state = EMPTY;
+        // If the load fails, we keep the state RUNABLE because
+        // the original code should still run to return non-zero from exec()
+        //
+        // Process_State[Current_Process].state = EMPTY;
+        // Schedule();
         return status;
     }
 

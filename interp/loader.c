@@ -73,7 +73,13 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
     int  slen;
     FILE *input = fopen(filename, "r");
 
-    if (input == NULL) return 1;
+    if (input == NULL) 
+    {
+        strcpy(string, filename);
+        strcat(string, ".sl");
+        input = fopen(string, "r");
+        if (input == NULL) return 1;
+    }
 
     fscanf(input, "%s", record_type);
 

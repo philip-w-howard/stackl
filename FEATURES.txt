@@ -1,11 +1,7 @@
 BUGS
 
+
 TODO
-
-JUMPs and RETURNs need to be relative?
-OR: GetMem/SetMem relative to base reg
-
-Include files for "regular" C code to mimic stackl C code.
 
 command line args to main
 
@@ -23,6 +19,9 @@ make opcodes an enum?
 
 WORKS
 
+Load appends ".sl" if not already there
+Include files for "regular" C code to mimic stackl C code.
+GetMem/SetMem relative to base reg
 Have I/O happen in separate thread so that a GET does not block all threads.
 Rudimentary scheduler
 include files from proper directories
