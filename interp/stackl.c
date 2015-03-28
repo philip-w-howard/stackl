@@ -25,7 +25,15 @@ void Process_Args(int argc, char **argv)
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
+            {
                 printf("stackl Beta %s %s\n", __DATE__, __TIME__);
+                exit(0);
+            }
+            else if (strcmp(arg, "help") == 0)
+            {
+                printf("stackl -version -help -opcodes -sched -syscall <file>\n");
+                exit(0);
+            }
             else
                 printf("Unrecognized option %s\n", argv[ii]);
         }

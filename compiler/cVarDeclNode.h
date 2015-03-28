@@ -86,6 +86,7 @@ class cVarDeclNode : public cDeclNode
 
     virtual void GenerateCode()
     {
+        // FIX THIS: This won't work for arrays in structs
         if (mType->IsArray())
         {
             // we need to assign a value to the pointer that 

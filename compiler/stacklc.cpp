@@ -56,8 +56,16 @@ void Process_Args(int argc, char **argv)
             else if (strcmp(arg, "ast") == 0)
                 Do_Ast = 1;
             else if (strcmp(arg, "version") == 0)
+            {
                 std::cout << "stacklc Beta " << __DATE__ << " " 
                     << __TIME__ << std::endl;
+                exit(0);
+            }
+            else if (strcmp(arg, "help") == 0)
+            {
+                std::cout << "stacklc -help -version -debug -ast <file>\n";
+                exit(0);
+            }
             else
                 std::cerr << "Unrecognized option " << argv[ii] << std::endl;
         }

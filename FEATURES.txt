@@ -3,24 +3,23 @@ BUGS
 
 TODO
 
+Include files for "regular" C code to mimic stackl C code.
+short circuit of && and ||
+proper implementation of structs
+full semantic checks
+
 command line args to main
 
 assignment to charp vars
     array cell address
 address-of operator
 
-short circuit of && and ||
-proper implementation of structs
-
-full semantic checks
 make opcodes an enum?
-
--help for stackl and stacklc
 
 WORKS
 
+-help for stackl and stacklc
 Load appends ".sl" if not already there
-Include files for "regular" C code to mimic stackl C code.
 GetMem/SetMem relative to base reg
 Have I/O happen in separate thread so that a GET does not block all threads.
 Rudimentary scheduler
