@@ -200,7 +200,7 @@ void Execute(Machine_State *cpu)
                 }
                 //INC(SP, -args[0]);
                 INC(IP, 1);
-                temp = syscall(cpu, args);
+                temp = syscall(args);
                 SET_INTVAL(SP, 0, temp);
                 INC(SP, 1);
             }

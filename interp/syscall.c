@@ -29,7 +29,7 @@ static void debug_print(const char *fmt, ...)
     va_end(args);
 }
 //***************************************
-int syscall(Machine_State *cpu, int *args)
+int syscall(int *args)
 {
     int temp = 0;
     switch (args[1])
