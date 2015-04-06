@@ -58,9 +58,54 @@ class cBinaryExprNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        mLeftExpr->GenerateCode();
-        mRightExpr->GenerateCode();
-        EmitInt(IntOp());
+        // TODO: don't hardcode the values for AND and OR ops
+        if(mOperator == 281)
+        {
+            // get a label to jump to
+            std::string jmp = GenerateLabel();
+
+            // at a minimum, we want to output the left expression
+            mLeftExpr->GenerateCode();
+
+            // if the result of the left expression left a 0
+            // on the stack, skip the right expression
+            EmitInt(DUP_OP);
+            EmitInt(JUMPE_OP);
+            SetJumpSource(jmp);
+
+            // generate the code for the right expression
+            mRightExpr->GenerateCode();
+
+            // generate the code for the operator
+            EmitInt(IntOp());
+
+            // jump to the end if the left expression was false
+            SetJumpDest(jmp);
+        }
+        else if(mOperator == 282)
+        {
+            // get a label to jump to
+            std::string skipExpression = GenerateLabel();
+            std::string checkExpression = GenerateLabel();
+
+            // at a minimum, we want to output the left expression
+            mLeftExpr->GenerateCode();
+            EmitInt(DUP_OP);
+            EmitInt(JUMPE_OP);
+            SetJumpSource(checkExpression);
+            EmitInt(JUMP_OP);
+            SetJumpSource(skipExpression);
+            SetJumpDest(checkExpression);
+            mRightExpr->GenerateCode();
+            EmitInt(IntOp());
+            SetJumpDest(skipExpression);
+        }
+        else
+        {
+            mLeftExpr->GenerateCode();
+            mRightExpr->GenerateCode();
+            EmitInt(IntOp());
+        }
     }
   protected:
     cExprNode *mLeftExpr;       // left expression

@@ -53,7 +53,9 @@ void Execute(Machine_State *cpu)
         return;
     }
 
-    switch (GET_INTVAL(IP, 0))
+    int val = GET_INTVAL(IP, 0);
+    
+    switch (val)
     {
         case NOP:
             DEBUG("NOP");
@@ -67,7 +69,6 @@ void Execute(Machine_State *cpu)
             break;
         case MINUS_OP:
             DEBUG("MINUS");
-
             SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) - GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
@@ -267,8 +268,14 @@ void Execute(Machine_State *cpu)
             cpu->SP += GET_INTVAL(IP,0);
             INC(IP,1);
             break;
+        case DUP_OP:
+            DEBUG("DUP");
+            SET_INTVAL(SP, 0, GET_INTVAL(SP, -1));
+            INC(SP, 1);
+            INC(IP,1);
+            break;
         default:
-            fprintf(stderr, "Illegal instruction at %d\n", cpu->IP);
+            fprintf(stderr, "Illegal instruction '%i' at %d\n", val, cpu->IP);
             exit(-1);
             break;
     }
