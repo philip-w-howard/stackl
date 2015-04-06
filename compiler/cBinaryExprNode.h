@@ -58,8 +58,9 @@ class cBinaryExprNode : public cExprNode
 
     virtual void GenerateCode()
     {
+        int op = IntOp();
         // TODO: don't hardcode the values for AND and OR ops
-        if(mOperator == 281)
+        if(op == AND_OP)
         {
             // get a label to jump to
             std::string jmp = GenerateLabel();
@@ -82,7 +83,7 @@ class cBinaryExprNode : public cExprNode
             // jump to the end if the left expression was false
             SetJumpDest(jmp);
         }
-        else if(mOperator == 282)
+        else if(op == OR_OP)
         {
             // get a label to jump to
             std::string skipExpression = GenerateLabel();
