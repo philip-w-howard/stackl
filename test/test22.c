@@ -9,8 +9,8 @@ int DoNotPrintMe()
 int main()
 {
     if(0 && DoNotPrintMe())
-        prints("AND success\n");
+        prints("failure\n");
     if(1 || DoNotPrintMe())
-        prints("OR success\n");
+        prints("success");
 }
 
