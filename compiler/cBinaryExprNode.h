@@ -58,8 +58,8 @@ class cBinaryExprNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        int op = IntOp();
         // TODO: don't hardcode the values for AND and OR ops
+        int op = IntOp();
         if(op == AND_OP)
         {
             // get a label to jump to
