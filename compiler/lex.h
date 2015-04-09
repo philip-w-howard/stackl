@@ -12,7 +12,6 @@
 #include "cAstNode.h"
 #include "cBlockNode.h"
 #include "cIntExprNode.h"
-#include "cBinaryExprNode.h"
 #include "cUnaryMinusNode.h"
 #include "cPrintNode.h"
 #include "cTrapNode.h"
@@ -41,6 +40,8 @@
 #include "cArraySpecNode.h"
 #include "cArrayValNode.h"
 #include "cStringLitNode.h"
+#include "cBinaryExprNode.h"
+#include "cShortCircuitNode.h"
 
 #include "parser.h"
 

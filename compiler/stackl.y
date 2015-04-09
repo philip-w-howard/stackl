@@ -298,8 +298,8 @@ param:      expr                { $$ = $1; }
         |   string_lit          { $$ = $1; }
         |   '&' varref          { $$ = new cVarAddrNode($2); }
 
-ccomp:      ccomp OR comp       { $$ = new cBinaryExprNode($1, OR, $3); }
-        |   ccomp AND comp      { $$ = new cBinaryExprNode($1, AND, $3); }
+ccomp:      ccomp OR comp       { $$ = new cShortCircuitNode($1, OR, $3, true); }
+        |   ccomp AND comp      { $$ = new cShortCircuitNode($1, AND, $3, false); }
         |   comp                { $$ = $1; }
 comp:       comp EQ expr        { $$ = new cBinaryExprNode($1, EQ, $3); }
         |   comp NE expr        { $$ = new cBinaryExprNode($1, NE, $3); }
