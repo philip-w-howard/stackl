@@ -1,0 +1,18 @@
+Bugs:
+
+Todo:
+
+Implement Interrupt mechanism
+Implement Timer interrupt
+Implement priv instructions:
+   ena/dis interrupts
+   get/set processor state
+   RTI
+Implement Process Control Block in Machine mem
+Design I/O architecture
+Change syscalls to use I/O architecture and run in Machine
+update exe format
+Implement load in machine: requires disk I/O
+Implement fork() exec() in machine
+Implement sched in machine
+

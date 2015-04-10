@@ -20,58 +20,104 @@ static void machine_check(const char *fmt, ...)
     exit(-1);
 }
 //***************************************
+int Is_User_Mode()
+{
+    return Regs.FLAG & FL_USER_MODE;
+}
+//***************************************
+int Set_User_Mode(int value)
+{
+    int user_mode = Regs.FLAG & FL_USER_MODE;
+
+    if (value)
+        Regs.FLAG |= FL_USER_MODE;
+    else
+        Regs.FLAG &= ~FL_USER_MODE;
+
+    return user_mode;
+}
+//***************************************
 int Get_Word(int address)
 {
-    if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
-    {
-        machine_check("address %d out of bounds\n", address);
-        exit(-1);
-    } 
-    else if (address & 0x0003)
+    int value;
+
+    if (address & 0x0003)
     {
         machine_check("misaligned address %d\n", address);
         exit(-1);
     }
+    if (Regs.FLAG & FL_USER_MODE)
+    {
+        if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
+        {
+            machine_check("address %d out of bounds\n", address);
+            exit(-1);
+        } 
 
-    return *(int *)&Memory[Regs.BP+address];
+        value = *(int *)&Memory[Regs.BP+address];
+    } else {
+        value = *(int *)&Memory[address];
+    }
+
+    return value;
 }
 //***************************************
 void Set_Word(int address, int value)
 {
-    if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
-    {
-        machine_check("address %d out of bounds\n", address);
-        exit(-1);
-    } 
-    else if (address & 0x0003)
+    if (address & 0x0003)
     {
         machine_check("misaligned address %d\n", address);
         exit(-1);
     }
 
-    *(int *)&Memory[Regs.BP+address] = value;
+    if (Regs.FLAG & FL_USER_MODE)
+    {
+        if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
+        {
+            machine_check("address %d out of bounds\n", address);
+            exit(-1);
+        } 
+
+        *(int *)&Memory[Regs.BP+address] = value;
+    } else {
+        *(int *)&Memory[address] = value;
+    }
 }
 //***************************************
 int Get_Byte(int address)
 {
-    if (address < 0 || address >= Regs.LP - Regs.BP)
-    {
-        machine_check("address %d out of bounds\n", address);
-        exit(-1);
-    } 
+    int value;
 
-    return Memory[Regs.BP+address];
+    if (Regs.FLAG & FL_USER_MODE)
+    {
+        if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
+        {
+            machine_check("address %d out of bounds\n", address);
+            exit(-1);
+        } 
+
+        value = Memory[Regs.BP+address];
+    } else {
+        value = Memory[address];
+    }
+
+    return value;
 }
 //***************************************
 void Set_Byte(int address, int value)
 {
-    if (address < 0 || address >= Regs.LP - Regs.BP)
+    if (Regs.FLAG & FL_USER_MODE)
     {
-        machine_check("address %d out of bounds\n", address);
-        exit(-1);
-    } 
+        if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
+        {
+            machine_check("address %d out of bounds\n", address);
+            exit(-1);
+        } 
 
-    Memory[Regs.BP+address] = value;
+        Memory[Regs.BP+address] = value;
+    } else {
+        Memory[address] = value;
+    }
 }
 //***************************************
 void *Get_Addr(int address)
@@ -82,7 +128,12 @@ void *Get_Addr(int address)
         exit(-1);
     } 
 
-    return &Memory[Regs.BP+address];
+    if (Regs.FLAG & FL_USER_MODE)
+    {
+        return &Memory[Regs.BP+address];
+    } else {
+        return &Memory[address];
+    }
 }
 //***************************************
 void Init_Machine()
@@ -92,22 +143,32 @@ void Init_Machine()
     Regs.IP = 0;
     Regs.FP = 0;
     Regs.SP = 0;
-    Regs.halted = 0;
+    Regs.FLAG = 0;
 }
 //***************************************
 void Get_Machine_State(Machine_State *cpu)
 {
+    if (Regs.FLAG & FL_USER_MODE) 
+    {
+        machine_check("Protected instruction exception");
+    }
+
     memcpy(cpu, &Regs, sizeof(Regs));
 }
 //***************************************
 void Set_Machine_State(Machine_State *cpu)
 {
+    if (Regs.FLAG & FL_USER_MODE) 
+    {
+        machine_check("Protected instruction exception");
+    }
+
     memcpy(&Regs, cpu, sizeof(Regs));
 }
 //***************************************
 void Machine_Execute()
 {
-    while (!Regs.halted)
+    while (!Regs.FLAG & FL_HALTED)
     {
         Execute(&Regs);
     }

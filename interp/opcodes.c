@@ -49,7 +49,7 @@ void Execute(Machine_State *cpu)
 
     if (++num_instructions >= Max_Instructions) 
     {
-        cpu->halted = 1;
+        cpu->FLAG |= FL_HALTED;
         return;
     }
 
@@ -146,7 +146,7 @@ void Execute(Machine_State *cpu)
             break;
         case HALT_OP:
             DEBUG("HALT");
-            cpu->halted = 1;
+            cpu->FLAG |= FL_HALTED;
             break;
         case POP_OP:
             DEBUG("POP");
