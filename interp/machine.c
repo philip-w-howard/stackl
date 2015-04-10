@@ -8,7 +8,7 @@ char Memory[MEMORY_SIZE];
 Machine_State Regs;
 
 //**************************************
-static void machine_check(const char *fmt, ...)
+void Machine_Check(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -43,14 +43,14 @@ int Get_Word(int address)
 
     if (address & 0x0003)
     {
-        machine_check("misaligned address %d\n", address);
+        Machine_Check("misaligned address %d\n", address);
         exit(-1);
     }
     if (Regs.FLAG & FL_USER_MODE)
     {
         if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
         {
-            machine_check("address %d out of bounds\n", address);
+            Machine_Check("address %d out of bounds\n", address);
             exit(-1);
         } 
 
@@ -66,7 +66,7 @@ void Set_Word(int address, int value)
 {
     if (address & 0x0003)
     {
-        machine_check("misaligned address %d\n", address);
+        Machine_Check("misaligned address %d\n", address);
         exit(-1);
     }
 
@@ -74,7 +74,7 @@ void Set_Word(int address, int value)
     {
         if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
         {
-            machine_check("address %d out of bounds\n", address);
+            Machine_Check("address %d out of bounds\n", address);
             exit(-1);
         } 
 
@@ -92,7 +92,7 @@ int Get_Byte(int address)
     {
         if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
         {
-            machine_check("address %d out of bounds\n", address);
+            Machine_Check("address %d out of bounds\n", address);
             exit(-1);
         } 
 
@@ -110,7 +110,7 @@ void Set_Byte(int address, int value)
     {
         if (address < 0 || (address+WORD_SIZE) > Regs.LP - Regs.BP)
         {
-            machine_check("address %d out of bounds\n", address);
+            Machine_Check("address %d out of bounds\n", address);
             exit(-1);
         } 
 
@@ -124,7 +124,7 @@ void *Get_Addr(int address)
 {
     if (address < 0 || address >= Regs.LP - Regs.BP)
     {
-        machine_check("address %d out of bounds\n", address);
+        Machine_Check("address %d out of bounds\n", address);
         exit(-1);
     } 
 
@@ -150,7 +150,7 @@ void Get_Machine_State(Machine_State *cpu)
 {
     if (Regs.FLAG & FL_USER_MODE) 
     {
-        machine_check("Protected instruction exception");
+        Machine_Check("Protected instruction exception");
     }
 
     memcpy(cpu, &Regs, sizeof(Regs));
@@ -160,7 +160,7 @@ void Set_Machine_State(Machine_State *cpu)
 {
     if (Regs.FLAG & FL_USER_MODE) 
     {
-        machine_check("Protected instruction exception");
+        Machine_Check("Protected instruction exception");
     }
 
     memcpy(&Regs, cpu, sizeof(Regs));

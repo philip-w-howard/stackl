@@ -42,6 +42,39 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
     va_end(args);
 }
 
+//***************************************
+static void push(Machine_State *cpu, int value)
+{
+    Set_Word(cpu->SP, value);
+    cpu->SP += WORD_SIZE;
+}
+//***************************************
+static int pop(Machine_State *cpu)
+{
+    cpu->SP -= WORD_SIZE;
+    return Get_Word(cpu->SP);
+}
+//***********************************************
+static void interrupt(Machine_State *cpu)
+{
+    int temp;
+
+    push(cpu, cpu->BP);
+    push(cpu, cpu->LP);
+    push(cpu, cpu->IP);
+    push(cpu, cpu->SP);
+    push(cpu, cpu->FP);
+    push(cpu, cpu->FLAG);
+
+    // turn off pending and go to system mode
+    cpu->FLAG &= ~(FL_INT_PENDING | FL_USER_MODE);
+    cpu->FLAG |= FL_INT_MODE;
+
+    temp = cpu->SP;
+    cpu->SP = cpu->SSP;
+    push(cpu, temp);
+}
+//***************************************
 void Execute(Machine_State *cpu)
 {
     int temp;
@@ -50,6 +83,12 @@ void Execute(Machine_State *cpu)
     if (++num_instructions >= Max_Instructions) 
     {
         cpu->FLAG |= FL_HALTED;
+        return;
+    }
+
+    if ((cpu->FLAG & FL_INT_PENDING) && !(cpu->FLAG & FL_INT_MODE))
+    {
+        interrupt(cpu);
         return;
     }
 
@@ -206,6 +245,24 @@ void Execute(Machine_State *cpu)
                 INC(SP, 1);
             }
             break;
+        case RTI_OP:
+            if ( !(cpu->FLAG & FL_INT_MODE) )
+            {
+                Machine_Check("RTI while not in interrupt mode at %d", cpu->IP);
+            }
+
+            temp = pop(cpu);
+            cpu->SSP = cpu->SP;
+            cpu->SP = temp;
+
+            cpu->FLAG = pop(cpu);
+            cpu->FP = pop(cpu);
+            cpu->SP = pop(cpu);
+            cpu->IP = pop(cpu);
+            cpu->LP = pop(cpu);
+            cpu->BP = pop(cpu);
+
+            break;
         case JUMP_OP:
             DEBUG("JUMP %d", GET_INTVAL(IP, 1));
             cpu->IP = GET_INTVAL(IP, 1);
@@ -275,9 +332,7 @@ void Execute(Machine_State *cpu)
             INC(IP,1);
             break;
         default:
-            fprintf(stderr, "Illegal instruction '%i' at %d\n", val, cpu->IP);
-            exit(-1);
+            Machine_Check("Illegal instruction '%i' at %d\n", val, cpu->IP);
             break;
     }
 }
-

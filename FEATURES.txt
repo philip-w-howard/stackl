@@ -4,9 +4,12 @@ BUGS
 TODO
 
 Include files for "regular" C code to mimic stackl C code.
-short circuit of && and ||
+
+proper implementation of general arrays
 proper implementation of structs
 full semantic checks
+
+separate compilation
 
 command line args to main
 
@@ -18,6 +21,7 @@ make opcodes an enum?
 
 WORKS
 
+short circuit of && and ||
 -help for stackl and stacklc
 Load appends ".sl" if not already there
 GetMem/SetMem relative to base reg
