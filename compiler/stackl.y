@@ -57,6 +57,7 @@
 %token  JUNK_TOKEN
 %token  EQ NE LT GT GE LE
 %token  AND OR
+%token  SIZE_OF
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
 %token  TRAP
@@ -324,6 +325,10 @@ fact:        '(' ccomp ')'      { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
         |   varref              { $$ = $1; }
         |   func_call           { $$ = $1; }
+        |   SIZE_OF '(' IDENTIFIER ')' { $$ = new cSizeOfNode($3); }
+        |   SIZE_OF '(' TYPE_ID ')' { $$ = new cSizeOfNode($3); }
+        |   SIZE_OF '(' CHAR ')' { $$ = new cSizeOfNode(true); }
+        |   SIZE_OF IDENTIFIER { $$ = new cSizeOfNode($2); }
 
 string_lit: STRING_LIT          { $$ = new cStringLitNode($1); }
 %%

@@ -106,6 +106,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 "char"                      { yylval.symbol = symbolTableRoot->Lookup("char");
                               RETURN(CHAR);
                             }
+"sizeof"                    RETURN(SIZE_OF);
 "struct"                    RETURN(STRUCT);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
@@ -170,7 +171,7 @@ static void open_input(char *name)
 }
 static int Return(int val)
 {
-    //printf("Scanned '%s': %d\n", yytext, val);
+//    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

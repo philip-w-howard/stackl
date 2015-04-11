@@ -15,6 +15,7 @@
 #include "cUnaryMinusNode.h"
 #include "cPrintNode.h"
 #include "cTrapNode.h"
+#include "cSizeOfNode.h"
 #include "cPrintcNode.h"
 #include "cScanNode.h"
 #include "cReturnNode.h"
