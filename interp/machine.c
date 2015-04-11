@@ -168,7 +168,7 @@ void Set_Machine_State(Machine_State *cpu)
 //***************************************
 void Machine_Execute()
 {
-    while (!Regs.FLAG & FL_HALTED)
+    while ( !(Regs.FLAG & FL_HALTED) )
     {
         Execute(&Regs);
     }

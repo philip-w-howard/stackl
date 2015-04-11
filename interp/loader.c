@@ -130,7 +130,7 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
         fscanf(input, "%s", record_type);
     }
 
-    cpu->IP = base;
+    cpu->IP = base + WORD_SIZE;
     cpu->FP = byte;
     cpu->SP = byte;
 
