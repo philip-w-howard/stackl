@@ -15,10 +15,16 @@
 
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
+int Timer_Interval = 0;
 
 void Opcodes_Debug()
 {
     Do_Debug = 1;
+}
+
+void Set_Timer_Interval(int instr)
+{
+    Timer_Interval = instr;
 }
 
 void Set_Max_Instr(int max)
@@ -73,6 +79,9 @@ static void interrupt(Machine_State *cpu)
     temp = cpu->SP;
     cpu->SP = cpu->SSP;
     push(cpu, temp);
+
+    // ISR is at zero
+    cpu->IP = 0;
 }
 //***************************************
 void Execute(Machine_State *cpu)
@@ -84,6 +93,11 @@ void Execute(Machine_State *cpu)
     {
         cpu->FLAG |= FL_HALTED;
         return;
+    }
+
+    if (Timer_Interval > 0 && (num_instructions % Timer_Interval) == 0)
+    {
+        cpu->FLAG |= FL_INT_PENDING;
     }
 
     if ((cpu->FLAG & FL_INT_PENDING) && !(cpu->FLAG & FL_INT_MODE))

@@ -23,6 +23,8 @@ static cFixupTable FixupTable;
 #define WORD_SIZE 4
 static int Location = 0;
 
+extern int Do_Boot_Code;
+
 //*****************************************
 // Open output files and write the prefix
 bool InitOutput(const char *filename)
@@ -33,6 +35,12 @@ bool InitOutput(const char *filename)
         std::cerr << "Unable to open output file." << std::endl;
         return false;
     }
+
+    // Leave room for ISR address (if any)
+    if (Do_Boot_Code)
+        SetJumpSource("interrupt");
+    else
+        EmitInt(NOP);
 
     EmitInt(CALL_OP);
     SetJumpSource("startup__");
