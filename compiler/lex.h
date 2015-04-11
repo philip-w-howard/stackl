@@ -16,6 +16,7 @@
 #include "cPrintNode.h"
 #include "cTrapNode.h"
 #include "cSizeOfNode.h"
+#include "cRTINode.h"
 #include "cPrintcNode.h"
 #include "cScanNode.h"
 #include "cReturnNode.h"

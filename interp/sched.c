@@ -164,7 +164,7 @@ void Sched_Exit(int status)
     }
 
     // No runable processes, so HALT the system
-    Process_State[ii].cpu.halted = 1;
+    Process_State[ii].cpu.FLAG |= FL_HALTED;
     exit(status);
     return;
 }
@@ -206,6 +206,7 @@ int  Sched_Fork()
             }
 
             Process_State[ii].state = RUNABLE;
+            Process_State[ii].cpu.FLAG &= ~FL_USER_MODE;
             
             
             // Current_Process = ii;

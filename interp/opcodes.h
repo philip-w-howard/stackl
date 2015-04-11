@@ -16,7 +16,7 @@
 #define AND_OP      12
 #define OR_OP       13
 //#define PRINT_OP    14
-//#define PRINTS_OP   15
+#define SWAP_OP     15
 #define DUP_OP      16
 #define HALT_OP     17
 #define POP_OP      18
@@ -32,6 +32,9 @@
 //#define GETL_OP     28
 //#define GETI_OP     29
 #define TRAP_OP     30
+#define RTI_OP      31
+#define CALLI_OP    32
+
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2
@@ -46,3 +49,4 @@
 void Execute(Machine_State *machine);
 void Opcodes_Debug();
 void Set_Max_Instr(int max);
+void Set_Timer_Interval(int instr);

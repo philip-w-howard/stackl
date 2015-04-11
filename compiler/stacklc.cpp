@@ -43,6 +43,7 @@ extern cDeclsNode *yyast_root;
 char Input_File[200] = "";
 int  Do_Debug = 0;
 int  Do_Ast = 0;
+int  Do_Boot_Code = 0;
 
 void Process_Args(int argc, char **argv)
 {
@@ -55,6 +56,8 @@ void Process_Args(int argc, char **argv)
                 Do_Debug = 1;
             else if (strcmp(arg, "ast") == 0)
                 Do_Ast = 1;
+            else if (strcmp(arg, "boot") == 0)
+                Do_Boot_Code = 1;
             else if (strcmp(arg, "version") == 0)
             {
                 std::cout << "stacklc Beta " << __DATE__ << " " 

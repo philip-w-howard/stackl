@@ -24,6 +24,8 @@ void Process_Args(int argc, char **argv)
                 Syscall_Debug();
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
+            else if (argv[ii][1] == 'T')
+                Set_Timer_Interval(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
             {
                 printf("stackl Beta %s %s\n", __DATE__, __TIME__);

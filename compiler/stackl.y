@@ -60,7 +60,7 @@
 %token  SIZE_OF
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
-%token  TRAP
+%token  TRAP RTI
 %token  DEFINE CONST
 
 %type <decls> program
@@ -230,6 +230,7 @@ stmt:       decl                { $$ = $1; }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   TRAP '(' ')' ';'    { $$ = new cTrapNode(); }
+        |   RTI '(' ')' ';'     { $$ = new cRTINode(); }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }

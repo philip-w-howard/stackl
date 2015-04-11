@@ -31,7 +31,11 @@ static void debug_print(const char *fmt, ...)
 //***************************************
 int syscall(int *args)
 {
+    int user_mode;
     int temp = 0;
+
+    user_mode = Is_User_Mode();
+
     switch (args[1])
     {
         case EXIT_CALL:
@@ -91,5 +95,9 @@ int syscall(int *args)
     // The is necessary to get the two processes to return the right values
     if (args[1] != FORK_CALL) Schedule();
     DEBUG("Syscall returning: %d\n", temp);
+
+    // What about forked process?
+    Set_User_Mode(user_mode);
+
     return temp;
 }

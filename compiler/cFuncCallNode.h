@@ -72,33 +72,16 @@ class cFuncCallNode : public cExprNode
         EmitInt(CALL_OP);
         SetJumpSource(mId->Name());
 
-        /*
-        EmitPushFP();
-        // need to add params
-        if (mParams != NULL) 
+        // Need to pop the args off the stack without affecting the 
+        // return value
+        if (mParams != NULL)
         {
-            mParams->GenerateCode();
-            EmitString("Frame_Pointer = Stack_Pointer - ");
-            EmitInt(mParams->Size());
-            EmitString(";\n");
+            for (int ii=0; ii<mParams->Size()/WORD_SIZE; ii++)
+            {
+                EmitInt(SWAP_OP);
+                EmitInt(POP_OP);
+            }
         }
-        else
-        {
-            EmitString("Frame_Pointer = Stack_Pointer;\n");
-        }
-
-        EmitString(mId->Name() + "_");
-        EmitInt(mId->Id());
-        EmitString("();\n");
-        // need to pop params
-        if (mParams != NULL) 
-        {
-            EmitString("Stack_Pointer -= ");
-            EmitInt(mParams->Size());
-            EmitString(";\n");
-        }
-        EmitPopFP();
-        */
     }
   protected:
     cSymbol *mId;           // name of the function
