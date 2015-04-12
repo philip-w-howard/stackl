@@ -1,4 +1,5 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
 int main()
 {
     int ii;
@@ -6,6 +7,7 @@ int main()
     while (ii < 3)
     {
         printi(ii);
+        prints("\n");
         ii = ii + 1;
     }
 }

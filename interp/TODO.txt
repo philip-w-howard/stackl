@@ -2,7 +2,8 @@ Bugs:
 
 Todo:
 
-Implement Timer interrupt
+Implement TRAP handler in machine mem
+
 Implement priv instructions:
    ena/dis interrupts
    get/set processor state
@@ -18,4 +19,5 @@ Done:
 Implement Interrupt mechanism
 Implement priv instructions:
    RTI
+Implement Timer interrupt
 

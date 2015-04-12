@@ -1,4 +1,6 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
+
 int strlen(char *str)
 {
     int count;
@@ -60,6 +62,7 @@ int main()
     ptr = "1234\n";
 
     printi( strlen(ptr) );
+    prints("\n");
     strcpy(array, ptr);
     prints( array );
 

@@ -1,5 +1,5 @@
-#include "string.h"
-#include "system.h"
+#include <string.h>
+#include <system.h>
 
 int main()
 {
@@ -19,7 +19,9 @@ int main()
     stuff.dd = "this is a test\n";
 
     printi(stuff.aa);
+    prints("\n");
     printi(stuff.bb);
+    prints("\n");
     prints(stuff.cc);
     prints(stuff.dd);
 

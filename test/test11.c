@@ -1,5 +1,5 @@
-#include "system.h"
-#include "string.h"
+#include <string.h>
+#include <system.h>
 
 int main()
 {
@@ -9,6 +9,7 @@ int main()
     ptr = "1234\n";
 
     printi( strlen(ptr) );
+    prints("\n");
     strcpy(array, ptr);
     prints( array );
 

@@ -1,3 +1,5 @@
+#include <string.h>
+#include <system.h>
 int prints(char *string);
 
 int interrupt()
@@ -5,8 +7,6 @@ int interrupt()
     prints("Interrupt\n");
     rti();
 }
-
-#include <system.h>
 
 int main()
 {

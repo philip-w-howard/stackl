@@ -1,4 +1,5 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
 
 int DoNotPrintMe()
 {

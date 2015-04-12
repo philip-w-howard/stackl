@@ -1,4 +1,6 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
+
 int main()
 {
     char *cptr;
@@ -10,9 +12,10 @@ int main()
     cptr[1] = 'x';
     carr[2] = '\n';
     carr[3] = 0;
-    printc(carr[0]);
-    printc(carr[1]);
-    printc(carr[2]);
+    prints(carr);
+    //printc(carr[0]);
+    //printc(carr[1]);
+    //printc(carr[2]);
     prints(cptr);
     prints("The end\n");
 

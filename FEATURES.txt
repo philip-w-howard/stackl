@@ -5,6 +5,7 @@ TODO
 
 Include files for "regular" C code to mimic stackl C code.
 
+implement sizeof() operator
 proper implementation of general arrays
 proper implementation of structs
 full semantic checks

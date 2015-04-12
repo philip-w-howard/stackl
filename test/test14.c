@@ -1,4 +1,5 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
 
 const int ONE = 1;
 #define TWO 2
@@ -12,7 +13,9 @@ int main()
     if (aa) prints(ptr);
 
     printi(ONE);
+    prints("\n");
     printi(TWO);
+    prints("\n");
 
     return 0;
 }

@@ -67,3 +67,70 @@ int strcmp(char *str1, char *str2)
     }
     return 0;
 }
+
+char *strrev(char *str)
+{
+    char *start;
+    char *end;
+    int  temp;
+
+    if (str == 0) return 0;
+
+    end = str;
+    start = str;
+
+    // find the end of the string
+    while (end[0])
+    {
+        end++;
+    }
+    end--;
+
+    while (start < end)
+    {
+        temp = start[0];
+        start[0] = end[0];
+        end[0] = temp;
+        start++;
+        end--;
+    }
+
+    return str;
+}
+
+char *itostr(int value, char *str)
+{
+    char *ptr;
+    int minus;
+
+    minus = 0;
+    ptr = str;
+    if (value == 0)
+    {
+        strcpy(str, "0");
+        return str;
+    }
+    
+    if (value < 0)
+    {
+        minus = 1;
+        value = -value;
+    }
+
+    while (value > 0)
+    {
+        ptr[0] = (value % 10) + '0';
+        ptr++;
+        value /= 10;
+    }
+
+    if (minus) 
+    {
+        ptr[0] = '-';
+        ptr++;
+    }
+    ptr[0] = 0;
+
+    strrev(str);
+    return str;
+}

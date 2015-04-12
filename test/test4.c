@@ -1,4 +1,5 @@
-#include "system.h"
+#include <string.h>
+#include <system.h>
 int main()
 {
     int x;
@@ -7,5 +8,7 @@ int main()
         printi(1);
     else
         printi(2);
+    prints("\n");
     printi(3);
+    prints("\n");
 }

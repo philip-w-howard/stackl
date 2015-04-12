@@ -1,18 +1,14 @@
-int printi(int val)
-{
-    syscall(3, PRINTI_CALL, val);
-    return 0;
-}
-
 int prints(char *string)
 {
     syscall(3, PRINTS_CALL, string);
     return 0;
 }
 
-int printc(int string)
+int printi(int val)
 {
-    syscall(3, PRINTC_CALL, string);
+    char buff[16];
+    itostr(val, buff);
+    prints(buff);
     return 0;
 }
 
