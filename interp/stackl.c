@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "sched.h"
-#include "opcodes.h"
+#include "opcodefunc.h"
 #include "syscall.h"
 #include "io_handler.h"
 

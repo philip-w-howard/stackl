@@ -3,6 +3,7 @@ INCLUDES = startup.h \
 	   system.h \
 	   string.h \
 	   syscodes.h \
+	   opcodes.h \
 
 .PHONY: compiler interp
 
@@ -29,3 +30,4 @@ execs: compiler interp
 	cp compiler/stacklc .
 	cp interp/stackl .
 	cp interp/syscodes.h .
+	cp interp/opcodes.h .

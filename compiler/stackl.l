@@ -80,8 +80,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 "-="                        RETURN(MINUS_EQ);
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
-"rti"                       RETURN(RTI);
-"trap"                      RETURN(TRAP);
+"asm"                       RETURN(ASM);
 "static"                    { RETURN(proc_unsupported()); }
 "const"                     { RETURN(CONST); }
 "#define"                   { RETURN(DEFINE); }

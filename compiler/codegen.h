@@ -14,6 +14,7 @@
 #include "../interp/opcodes.h"
 
 static const int STACK_FRAME_SIZE = 8;
+static const int WORD_SIZE = 4;
 
 bool InitOutput(const char *filename);
 bool FinalizeOutput();

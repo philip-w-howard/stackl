@@ -5,7 +5,7 @@ int prints(char *string);
 int interrupt()
 {
     prints("Interrupt\n");
-    rti();
+    asm(31);        // RTI_OP
 }
 
 int main()

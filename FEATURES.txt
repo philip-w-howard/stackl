@@ -5,10 +5,15 @@ TODO
 
 Include files for "regular" C code to mimic stackl C code.
 
+allow #define'd constants to show up as INT_VAL, not Expr (or whatever)
+
 implement sizeof() operator
 proper implementation of general arrays
 proper implementation of structs
 full semantic checks
+   matching function params
+   only one function body
+casting an int into a char
 
 separate compilation
 

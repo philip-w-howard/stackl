@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "opcodes.h"
+#include "opcodefunc.h"
 #include "machine.h"
 #include "loader.h"
 
@@ -130,7 +131,7 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
         fscanf(input, "%s", record_type);
     }
 
-    cpu->IP = base + WORD_SIZE;
+    cpu->IP = base + 2*WORD_SIZE;
     cpu->FP = byte;
     cpu->SP = byte;
 

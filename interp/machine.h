@@ -10,6 +10,9 @@
 #define FL_INT_DIS      0x0008
 #define FL_INT_PENDING  0x0010
 
+#define INTERRUPT_VECTOR    0
+#define TRAP_VECTOR         1
+
 typedef struct
 {
     int BP;         // Base Pointer: base addr for mem

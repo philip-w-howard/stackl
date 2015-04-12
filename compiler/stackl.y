@@ -60,7 +60,7 @@
 %token  SIZE_OF
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
-%token  TRAP RTI
+%token  ASM
 %token  DEFINE CONST
 
 %type <decls> program
@@ -157,6 +157,8 @@ global_decl: func_decl          { $$ = $1; }
                                 { $$ = new cConstDeclNode($3, $5); }
         | DEFINE IDENTIFIER INT_VAL
                                 { $$ = new cConstDeclNode($2, $3); }
+        | DEFINE IDENTIFIER '-' INT_VAL
+                                { $$ = new cConstDeclNode($2, -$4); }
         | UNSUPPORTED           { 
                                     semantic_error(std::string(yytext) + 
                                             " is not supported");
@@ -229,12 +231,12 @@ stmt:       decl                { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
-        |   TRAP '(' ')' ';'    { $$ = new cTrapNode(); }
-        |   RTI '(' ')' ';'     { $$ = new cRTINode(); }
+        |   ASM '(' INT_VAL ')' ';' { $$ = new cAsmNode($3); }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }
-        | lval '=' TRAP '(' ')' { $$ = new cAssignTrapNode($1); }
+        | lval '=' ASM '(' INT_VAL ')' 
+                                { $$ = new cAssignAsmNode($1, $5); }
         | lval PLUS_EQ expr     { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '+', $3));
                                 }

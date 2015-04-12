@@ -1,11 +1,11 @@
 #pragma once
 //*******************************************************
-// Purpose: Class for a TRAP statement
+// Purpose: Class for a emitting an assembly statement
 //
 // Author: Philip Howard
 // Email:  phil.howard@oit.edu
 //
-// Date: 2/20/2015
+// Date: 4/11/2015
 //
 //*******************************************************
 
@@ -14,16 +14,18 @@
 #include "cStmtNode.h"
 #include "codegen.h"
 
-class cTrapNode : public cStmtNode
+class cAsmNode : public cStmtNode
 {
   public:
-    cTrapNode() : cStmtNode()
+    cAsmNode(int code) : cStmtNode()
     {
+        mCode = code;
     }
 
     virtual std::string toString()
     {
-        std::string result("TRAP");
+        std::string result("ASM ");
+        result += std::to_string(mCode);
         return result;
     }
 
@@ -34,8 +36,9 @@ class cTrapNode : public cStmtNode
 
     virtual void GenerateCode()
     {
-        EmitInt(TRAP_OP);
-        EmitInt(POP_OP);
+        EmitInt(mCode);
     }
+  protected:
+    int mCode;          // the opcode to be emitted
 };
 

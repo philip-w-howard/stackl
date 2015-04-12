@@ -16,12 +16,13 @@
 #include "parse.h"
 #include "codegen.h"
 
-class cAssignTrapNode : public cStmtNode
+class cAssignAsmNode : public cStmtNode
 {
   public:
-    cAssignTrapNode(cVarRefNode *lval) : cStmtNode()
+    cAssignAsmNode(cVarRefNode *lval, int code) : cStmtNode()
     {
         mLval = lval;
+        mCode = code;
         if (!lval->GetType()->CompatibleWith(
                     symbolTableRoot->Lookup("int")->GetType())
            )
@@ -42,18 +43,20 @@ class cAssignTrapNode : public cStmtNode
         std::string result("(ASSIGN: ");
         result += mLval->toString();
         result += " = ";
-        result += "TRAP() ";
+        result += "ASM: ";
+        result += std::to_string(mCode);
         result += ")";
         return result;
     }
 
     virtual void GenerateCode()
     {
-        EmitInt(TRAP_OP);
+        EmitInt(mCode);
         mLval->GenerateLVal();
     }
 
   protected:
     cVarRefNode *mLval;     // the lhs of the assignment
+    int         mCode;      // the opcode to be emitted
 };
 

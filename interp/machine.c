@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "opcodes.h"
+#include "opcodefunc.h"
 
 char Memory[MEMORY_SIZE];
 Machine_State Regs;

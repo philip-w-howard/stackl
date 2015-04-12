@@ -1,6 +1,11 @@
 Bugs:
 
+loader can't handle "\nthis is a test\n" (or probably any other string with two control codes)
+
 Todo:
+
+in compiler, -boot means "don't include startup.h"
+in compiler: OUTS instruction and TRAPTOC instruction
 
 Implement TRAP handler in machine mem
 

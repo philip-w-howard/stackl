@@ -20,7 +20,6 @@ static std::ofstream Output;
 static int  Next_Label = 1;
 
 static cFixupTable FixupTable;
-#define WORD_SIZE 4
 static int Location = 0;
 
 extern int Do_Boot_Code;
@@ -37,10 +36,8 @@ bool InitOutput(const char *filename)
     }
 
     // Leave room for ISR address (if any)
-    if (Do_Boot_Code)
-        SetJumpSource("interrupt");
-    else
-        EmitInt(NOP);
+    SetJumpSource("interrupt");
+    SetJumpSource("systrap");
 
     EmitInt(CALL_OP);
     SetJumpSource("startup__");

@@ -5,6 +5,7 @@
 
 #include "syscall.h"
 #include "opcodes.h"
+#include "opcodefunc.h"
 #include "machine.h"
 
 #define WORD_SIZE 4
@@ -81,7 +82,7 @@ static void do_rti(Machine_State *cpu)
     cpu->BP = pop(cpu);
 }
 //***********************************************
-static void interrupt(Machine_State *cpu)
+static void interrupt(Machine_State *cpu, int vector)
 {
     int temp;
 
@@ -100,11 +101,15 @@ static void interrupt(Machine_State *cpu)
 
     temp = cpu->SP;
 //    cpu->SP = cpu->SSP;
+    // Switch FP and SP to absolute addresses
+    cpu->FP += cpu->BP;
     cpu->SP += cpu->BP;
+
+    // store SP on system stack
     push(cpu, temp);
 
-    // ISR is at zero
-    cpu->IP = Get_Word(0);
+    // ISR is at vector
+    cpu->IP = Get_Word(vector*WORD_SIZE);
 }
 //***************************************
 void Execute(Machine_State *cpu)
@@ -125,7 +130,7 @@ void Execute(Machine_State *cpu)
 
     if ((cpu->FLAG & FL_INT_PENDING) && !(cpu->FLAG & FL_INT_MODE))
     {
-        interrupt(cpu);
+        interrupt(cpu, INTERRUPT_VECTOR);
         return;
     }
 
@@ -275,8 +280,16 @@ void Execute(Machine_State *cpu)
             INC(SP, 1);
             INC(IP, 1);
             break;
-        case TRAP_OP:
-            DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
+        case OUTS_OP:
+            DEBUG("OUTS");
+            if (cpu->FLAG & FL_USER_MODE)
+            {
+                Machine_Check("OUTS instruction while not in system mode");
+            }
+            INC(IP, 1);
+            break;
+        case TRAPTOC_OP:
+            DEBUG("TRAPTOC_OP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             {
                 int args[20];
                 int ii;
@@ -292,26 +305,13 @@ void Execute(Machine_State *cpu)
                 INC(SP, 1);
             }
             break;
+        case TRAP_OP:
+            DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
+            interrupt(cpu, TRAP_VECTOR);
+            break;
         case RTI_OP:
             DEBUG("RTI");
             do_rti(cpu);
-            /*
-            if ( !(cpu->FLAG & FL_INT_MODE) )
-            {
-                Machine_Check("RTI while not in interrupt mode at %d", cpu->IP);
-            }
-
-            temp = pop(cpu);
-            cpu->SSP = cpu->SP;
-            cpu->SP = temp;
-
-            cpu->FLAG = pop(cpu);
-            cpu->FP = pop(cpu);
-            cpu->IP = pop(cpu);
-            cpu->LP = pop(cpu);
-            cpu->BP = pop(cpu);
-            */
-
             break;
         case JUMP_OP:
             DEBUG("JUMP %d", GET_INTVAL(IP, 1));

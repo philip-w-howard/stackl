@@ -45,7 +45,6 @@ class cDeclNode : public cStmtNode
         return false;
     }
   protected:
-    static const int WORD_SIZE = 4;
     cSymbol *mId;
     int mOffset;
     int mSize;
