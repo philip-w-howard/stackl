@@ -8,18 +8,29 @@ int interrupt()
     asm(31);        // RTI_OP
 }
 
-int systrap()
+int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
+        int size, int op, int parm1)
 {
-    asm(29);        // TRAPTOC_OP
-    asm(18);        // POP_OP
-    asm(31);        // RTI_OP
+    if (op == PRINTS_CALL)
+    {
+        asm(24, parm1);     // OUTS_OP
+    } else {
+        asm(29);            // TRAPTOC_OP
+        asm(18);            // POP_OP
+    }
+    asm(31);                // RTI_OP
 }
 
-int syscall(int size, int op)
+int syscall(int size, int op, int parm1)
 {
-    int result;
-    result = asm(29);  // TRAPTOC_OP
-    return result;
+    if (op == PRINTS_CALL)
+    {
+        asm(30);            // TRAP_OP
+    } else {
+        asm(29);            // TRAPTOC_OP
+        asm(18);            // POP_OP
+    }
+    return 0;
 }
 
 int exit(int status)

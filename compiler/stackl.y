@@ -25,6 +25,7 @@
     cArraySpecNode*     arraySpec;
     cFuncCallNode*      funcCall;
     cStmtsNode*         stmts;
+    cAsmNode*           asmstmt;
     cStmtNode*          stmt;
     cVarRefNode*        varRef;
     cVarPartNode*       varPart;
@@ -83,6 +84,7 @@
 %type <stmts> stmts
 %type <stmt> stmt
 %type <stmt> assign
+%type <asmstmt> asm_stmt
 %type <varRef> lval
 %type <arrayVal> arrayval
 %type <param> params
@@ -231,12 +233,12 @@ stmt:       decl                { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
         |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
-        |   ASM '(' INT_VAL ')' ';' { $$ = new cAsmNode($3); }
+        |   asm_stmt ';'        { $$ = $1; }
 
 assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval '=' string_lit   { $$ = new cAssignNode($1, $3); }
-        | lval '=' ASM '(' INT_VAL ')' 
-                                { $$ = new cAssignAsmNode($1, $5); }
+        | lval '=' asm_stmt
+                                { $$ = new cAssignAsmNode($1, $3); }
         | lval PLUS_EQ expr     { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '+', $3));
                                 }
@@ -265,6 +267,10 @@ assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
                                         new cBinaryExprNode($2, '-',
                                             new cIntExprNode(1)));
                                 }
+asm_stmt : ASM '(' INT_VAL ')' 
+                                { $$ = new cAsmNode($3, NULL); }
+        | ASM '(' INT_VAL ',' params ')'
+                                { $$ = new cAsmNode($3, $5); }
 func_call:  IDENTIFIER '(' params ')' 
                                 { $$ = new cFuncCallNode($1, $3); }
 

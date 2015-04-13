@@ -281,11 +281,13 @@ void Execute(Machine_State *cpu)
             INC(IP, 1);
             break;
         case OUTS_OP:
-            DEBUG("OUTS");
+            DEBUG("OUTS %d", GET_INTVAL(SP,-1));
             if (cpu->FLAG & FL_USER_MODE)
             {
                 Machine_Check("OUTS instruction while not in system mode");
             }
+            temp = pop(cpu);
+            printf("%s", (char *)Get_Addr(temp));
             INC(IP, 1);
             break;
         case TRAPTOC_OP:
@@ -307,6 +309,7 @@ void Execute(Machine_State *cpu)
             break;
         case TRAP_OP:
             DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
+            INC(IP, 1);
             interrupt(cpu, TRAP_VECTOR);
             break;
         case RTI_OP:

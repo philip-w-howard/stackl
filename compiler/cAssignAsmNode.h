@@ -19,10 +19,10 @@
 class cAssignAsmNode : public cStmtNode
 {
   public:
-    cAssignAsmNode(cVarRefNode *lval, int code) : cStmtNode()
+    cAssignAsmNode(cVarRefNode *lval, cAsmNode *stmt) : cStmtNode()
     {
         mLval = lval;
-        mCode = code;
+        mAsm = stmt;
         if (!lval->GetType()->CompatibleWith(
                     symbolTableRoot->Lookup("int")->GetType())
            )
@@ -35,6 +35,7 @@ class cAssignAsmNode : public cStmtNode
     virtual int ComputeOffsets(int base)
     {
         mLval->ComputeOffsets(base);
+        mAsm->ComputeOffsets(base);
         return base;
     }
 
@@ -43,20 +44,19 @@ class cAssignAsmNode : public cStmtNode
         std::string result("(ASSIGN: ");
         result += mLval->toString();
         result += " = ";
-        result += "ASM: ";
-        result += std::to_string(mCode);
+        result += mAsm->toString();
         result += ")";
         return result;
     }
 
     virtual void GenerateCode()
     {
-        EmitInt(mCode);
+        mAsm->GenerateCode();
         mLval->GenerateLVal();
     }
 
   protected:
     cVarRefNode *mLval;     // the lhs of the assignment
-    int         mCode;      // the opcode to be emitted
+    cAsmNode    *mAsm;      // the opcode to be emitted
 };
 
