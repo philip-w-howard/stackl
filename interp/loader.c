@@ -62,18 +62,26 @@ char *format_string(char *str)
     return str;
 }
 //***************************************
-int Load(Machine_State *cpu, const char *filename, int base, int top)
+//int Load(Machine_State *cpu, const char *filename, int base, int top)
+int Load(const char *filename)
 {
-    int byte = base;
-    int heap_top = top;
+    Machine_State cpu;
+    int base;
+    int top;
     int loc;
     int value;
     char record_type[20];
     char string[256];
     char *sptr;
     int  slen;
-    FILE *input = fopen(filename, "r");
 
+    Get_Machine_State(&cpu);
+    base = cpu.BP;
+    top  = cpu.LP;
+
+    int byte = base;
+    int heap_top = top;
+    FILE *input = fopen(filename, "r");
     if (input == NULL) 
     {
         strcpy(string, filename);
@@ -131,9 +139,10 @@ int Load(Machine_State *cpu, const char *filename, int base, int top)
         fscanf(input, "%s", record_type);
     }
 
-    cpu->IP = base + 2*WORD_SIZE;
-    cpu->FP = byte;
-    cpu->SP = byte;
+    cpu.IP = base + 2*WORD_SIZE;
+    cpu.FP = byte;
+    cpu.SP = byte;
+    Set_Machine_State(&cpu);
 
     return 0;
 }

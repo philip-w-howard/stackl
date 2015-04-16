@@ -1,0 +1,4 @@
+test/regress
+
+echo "enter 'this is a test' 'testing' '123'"
+test/runc test21

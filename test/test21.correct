@@ -1,6 +1,4 @@
-prints works
-print the number 88: 88
-this
- is a test
-entered: 77
+calling scanl: this is a test
+calling scans: testing
+calling scani: entered: 123
 Testing exit

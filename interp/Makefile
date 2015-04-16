@@ -2,9 +2,7 @@ COPTS=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
-	 syscall.o \
 	 loader.o \
-	 sched.o \
 	 io_handler.o \
 
 all: stackl

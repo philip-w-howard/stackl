@@ -19,6 +19,11 @@ int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
 int Timer_Interval = 0;
 
+static int debug_break()
+{
+    return 0;
+}
+
 void Opcodes_Debug()
 {
     Do_Debug = 1;
@@ -44,8 +49,8 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
     va_start(args, fmt);
 
     char format[200];
-    sprintf(format, "%d %d %d %d %s\n", 
-            cpu->BP, cpu->IP, cpu->SP, cpu->FP, fmt);
+    sprintf(format, "%0x %d %d %d %d %s\n", 
+            cpu->FLAG, cpu->BP, cpu->IP, cpu->SP, cpu->FP, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
 }
@@ -466,6 +471,7 @@ void Execute(Machine_State *cpu)
             break;
         case POPREG_OP:
             DEBUG("POPREG %d", GET_INTVAL(IP,1));
+            debug_break();
             if (GET_INTVAL(IP,1) == FLAG_REG) check_priv(cpu, "POPREG FLAG");
             temp = GET_INTVAL(IP,1);
             INC(IP,2);
@@ -478,16 +484,16 @@ void Execute(Machine_State *cpu)
                     cpu->LP = pop(cpu);
                     break;
                 case IP_REG:
-                    cpu->LP = pop(cpu);
+                    cpu->IP = pop(cpu);
                     break;
                 case SP_REG:
-                    cpu->LP = pop(cpu);
+                    cpu->SP = pop(cpu);
                     break;
                 case FP_REG:
-                    cpu->LP = pop(cpu);
+                    cpu->FP = pop(cpu);
                     break;
                 case FLAG_REG:
-                    cpu->LP = pop(cpu);
+                    cpu->FLAG = pop(cpu);
                     break;
             }
             break;

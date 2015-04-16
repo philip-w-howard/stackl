@@ -14,6 +14,9 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
     if (op == PRINTS_CALL)
     {
         asm(OUTS_OP, parm1);
+    } else if (op == EXIT_CALL) {
+        asm(POPREG_OP, 1); // halt state
+        asm(FLAG_REG);
     } else {
         asm(TRAPTOC_OP);
         asm(POP_OP);
@@ -30,10 +33,8 @@ int syscall(int size, int op, int parm1)
         int status;
     } io_blk_t;
     io_blk_t io_blk;
-    if (op == PRINTS_CALL)
-    {
-        asm(TRAP_OP);
-    } else if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
+
+    if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
         io_blk.op = op;
         io_blk.addr = parm1;
         io_blk.status = 0;
@@ -43,9 +44,9 @@ int syscall(int size, int op, int parm1)
             asm(NOP);
         }
     } else {
-        asm(TRAPTOC_OP);
-        asm(POP_OP);
+        asm(TRAP_OP);
     }
+
     return 0;
 }
 

@@ -38,42 +38,6 @@ int syscall(int *args)
 
     switch (args[1])
     {
-        case EXIT_CALL:
-            DEBUG("EXIT: %d\n", args[2]);
-            Sched_Exit(args[2]);
-            break;
-            /*
-        case PRINTI_CALL:
-            DEBUG("PRINTI: %d\n", args[2]);
-            printf("%d\n", args[2]);
-            fflush(stdout);
-            break;
-        case PRINTS_CALL:
-            DEBUG("PRINTS: %s\n", (char *)Get_Addr(args[2]));
-            printf("%s", (char *)Get_Addr(args[2]));
-            fflush(stdout);
-            break;
-        case PRINTC_CALL:
-            DEBUG("PRINTC: %c\n", args[2]);
-            printf("%c", args[2]);
-            fflush(stdout);
-            break;
-            */
-        case GETS_CALL:
-            DEBUG("GETS:\n");
-            //Sched_WaitIO(GETS_CALL, Get_Addr(args[2]));
-            scanf("%s", (char *)Get_Addr(args[2]));
-            break;
-        case GETL_CALL:
-            DEBUG("GETL:\n");
-            //Sched_WaitIO(GETL_CALL, Get_Addr(args[2]));
-            gets(Get_Addr(args[2]));
-            break;
-        case GETI_CALL:
-            DEBUG("GETI:\n");
-            //Sched_WaitIO(GETI_CALL, Get_Addr(args[2]));
-            scanf("%d", (int *)Get_Addr(args[2]));
-            break;
         case EXEC_CALL:
             DEBUG("EXEC: %s\n", Get_Addr(args[2]));
             temp = Sched_Load(Get_Addr(args[2]));

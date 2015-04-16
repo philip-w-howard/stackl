@@ -1,9 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "sched.h"
 #include "opcodefunc.h"
-#include "syscall.h"
+#include "loader.h"
 #include "io_handler.h"
 
 char Input_File[200] = "";
@@ -18,10 +17,10 @@ void Process_Args(int argc, char **argv)
             char *arg = &argv[ii][1];
             if (strcmp(arg, "opcodes") == 0)
                 Opcodes_Debug();
-            else if (strcmp(arg, "sched") == 0)
-                Sched_Debug();
-            else if (strcmp(arg, "syscall") == 0)
-                Syscall_Debug();
+//            else if (strcmp(arg, "sched") == 0)
+//                Sched_Debug();
+//            else if (strcmp(arg, "syscall") == 0)
+//                Syscall_Debug();
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (argv[ii][1] == 'T')
@@ -33,7 +32,7 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                printf("stackl -version -help -opcodes -sched -syscall <file>\n");
+                printf("stackl -version -help -opcodes <file>\n");
                 exit(0);
             }
             else
@@ -60,23 +59,25 @@ int main(int argc, char **argv)
 
     Init_IO();
     Init_Machine();
-    Sched_Init();
+    //Sched_Init();
 
+    /*
     result = Sched_Fork();
     if (result == -1)
     {
         printf("Unable to fork initial process\n");
         return 2;
     }
+    */
 
-    result = Sched_Load(Input_File);
+    result = Load(Input_File);
     if (result != 0) 
     {
         printf("Unable to execute %s\n", Input_File);
         return 3;
     }
 
-    Schedule();
+    //Schedule();
 
     Machine_Execute();
 
