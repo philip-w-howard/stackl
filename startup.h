@@ -5,7 +5,7 @@ int main();
 
 int interrupt()
 {
-    asm(31);        // RTI_OP
+    asm(RTI_OP);
 }
 
 int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
@@ -13,22 +13,22 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 {
     if (op == PRINTS_CALL)
     {
-        asm(24, parm1);     // OUTS_OP
+        asm(OUTS_OP, parm1);
     } else {
-        asm(29);            // TRAPTOC_OP
-        asm(18);            // POP_OP
+        asm(TRAPTOC_OP);
+        asm(POP_OP);
     }
-    asm(31);                // RTI_OP
+    asm(RTI_OP);
 }
 
 int syscall(int size, int op, int parm1)
 {
     if (op == PRINTS_CALL)
     {
-        asm(30);            // TRAP_OP
+        asm(TRAP_OP);
     } else {
-        asm(29);            // TRAPTOC_OP
-        asm(18);            // POP_OP
+        asm(TRAPTOC_OP);
+        asm(POP_OP);
     }
     return 0;
 }

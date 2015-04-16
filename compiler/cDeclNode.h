@@ -27,6 +27,7 @@ class cDeclNode : public cStmtNode
     virtual bool IsPointer()    { return false; }
     //virtual bool IsAbsolute()   { return false; }
     virtual bool IsConst()      { return false; }
+    virtual int  GetValue()     { return 0; }
     virtual int Size()          { return mSize; }
     virtual int GetOffset()     { return mOffset; }
 

@@ -131,6 +131,11 @@ static int proc_identifier(const char *name)
     if (yylval.symbol == NULL) yylval.symbol = new cSymbol(name);
     if (yylval.symbol->GetType() == NULL) return IDENTIFIER;
     if (yylval.symbol->GetType()->IsType()) return TYPE_ID;
+    if (yylval.symbol->GetType()->IsConst()) 
+    {
+        yylval.int_val = yylval.symbol->GetType()->GetValue();
+        return INT_VAL;
+    }
 
     return IDENTIFIER;
 }

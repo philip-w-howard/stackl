@@ -42,6 +42,7 @@ int syscall(int *args)
             DEBUG("EXIT: %d\n", args[2]);
             Sched_Exit(args[2]);
             break;
+            /*
         case PRINTI_CALL:
             DEBUG("PRINTI: %d\n", args[2]);
             printf("%d\n", args[2]);
@@ -57,6 +58,7 @@ int syscall(int *args)
             printf("%c", args[2]);
             fflush(stdout);
             break;
+            */
         case GETS_CALL:
             DEBUG("GETS:\n");
             Sched_WaitIO(GETS_CALL, Get_Addr(args[2]));
