@@ -23,14 +23,16 @@
 #define PUSHCVARIND_OP  22
 #define POPCVARIND_OP   23
 #define OUTS_OP     24
-//#define PRINTSA_OP  25
+#define INP_OP      25
 #define PUSHFP_OP   26
-//#define GETS_OP     27
-//#define GETL_OP     28
+#define SAVEREG_OP  27
+#define RESTREG_OP  28
 #define TRAPTOC_OP  29
 #define TRAP_OP     30
 #define RTI_OP      31
 #define CALLI_OP    32
+#define PUSHREG_OP  33
+#define POPREG_OP   34
 
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
@@ -42,3 +44,12 @@
 #define CALL_OP     -7
 #define PUSHCVAR_OP -8
 #define POPCVAR_OP  -9
+
+
+// Register definitions for SAVEREG and RESTREG
+#define BP_REG      0
+#define LP_REG      1
+#define IP_REG      2
+#define SP_REG      3
+#define FP_REG      4
+#define FLAG_REG    5

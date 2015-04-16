@@ -21,7 +21,6 @@ typedef struct
     int SP;         // Stack Pointer
     int FP;         // Frame Pointer
     int FLAG;       // FLAG register (bits defined above)
-    int SSP;        // System Stack Pointer
 } Machine_State;
 
 int Get_Word(int address);

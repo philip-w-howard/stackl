@@ -13,9 +13,7 @@ static pthread_mutex_t IO_Q_Lock = PTHREAD_MUTEX_INITIALIZER;
 
 typedef struct
 {
-    int io_op;
-    void *addr;
-    Process_State_t *proc;
+    int io_blk_addr;
 } io_op_t;
 
 static io_op_t IO_Q[IO_Q_SIZE];
@@ -27,9 +25,9 @@ static pthread_t IO_Q_Thread;
 //*************************************
 static void *IO_Processor(void *arg)
 {
+    int io_blk_addr;
     int io_op;
     void *addr;
-    Process_State_t *proc;
 
     while (IO_Q_Halt_Thread == 0)
     {
@@ -41,25 +39,30 @@ static void *IO_Processor(void *arg)
         else
         {
             pthread_mutex_lock(&IO_Q_Lock);
-            io_op = IO_Q[IO_Q_Tail].io_op;
-            addr = IO_Q[IO_Q_Tail].addr;
-            proc = IO_Q[IO_Q_Tail].proc;
+            io_blk_addr = IO_Q[IO_Q_Tail].io_blk_addr;
 
             IO_Q_Tail++;
             IO_Q_Tail %= IO_Q_SIZE;
 
             pthread_mutex_unlock(&IO_Q_Lock);
 
+            io_op = Get_Word(io_blk_addr);
+            addr = Get_Addr( Get_Word(io_blk_addr + WORD_SIZE));
+            Set_Word(io_blk_addr + 2*WORD_SIZE, IO_PENDING);
+
             switch (io_op)
             {
                 case GETL_CALL:
                     gets((char *)addr);
+                    Set_Word(io_blk_addr + 2*WORD_SIZE, IO_COMPLETE);
                     break;
                 case GETS_CALL:
                     scanf("%s", (char *)addr);
+                    Set_Word(io_blk_addr + 2*WORD_SIZE, IO_COMPLETE);
                     break;
                 case GETI_CALL:
                     scanf("%d", (int *)addr);
+                    Set_Word(io_blk_addr + 2*WORD_SIZE, IO_COMPLETE);
                     break;
                 default:
                     fprintf(stderr, "Invalid IO code: %d\n", io_op);
@@ -68,7 +71,7 @@ static void *IO_Processor(void *arg)
                     break;
             }
 
-            Sched_Reschedule(proc);
+            // Sched_Reschedule(proc);
         }
 
     }
@@ -91,14 +94,13 @@ void Finish_IO()
     pthread_join(IO_Q_Thread, NULL);
 }
 //*************************************
-void Schedule_IO(int io_op, void *addr, Process_State_t *proc)
+void Schedule_IO(int io_blk_addr)
 {
     // NOTE: Ignoring queue overflow
     pthread_mutex_lock(&IO_Q_Lock);
 
-    IO_Q[IO_Q_Head].io_op = io_op;
-    IO_Q[IO_Q_Head].addr = addr;
-    IO_Q[IO_Q_Head].proc = proc;
+    IO_Q[IO_Q_Head].io_blk_addr = io_blk_addr;
+    Set_Word(io_blk_addr + 2*WORD_SIZE, IO_QUEUED);
 
     IO_Q_Head++;
     IO_Q_Head %= IO_Q_SIZE;

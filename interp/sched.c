@@ -265,7 +265,7 @@ void  Sched_WaitIO(int io_op, void *addr)
     DEBUG("wait IO: %d", io_op);
     Get_Machine_State(&Process_State[Current_Process].cpu);
     Process_State[Current_Process].state = WAITING_IO;
-    Schedule_IO(io_op, addr, &Process_State[Current_Process]);
+    //Schedule_IO(io_op, addr, &Process_State[Current_Process]);
     Schedule();
 }
 //*************************************

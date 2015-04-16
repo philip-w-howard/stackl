@@ -61,18 +61,18 @@ int syscall(int *args)
             */
         case GETS_CALL:
             DEBUG("GETS:\n");
-            Sched_WaitIO(GETS_CALL, Get_Addr(args[2]));
-            //scanf("%s", (char *)Get_Addr(args[2]));
+            //Sched_WaitIO(GETS_CALL, Get_Addr(args[2]));
+            scanf("%s", (char *)Get_Addr(args[2]));
             break;
         case GETL_CALL:
             DEBUG("GETL:\n");
-            Sched_WaitIO(GETL_CALL, Get_Addr(args[2]));
-            //gets(Get_Addr(args[2]));
+            //Sched_WaitIO(GETL_CALL, Get_Addr(args[2]));
+            gets(Get_Addr(args[2]));
             break;
         case GETI_CALL:
             DEBUG("GETI:\n");
-            Sched_WaitIO(GETI_CALL, Get_Addr(args[2]));
-            //scanf("%d", (int *)Get_Addr(args[2]));
+            //Sched_WaitIO(GETI_CALL, Get_Addr(args[2]));
+            scanf("%d", (int *)Get_Addr(args[2]));
             break;
         case EXEC_CALL:
             DEBUG("EXEC: %s\n", Get_Addr(args[2]));

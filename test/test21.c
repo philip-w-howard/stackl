@@ -1,3 +1,4 @@
+#include <string.h>
 #include <system.h>
 
 int main()
@@ -5,20 +6,21 @@ int main()
     char arr[50];
     int val;
 
-    prints("prints works\n");
-    prints("print the number 88: ");
-    printi(88);
-
-    scans(arr);
-    prints(arr);
-    prints("\n");
+    prints("calling scanl: ");
     scanl(arr);
     prints(arr);
     prints("\n");
 
+    prints("calling scans: ");
+    scans(arr);
+    prints(arr);
+    prints("\n");
+
+    prints("calling scani: ");
     scani(&val);
     prints("entered: ");
     printi(val);
+    prints("\n");
 
     prints("Testing exit\n");
     exit(0);

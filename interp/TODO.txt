@@ -4,8 +4,15 @@ loader can't handle "\nthis is a test\n" (or probably any other string with two 
 
 Todo:
 
+Design I/O architecture
+   IOBlock: instr, addr, status
+       instr: INS, INC, INL
+       addr: abs Memory[] addr of buffer
+       status: queued, pending, done
+
+Input syscal does IO instr and polls for completion.
+
 in compiler, -boot means "don't include startup.h"
-in compiler: OUTS instruction and TRAPTOC instruction
 
 Implement TRAP handler in machine mem
 
@@ -13,7 +20,6 @@ Implement priv instructions:
    ena/dis interrupts
    get/set processor state
 Implement Process Control Block in Machine mem
-Design I/O architecture
 Change syscalls to use I/O architecture and run in Machine
 update exe format
 Implement load in machine: requires disk I/O

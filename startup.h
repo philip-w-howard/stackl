@@ -23,9 +23,25 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 
 int syscall(int size, int op, int parm1)
 {
+    struct
+    {
+        int op;
+        int addr;
+        int status;
+    } io_blk_t;
+    io_blk_t io_blk;
     if (op == PRINTS_CALL)
     {
         asm(TRAP_OP);
+    } else if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
+        io_blk.op = op;
+        io_blk.addr = parm1;
+        io_blk.status = 0;
+        asm(INP_OP, &io_blk);
+        while(io_blk.status != 4)
+        {
+            asm(NOP);
+        }
     } else {
         asm(TRAPTOC_OP);
         asm(POP_OP);

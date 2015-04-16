@@ -7,6 +7,7 @@
 #include "opcodes.h"
 #include "opcodefunc.h"
 #include "machine.h"
+#include "io_handler.h"
 
 #define WORD_SIZE 4
 #define GET_INTVAL(reg, off) (Get_Word(cpu-> reg + OFFSET(off)))
@@ -61,18 +62,22 @@ static int pop(Machine_State *cpu)
     cpu->SP -= WORD_SIZE;
     return Get_Word(cpu->SP);
 }
+//***********************************
+void check_priv(Machine_State *cpu, char *inst_name)
+{
+    if (cpu->FLAG & FL_USER_MODE)
+    {
+        Machine_Check("%s instruction while not in system mode", inst_name);
+    }
+}
 //***************************************
 static void do_rti(Machine_State *cpu)
 {
     int temp;
 
-    if ( !(cpu->FLAG & FL_INT_MODE) )
-    {
-        Machine_Check("RTI while not in interrupt mode at %d", cpu->IP);
-    }
+    check_priv(cpu, "RTI");
 
     temp = pop(cpu);
-    cpu->SSP = cpu->SP;
     cpu->SP = temp;
 
     cpu->FLAG = pop(cpu);
@@ -100,7 +105,6 @@ static void interrupt(Machine_State *cpu, int vector)
     cpu->FLAG |= FL_INT_MODE;
 
     temp = cpu->SP;
-//    cpu->SP = cpu->SSP;
     // Switch FP and SP to absolute addresses
     cpu->FP += cpu->BP;
     cpu->SP += cpu->BP;
@@ -282,12 +286,17 @@ void Execute(Machine_State *cpu)
             break;
         case OUTS_OP:
             DEBUG("OUTS %d", GET_INTVAL(SP,-1));
-            if (cpu->FLAG & FL_USER_MODE)
-            {
-                Machine_Check("OUTS instruction while not in system mode");
-            }
+            check_priv(cpu, "OUTS");
             temp = pop(cpu);
             printf("%s", (char *)Get_Addr(temp));
+            INC(IP, 1);
+            break;
+        case INP_OP:
+            temp = GET_INTVAL(SP, -1);
+            DEBUG("INP %d", Get_Word(temp), Get_Word(temp+4));
+            check_priv(cpu, "INP");
+            Schedule_IO(temp);
+            INC(SP, 1);
             INC(IP, 1);
             break;
         case TRAPTOC_OP:
@@ -371,6 +380,116 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             Set_Byte(temp, Get_Byte(cpu->SP));
             INC(IP,2);
+            break;
+        case SAVEREG_OP:
+            DEBUG("SAVEREG %d %d", GET_INTVAL(SP,-1), GET_INTVAL(SP,-1));
+            check_priv(cpu, "SAVEREG");
+            temp = GET_INTVAL(SP,-1);
+            INC(IP,1);
+            INC(SP,2);
+            switch (temp)
+            {
+                case BP_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->BP);
+                    break;
+                case LP_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->LP);
+                    break;
+                case IP_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->IP);
+                    break;
+                case SP_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->SP);
+                    break;
+                case FP_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->FP);
+                    break;
+                case FLAG_REG:
+                    Set_Word(GET_INTVAL(SP,1), cpu->FLAG);
+                    break;
+            }
+            break;
+        case RESTREG_OP:
+            DEBUG("RESTREG %d %d", GET_INTVAL(SP,-1), GET_INTVAL(SP,-1));
+            check_priv(cpu, "RESTREG");
+            temp = GET_INTVAL(SP,-1);
+            INC(IP,1);
+            INC(SP,2);
+            switch (temp)
+            {
+                case BP_REG:
+                    cpu->BP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+                case LP_REG:
+                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+                case IP_REG:
+                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+                case SP_REG:
+                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+                case FP_REG:
+                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+                case FLAG_REG:
+                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
+                    break;
+            }
+            break;
+        case PUSHREG_OP:
+            DEBUG("PUSHREG %d", GET_INTVAL(IP,1));
+            //check_priv(cpu, "SAVEREG");
+            temp = GET_INTVAL(IP,1);
+            INC(IP,2);
+            switch (temp)
+            {
+                case BP_REG:
+                    push(cpu, cpu->BP);
+                    break;
+                case LP_REG:
+                    push(cpu, cpu->LP);
+                    break;
+                case IP_REG:
+                    push(cpu, cpu->IP);
+                    break;
+                case SP_REG:
+                    push(cpu, cpu->SP);
+                    break;
+                case FP_REG:
+                    push(cpu, cpu->FP);
+                    break;
+                case FLAG_REG:
+                    push(cpu, cpu->FLAG);
+                    break;
+            }
+            break;
+        case POPREG_OP:
+            DEBUG("POPREG %d", GET_INTVAL(IP,1));
+            if (GET_INTVAL(IP,1) == FLAG_REG) check_priv(cpu, "POPREG FLAG");
+            temp = GET_INTVAL(IP,1);
+            INC(IP,2);
+            switch (temp)
+            {
+                case BP_REG:
+                    cpu->BP = pop(cpu);
+                    break;
+                case LP_REG:
+                    cpu->LP = pop(cpu);
+                    break;
+                case IP_REG:
+                    cpu->LP = pop(cpu);
+                    break;
+                case SP_REG:
+                    cpu->LP = pop(cpu);
+                    break;
+                case FP_REG:
+                    cpu->LP = pop(cpu);
+                    break;
+                case FLAG_REG:
+                    cpu->LP = pop(cpu);
+                    break;
+            }
             break;
         case ADJSP_OP:
             DEBUG("ADJSP %d", GET_INTVAL(IP,1));
