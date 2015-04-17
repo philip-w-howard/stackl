@@ -30,7 +30,6 @@ class cDeclNode : public cStmtNode
     virtual int  GetValue()     { return 0; }
     virtual int Size()          { return mSize; }
     virtual int GetOffset()     { return mOffset; }
-
     virtual int ComputeOffsets(int base) { return base; }
 
     virtual bool CompatibleWith(cDeclNode *other)

@@ -63,10 +63,10 @@ class cVarPartNode : public cAstNode
         return result;
     }
 
-    virtual int ComputeOffsets(int base)
+    bool IsArray()
     {
-        if (mArrayPart != NULL) mArrayPart->ComputeOffsets(base);
-        return base;
+        // TODO why is this function necessary?
+        return mId->GetType()->IsArray();
     }
 
   protected:

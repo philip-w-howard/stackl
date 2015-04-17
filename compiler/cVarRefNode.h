@@ -143,12 +143,10 @@ class cVarRefNode : public cExprNode
 
                 if(last->GetDecl()->GetBaseType()->IsPointer())
                 {
-                    // ptr[index] pushes *(FP + offset) + (size * index)
-                    EmitInt(PUSH_OP);
+                    // ptr[index] pushes (ptr + (size * index))
+                    
+                    EmitInt(PUSHVAR_OP);
                     EmitInt(mOffset);
-                    EmitInt(PUSHFP_OP);
-                    EmitInt(PLUS_OP);
-                    EmitInt(PUSHVARIND_OP);
 
                     EmitInt(PUSH_OP);
                     EmitInt(1);
@@ -159,7 +157,7 @@ class cVarRefNode : public cExprNode
                 }
                 else
                 {
-                    // arr[index] pushes (FP + offset) + (size * index)
+                    // arr[index] pushes ((FP + offset) + (size * index))
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PUSHFP_OP);
@@ -199,13 +197,15 @@ class cVarRefNode : public cExprNode
             else if (last->IsArrayRef())
             {
                 // array refs leave *x at top of stack
+                
                 EmitOffset();
                 EmitInt(PUSHCVARIND_OP);
             } 
-            else if (last->GetDecl()->IsArray())
+            else if (last->IsArray())
             {
                 // arrays leave &x on top of stack
                 // push (mOffset + FP)
+                
                 EmitInt(PUSH_OP);
                 EmitInt(mOffset);
                 EmitInt(PUSHFP_OP);
@@ -214,7 +214,6 @@ class cVarRefNode : public cExprNode
             else 
             {
                 // non-arrays leave 'x' on top of stack
-                //
                 EmitInt(PUSHVAR_OP);
                 EmitInt(mOffset);
             }
