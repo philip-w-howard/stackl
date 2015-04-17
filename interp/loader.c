@@ -6,12 +6,12 @@
 #include "machine.h"
 #include "loader.h"
 
-void MemCpy(int heap_top, char *sptr)
+void MemCpy(int addr, char *sptr)
 {
     while (*sptr)
     {
-        Set_Byte(heap_top, *sptr);
-        heap_top++;
+        Set_Byte(addr, *sptr);
+        addr++;
         sptr++;
     }
 }
@@ -80,7 +80,7 @@ int Load(const char *filename)
     top  = cpu.LP;
 
     int byte = base;
-    int heap_top = top;
+    int max_byte = byte;
     FILE *input = fopen(filename, "r");
     if (input == NULL) 
     {
@@ -97,19 +97,25 @@ int Load(const char *filename)
         switch (record_type[0])
         {
             case 'D':
-                fscanf(input, "%d", &value);
+                fscanf(input, "%d %d", &byte, &value);
                 Set_Word(byte, value);
                 byte += WORD_SIZE;
+                max_byte = max_byte>byte ? max_byte : byte;
+                if (max_byte > top)
+                {
+                    fprintf(stderr, "Memory overflow while loading\n");
+                }
                 break;
             case 'F':
                 fscanf(input, "%d %d", &loc, &value);
-                if (loc >= byte)
+                if (loc >= max_byte)
                 {
-                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, byte);
+                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_byte);
                 }
                 Set_Word(loc, value);
                 break;
             case 'S':
+                fscanf(input, "%d", &byte);
                 fgets(string, sizeof(string), input);
                 slen = strlen(string);
                 if (string[slen - 1] != '\n')
@@ -121,12 +127,14 @@ int Load(const char *filename)
                 sptr = format_string(string);
                 slen = strlen(sptr);
 
-                // +4 instead of +3 to accomodate the null byte
-                heap_top -= ((slen+4)/4)*WORD_SIZE;
+                MemCpy(byte, sptr);
+                byte += ((slen + WORD_SIZE)/WORD_SIZE)*WORD_SIZE;
+                max_byte = max_byte>byte ? max_byte : byte;
+                if (max_byte > top)
+                {
+                    fprintf(stderr, "Memory overflow while loading\n");
+                }
 
-                MemCpy(heap_top, sptr);
-                Set_Word(byte, heap_top);
-                byte += WORD_SIZE;
                 break;
             case 'C':
                 fgets(string, sizeof(string), input);
@@ -140,8 +148,8 @@ int Load(const char *filename)
     }
 
     cpu.IP = base + 2*WORD_SIZE;
-    cpu.FP = byte;
-    cpu.SP = byte;
+    cpu.FP = max_byte;
+    cpu.SP = max_byte;
     Set_Machine_State(&cpu);
 
     return 0;

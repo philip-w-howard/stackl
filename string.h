@@ -107,7 +107,8 @@ char *itostr(int value, char *str)
     ptr = str;
     if (value == 0)
     {
-        strcpy(str, "0");
+        str[0] = '0';
+        str[1] = 0;
         return str;
     }
     

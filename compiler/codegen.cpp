@@ -22,8 +22,6 @@ static int  Next_Label = 1;
 static cFixupTable FixupTable;
 static int Location = 0;
 
-extern int Do_Boot_Code;
-
 //*****************************************
 // Open output files and write the prefix
 bool InitOutput(const char *filename)
@@ -60,7 +58,7 @@ bool FinalizeOutput()
 // write an integer constant to the output
 void EmitInt(int val)
 {
-    Output << "D " << val << "\n";
+    Output << "D " << Location << " " << val << "\n";
     Location += WORD_SIZE;
 }
 //*****************************************
@@ -80,8 +78,20 @@ void EmitFixup(int loc, int dest)
 //*****************************************
 void EmitString(std::string str)
 {
-    Output << "S " << str << "\n";
-    Location += WORD_SIZE;
+    std::string label = GenerateLabel();
+    SetJumpSource(label);
+    FixupTable.FixupAddString(str, label);
+    // Output << "S " << str << "\n";
+    // Location += WORD_SIZE;
+}
+//*****************************************
+void EmitActualString(std::string str)
+{
+    int size;
+    Output << "S " << Location << " " << str << "\n";
+    size = (str.size() + WORD_SIZE)/WORD_SIZE;
+    size *= WORD_SIZE;
+    Location += size;
 }
 //*****************************************
 void EmitComment(std::string str)
