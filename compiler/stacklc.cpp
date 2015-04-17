@@ -139,7 +139,10 @@ int main(int argc, char **argv)
     char startup[PATH_MAX];
     strcpy(startup, Include_Path);
     strcat(startup, "startup.h");
-    result = process_file(startup, &program, &total_errors);
+    if (!Do_Boot_Code)
+    {
+        result = process_file(startup, &program, &total_errors);
+    }
     if (result ==0) process_file(Input_File, &program, &total_errors);
 
     if (result == 0 && total_errors == 0)

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <unordered_map>
+#include <list>
 #include <string>
 
 class cFixupTable
@@ -22,6 +23,13 @@ class cFixupTable
     {
         std::string name;
 
+        std::list<string_item>::iterator str_it;
+        for (str_it=mStringList.begin(); str_it!=mStringList.end(); str_it++)
+        {
+            SetJumpDest((*str_it).mLabel);
+            EmitActualString( (*str_it).mString );
+        }
+
         std::unordered_multimap<std::string, int>::iterator it;
         std::unordered_map<std::string, int>::const_iterator found;
         for (it=mSource.begin(); it!=mSource.end(); it++)
@@ -43,7 +51,23 @@ class cFixupTable
         }
     }
 
+    void FixupAddString(std::string str, std::string label)
+    {
+        string_item item;
+        item.mString = str;
+        item.mLabel = label;
+        mStringList.push_back(item);
+    }
+
   protected:
+    class string_item
+    {
+      public:
+        std::string mString;
+        std::string mLabel;
+    };
+
     std::unordered_multimap<std::string, int> mSource;
     std::unordered_map<std::string, int> mDest;
+    std::list<string_item> mStringList;
 };
