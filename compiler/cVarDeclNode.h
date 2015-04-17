@@ -84,22 +84,6 @@ class cVarDeclNode : public cDeclNode
         return result;
     }
 
-    virtual void GenerateCode()
-    {
-        // FIX THIS: This won't work for arrays in structs
-        if (mType->IsArray())
-        {
-            // we need to assign a value to the pointer that 
-            // represents the array
-            EmitInt(PUSH_OP);
-            EmitInt(mOffset + WORD_SIZE);
-            EmitInt(PUSHFP_OP);
-            EmitInt(PLUS_OP);
-            EmitInt(POPVAR_OP);
-            EmitInt(mOffset);
-        }
-    }
-
   protected:
     cDeclNode *mType;   // the type for the decl
                         // NOTE: this class inherits members from cDeclNode
@@ -114,14 +98,6 @@ class cVarDeclNode : public cDeclNode
             cArrayDeclNode *array = dynamic_cast<cArrayDeclNode *>(mType);
             size *= array->NumElements();
             size = ((size + WORD_SIZE - 1)/WORD_SIZE) * WORD_SIZE;
-
-            // NOTE: arrays are implemented as a pointer AND an array.
-            // The array holds the data and the pointer points to the 
-            // first element of the array. With this implemntation, at code 
-            // generation time, arrays and pointers are treated identically.
-            //
-            // The following assignment makes room for the pointer.
-            size += WORD_SIZE;
         }
         else
         {

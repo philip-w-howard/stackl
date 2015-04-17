@@ -44,6 +44,13 @@ class cArrayValNode: public cAstNode
         return mList->front();
     }
 
+    int ComputeOffsets(int base)
+    {
+        mList->front()->ComputeOffsets(base);
+
+        return base;
+    }
+
     virtual std::string toString()
     {
         std::string result("(ARRAYVAL:");

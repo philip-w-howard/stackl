@@ -33,7 +33,7 @@
 #define CALLI_OP    32
 #define PUSHREG_OP  33
 #define POPREG_OP   34
-
+#define PUSHVARIND_OP 35
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2
