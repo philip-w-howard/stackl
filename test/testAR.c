@@ -3,23 +3,30 @@
 
 int main()
 {
-    char * src; 
+    struct 
+    {
+        int z;
+    char b[20];
+    } s;
+    
+    char * src;
     src = "ABCDEFG";
     char * dest;
     dest = "GFEDCBA";
+    s a;
 
-    strcpy(dest, src);
-
-    //int count;
-    //count = 0;
-    //while (src[count] != 0)
-    //{
-    //    dest[count] = src[count];
-    //    count++;
-    //}
-    //dest[count] = 0;
-
-    prints(dest);
+    int count;
+    count = 0;
+    while (src[count] != 0)
+    {
+        a.b[count] = src[count];
+        //dest[count] = src[count];
+        count++;
+    }
+    a.b[count] = 0;
+    //dest[count] = 0;  
+    prints(a.b);
+    //prints(dest);
 
     return 0;
 }
