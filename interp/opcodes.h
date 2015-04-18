@@ -25,7 +25,7 @@
 #define OUTS_OP     24
 #define INP_OP      25
 #define PUSHFP_OP   26
-//#define SAVEREG_OP  27
+#define SETMODE_OP  27
 //#define RESTREG_OP  28
 #define TRAPTOC_OP  29
 #define TRAP_OP     30

@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +6,28 @@
 #include "opcodefunc.h"
 #include "machine.h"
 #include "loader.h"
+
+static int Do_Debug = 0;
+
+void Loader_Debug()
+{
+    Do_Debug = 1;
+}
+
+// set DEBUG to "//" to turn off DEBUG
+#define DEBUG(...) debug_print(__VA_ARGS__);
+static void debug_print(int location, const char *fmt, ...)
+{
+    if (!Do_Debug) return;
+
+    va_list args;
+    va_start(args, fmt);
+
+    char format[200];
+    sprintf(format, "Loading at %d: %s\n", location, fmt);
+    vfprintf(stderr, format, args);
+    va_end(args);
+}
 
 void MemCpy(int addr, char *sptr)
 {
@@ -89,7 +112,7 @@ int Load(const char *filename)
         strcpy(string, filename);
         strcat(string, ".sl");
         input = fopen(string, "r");
-        if (input == NULL) return 1;
+        if (input == NULL) return 0;
     }
 
     fscanf(input, "%s", record_type);
@@ -100,25 +123,34 @@ int Load(const char *filename)
         {
             case 'D':
                 fscanf(input, "%d %d", &byte, &value);
+                byte += base;
+                DEBUG(byte, "D: %d", value);
                 Set_Word(byte, value);
                 byte += WORD_SIZE;
                 max_byte = max_byte>byte ? max_byte : byte;
                 if (max_byte > top)
                 {
                     fprintf(stderr, "Memory overflow while loading\n");
+                    exit(-1);
                 }
                 break;
             case 'F':
                 fscanf(input, "%d %d", &loc, &value);
+                loc += base;
+                value += base;
+                DEBUG(loc, "F: %d", value);
                 if (loc >= max_byte)
                 {
                     fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_byte);
+                    exit(-1);
                 }
                 Set_Word(loc, value);
                 break;
             case 'S':
                 fscanf(input, "%d", &byte);
+                byte += base;
                 fgets(string, sizeof(string), input);
+                DEBUG(byte, "S: %s", input);
                 slen = strlen(string);
                 if (string[slen - 1] != '\n')
                 {
@@ -135,6 +167,7 @@ int Load(const char *filename)
                 if (max_byte > top)
                 {
                     fprintf(stderr, "Memory overflow while loading\n");
+                    exit(-1);
                 }
 
                 break;
@@ -149,9 +182,25 @@ int Load(const char *filename)
         fscanf(input, "%s", record_type);
     }
 
-    cpu.IP = base + 2*WORD_SIZE;
-    cpu.FP = max_byte;
-    cpu.SP = max_byte;
+    return max_byte;
+}
+
+int Boot(const char *filename)
+{
+    int top;
+    Machine_State cpu;
+
+    Get_Machine_State(&cpu);
+    cpu.SP = cpu.LP - 8;
+    cpu.FP = cpu.SP;
+    Set_Machine_State(&cpu);
+
+    top = Load(filename);
+    if (top == 0) return 1;
+
+    cpu.SP = top + WORD_SIZE;
+    cpu.FP = cpu.SP;
+    cpu.IP = cpu.BP + 2*WORD_SIZE;
     Set_Machine_State(&cpu);
 
     return 0;

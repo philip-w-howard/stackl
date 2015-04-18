@@ -95,6 +95,9 @@ static void do_rti(Machine_State *cpu)
 static void interrupt(Machine_State *cpu, int vector)
 {
     int temp;
+    int was_user;
+
+    was_user = cpu->FLAG & FL_USER_MODE;
 
     // turn off pending bit
     cpu->FLAG &= ~FL_INT_PENDING;
@@ -109,13 +112,18 @@ static void interrupt(Machine_State *cpu, int vector)
     cpu->FLAG &= ~FL_USER_MODE;
     cpu->FLAG |= FL_INT_MODE;
 
-    temp = cpu->SP;
-    // Switch FP and SP to absolute addresses
-    cpu->FP += cpu->BP;
-    cpu->SP += cpu->BP;
+    if (was_user)
+    {
+        // Switch FP and SP to absolute addresses
+        temp = cpu->SP;
+        cpu->FP += cpu->BP;
+        cpu->SP += cpu->BP;
 
-    // store SP on system stack
-    push(cpu, temp);
+        // store SP on system stack
+        push(cpu, temp);
+    } else {
+        push(cpu, cpu->SP);
+    }
 
     // ISR is at vector
     cpu->IP = Get_Word(vector*WORD_SIZE);
@@ -384,6 +392,12 @@ void Execute(Machine_State *cpu)
             temp = cpu->FP + GET_INTVAL(IP, 1);
             INC(SP, -1);
             Set_Byte(temp, Get_Byte(cpu->SP));
+            INC(IP,2);
+            break;
+        case SETMODE_OP:
+            DEBUG("SETMODE %d", GET_INTVAL(IP,1));
+            check_priv(cpu, "SETMODE");
+            cpu->FLAG = GET_INTVAL(IP,1);
             INC(IP,2);
             break;
             /*

@@ -22,7 +22,7 @@ int do_inp(int op, int param)
     io_blk.addr = param;
     io_blk.status = 0;
     asm(INP_OP, &io_blk);
-    while(io_blk.status != 4)
+    while(io_blk.op >= 0)
     {
         asm(NOP);
     }
@@ -50,26 +50,7 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 
 int syscall(int size, int op, int parm1)
 {
-    struct
-    {
-        int op;
-        int addr;
-        int status;
-    } io_blk_t;
-    io_blk_t io_blk;
-
-    if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
-        io_blk.op = op;
-        io_blk.addr = parm1;
-        io_blk.status = 0;
-        asm(INP_OP, &io_blk);
-        while(io_blk.status != 4)
-        {
-            asm(NOP);
-        }
-    } else {
-        asm(TRAP_OP);
-    }
+    asm(TRAP_OP);
 
     return 0;
 }

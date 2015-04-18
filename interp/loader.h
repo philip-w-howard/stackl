@@ -2,4 +2,6 @@
 #include "machine.h"
 
 //int Load(Machine_State *cpu, const char *filename, int base, int top);
+void Loader_Debug();
+int Boot(const char *filename);
 int Load(const char *filename);

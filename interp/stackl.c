@@ -19,8 +19,8 @@ void Process_Args(int argc, char **argv)
                 Opcodes_Debug();
 //            else if (strcmp(arg, "sched") == 0)
 //                Sched_Debug();
-//            else if (strcmp(arg, "syscall") == 0)
-//                Syscall_Debug();
+            else if (strcmp(arg, "loader") == 0)
+                Loader_Debug();
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (argv[ii][1] == 'T')
@@ -32,11 +32,14 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                printf("stackl -version -help -opcodes <file>\n");
+                printf("stackl -version -help -opcodes -loader <file>\n");
                 exit(0);
             }
             else
+            {
                 printf("Unrecognized option %s\n", argv[ii]);
+                exit(-1);
+            }
         }
         else
         {
@@ -70,7 +73,7 @@ int main(int argc, char **argv)
     }
     */
 
-    result = Load(Input_File);
+    result = Boot(Input_File);
     if (result != 0) 
     {
         printf("Unable to execute %s\n", Input_File);
