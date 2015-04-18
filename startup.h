@@ -50,6 +50,18 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 
 int syscall(int size, int op, int parm1)
 {
+    int mode;
+    asm(PUSHREG_OP);
+    asm(FLAG_REG);
+    mode = asm(NOP);
+
+    if (mode == 2)  // user mode
+    {
+        asm(PUSHREG_OP);
+        asm(BP_REG);
+        parm1 = asm(PLUS_OP, parm1);
+    }
+
     asm(TRAP_OP);
 
     return 0;

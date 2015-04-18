@@ -137,7 +137,6 @@ int Load(const char *filename)
             case 'F':
                 fscanf(input, "%d %d", &loc, &value);
                 loc += base;
-                value += base;
                 DEBUG(loc, "F: %d", value);
                 if (loc >= max_byte)
                 {

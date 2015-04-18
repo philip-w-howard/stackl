@@ -78,23 +78,19 @@ void check_priv(Machine_State *cpu, char *inst_name)
 //***************************************
 static void do_rti(Machine_State *cpu)
 {
-    int temp;
-
     check_priv(cpu, "RTI");
 
-    temp = pop(cpu);
-    cpu->SP = temp;
-
-    cpu->FLAG = pop(cpu);
     cpu->FP = pop(cpu);
     cpu->IP = pop(cpu);
     cpu->LP = pop(cpu);
     cpu->BP = pop(cpu);
+    cpu->FLAG = pop(cpu);
+
+    cpu->SP -= cpu->BP;
 }
 //***********************************************
 static void interrupt(Machine_State *cpu, int vector)
 {
-    int temp;
     int was_user;
 
     was_user = cpu->FLAG & FL_USER_MODE;
@@ -102,11 +98,11 @@ static void interrupt(Machine_State *cpu, int vector)
     // turn off pending bit
     cpu->FLAG &= ~FL_INT_PENDING;
 
+    push(cpu, cpu->FLAG);
     push(cpu, cpu->BP);
     push(cpu, cpu->LP);
     push(cpu, cpu->IP);
     push(cpu, cpu->FP);
-    push(cpu, cpu->FLAG);
 
     // go to system mode and interrupt mode
     cpu->FLAG &= ~FL_USER_MODE;
@@ -115,14 +111,8 @@ static void interrupt(Machine_State *cpu, int vector)
     if (was_user)
     {
         // Switch FP and SP to absolute addresses
-        temp = cpu->SP;
         cpu->FP += cpu->BP;
         cpu->SP += cpu->BP;
-
-        // store SP on system stack
-        push(cpu, temp);
-    } else {
-        push(cpu, cpu->SP);
     }
 
     // ISR is at vector
@@ -398,7 +388,29 @@ void Execute(Machine_State *cpu)
             DEBUG("SETMODE %d", GET_INTVAL(IP,1));
             check_priv(cpu, "SETMODE");
             cpu->FLAG = GET_INTVAL(IP,1);
+
+            if (cpu->FLAG & FL_USER_MODE)
+            {
+                // need to update regs so we are still executing the same code
+                cpu->IP -= cpu->BP;
+                cpu->SP -= cpu->BP;
+                cpu->FP -= cpu->BP;
+            }
+
             INC(IP,2);
+            break;
+        case JMPUSER_OP:
+            DEBUG("JMPUSER_%d", GET_INTVAL(IP,1));
+            check_priv(cpu, "JMPUSER");
+
+            temp = GET_INTVAL(IP,1);
+
+            // need to update regs to reflect user mode
+            cpu->FLAG |= FL_USER_MODE;
+            //cpu->SP -= cpu->BP;
+            //cpu->FP -= cpu->BP;
+            cpu->IP = temp;
+
             break;
             /*
         case SAVEREG_OP:
