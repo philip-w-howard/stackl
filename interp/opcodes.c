@@ -386,6 +386,7 @@ void Execute(Machine_State *cpu)
             Set_Byte(temp, Get_Byte(cpu->SP));
             INC(IP,2);
             break;
+            /*
         case SAVEREG_OP:
             DEBUG("SAVEREG %d %d", GET_INTVAL(SP,-1), GET_INTVAL(SP,-1));
             check_priv(cpu, "SAVEREG");
@@ -442,6 +443,7 @@ void Execute(Machine_State *cpu)
                     break;
             }
             break;
+            */
         case PUSHREG_OP:
             DEBUG("PUSHREG %d", GET_INTVAL(IP,1));
             //check_priv(cpu, "SAVEREG");
@@ -472,7 +474,7 @@ void Execute(Machine_State *cpu)
         case POPREG_OP:
             DEBUG("POPREG %d", GET_INTVAL(IP,1));
             debug_break();
-            if (GET_INTVAL(IP,1) == FLAG_REG) check_priv(cpu, "POPREG FLAG");
+            check_priv(cpu, "POPREG");
             temp = GET_INTVAL(IP,1);
             INC(IP,2);
             switch (temp)

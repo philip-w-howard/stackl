@@ -4,11 +4,6 @@ loader can't handle "\nthis is a test\n" (or probably any other string with two 
 
 Todo:
 
-Fix loader for better memory layout and file format
-
-Allow local variables in TRAP handler
-Move INP into TRAP handler
-
 Implement priv instructions:
    ena/dis interrupts
    get/set processor state
@@ -20,6 +15,10 @@ Implement fork() exec() in machine
 Implement sched in machine
 
 Done:
+Move INP into TRAP handler
+Allow local variables in TRAP handler
+   can call function with locals
+Fix loader for better memory layout and file format
 Implement TRAP handler in machine mem
 in compiler, -boot means "don't include startup.h"
 Change syscalls to use I/O architecture and run in Machine

@@ -8,6 +8,28 @@ int interrupt()
     asm(RTI_OP);
 }
 
+int do_inp(int op, int param)
+{
+    struct
+    {
+        int op;
+        int addr;
+        int status;
+    } io_blk_t;
+    io_blk_t io_blk;
+
+    io_blk.op = op;
+    io_blk.addr = param;
+    io_blk.status = 0;
+    asm(INP_OP, &io_blk);
+    while(io_blk.status != 4)
+    {
+        asm(NOP);
+    }
+
+    return 0;
+}
+
 int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
         int size, int op, int parm1)
 {
@@ -17,9 +39,11 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
     } else if (op == EXIT_CALL) {
         asm(POPREG_OP, 1); // halt state
         asm(FLAG_REG);
-    } else {
-        asm(TRAPTOC_OP);
-        asm(POP_OP);
+    } else if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
+        do_inp(op, parm1);
+    //} else {
+    //    asm(TRAPTOC_OP);
+    //    asm(POP_OP);
     }
     asm(RTI_OP);
 }

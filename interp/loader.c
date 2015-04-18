@@ -51,7 +51,9 @@ char *format_string(char *str)
             sptr++;
             *sptr = 0;
             sptr++;
-            strcat(str, sptr);
+            // can't user strcat because dest overlaps with src
+            //strcat(str, sptr);
+            memmove(str+strlen(str), sptr, strlen(sptr)+1);
         } else {
             fprintf(stderr, "Unrecognized escape sequence in string\n");
             sptr += 2;
