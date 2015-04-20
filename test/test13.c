@@ -3,7 +3,7 @@
 
 int main()
 {
-    struct
+    typedef struct
     {
         int aa;
         int bb;

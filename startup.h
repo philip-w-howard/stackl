@@ -10,7 +10,7 @@ int interrupt()
 
 int do_inp(int op, int param)
 {
-    struct
+    typedef struct
     {
         int op;
         int addr;

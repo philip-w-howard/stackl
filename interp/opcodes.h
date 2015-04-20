@@ -36,6 +36,8 @@
 #define LAND_OP     35
 #define LOR_OP      36
 #define LXOR_OP     37
+#define SHIFTL_OP   38
+#define SHIFTR_OP   39
 
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1

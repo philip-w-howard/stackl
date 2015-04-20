@@ -53,7 +53,7 @@
 %token  PRINT PRINTC
 %token  GETS GETL GETI
 %token  FOR WHILE IF ELSE 
-%token  STRUCT
+%token  TYPEDEF STRUCT
 %token  RETURN
 %token  JUNK_TOKEN
 %token  EQ NE LT GT GE LE
@@ -116,6 +116,7 @@ program: global_decls           { $$ = $1;
     | /* empty */               { yyast_root = NULL; YYACCEPT; }
 
 block:      open stmts close    { $$ = new cBlockNode(NULL, $2); }
+        | '{' '}'               { $$ = new cBlockNode(NULL, NULL); }
 open:   '{'                     { $$ = symbolTableRoot->IncreaseScope(); }
 
 close:  '}'                     { $$ = symbolTableRoot->DecreaseScope(); }
@@ -145,8 +146,8 @@ var_decl:   TYPE_ID IDENTIFIER
                                     $$ = new cVarDeclNode(sym, $2);
                                 }
 
-struct_decl:  STRUCT open decls close IDENTIFIER    
-                                { $$ = new cStructDeclNode($2, $3, $5); }
+struct_decl:  TYPEDEF STRUCT open decls close IDENTIFIER    
+                                { $$ = new cStructDeclNode($3, $4, $6); }
 global_decls: global_decls global_decl  
                                 {
                                     $$ = $1;
@@ -176,6 +177,13 @@ func_decl:  func_header ';'
                             symbolTableRoot->DecreaseScope();
                             $$ = $1;
                             $1->SetBody($3);
+                          }
+
+        |   func_header '{' '}'
+                          {
+                            symbolTableRoot->DecreaseScope();
+                            $$ = $1;
+                            $1->SetBody(NULL);
                           }
 
 func_header:  func_prefix paramsspec ')' 
@@ -221,6 +229,7 @@ stmts:      stmts stmt          { $$ = $1;
         |   stmt                { $$ = new cStmtsNode($1); }
 
 stmt:       decl                { $$ = $1; }
+        |   ';'                 { $$ = NULL; }
         |   IF '(' ccomp ')' stmt ELSE stmt
                                 { $$ = new cIfNode($3, $5, $7); }
         |   IF '(' ccomp ')' stmt

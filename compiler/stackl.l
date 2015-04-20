@@ -107,6 +107,7 @@ identifier      {letter}({letter}|{digit}|"_")*
                               RETURN(CHAR);
                             }
 "sizeof"                    RETURN(SIZE_OF);
+"typedef"                   RETURN(TYPEDEF);
 "struct"                    RETURN(STRUCT);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);

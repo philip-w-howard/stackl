@@ -23,13 +23,13 @@ class cStmtsNode : public cAstNode
     cStmtsNode(cStmtNode *stmt) : cAstNode()
     {
         mList = new list<cStmtNode *>();
-        mList->push_back(stmt);
+        if (stmt != NULL) mList->push_back(stmt);
     }
 
     // add a statement to the list
     void AddNode(cStmtNode *stmt) 
     {
-        mList->push_back(stmt);
+        if (stmt != NULL) mList->push_back(stmt);
     }
 
     virtual int ComputeOffsets(int base)

@@ -30,7 +30,7 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 
 int syscall(int size, int op, int parm1)
 {
-    struct
+    typedef struct
     {
         int op;
         int addr;

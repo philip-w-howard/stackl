@@ -250,6 +250,18 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             INC(IP, 1);
             break;
+        case SHIFTL_OP:
+            DEBUG("SHIFTL");
+            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) << GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
+        case SHIFTR_OP:
+            DEBUG("SHIFTR");
+            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) >> GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
         case HALT_OP:
             DEBUG("HALT");
             cpu->FLAG |= FL_HALTED;

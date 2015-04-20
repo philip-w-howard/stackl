@@ -47,6 +47,7 @@ class cFuncDeclNode : public cDeclNode
             mReturnType = type;
             mId = id;
             mParams = NULL;
+            mHasStmts = false;
             mStmts = NULL;
             mParamsSet = false;
             mId->SetType(this);
@@ -85,6 +86,7 @@ class cFuncDeclNode : public cDeclNode
     // set the local var delcs and the statments
     void SetBody(cStmtsNode *stmts)
     {
+        mHasStmts = true;
         mStmts = stmts;
     }
 
@@ -117,7 +119,7 @@ class cFuncDeclNode : public cDeclNode
     virtual void GenerateCode()
     {
         // if no statements, this is a prototype and we don't gen code
-        if (mStmts == NULL) return;
+        if (!mHasStmts) return;
 
         EmitComment(mId->Name() + "\n");
         SetJumpDest(mId->Name());
@@ -128,16 +130,15 @@ class cFuncDeclNode : public cDeclNode
             EmitInt(mDeclsSize);
         }
 
-        if (mStmts != NULL)
-        {
-            mStmts->GenerateCode();
-            cReturnNode *ret = new cReturnNode(new cIntExprNode(0));
-            ret->GenerateCode();
-        }
+        if (mStmts != NULL) mStmts->GenerateCode();
+
+        cReturnNode *ret = new cReturnNode(new cIntExprNode(0));
+        ret->GenerateCode();
     }
   protected:
     cSymbol *mReturnType;       // return type of function
     cParamsSpecNode *mParams;   // formal parameter list
+    bool mHasStmts;             // true = function definition false=decl
     cStmtsNode *mStmts;         // executable statements
     bool mParamsSet;            // indicates parameters have been set
     int mDeclsSize;             // size of the declarations. Needed to

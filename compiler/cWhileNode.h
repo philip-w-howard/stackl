@@ -28,7 +28,7 @@ class cWhileNode : public cStmtNode
     {
         std::string result("(WHILE: ");
         result += mExpr->toString();
-        result += "\n" + mStmt->toString();
+        if (mStmt != NULL) result += "\n" + mStmt->toString();
         result += "\n)";
         return result;
     }
@@ -36,7 +36,7 @@ class cWhileNode : public cStmtNode
     virtual int ComputeOffsets(int base)
     {
         mExpr->ComputeOffsets(base);
-        mStmt->ComputeOffsets(base);
+        if (mStmt != NULL) mStmt->ComputeOffsets(base);
         return base;
     }
 
@@ -49,7 +49,7 @@ class cWhileNode : public cStmtNode
         mExpr->GenerateCode();
         EmitInt(JUMPE_OP);
         SetJumpSource(end_loop);
-        mStmt->GenerateCode();
+        if (mStmt != NULL) mStmt->GenerateCode();
         EmitInt(JUMP_OP);
         SetJumpSource(start_loop);
         SetJumpDest(end_loop);

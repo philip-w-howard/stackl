@@ -37,7 +37,7 @@ bool InitOutput(const char *filename)
     SetJumpSource("interrupt");
     SetJumpSource("systrap");
 
-    EmitInt(CALL_OP);
+    EmitInt(JUMP_OP);
     SetJumpSource("startup__");
     EmitInt(POP_OP);            // need to throw away the return value
     EmitInt(HALT_OP);

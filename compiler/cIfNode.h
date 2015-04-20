@@ -30,7 +30,7 @@ class cIfNode : public cStmtNode
     {
         std::string result("(IF: ");
         result += mExpr->toString();
-        result += "\n" + mStmt->toString();
+        if (mStmt != NULL) result += "\n" + mStmt->toString();
         if (mElse != NULL) result += "\nELSE:\n" + mElse->toString();
         result += "\n)";
         return result;
@@ -39,7 +39,7 @@ class cIfNode : public cStmtNode
     virtual int ComputeOffsets(int base)
     {
         mExpr->ComputeOffsets(base);
-        mStmt->ComputeOffsets(base);
+        if (mStmt != NULL) mStmt->ComputeOffsets(base);
         if (mElse != NULL) mElse->ComputeOffsets(base);
         return base;
     }
@@ -50,7 +50,7 @@ class cIfNode : public cStmtNode
         mExpr->GenerateCode();
         EmitInt(JUMPE_OP);
         SetJumpSource(if_label);
-        mStmt->GenerateCode();
+        if (mStmt != NULL) mStmt->GenerateCode();
 
         if (mElse != NULL)
         {
