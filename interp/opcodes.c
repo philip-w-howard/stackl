@@ -232,6 +232,24 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             INC(IP, 1);
             break;
+        case LAND_OP:
+            DEBUG("LAND");
+            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) & GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
+        case LOR_OP:
+            DEBUG("LOR");
+            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) | GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
+        case LXOR_OP:
+            DEBUG("LXOR");
+            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) ^ GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
         case HALT_OP:
             DEBUG("HALT");
             cpu->FLAG |= FL_HALTED;

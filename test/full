@@ -1,4 +1,3 @@
 test/regress
 
-echo "enter 'this is a test' 'testing' '123'"
-test/runc test21
+test/runc test21 < test/test21.input

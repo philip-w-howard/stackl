@@ -4,6 +4,7 @@ OBJS=stackl.o \
 	 machine.o \
 	 loader.o \
 	 io_handler.o \
+	 dma_term.o \
 
 all: stackl
 

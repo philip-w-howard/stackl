@@ -4,6 +4,7 @@
 #include "opcodefunc.h"
 #include "loader.h"
 #include "io_handler.h"
+#include "dma_term.h"
 
 char Input_File[200] = "";
 
@@ -61,7 +62,8 @@ int main(int argc, char **argv)
     } 
 
     Init_IO();
-    Init_Machine();
+    Init_Machine(0);
+    DMA_T_Init();
     //Sched_Init();
 
     /*

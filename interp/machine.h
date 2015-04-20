@@ -1,6 +1,5 @@
 #pragma once
 
-#define MEMORY_SIZE  20000
 #define WORD_SIZE 4
 
 // Bits for FLAG register
@@ -37,4 +36,5 @@ void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
 void Machine_Execute();
 void Machine_Check(const char *fmt, ...);
+void Machine_Signal_Interrupt();
 

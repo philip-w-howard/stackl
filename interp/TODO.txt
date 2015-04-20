@@ -4,17 +4,15 @@ loader can't handle "\nthis is a test\n" (or probably any other string with two 
 
 Todo:
 
-Implement priv instructions:
-   ena/dis interrupts
-   get/set processor state
-   INP instruction
 Implement Process Control Block in Machine mem
-update exe format
 Implement load in machine: requires disk I/O
-Implement fork() exec() in machine
+Implement fork() in machine
 Implement sched in machine
 
 Done:
+exec() works in machine
+   Using C Load()
+update exe format
 Move INP into TRAP handler
 Allow local variables in TRAP handler
    can call function with locals
@@ -25,6 +23,9 @@ Change syscalls to use I/O architecture and run in Machine
 Implement Interrupt mechanism
 Implement priv instructions:
    RTI
+   get/set processor state
+   INP instruction
+   ena/dis interrupts
 Implement Timer interrupt
 
 Design I/O architecture

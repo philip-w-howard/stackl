@@ -18,3 +18,15 @@ typedef struct
 void Init_IO();
 void Finish_IO();
 void Schedule_IO(int io_blk_addr);
+int IO_Get_Word(int address);
+void IO_Set_Word(int address, int value);
+int IO_Get_Byte(int address);
+void IO_Set_Byte(int address, int value);
+
+int IO_Register_Handler(int start_addr, int size, int id, 
+        int (*get_word)(int id, int addr),
+        int (*get_byte)(int id, int addr),
+        void (*set_word)(int id, int addr, int value),
+        void (*set_byte)(int id, int addr, int value)
+        );
+
