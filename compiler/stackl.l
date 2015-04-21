@@ -29,12 +29,13 @@ apost           [']
 quote           [\"]
 not_quote       [^\"]
 period          ['.']
-whitespace      [ \t\n]
+whitespace      [ \t\n\r]
 letter          [A-Za-z]
 digit           [0-9]
 punctuation     [(){}\[\];,\.]
 operator        [+\-*/%=&]
 integer         0|([1-9][0-9]*)
+hexint          0x([0-9a-fA-F])+
 identifier      {letter}({letter}|{digit}|"_")*
 %%
 
@@ -111,7 +112,11 @@ identifier      {letter}({letter}|{digit}|"_")*
 "struct"                    RETURN(STRUCT);
 "return"                    RETURN(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); RETURN(INT_VAL);
-"'"."'"                       yylval.int_val = yytext[1]; RETURN(INT_VAL); 
+{hexint}                    { yylval.int_val = (int)strtol(yytext, NULL, 0); 
+                                RETURN(INT_VAL);
+                            }
+                                
+"'"."'"                      yylval.int_val = yytext[1]; RETURN(INT_VAL); 
 "'\\n'"                      yylval.int_val = '\n'; RETURN(INT_VAL);
  /* 
 L?'(\\.|[^\\'])+'           yylval.int_val = yytext[1]; RETURN(INT_VAL);
@@ -177,7 +182,7 @@ static void open_input(char *name)
 }
 static int Return(int val)
 {
-//    printf("Scanned '%s': %d\n", yytext, val);
+    //printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

@@ -1,8 +1,8 @@
 Bugs:
 
-loader can't handle "\nthis is a test\n" (or probably any other string with two control codes)
-
 Todo:
+
+test dma_term
 
 Implement Process Control Block in Machine mem
 Implement load in machine: requires disk I/O

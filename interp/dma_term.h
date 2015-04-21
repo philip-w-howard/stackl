@@ -15,4 +15,5 @@
 #define DMA_T_CMD_START_READ    0x00000002
 #define DMA_T_CMD_START_WRITE   0x00000004
 
-void DMA_T_Init();
+int DMA_T_Init();
+int DMA_T_Finish();

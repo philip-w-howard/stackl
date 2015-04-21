@@ -116,7 +116,7 @@ static void set_byte(int id, int addr, int value)
 {
 }
 //*************************************
-void DMA_T_Init()
+int DMA_T_Init()
 {
     IO_Q_Halt_Thread = 0;
 
@@ -124,11 +124,15 @@ void DMA_T_Init()
 
     IO_Register_Handler(DMA_T_STATUS, 16, 0,
             get_word, get_byte, set_word, set_byte);
+
+    return 0;
 }
 //*************************************
-void DMA_T_Finish()
+int DMA_T_Finish()
 {
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread, NULL);
+
+    return 0;
 }

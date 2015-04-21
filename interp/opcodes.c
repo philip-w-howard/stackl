@@ -384,6 +384,19 @@ void Execute(Machine_State *cpu)
             INC(SP, -2);
             INC(IP, 1);
             break;
+        case PUSHVARIND_OP:
+            temp = GET_INTVAL(SP, -1);
+            DEBUG("PUSHVARIND %d %d", GET_INTVAL(SP, -1), Get_Byte(temp));
+            SET_INTVAL(SP,-1, Get_Word(temp));
+            INC(IP, 1);
+            break;
+        case POPVARIND_OP:
+            DEBUG("POPVARIND %d %d", GET_INTVAL(SP, -2), GET_INTVAL(SP, -1));
+            temp = GET_INTVAL(SP, -1);
+            Set_Word(temp, GET_INTVAL(SP, -2));
+            INC(SP, -2);
+            INC(IP, 1);
+            break;
         case PUSHVAR_OP:
             temp = cpu->FP + GET_INTVAL(IP, 1);
             DEBUG("PUSHVAR %d %d", GET_INTVAL(IP, 1), Get_Word(temp));

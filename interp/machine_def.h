@@ -38,6 +38,8 @@
 #define LXOR_OP     37
 #define SHIFTL_OP   38
 #define SHIFTR_OP   39
+#define PUSHVARIND_OP  40
+#define POPVARIND_OP   41
 
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
