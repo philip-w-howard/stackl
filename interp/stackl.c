@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "opcodefunc.h"
+#include "opcodes.h"
 #include "loader.h"
 #include "io_handler.h"
 #include "dma_term.h"

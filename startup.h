@@ -1,5 +1,5 @@
 #include <syscodes.h>
-#include <opcodes.h>
+#include <machine_def.h>
 
 int main();
 

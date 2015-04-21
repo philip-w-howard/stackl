@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#include "machine_def.h"
 #include "syscodes.h"
 #include "io_handler.h"
 #include "loader.h"

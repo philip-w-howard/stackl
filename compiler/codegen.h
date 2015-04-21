@@ -11,10 +11,9 @@
 
 #include <fstream>
 #include <string>
-#include "../interp/opcodes.h"
+#include "../interp/machine_def.h"
 
 static const int STACK_FRAME_SIZE = 8;
-static const int WORD_SIZE = 4;
 
 bool InitOutput(const char *filename);
 bool FinalizeOutput();

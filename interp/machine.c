@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "machine_def.h"
 #include "opcodes.h"
-#include "opcodefunc.h"
 #include "io_handler.h"
 
 #define DEFAULT_MEMORY_SIZE  20000

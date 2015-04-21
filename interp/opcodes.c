@@ -4,8 +4,8 @@
 #include <limits.h>
 
 #include "syscall.h"
+#include "machine_def.h"
 #include "opcodes.h"
-#include "opcodefunc.h"
 #include "machine.h"
 #include "io_handler.h"
 

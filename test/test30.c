@@ -1,6 +1,6 @@
 int syscall(int size, int op, int parm1);
 #include <syscodes.h>
-#include <opcodes.h>
+#include <machine_def.h>
 #include <string.h>
 #include <system.h>
 

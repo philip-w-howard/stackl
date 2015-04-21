@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "machine_def.h"
 #include "opcodes.h"
-#include "opcodefunc.h"
 #include "machine.h"
 #include "loader.h"
 
