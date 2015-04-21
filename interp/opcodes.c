@@ -326,7 +326,7 @@ void Execute(Machine_State *cpu)
             break;
         case INP_OP:
             temp = GET_INTVAL(SP, -1);
-            DEBUG("INP %d", Get_Word(temp), Get_Word(temp+4));
+            DEBUG("INP %d %d", Get_Word(temp), Get_Word(temp+4));
             check_priv(cpu, "INP");
             Schedule_IO(temp);
             INC(SP, 1);
