@@ -19,55 +19,57 @@
 // blocks can be statements (e.g. if (cond) {block}
 class cBlockNode : public cStmtNode
 {
-  public:
-    cBlockNode(cDeclsNode *decls, cStmtsNode *stmts) : cStmtNode()
+    public:
+        cBlockNode(cDeclsNode *decls, cStmtsNode *stmts) : cStmtNode()
     {
         mDecls = decls;
         mStmts = stmts;
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        int offset = base;
-        if (mDecls != NULL) offset = mDecls->ComputeOffsets(offset);
-        if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
+        virtual int ComputeOffsets(int base)
+        {
+            int offset = base;
+            if (mDecls != NULL) offset = mDecls->ComputeOffsets(offset);
+            if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
 
-        mSize = offset - base;
-        // blocks take no room in memory, so return the original base
-        return base;
-    }
+            mSize = offset - base;
+            // blocks take no room in memory, so return the original base
+            return base;
+        }
 
-    virtual std::string toString()
-    {
-        std::string result("BLOCK: ");
-        if (mSize != 0) result += "size: " + std::to_string(mSize);
-        result += "\n{\n";
-        if (mDecls != NULL) result += mDecls->toString();
-        if (mStmts != NULL) result += mStmts->toString();
-        result += "}\n";
-        
-        return result;
-    }
+        virtual std::string toString()
+        {
+            std::string result("BLOCK: ");
+            if (mSize != 0) result += "size: " + std::to_string(mSize);
+            result += "\n{\n";
+            if (mDecls != NULL) result += mDecls->toString();
+            if (mStmts != NULL) result += mStmts->toString();
+            result += "}\n";
 
-    virtual void GenerateCode()
-    {
-        /*
-        // adjust the stack pointer for local vars
-        EmitString("Stack_Pointer += ");
-        EmitInt(mSize);
-        EmitString(";\n");
-        */
-        if (mDecls != NULL) mDecls->GenerateCode();
-        if (mStmts != NULL) mStmts->GenerateCode();
-        /*
-        EmitString("Stack_Pointer -= ");
-        EmitInt(mSize);
-        EmitString(";\n");
-        */
-    }
-  protected:
-    cDeclsNode *mDecls;     // declarations
-    cStmtsNode *mStmts;     // statements
-    int mSize;              // size of declarations
+            return result;
+        }
+
+        virtual void GenerateCode()
+        {
+            if(mSize != 0)
+            {
+                EmitInt(ADJSP_OP);
+                EmitInt(mSize);
+            }
+            if (mDecls != NULL)
+            {
+                mDecls->GenerateCode();
+            }
+            if (mStmts != NULL) mStmts->GenerateCode();
+            if(mSize != 0)
+            {
+                EmitInt(ADJSP_OP);
+                EmitInt(-mSize);
+            }
+        }
+    protected:
+        cDeclsNode *mDecls;     // declarations
+        cStmtsNode *mStmts;     // statements
+        int mSize;              // size of declarations
 };
 
