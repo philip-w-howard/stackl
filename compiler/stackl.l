@@ -90,6 +90,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 "switch"                    { RETURN(proc_unsupported()); }
 "case"                      { RETURN(proc_unsupported()); }
 "void"                      { RETURN(proc_unsupported()); }
+"/*"                        { RETURN(proc_unsupported()); }
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
 "for"                       RETURN(FOR);
