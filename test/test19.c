@@ -22,14 +22,21 @@ int main()
                         f = 0;
 
                         printi(f);
+                        prints(" ");
                         printi(e);
+                        prints(" ");
                         printi(d);
                     }
+                    prints(" ");
                     printi(c);
                 }
+                prints(" ");
                 printi(b);
             }
+            prints(" ");
             printi(a);
         }
     }
+
+    prints("\n");
 }
