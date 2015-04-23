@@ -94,6 +94,27 @@ void EmitActualString(std::string str)
     Location += size;
 }
 //*****************************************
+void EmitGlobalDef(std::string str, int size)
+{
+    std::string label = GenerateLabel();
+    FixupTable.FixupAddGlobal(str, label, size);
+}
+//*****************************************
+void EmitGlobalRef(std::string str)
+{
+    std::string label = GenerateLabel();
+    SetJumpSource(label);
+    FixupTable.FixupAddGlobal(str, label, 0);
+}
+//*****************************************
+void EmitActualGlobal(std::string str, int size)
+{
+    Output << "G " << Location << " " << str << " " << size << "\n";
+    size = (size + WORD_SIZE - 1)/WORD_SIZE;
+    size *= WORD_SIZE;
+    Location += size;
+}
+//*****************************************
 void EmitComment(std::string str)
 {
     Output << "C " << Location << " " << str << "\n";

@@ -31,6 +31,7 @@ class cVarRefNode : public cExprNode
             }
             else
             {
+                mBaseName = var->Name();
                 mName = var->Name();
                 mList = new list<cVarPartNode *>();
                 mList->push_back(var);
@@ -211,6 +212,15 @@ class cVarRefNode : public cExprNode
                 EmitInt(PUSHFP_OP);
                 EmitInt(PLUS_OP);
             }
+            else if (last->IsGlobal())
+            {
+                EmitInt(PUSH_OP);
+                EmitGlobalRef(mBaseName);
+                EmitInt(PUSH_OP);
+                EmitInt(mOffset);
+                EmitInt(PLUS_OP);
+                EmitInt(PUSHVARIND_OP);
+            }
             else 
             {
                 // non-arrays leave 'x' on top of stack
@@ -229,6 +239,15 @@ class cVarRefNode : public cExprNode
                 EmitOffset();
                 EmitInt(POPCVARIND_OP);
             }
+            else if (last->IsGlobal())
+            {
+                EmitInt(PUSH_OP);
+                EmitGlobalRef(mBaseName);
+                EmitInt(PUSH_OP);
+                EmitInt(mOffset);
+                EmitInt(PLUS_OP);
+                EmitInt(POPVARIND_OP);
+            }
             else 
             {
                 EmitInt(POPVAR_OP);
@@ -237,6 +256,7 @@ class cVarRefNode : public cExprNode
         }
 
     protected:
+        std::string mBaseName;
         std::string mName;
         list<cVarPartNode *> *mList;
         cDeclNode *mDepthDecl;

@@ -30,6 +30,15 @@ class cFixupTable
             EmitActualString( (*str_it).mString );
         }
 
+        std::list<string_item>::iterator glb_it;
+        for (glb_it=mGlobalList.begin(); glb_it!=mGlobalList.end(); glb_it++)
+        {
+            if ((*glb_it).mSize != 0)
+                EmitActualGlobal( (*glb_it).mString, (*glb_it).mSize );
+            else
+                SetJumpDest((*glb_it).mLabel);
+        }
+
         std::unordered_multimap<std::string, int>::iterator it;
         std::unordered_map<std::string, int>::const_iterator found;
         for (it=mSource.begin(); it!=mSource.end(); it++)
@@ -59,15 +68,26 @@ class cFixupTable
         mStringList.push_back(item);
     }
 
+    void FixupAddGlobal(std::string str, std::string label, int size)
+    {
+        string_item item;
+        item.mString = str;
+        item.mLabel = label;
+        item.mSize = size;
+        mGlobalList.push_back(item);
+    }
+
   protected:
     class string_item
     {
       public:
         std::string mString;
         std::string mLabel;
+        int mSize;
     };
 
     std::unordered_multimap<std::string, int> mSource;
     std::unordered_map<std::string, int> mDest;
     std::list<string_item> mStringList;
+    std::list<string_item> mGlobalList;
 };
