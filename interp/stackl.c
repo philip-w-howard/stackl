@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
     Init_Machine(0);
     Init_IO();
-    //DMA_T_Init();
+    DMA_T_Init();
     //Sched_Init();
 
     /*
@@ -86,8 +86,8 @@ int main(int argc, char **argv)
 
     Machine_Execute();
 
+    DMA_T_Finish();
     Finish_IO();
-    //DMA_T_Finish();
 
     return 0;
 }

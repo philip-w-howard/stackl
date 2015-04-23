@@ -27,29 +27,31 @@ static void *terminal_device(void *arg)
     while (IO_Q_Halt_Thread == 0)
     {
         pthread_mutex_lock(&IO_Q_Lock);
-        while ( (Command & DMA_T_CMD_START_READ) == 0)
+        while ( !IO_Q_Halt_Thread && (Command & DMA_T_CMD_START_READ) == 0)
         {
             pthread_cond_wait(&IO_Q_Cond, &IO_Q_Lock);
         }
 
-        Command &= ~DMA_T_CMD_START_READ;
-        Status &= ~(DMA_T_STATUS_READ_DONE | DMA_T_STATUS_READ_ERROR);
-        Status |= DMA_T_STATUS_READ_BUSY;
+        if (Command & DMA_T_CMD_START_READ)
+        {
+            Command &= ~DMA_T_CMD_START_READ;
+            Status &= ~(DMA_T_STATUS_READ_DONE | DMA_T_STATUS_READ_ERROR);
+            Status |= DMA_T_STATUS_READ_BUSY;
 
-        size = Size;
-        buffer = (char *)Get_Addr(Address);
-        if (buffer == NULL) Machine_Check("DMA_T read to invalid address");
+            size = Size;
+            buffer = (char *)Get_Addr(Address);
+            if (buffer == NULL) Machine_Check("DMA_T read to invalid address");
 
-        pthread_mutex_unlock(&IO_Q_Lock);
-        buffer = fgets(buffer, size, stdin);
+            pthread_mutex_unlock(&IO_Q_Lock);
+            buffer = fgets(buffer, size, stdin);
 
-        pthread_mutex_lock(&IO_Q_Lock);
-        Status &= ~DMA_T_STATUS_READ_BUSY;
-        Status |= DMA_T_STATUS_READ_DONE;
-        if (buffer == NULL) Status |= DMA_T_STATUS_READ_ERROR;
+            pthread_mutex_lock(&IO_Q_Lock);
+            Status &= ~DMA_T_STATUS_READ_BUSY;
+            Status |= DMA_T_STATUS_READ_DONE | DMA_T_STATUS_ATTN;
+            if (buffer == NULL) Status |= DMA_T_STATUS_READ_ERROR;
 
-        if (Command & DMA_T_CMD_INT_ENA) Machine_Signal_Interrupt();
-
+            if (Command & DMA_T_CMD_INT_ENA) Machine_Signal_Interrupt();
+        }
         pthread_mutex_unlock(&IO_Q_Lock);
     }
     return NULL;
@@ -98,7 +100,7 @@ static void set_word(int id, int addr, int value)
             if (buffer == NULL) Machine_Check("DMA_T write from invalid address");
             printf("%s", buffer);
             Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);
-            Status |= DMA_T_STATUS_WRITE_DONE;
+            Status |= DMA_T_STATUS_WRITE_DONE | DMA_T_STATUS_ATTN;
             if (Command & DMA_T_CMD_INT_ENA) Machine_Signal_Interrupt();
         }
 
@@ -122,7 +124,7 @@ int DMA_T_Init()
 
     pthread_create(&IO_Q_Thread, NULL, terminal_device, NULL);
 
-    IO_Register_Handler(DMA_T_STATUS, 16, 0,
+    IO_Register_Handler(0, DMA_T_STATUS, 16,
             get_word, get_byte, set_word, set_byte);
 
     return 0;
