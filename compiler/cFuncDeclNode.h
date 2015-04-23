@@ -122,7 +122,7 @@ class cFuncDeclNode : public cDeclNode
         if (!mHasStmts) return;
 
         EmitComment(mId->Name() + "\n");
-        SetJumpDest(mId->Name());
+        SetLabelValue(mId->Name());
 
         if (mDeclsSize != 0)
         {

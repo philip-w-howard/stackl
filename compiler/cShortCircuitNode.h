@@ -36,13 +36,13 @@ class cShortCircuitNode : public cBinaryExprNode
             mLeftExpr->GenerateCode();
             EmitInt(DUP_OP);
             EmitInt(JUMPE_OP);
-            SetJumpSource(checkExpression);
+            SetLabelRef(checkExpression);
             EmitInt(JUMP_OP);
-            SetJumpSource(skipExpression);
-            SetJumpDest(checkExpression);
+            SetLabelRef(skipExpression);
+            SetLabelValue(checkExpression);
             mRightExpr->GenerateCode();
             EmitInt(IntOp());
-            SetJumpDest(skipExpression);
+            SetLabelValue(skipExpression);
         }
         else
         {
@@ -56,7 +56,7 @@ class cShortCircuitNode : public cBinaryExprNode
             // on the stack, skip the right expression
             EmitInt(DUP_OP);
             EmitInt(JUMPE_OP);
-            SetJumpSource(jmp);
+            SetLabelRef(jmp);
 
             // generate the code for the right expression
             mRightExpr->GenerateCode();
@@ -65,7 +65,7 @@ class cShortCircuitNode : public cBinaryExprNode
             EmitInt(IntOp());
 
             // jump to the end if the left expression was false
-            SetJumpDest(jmp);
+            SetLabelValue(jmp);
         }
     }
   protected:

@@ -25,6 +25,6 @@ void EmitGlobalRef(std::string str);
 void EmitActualGlobal(std::string str, int size);
 void EmitComment(std::string str);
 void EmitFixup(int loc, int dest);
-void SetJumpSource(std::string label);
-void SetJumpDest(std::string label);
+void SetLabelRef(std::string label);
+void SetLabelValue(std::string label);
 std::string GenerateLabel();

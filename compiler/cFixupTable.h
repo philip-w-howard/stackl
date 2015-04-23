@@ -6,15 +6,17 @@
 class cFixupTable
 {
   public:
+    static const std::string GlobalLabel;
+
     cFixupTable()
     {}
 
-    void AddJumpSource(std::string label, int loc)
+    void AddLabelRef(std::string label, int loc)
     {
         std::pair<std::string,int> mypair (label, loc);
         mSource.insert(mypair);
     }
-    void AddJumpDest(std::string label, int loc)
+    void AddLabelValue(std::string label, int loc)
     {
         mDest[label] = loc;
     }
@@ -26,17 +28,15 @@ class cFixupTable
         std::list<string_item>::iterator str_it;
         for (str_it=mStringList.begin(); str_it!=mStringList.end(); str_it++)
         {
-            SetJumpDest((*str_it).mLabel);
+            SetLabelValue((*str_it).mLabel);
             EmitActualString( (*str_it).mString );
         }
 
+        SetLabelValue(GlobalLabel);
         std::list<string_item>::iterator glb_it;
         for (glb_it=mGlobalList.begin(); glb_it!=mGlobalList.end(); glb_it++)
         {
-            if ((*glb_it).mSize != 0)
-                EmitActualGlobal( (*glb_it).mString, (*glb_it).mSize );
-            else
-                SetJumpDest((*glb_it).mLabel);
+            EmitActualGlobal( (*glb_it).mLabel, (*glb_it).mSize );
         }
 
         std::unordered_multimap<std::string, int>::iterator it;
@@ -68,10 +68,9 @@ class cFixupTable
         mStringList.push_back(item);
     }
 
-    void FixupAddGlobal(std::string str, std::string label, int size)
+    void FixupAddGlobal(std::string label, int size)
     {
         string_item item;
-        item.mString = str;
         item.mLabel = label;
         item.mSize = size;
         mGlobalList.push_back(item);

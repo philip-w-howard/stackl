@@ -212,7 +212,7 @@ class cVarRefNode : public cExprNode
                 EmitInt(PUSHFP_OP);
                 EmitInt(PLUS_OP);
             }
-            else if (last->IsGlobal())
+            else if (mList->front()->IsGlobal())
             {
                 EmitInt(PUSH_OP);
                 EmitGlobalRef(mBaseName);
@@ -239,7 +239,7 @@ class cVarRefNode : public cExprNode
                 EmitOffset();
                 EmitInt(POPCVARIND_OP);
             }
-            else if (last->IsGlobal())
+            else if (mList->front()->IsGlobal())
             {
                 EmitInt(PUSH_OP);
                 EmitGlobalRef(mBaseName);
