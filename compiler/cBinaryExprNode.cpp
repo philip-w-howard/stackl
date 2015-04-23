@@ -22,6 +22,8 @@ std::string cBinaryExprNode::StrOp()
         case '*': return ("*");
         case '/': return ("/");
         case '%': return ("%");
+        case '&': return ("&");
+        case '^': return ("&");
         case AND: return ("&&");
         case OR: return ("||");
         case EQ: return ("==");
@@ -43,6 +45,9 @@ int cBinaryExprNode::IntOp()
         case '*': return TIMES_OP;
         case '/': return DIVIDE_OP;
         case '%': return MOD_OP;
+        case '&': return LAND_OP;
+        case '|': return LOR_OP;
+        case '^': return LXOR_OP;
         case AND: return AND_OP;
         case OR:  return OR_OP;
         case EQ:  return EQ_OP;
