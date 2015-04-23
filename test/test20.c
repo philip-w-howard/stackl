@@ -1,93 +1,96 @@
-#include "string.h"
+#include <string.h>
+#include <system.h>
 
-stuff = more_stuff;
-int Split(char *str, char *first, char *rest)
+const int XVALX = 0xFF;
+int global1;
+int global2;
+
+typedef struct
 {
-    char *space;
-    char *nothing;
-    nothing = "";
-    space = strchr(str, ' ');
-    if (space == NULL)
-    {
-        strcpy(first, str);
-        strcpy(rest, nothing);
-    } else {
-        strncpy(first, str, space - str);
-        first[space-str] = 0;
-        strcpy(rest, space+1);
-    }
-}
+    int a;
+    int b;
+} struct_t;
 
-int Equal(char *str1, char *str2)
+struct_t global3;
+
+int func()
 {
-    int retval;
-    retval = (strcmp(str1, str2) == 0);
-    return retval;
-}
+    prints("g1: ");
+    printi(global1);
+    prints("\n");
 
-void process(char *cmd)
-{
-    char first[200];
-    char rest[200];
-    char *exit;
-    char *greeting;
-    exit = "exit";
-    greeting = "greeting";
+    global2 = 15;
 
-    int fork_status;
-    int child_status;
+    prints("g3a: ");
+    printi(global3.a);
+    prints("\n");
 
-    Split(cmd, first, rest);
-    Print("Execute '");
-    Print(cmd);
-    Print("' '");
-    Print(first);
-    Print("' '");
-    Print(rest);
-    Print("'\n");
-
-    if (Equal(first, exit))
-    {
-        exit(0);
-    } 
-    else if (Equal(first, greeting))
-    {
-        Print("Hello ");
-        Print(rest);
-        Print("\n");
-    }
-    else 
-    {
-        fork_status = fork();
-        if (fork_status == -1)
-            Print("Failed to start process\n");
-        else if (fork_status == 0)
-        {
-            child_status = execlp(first, first, rest, (char *)NULL);
-            Print("Command not found\n");
-            exit(child_status);
-        } 
-        else
-            waitpid(fork_status, &child_status, 0);
-    }
-}
-
-int main()
-{
-    char *PROMPT;
-    char cmd[200];
-
-    PROMPT = "msh> ";
-
-    while (1)
-    {
-        print(PROMPT);
-        getl(cmd);
-
-        process(cmd);
-    }
+    global3.b = 35;
 
     return 0;
 }
+int main()
+{
+    int local1;
+    int local2;
 
+    local1 = 1;
+    local2 = 2;
+    global1 = 11;
+    global2 = 12;
 
+    global3.a = 21;
+    global3.b = 22;
+
+    prints("l1: ");
+    printi(local1);
+    prints("\n");
+
+    prints("l2: ");
+    printi(local2);
+    prints("\n");
+
+    prints("g1: ");
+    printi(global1);
+    prints("\n");
+
+    prints("g2: ");
+    printi(global2);
+    prints("\n");
+
+    prints("g3.a: ");
+    printi(global3.a);
+    prints("\n");
+
+    prints("g3.b: ");
+    printi(global3.b);
+    prints("\n");
+
+    func();
+
+    prints("l1: ");
+    printi(local1);
+    prints("\n");
+
+    prints("l2: ");
+    printi(local2);
+    prints("\n");
+
+    prints("g1: ");
+    printi(global1);
+    prints("\n");
+
+    prints("g2: ");
+    printi(global2);
+    prints("\n");
+
+    prints("g3.a: ");
+    printi(global3.a);
+    prints("\n");
+
+    prints("g3.b: ");
+    printi(global3.b);
+    prints("\n");
+
+    return 0;
+}

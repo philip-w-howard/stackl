@@ -162,6 +162,8 @@ global_decl: func_decl          { $$ = $1; }
                                 { $$ = new cConstDeclNode($2, $3); }
         | DEFINE IDENTIFIER '-' INT_VAL
                                 { $$ = new cConstDeclNode($2, -$4); }
+        | TYPE_ID IDENTIFIER 
+                                { $$ = new cVarDeclNode($1, $2, true); }
         | UNSUPPORTED           { 
                                     semantic_error(std::string(yytext) + 
                                             " is not supported");

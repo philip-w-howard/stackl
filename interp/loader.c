@@ -145,6 +145,24 @@ int Load(const char *filename)
                 }
                 Set_Word(loc, value);
                 break;
+            case 'G':
+                fscanf(input, "%d %s %d", &byte, string, &slen);
+                byte += base;
+                DEBUG(byte, "G: %s %d %d", string, byte, slen);
+                while (slen > 0)
+                {
+                    Set_Word(byte, value);
+                    byte += WORD_SIZE;
+                    slen -= WORD_SIZE;
+                }
+
+                max_byte = max_byte>byte ? max_byte : byte;
+                if (max_byte > top)
+                {
+                    fprintf(stderr, "Memory overflow while loading\n");
+                    exit(-1);
+                }
+                break;
             case 'S':
                 fscanf(input, "%d", &byte);
                 byte += base;

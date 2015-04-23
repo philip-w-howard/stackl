@@ -33,6 +33,11 @@ class cVarPartNode : public cAstNode
         return mDecl;
     }
 
+    virtual bool IsGlobal()
+    {
+        return mDecl->IsGlobal();
+    }
+
     // Gets called by cVarRefNode::AddNode for structs
     void SetDecl(cDeclNode *decl)
     {

@@ -53,15 +53,15 @@ class cForNode : public cStmtNode
         std::string end_loop = GenerateLabel();
 
         mInit->GenerateCode();
-        SetJumpDest(start_loop);
+        SetLabelValue(start_loop);
         mExpr->GenerateCode();
         EmitInt(JUMPE_OP);
-        SetJumpSource(end_loop);
+        SetLabelRef(end_loop);
         mStmt->GenerateCode();
         mUpdate->GenerateCode();
         EmitInt(JUMP_OP);
-        SetJumpSource(start_loop);
-        SetJumpDest(end_loop);
+        SetLabelRef(start_loop);
+        SetLabelValue(end_loop);
     }
 
   protected:

@@ -22,6 +22,8 @@ static int  Next_Label = 1;
 static cFixupTable FixupTable;
 static int Location = 0;
 
+const std::string cFixupTable::GlobalLabel = "$global$";
+
 //*****************************************
 // Open output files and write the prefix
 bool InitOutput(const char *filename)
@@ -34,11 +36,11 @@ bool InitOutput(const char *filename)
     }
 
     // Leave room for ISR address (if any)
-    SetJumpSource("interrupt");
-    SetJumpSource("systrap");
+    SetLabelRef("interrupt");
+    SetLabelRef("systrap");
 
     EmitInt(JUMP_OP);
-    SetJumpSource("startup__");
+    SetLabelRef("startup__");
     EmitInt(POP_OP);            // need to throw away the return value
     EmitInt(HALT_OP);
 
@@ -79,7 +81,7 @@ void EmitFixup(int loc, int dest)
 void EmitString(std::string str)
 {
     std::string label = GenerateLabel();
-    SetJumpSource(label);
+    SetLabelRef(label);
     FixupTable.FixupAddString(str, label);
     // Output << "S " << str << "\n";
     // Location += WORD_SIZE;
@@ -94,18 +96,36 @@ void EmitActualString(std::string str)
     Location += size;
 }
 //*****************************************
+void EmitGlobalDef(std::string str, int size)
+{
+    FixupTable.FixupAddGlobal(str, size);
+}
+//*****************************************
+void EmitGlobalRef(std::string str)
+{
+    SetLabelRef(cFixupTable::GlobalLabel);
+}
+//*****************************************
+void EmitActualGlobal(std::string str, int size)
+{
+    Output << "G " << Location << " " << str << " " << size << "\n";
+    size = (size + WORD_SIZE - 1)/WORD_SIZE;
+    size *= WORD_SIZE;
+    Location += size;
+}
+//*****************************************
 void EmitComment(std::string str)
 {
     Output << "C " << Location << " " << str << "\n";
 }
 //*****************************************
-void SetJumpSource(std::string label)
+void SetLabelRef(std::string label)
 {
-    FixupTable.AddJumpSource(label, Location);
+    FixupTable.AddLabelRef(label, Location);
     EmitInt(-99);
 }
 //*****************************************
-void SetJumpDest(std::string label)
+void SetLabelValue(std::string label)
 {
-    FixupTable.AddJumpDest(label, Location);
+    FixupTable.AddLabelValue(label, Location);
 }

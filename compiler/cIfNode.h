@@ -49,21 +49,21 @@ class cIfNode : public cStmtNode
         std::string if_label = GenerateLabel();
         mExpr->GenerateCode();
         EmitInt(JUMPE_OP);
-        SetJumpSource(if_label);
+        SetLabelRef(if_label);
         if (mStmt != NULL) mStmt->GenerateCode();
 
         if (mElse != NULL)
         {
             std::string else_label = GenerateLabel();
             EmitInt(JUMP_OP);
-            SetJumpSource(else_label);
-            SetJumpDest(if_label);
+            SetLabelRef(else_label);
+            SetLabelValue(if_label);
             mElse->GenerateCode();
-            SetJumpDest(else_label);
+            SetLabelValue(else_label);
         }
         else
         {
-            SetJumpDest(if_label);
+            SetLabelValue(if_label);
         }
     }
 

@@ -70,7 +70,7 @@ class cFuncCallNode : public cExprNode
         if (mParams != NULL) mParams->GenerateCode();
 
         EmitInt(CALL_OP);
-        SetJumpSource(mId->Name());
+        SetLabelRef(mId->Name());
 
         // Need to pop the args off the stack without affecting the 
         // return value

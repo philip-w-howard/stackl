@@ -25,7 +25,7 @@ class cDeclNode : public cStmtNode
     virtual bool IsStruct()     { return false; }
     virtual bool IsArray()      { return false; }
     virtual bool IsPointer()    { return false; }
-    //virtual bool IsAbsolute()   { return false; }
+    virtual bool IsGlobal()     { return false; }
     virtual bool IsConst()      { return false; }
     virtual int  GetValue()     { return 0; }
     virtual int Size()          { return mSize; }

@@ -97,7 +97,7 @@ class cFuncDeclNode : public cDeclNode
         int offset = 0;
         if (mParams != NULL) mParams->ComputeOffsets(-STACK_FRAME_SIZE);
         if (mStmts != NULL) offset = mStmts->ComputeOffsets(offset);
-        mDeclsSize = offset - base; 
+        mDeclsSize = offset; 
 
         return base;
     }
@@ -122,7 +122,7 @@ class cFuncDeclNode : public cDeclNode
         if (!mHasStmts) return;
 
         EmitComment(mId->Name() + "\n");
-        SetJumpDest(mId->Name());
+        SetLabelValue(mId->Name());
 
         if (mDeclsSize != 0)
         {

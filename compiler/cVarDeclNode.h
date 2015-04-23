@@ -22,10 +22,12 @@
 class cVarDeclNode : public cDeclNode
 {
   public:
-    cVarDeclNode(cSymbol *type, cSymbol *id) : cDeclNode()
+    cVarDeclNode(cSymbol *type, cSymbol *id, bool isGlobal = false) 
+        : cDeclNode()
     {
         mSize = 0;
         mOffset = 0;
+        mGlobal = isGlobal;
         cSymbol *localId = symbolTableRoot->LocalLookup(id->Name());
         if (localId != NULL)
         {
@@ -51,6 +53,7 @@ class cVarDeclNode : public cDeclNode
     virtual bool IsArray()  { return mType->IsArray(); }
     virtual bool IsStruct() { return mType->IsStruct(); }
     virtual bool IsInt()    { return mType->IsInt(); }
+    virtual bool IsGlobal() { return mGlobal; }
 
     virtual int ComputeOffsets(int base)
     {
@@ -70,9 +73,18 @@ class cVarDeclNode : public cDeclNode
         return mOffset;
     }
 
+    virtual void GenerateCode()
+    {
+        if (mGlobal) EmitGlobalDef(mId->Name(), ComputeSize());
+    }
+
     virtual std::string toString()
     {
-        std::string result("VAR: ");
+        std::string result;
+        if (mGlobal)
+            result = "GLOBAL VAR: ";
+        else
+            result = "VAR: ";
         result += mType->TypeId();
         result += " " + mId->toString();
         if (mSize != 0 || mOffset != 0)
@@ -87,7 +99,7 @@ class cVarDeclNode : public cDeclNode
   protected:
     cDeclNode *mType;   // the type for the decl
                         // NOTE: this class inherits members from cDeclNode
-
+    bool mGlobal;       // true if this is a global variable
     int ComputeSize()
     {
         int size;
