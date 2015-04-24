@@ -86,7 +86,8 @@ int process_file(const char *filename, cDeclsNode **program, int *total_errors)
     int result;
 
     // KLUDGE: should be handled within the scanner
-    yylineno = 0;
+    yylineno = 1;
+    strcpy(yycurrentfile, filename);
     yyin = fopen(filename, "r");
     if (yyin == NULL)
     {

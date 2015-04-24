@@ -356,13 +356,14 @@ string_lit: STRING_LIT          { $$ = new cStringLitNode($1); }
 int yyerror(const char *msg)
 {
     std::cerr << "ERROR: " << msg << " at symbol "
-        << yytext << " on line " << yylineno << "\n";
+        << yytext << " on line " << yylineno << " of " << yycurrentfile << "\n";
 
     return 0;
 }
 int semantic_error(std::string msg)
 {
-    std::cerr << "ERROR: " << msg << " on line " << yylineno << "\n";
+    std::cerr << "ERROR: " << msg << " on line " << yylineno 
+        << " of " << yycurrentfile << "\n";
     
     yynerrs++;
 

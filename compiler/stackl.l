@@ -3,8 +3,18 @@
 // Phil Howard
 
 #include <limits.h>     // for include path
+#include <list>
 #include "lex.h"
 
+class File_Def
+{
+  public:
+    char mName[PATH_MAX];
+    int  mPrevLine;
+};
+
+static std::list<File_Def> FileList ;
+char yycurrentfile[PATH_MAX];
 extern char Include_Path[PATH_MAX];
 
 #define RETURN(a) return Return(a);
@@ -24,6 +34,7 @@ static int File_Depth = 0;
    * of an include file
    */
 %x incl
+%x c_comment
 
 apost           [']
 quote           [\"]
@@ -41,6 +52,11 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "//"(.)*$                   {}
 {whitespace}+               {}
+
+"/*"                BEGIN(c_comment);
+<c_comment>"*/"     BEGIN(INITIAL);
+<c_comment>.        {}
+
 "#include"          BEGIN(incl);
 <incl>[ \t]*      /* eat the whitespace */
 <incl>[^ \t\n]+   { /* got the include file name */
@@ -49,6 +65,18 @@ identifier      {letter}({letter}|{digit}|"_")*
                   }
 
 <<EOF>>           {
+                    File_Def file_item;
+                    if (FileList.empty())
+                        yyterminate();
+                    else
+                    {
+                        file_item = FileList.back();
+                        FileList.pop_back();
+                        yylineno = file_item.mPrevLine;
+                        strcpy(yycurrentfile, file_item.mName);
+                        yypop_buffer_state();
+                    }
+                    /*
                     if (--File_Depth == 0) yylineno = Main_lineno;
 
                     //if ( !YY_CURRENT_BUFFER )
@@ -59,6 +87,7 @@ identifier      {letter}({letter}|{digit}|"_")*
                     } else {
                         yypop_buffer_state();
                     }
+                    */
                   }
 
 {quote}{not_quote}*{quote}  {
@@ -90,7 +119,6 @@ identifier      {letter}({letter}|{digit}|"_")*
 "switch"                    { RETURN(proc_unsupported()); }
 "case"                      { RETURN(proc_unsupported()); }
 "void"                      { RETURN(proc_unsupported()); }
-"/*"                        { RETURN(proc_unsupported()); }
 "if"                        RETURN(IF);
 "else"                      RETURN(ELSE);
 "for"                       RETURN(FOR);
@@ -177,6 +205,13 @@ static void open_input(char *name)
     {
         printf("Error opening %s\n", yytext);
     } else {
+        File_Def fileDef;
+        strcpy(fileDef.mName, yycurrentfile);
+        fileDef.mPrevLine = yylineno;
+        FileList.push_back(fileDef);
+        strcpy(yycurrentfile, path);
+        yylineno = 1;
+
         if (File_Depth++ == 0) Main_lineno = yylineno;
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }

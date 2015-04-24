@@ -55,3 +55,4 @@ extern char *yytext;
 extern int yylineno;
 extern int yynerrs;
 extern FILE *yyin;
+extern char yycurrentfile[];
