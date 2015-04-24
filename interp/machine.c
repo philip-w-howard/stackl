@@ -14,6 +14,12 @@ static int  Memory_Size = DEFAULT_MEMORY_SIZE;
 static Machine_State Regs;
 static pthread_mutex_t Machine_Lock = PTHREAD_MUTEX_INITIALIZER;
 
+static FILE *Mem_Log;
+
+void machine_debug()
+{
+    //printf("***************************** machine debug\n");
+}
 //**************************************
 void Machine_Check(const char *fmt, ...)
 {
@@ -76,12 +82,15 @@ int Get_Word(int address)
     else
         value = IO_Get_Word(address);
 
+    if (value == 0x79797979) machine_debug();
+    //fprintf(Mem_Log, "%5d %8d %08X Get_Word\n", address, value, value);
     return value;
 }
 //***************************************
 void Set_Word(int address, int value)
 {
     address = validate_address(address, 0);
+    //fprintf(Mem_Log, "%5d %8d %08X Set_Word\n", address, value, value);
     if (address < Memory_Size)
         *(int *)&Memory[address] = value;
     else
@@ -98,12 +107,15 @@ int Get_Byte(int address)
     else
         value = IO_Get_Byte(address);
 
+    if (value == 0x79) machine_debug();
+    //fprintf(Mem_Log, "%5d %8d %08X Get_Byte\n", address, value, value);
     return value;
 }
 //***************************************
 void Set_Byte(int address, int value)
 {
     address = validate_address(address, 1);
+    //fprintf(Mem_Log, "%5d %8d %08X Set_Byte\n", address, value, value);
     if (address < Memory_Size)
         Memory[address] = value;
     else
@@ -112,16 +124,21 @@ void Set_Byte(int address, int value)
 //***************************************
 void *Get_Addr(int address)
 {
+    //int value = Get_Word(address);
     address = validate_address(address, 1);
+    //fprintf(Mem_Log, "%5d %8d %08X Get_Addr\n", address, value, value);
     return &Memory[address];
 }
 //***************************************
 void Init_Machine(int mem_size)
 {
+    Mem_Log = fopen("mem.log", "w");
+
     pthread_mutex_lock(&Machine_Lock);
     if (mem_size <= 0) mem_size = DEFAULT_MEMORY_SIZE;
     Memory_Size = mem_size;
     Memory = (char *)malloc(Memory_Size);
+    memset(Memory, 0x79, Memory_Size);
     Regs.BP = 0;
     Regs.LP = Memory_Size;
     Regs.IP = 0;

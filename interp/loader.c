@@ -37,6 +37,9 @@ void MemCpy(int addr, char *sptr)
         addr++;
         sptr++;
     }
+
+    // do one more to get the NULL
+    Set_Byte(addr, *sptr);
 }
 
 char *format_string(char *str)

@@ -5,6 +5,7 @@
 #include "loader.h"
 #include "io_handler.h"
 #include "dma_term.h"
+#include "pio_term.h"
 
 char Input_File[200] = "";
 
@@ -64,6 +65,7 @@ int main(int argc, char **argv)
     Init_Machine(0);
     Init_IO();
     DMA_T_Init();
+    PIO_T_Init();
     //Sched_Init();
 
     /*
@@ -87,6 +89,7 @@ int main(int argc, char **argv)
     Machine_Execute();
 
     DMA_T_Finish();
+    PIO_T_Finish();
     Finish_IO();
 
     return 0;

@@ -86,7 +86,8 @@ static void do_rti(Machine_State *cpu)
     cpu->BP = pop(cpu);
     cpu->FLAG = pop(cpu);
 
-    cpu->SP -= cpu->BP;
+    //if (cpu->FLAG & FL_USER_MODE) 
+        cpu->SP -= cpu->BP;
 }
 //***********************************************
 static void interrupt(Machine_State *cpu, int vector)

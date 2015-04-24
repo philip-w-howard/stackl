@@ -34,6 +34,7 @@ int syscall(int *args)
     int user_mode;
     int temp = 0;
 
+    Machine_Check("obsolete interpreter");
     user_mode = Is_User_Mode();
 
     switch (args[1])
