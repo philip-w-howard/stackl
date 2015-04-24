@@ -331,6 +331,9 @@ comp:       comp EQ expr        { $$ = new cBinaryExprNode($1, EQ, $3); }
         |   expr                { $$ = $1; }
 expr:       expr '+' term       { $$ = new cBinaryExprNode($1, '+', $3); }
         |   expr '-' term       { $$ = new cBinaryExprNode($1, '-', $3); }
+        |   expr '&' term       { $$ = new cBinaryExprNode($1, '&', $3); }
+        |   expr '|' term       { $$ = new cBinaryExprNode($1, '|', $3); }
+        |   expr '^' term       { $$ = new cBinaryExprNode($1, '^', $3); }
         |   term                { $$ = $1; }
 
 term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
