@@ -25,6 +25,7 @@ class cSymbolTable
     // the preexisting symbol. Otherwise, return new symbol
     cSymbol *Insert(cSymbol *symbol);
 
+    cSymbol *InsertRoot(cSymbol *symbol);
     // Look for a symbol. Returns NULL if symbol is not found.
     cSymbol *Lookup(std::string name);
 

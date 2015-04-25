@@ -57,6 +57,17 @@ cSymbol *cSymbolTable::Insert(cSymbol *symbol)
     return symbol;
 }
 //*******************************************
+cSymbol *cSymbolTable::InsertRoot(cSymbol *symbol)
+{
+    cScope *scope = mScope;
+    while(scope->Parent() != NULL)
+        scope = scope->Parent();
+
+    scope->Insert(symbol->Name(), symbol);
+
+    return symbol;
+}
+//*******************************************
 // Look for a symbol. Return NULL if not found
 cSymbol *cSymbolTable::Lookup(std::string name)
 {
@@ -107,10 +118,6 @@ cSymbolTable *cSymbolTable::CreateDefaultTable()
     sym = new cSymbol("char");
     defaultTable->Insert(sym);
     sym->SetType(new cBaseDeclNode(sym, 1, false, false, false));
-
-    sym = new cSymbol("charp");
-    defaultTable->Insert(sym);
-    sym->SetType(new cBaseDeclNode(sym, 4, true, false, false));
 
     sym = new cSymbol("carray");
     defaultTable->Insert(sym);

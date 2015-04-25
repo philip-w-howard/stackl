@@ -18,7 +18,7 @@ class cBaseDeclNode : public cDeclNode
 {
   public:
     cBaseDeclNode(cSymbol *id, int size, bool isPointer, 
-            bool isArray, bool isAbs) 
+            bool isArray, bool isAbs, cDeclNode* pointsTo = NULL) 
         : cDeclNode()
     {
         mId = id;
@@ -26,8 +26,13 @@ class cBaseDeclNode : public cDeclNode
         mIsPointer = isPointer;
         mIsArray = isArray;
         mIsAbsolute = isAbs;
+        mPointsTo = pointsTo;
+
+        if(pointsTo != NULL)
+            mPtrLevel = pointsTo->GetPtrLevel() + 1;
     }
 
+    virtual cDeclNode* GetPointsTo() { return mPointsTo; }
     virtual bool IsChar()       { return (mSize==1); }
     virtual bool IsInt()        { return true; }
     virtual bool IsType()       { return true; }
@@ -40,6 +45,8 @@ class cBaseDeclNode : public cDeclNode
 
     virtual int ComputeOffsets(int base) { return base; }
 
+    virtual int GetPtrLevel() { return mPtrLevel; }
+
     virtual std::string toString()
     {
         return mId->toString();
@@ -50,5 +57,7 @@ class cBaseDeclNode : public cDeclNode
     bool mIsPointer;
     bool mIsArray;
     bool mIsAbsolute;
+    cDeclNode* mPointsTo;
+    int mPtrLevel;
 };
 

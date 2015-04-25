@@ -98,6 +98,7 @@
 %type <varRef> varref
 %type <varPart> varpart
 %type <string_lit> string_lit
+%type <symbol> type
 %token  <string> UNSUPPORTED
 
 %%
@@ -132,12 +133,9 @@ decl:       var_decl ';'        { $$ = $1; }
                                 }
         |   error ';'           { $$ = NULL; }
 
-var_decl:   TYPE_ID IDENTIFIER 
+var_decl:   type IDENTIFIER 
                                 { $$ = new cVarDeclNode($1, $2); }
-        |   CHAR '*' IDENTIFIER { $$ = new cVarDeclNode(
-                                        symbolTableRoot->Lookup("charp"),
-                                        $3); }
-        |   CHAR IDENTIFIER arrayspec
+        |   type IDENTIFIER arrayspec
                                 { 
                                     cSymbol *sym = new cSymbol("carray");
                                     cArrayDeclNode *arr = new cArrayDeclNode(
@@ -145,7 +143,15 @@ var_decl:   TYPE_ID IDENTIFIER
                                     sym->SetType(arr);
                                     $$ = new cVarDeclNode(sym, $2);
                                 }
-
+type:   type '*' {
+                        std::string new_type = $1->Name();
+                        new_type += "*";
+                        cSymbol* sym = new cSymbol(new_type);
+                        sym->SetType(new cBaseDeclNode(sym, 4, true, false, false, $1->GetType()));
+                        symbolTableRoot->InsertRoot(sym);
+                        $$ = sym;
+               }
+      | TYPE_ID { $$ = $1; }  
 struct_decl:  TYPEDEF STRUCT open decls close IDENTIFIER    
                                 { $$ = new cStructDeclNode($3, $4, $6); }
 global_decls: global_decls global_decl  
@@ -156,13 +162,13 @@ global_decls: global_decls global_decl
         | global_decl           { $$ = new cDeclsNode($1); }
 global_decl: func_decl          { $$ = $1; }
         | struct_decl           { $$ = $1; }
-        | CONST TYPE_ID IDENTIFIER '=' INT_VAL ';'
+        | CONST type IDENTIFIER '=' INT_VAL ';'
                                 { $$ = new cConstDeclNode($3, $5); }
         | DEFINE IDENTIFIER INT_VAL
                                 { $$ = new cConstDeclNode($2, $3); }
         | DEFINE IDENTIFIER '-' INT_VAL
                                 { $$ = new cConstDeclNode($2, -$4); }
-        | TYPE_ID IDENTIFIER 
+        | type IDENTIFIER 
                                 { $$ = new cVarDeclNode($1, $2, true); }
         | UNSUPPORTED           { 
                                     semantic_error(std::string(yytext) + 
@@ -197,14 +203,8 @@ func_header:  func_prefix paramsspec ')'
                           { $$ = $1;
                             $1->SetParams(NULL);
                           }
-func_prefix: TYPE_ID IDENTIFIER '('
+func_prefix: type IDENTIFIER '('
                           { $$ = new cFuncDeclNode($1, $2);
-                            symbolTableRoot->IncreaseScope(); 
-                          }
-func_prefix: CHAR '*' IDENTIFIER '('
-                          { $$ = new cFuncDeclNode(
-                                        symbolTableRoot->Lookup("charp"),
-                                        $3);
                             symbolTableRoot->IncreaseScope(); 
                           }
 paramsspec:     
@@ -317,7 +317,6 @@ params:     params',' param
 
 param:      expr                { $$ = $1; }
         |   string_lit          { $$ = $1; }
-        |   '&' varref          { $$ = new cVarAddrNode($2); }
 
 ccomp:      ccomp OR comp       { $$ = new cShortCircuitNode($1, OR, $3, true); }
         |   ccomp AND comp      { $$ = new cShortCircuitNode($1, AND, $3, false); }
@@ -334,6 +333,8 @@ expr:       expr '+' term       { $$ = new cBinaryExprNode($1, '+', $3); }
         |   expr '&' term       { $$ = new cBinaryExprNode($1, '&', $3); }
         |   expr '|' term       { $$ = new cBinaryExprNode($1, '|', $3); }
         |   expr '^' term       { $$ = new cBinaryExprNode($1, '^', $3); }
+        |   '&' varref          { $$ = new cVarAddrNode($2); }
+        |   '*' varref          { $$ = new cVarDerefNode($2); }
         |   term                { $$ = $1; }
 
 term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
@@ -349,8 +350,7 @@ fact:        '(' ccomp ')'      { $$ = $2; }
         |   varref              { $$ = $1; }
         |   func_call           { $$ = $1; }
         |   SIZE_OF '(' IDENTIFIER ')' { $$ = new cSizeOfNode($3); }
-        |   SIZE_OF '(' TYPE_ID ')' { $$ = new cSizeOfNode($3); }
-        |   SIZE_OF '(' CHAR ')' { $$ = new cSizeOfNode(true); }
+        |   SIZE_OF '(' type ')' { $$ = new cSizeOfNode($3); }
         |   SIZE_OF IDENTIFIER { $$ = new cSizeOfNode($2); }
 
 string_lit: STRING_LIT          { $$ = new cStringLitNode($1); }

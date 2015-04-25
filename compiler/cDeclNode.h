@@ -31,7 +31,8 @@ class cDeclNode : public cStmtNode
     virtual int Size()          { return mSize; }
     virtual int GetOffset()     { return mOffset; }
     virtual int ComputeOffsets(int base) { return base; }
-
+    virtual cDeclNode* GetPointsTo() { return NULL; }
+    virtual int GetPtrLevel() { return 0; }
     virtual bool CompatibleWith(cDeclNode *other)
     {
         cDeclNode *left = GetBaseType();

@@ -134,7 +134,7 @@ identifier      {letter}({letter}|{digit}|"_")*
                               RETURN(TYPE_ID);
                             }
 "char"                      { yylval.symbol = symbolTableRoot->Lookup("char");
-                              RETURN(CHAR);
+                              RETURN(TYPE_ID);
                             }
 "sizeof"                    RETURN(SIZE_OF);
 "typedef"                   RETURN(TYPEDEF);
@@ -218,7 +218,7 @@ static void open_input(char *name)
 }
 static int Return(int val)
 {
-    //printf("Scanned '%s': %d\n", yytext, val);
+//    printf("Scanned '%s': %d\n", yytext, val);
     return val;
 }
 

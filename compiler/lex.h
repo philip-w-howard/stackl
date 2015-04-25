@@ -44,6 +44,8 @@
 #include "cStringLitNode.h"
 #include "cBinaryExprNode.h"
 #include "cShortCircuitNode.h"
+#include "cBaseDeclNode.h"
+#include "cVarDerefNode.h"
 
 #include "parser.h"
 

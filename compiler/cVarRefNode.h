@@ -145,12 +145,13 @@ class cVarRefNode : public cExprNode
                 if(last->GetDecl()->GetBaseType()->IsPointer())
                 {
                     // ptr[index] pushes (ptr + (size * index))
+                    int deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size(); 
                     
                     EmitInt(PUSHVAR_OP);
                     EmitInt(mOffset);
 
                     EmitInt(PUSH_OP);
-                    EmitInt(1);
+                    EmitInt(deref_size);
                     index->GetIndex(0)->GenerateCode();
                     EmitInt(TIMES_OP);
 
@@ -159,13 +160,15 @@ class cVarRefNode : public cExprNode
                 else
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
+                    int deref_size = last->GetDecl()->GetBaseType()->GetBaseType()->Size();
+                    
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PUSHFP_OP);
                     EmitInt(PLUS_OP);
-
                     EmitInt(PUSH_OP);
-                    EmitInt(1);  // FIX THIS: assumint only char arrays
+                    //EmitInt(1);
+                    EmitInt(deref_size);
                     index->GetIndex(0)->GenerateCode();
                     EmitInt(TIMES_OP);
 
@@ -184,6 +187,7 @@ class cVarRefNode : public cExprNode
 
         virtual void GenerateCode()
         {
+            //TODO lots of optimization to be done here in terms of the compiler code
             // variable 'x' should leave its value at the top of the stack
 
             cVarPartNode *last = mList->back();
@@ -197,10 +201,19 @@ class cVarRefNode : public cExprNode
             }
             else if (last->IsArrayRef())
             {
-                // array refs leave *x at top of stack
-                
+                int deref_size;
+                if(last->GetDecl()->GetBaseType()->IsPointer())
+                    deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size();
+                else
+                    deref_size = last->GetDecl()->GetBaseType()->Size();
+                 
+                // array refs leave *x at top of stack 
                 EmitOffset();
-                EmitInt(PUSHCVARIND_OP);
+                
+                if(deref_size == 1)
+                    EmitInt(PUSHCVARIND_OP);
+                else
+                    EmitInt(PUSHVARIND_OP);
             } 
             else if (last->IsArray())
             {
