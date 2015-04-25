@@ -33,7 +33,10 @@ class cArrayDeclNode : public cDeclNode
         mId = id;
         mId->SetType(this);
         mArraySpec = array;
+        mPtrLevel = mType->GetPtrLevel() + 1;
     }
+
+    virtual int GetPtrLevel() { return mPtrLevel;}
 
     // return the type of an element of the array
     virtual cDeclNode *GetBaseType()
@@ -71,5 +74,6 @@ class cArrayDeclNode : public cDeclNode
   protected:
     cDeclNode      *mType;      // type of array elements
     cArraySpecNode *mArraySpec; // specification of indeces
+    int mPtrLevel;
 };
 
