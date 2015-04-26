@@ -44,28 +44,27 @@ class cDeclNode : public cStmtNode
             // foo * abc = foo * xyz
             // foo * abc = 123456
 
+            if(IsArray())
+            {
+                if(right->IsPointer() && right->GetPointsTo() == GetBaseType()) return true;
+            }
+
             if (left == right)
-            {   
                 return true;
-            }
-            if (left->IsPointer() && right->IsArray()
-                && left->GetPtrLevel() == right->GetPtrLevel())
-            {
+            if (left->IsPointer() && right->IsArray())
                 return true;
-            }
-            //if(left->IsPointer() && right->IsPointer())
-            //{
-            //    if(left->GetPointsTo() == right->GetPointsTo())
-            //        return true;
-            //    else
-            //        return false;
-            //}
-            //if(left->IsPointer() && right->IsInt())
-            //    return true;
+            if(right->IsPointer() && right->IsArray())
+                return true;
+            if(other->IsArray() && right->IsPointer())
+                return true;
+            if(left->IsPointer() && right->IsPointer())
+                return true;
+            if(left->IsPointer() && right->IsInt())
+                return true;
             if (left->IsInt() && right->IsInt() && left->Size() >= right->Size())
-            {
                 return true;
-            }
+
+            std::cout << this->toString() << " is left, right is " << other->toString() << "\n";
 
             return false;
         }
