@@ -48,10 +48,19 @@ class cVarAddrNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        EmitInt(PUSH_OP);
-        EmitInt(mOffset);
-        EmitInt(PUSHFP_OP);
-        EmitInt(PLUS_OP);
+        if (mVar->IsGlobal())
+        {
+            EmitInt(PUSH_OP);
+            EmitGlobalRef(mVar->Name());
+            EmitInt(PUSH_OP);
+            EmitInt(mOffset);
+            EmitInt(PLUS_OP);
+        } else {
+            EmitInt(PUSH_OP);
+            EmitInt(mOffset);
+            EmitInt(PUSHFP_OP);
+            EmitInt(PLUS_OP);
+        }
     }
 
   protected:

@@ -91,6 +91,10 @@ class cVarRefNode : public cExprNode
         {
             return mList->back()->IsArrayRef();
         }
+        virtual bool IsGlobal()
+        {
+            return mList->front()->IsGlobal();
+        }
         virtual int ComputeOffsets(int base)
         {
             list<cVarPartNode *>::iterator it = mList->begin();
@@ -147,8 +151,18 @@ class cVarRefNode : public cExprNode
                     // ptr[index] pushes (ptr + (size * index))
                     int deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size(); 
                     
-                    EmitInt(PUSHVAR_OP);
-                    EmitInt(mOffset);
+                    if (mList->front()->IsGlobal())
+                    {
+                        EmitInt(PUSH_OP);
+                        EmitGlobalRef(mBaseName);
+                        EmitInt(PUSH_OP);
+                        EmitInt(mOffset);
+                        EmitInt(PLUS_OP);
+                        EmitInt(PUSHVARIND_OP);
+                    } else {
+                        EmitInt(PUSHVAR_OP);
+                        EmitInt(mOffset);
+                    }
 
                     EmitInt(PUSH_OP);
                     EmitInt(deref_size);
@@ -162,10 +176,18 @@ class cVarRefNode : public cExprNode
                     // arr[index] pushes ((FP + offset) + (size * index))
                     int deref_size = last->GetDecl()->GetBaseType()->GetBaseType()->Size();
                     
-                    EmitInt(PUSH_OP);
-                    EmitInt(mOffset);
-                    EmitInt(PUSHFP_OP);
-                    EmitInt(PLUS_OP);
+                    if (mList->front()->IsGlobal())
+                    {
+                        EmitInt(PUSH_OP);
+                        EmitGlobalRef(mBaseName);
+                        EmitInt(PUSH_OP);
+                        EmitInt(mOffset);
+                    } else {
+                        EmitInt(PUSH_OP);
+                        EmitInt(mOffset);
+                        EmitInt(PUSHFP_OP);
+                        EmitInt(PLUS_OP);
+                    }
                     EmitInt(PUSH_OP);
                     //EmitInt(1);
                     EmitInt(deref_size);
@@ -220,25 +242,35 @@ class cVarRefNode : public cExprNode
                 // arrays leave &x on top of stack
                 // push (mOffset + FP)
                 
-                EmitInt(PUSH_OP);
-                EmitInt(mOffset);
-                EmitInt(PUSHFP_OP);
-                EmitInt(PLUS_OP);
-            }
-            else if (mList->front()->IsGlobal())
-            {
-                EmitInt(PUSH_OP);
-                EmitGlobalRef(mBaseName);
-                EmitInt(PUSH_OP);
-                EmitInt(mOffset);
-                EmitInt(PLUS_OP);
-                EmitInt(PUSHVARIND_OP);
+                if (mList->front()->IsGlobal())
+                {
+                    EmitInt(PUSH_OP);
+                    EmitGlobalRef(mBaseName);
+                    EmitInt(PUSH_OP);
+                    EmitInt(mOffset);
+                    EmitInt(PLUS_OP);
+                } else {
+                    EmitInt(PUSH_OP);
+                    EmitInt(mOffset);
+                    EmitInt(PUSHFP_OP);
+                    EmitInt(PLUS_OP);
+                }
             }
             else 
             {
                 // non-arrays leave 'x' on top of stack
-                EmitInt(PUSHVAR_OP);
-                EmitInt(mOffset);
+                if (mList->front()->IsGlobal())
+                {
+                    EmitInt(PUSH_OP);
+                    EmitGlobalRef(mBaseName);
+                    EmitInt(PUSH_OP);
+                    EmitInt(mOffset);
+                    EmitInt(PLUS_OP);
+                    EmitInt(PUSHVARIND_OP);
+                } else {
+                    EmitInt(PUSHVAR_OP);
+                    EmitInt(mOffset);
+                }
             }
         }
 
@@ -252,19 +284,20 @@ class cVarRefNode : public cExprNode
                 EmitOffset();
                 EmitInt(POPCVARIND_OP);
             }
-            else if (mList->front()->IsGlobal())
-            {
-                EmitInt(PUSH_OP);
-                EmitGlobalRef(mBaseName);
-                EmitInt(PUSH_OP);
-                EmitInt(mOffset);
-                EmitInt(PLUS_OP);
-                EmitInt(POPVARIND_OP);
-            }
             else 
             {
-                EmitInt(POPVAR_OP);
-                EmitInt(mOffset);
+                if (mList->front()->IsGlobal())
+                {
+                    EmitInt(PUSH_OP);
+                    EmitGlobalRef(mBaseName);
+                    EmitInt(PUSH_OP);
+                    EmitInt(mOffset);
+                    EmitInt(PLUS_OP);
+                    EmitInt(POPVARIND_OP);
+                } else {
+                    EmitInt(POPVAR_OP);
+                    EmitInt(mOffset);
+                }
             }
         }
 

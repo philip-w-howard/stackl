@@ -47,9 +47,20 @@ class cVarDerefNode : public cExprNode
 
     virtual void GenerateCode()
     {
-        EmitInt(PUSHVAR_OP);
-        EmitInt(mOffset);
-        EmitInt(PUSHVARIND_OP);
+        if (mVar->IsGlobal())
+        {
+            EmitInt(PUSH_OP);
+            EmitGlobalRef(mVar->Name());
+            EmitInt(PUSH_OP);
+            EmitInt(mOffset);
+            EmitInt(PLUS_OP);
+            EmitInt(PUSHVARIND_OP);
+            EmitInt(PUSHVARIND_OP);
+        } else {
+            EmitInt(PUSHVAR_OP);
+            EmitInt(mOffset);
+            EmitInt(PUSHVARIND_OP);
+        }
     }
 
   protected:

@@ -14,7 +14,7 @@ static int  Memory_Size = DEFAULT_MEMORY_SIZE;
 static Machine_State Regs;
 static pthread_mutex_t Machine_Lock = PTHREAD_MUTEX_INITIALIZER;
 
-static FILE *Mem_Log;
+//static FILE *Mem_Log;
 
 void machine_debug()
 {
@@ -132,7 +132,7 @@ void *Get_Addr(int address)
 //***************************************
 void Init_Machine(int mem_size)
 {
-    Mem_Log = fopen("mem.log", "w");
+    //Mem_Log = fopen("mem.log", "w");
 
     pthread_mutex_lock(&Machine_Lock);
     if (mem_size <= 0) mem_size = DEFAULT_MEMORY_SIZE;
