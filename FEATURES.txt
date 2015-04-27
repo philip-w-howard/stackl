@@ -3,19 +3,22 @@ BUGS
 
 TODO
 
+Clean up test suite
+    Get rid of useless tests
+    Combine like features
+    Comment block indicating purpose of test
+    Mimimise assumptions
+        Assume previous tests pass, but not later ones
+
+Implement proper precedence
+Test precedence
+
+
 Include files for "regular" C code to mimic stackl C code.
 
 Correct struct definition
     typedef struct ...
     struct refs with "struct ID"
-
-Global variables
-    treat similar to string constants
-    Add "G addr size" record to .sl
-    generate code:
-        PUSH
-        Fixup location
-        VARIND
 
 optimizations:
    ptr[0] -> *ptr
@@ -39,6 +42,14 @@ address-of operator
 make opcodes an enum?
 
 WORKS
+
+Global variables
+    treat similar to string constants
+    Add "G addr size" record to .sl
+    generate code:
+        PUSH
+        Fixup location
+        VARIND
 
 allow #define'd constants to show up as INT_VAL, not Expr (or whatever)
 short circuit of && and ||

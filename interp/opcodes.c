@@ -91,7 +91,7 @@ static void do_rti(Machine_State *cpu)
 
     if (flag & FL_INT_PENDING) cpu->FLAG |= FL_INT_PENDING;
 
-    //if (cpu->FLAG & FL_USER_MODE) 
+    if (cpu->FLAG & FL_USER_MODE) 
         cpu->SP -= cpu->BP;
 }
 //***********************************************

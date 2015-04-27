@@ -15,9 +15,9 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 static volatile int IO_Q_Halt_Thread = 0;
 static pthread_t IO_Q_Thread;
 
-static int Status;
-static int Command;
-static int Data;
+static volatile int Status;
+static volatile int Command;
+static volatile int Data;
 
 //************************************************
 // Enable/Disable nonblocking mode
@@ -68,7 +68,7 @@ static void *terminal_device(void *arg)
     while (IO_Q_Halt_Thread == 0)
     {
         pthread_mutex_lock(&IO_Q_Lock);
-        while ( !IO_Q_Halt_Thread && Data != 0)
+        while ( !IO_Q_Halt_Thread && Data == 0)
         {
             pthread_cond_wait(&IO_Q_Cond, &IO_Q_Lock);
         }
@@ -79,9 +79,12 @@ static void *terminal_device(void *arg)
             fflush(stdout);
             Status &= ~PIO_T_STATUS_WRITE_BUSY;
             Status |= PIO_T_STATUS_WRITE_DONE | PIO_T_STATUS_ATTN;
+            Data = 0;
+            pthread_mutex_unlock(&IO_Q_Lock);
             if (Command & PIO_T_CMD_INT_ENA) Machine_Signal_Interrupt(1);
+        } else {
+            pthread_mutex_unlock(&IO_Q_Lock);
         }
-        pthread_mutex_unlock(&IO_Q_Lock);
     }
     return NULL;
 }
