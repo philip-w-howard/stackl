@@ -27,5 +27,5 @@ void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
 void Machine_Execute();
 void Machine_Check(const char *fmt, ...);
-void Machine_Signal_Interrupt();
+void Machine_Signal_Interrupt(int from_hw);
 

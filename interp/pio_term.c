@@ -1,3 +1,5 @@
+#include <termios.h>
+#include <unistd.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,38 +19,67 @@ static int Status;
 static int Command;
 static int Data;
 
+//************************************************
+// Enable/Disable nonblocking mode
+// Code from:
+// http://cc.byexamples.com/2007/04/08/non-blocking-user-input-in-loop-without-ncurses/
+static void set_nonblock(int nonblock)
+{
+    struct termios ttystate;
+         
+    //get the terminal state
+    tcgetattr(STDIN_FILENO, &ttystate);
+
+    if (nonblock)
+    {
+        //turn off canonical mode
+        ttystate.c_lflag &= ~ICANON;
+        //minimum of number input read.
+        ttystate.c_cc[VMIN] = 1;
+    }
+    else
+    {
+        //turn on canonical mode
+        ttystate.c_lflag |= ICANON;
+    }
+    //set the terminal attributes.
+    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+}
+//********************************************
+// Check to see if a character is available on stdin
+// Code from:
+// http://cc.byexamples.com/2007/04/08/non-blocking-user-input-in-loop-without-ncurses/
+static int kbhit()
+{
+    int hit;
+    struct timeval tv;
+    fd_set fds;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    hit = FD_ISSET(STDIN_FILENO, &fds);
+    return hit;
+}
 //*************************************
 static void *terminal_device(void *arg)
 {
     while (IO_Q_Halt_Thread == 0)
     {
         pthread_mutex_lock(&IO_Q_Lock);
-        while ( !IO_Q_Halt_Thread && (Command & PIO_T_CMD_START_READ) == 0)
+        while ( !IO_Q_Halt_Thread && Data != 0)
         {
             pthread_cond_wait(&IO_Q_Cond, &IO_Q_Lock);
         }
 
-        if (Command & PIO_T_CMD_START_READ)
+        if (Data != 0)
         {
-            /*
-            Command &= ~PIO_T_CMD_START_READ;
-            Status &= ~(PIO_T_STATUS_READ_DONE | PIO_T_STATUS_READ_ERROR);
-            Status |= PIO_T_STATUS_READ_BUSY;
-
-            size = Size;
-            buffer = (char *)Get_Addr(Address);
-            if (buffer == NULL) Machine_Check("PIO_T read to invalid address");
-
-            pthread_mutex_unlock(&IO_Q_Lock);
-            buffer = fgets(buffer, size, stdin);
-
-            pthread_mutex_lock(&IO_Q_Lock);
-            Status &= ~PIO_T_STATUS_READ_BUSY;
-            Status |= PIO_T_STATUS_READ_DONE | PIO_T_STATUS_ATTN;
-            if (buffer == NULL) Status |= PIO_T_STATUS_READ_ERROR;
-
-            if (Command & PIO_T_CMD_INT_ENA) Machine_Signal_Interrupt();
-            */
+            fputc(Data, stdout);
+            fflush(stdout);
+            Status &= ~PIO_T_STATUS_WRITE_BUSY;
+            Status |= PIO_T_STATUS_WRITE_DONE | PIO_T_STATUS_ATTN;
+            if (Command & PIO_T_CMD_INT_ENA) Machine_Signal_Interrupt(1);
         }
         pthread_mutex_unlock(&IO_Q_Lock);
     }
@@ -63,6 +94,7 @@ static int get_byte(int id, int addr)
 
     if (addr == 0) 
     {
+        if (kbhit()) Status |= PIO_T_STATUS_READ_DONE;
         value = Status;
         if (value & 0x0080) value |= 0xFFFFFF00;
         Status = 0;
@@ -70,8 +102,15 @@ static int get_byte(int id, int addr)
     else if (addr == 4) 
         value = Command;
     else if (addr == 8)
+    {
+        //value = Data;
+        if (kbhit()) 
+        {
+            Data = fgetc(stdin);
+            Status &= ~PIO_T_STATUS_READ_DONE;
+        }
         value = Data;
-    
+    } 
     pthread_mutex_unlock(&IO_Q_Lock);
 
     //printf("pio_term get_byte: %X %X\n", addr, value);
@@ -95,16 +134,12 @@ static void set_byte(int id, int addr, int value)
     else if (addr == 4) 
     {
         Command = value;
-        pthread_cond_signal(&IO_Q_Cond);
     }
     else if (addr == 8)
     {
         Status |= PIO_T_STATUS_WRITE_BUSY;
-        Status &= PIO_T_STATUS_WRITE_DONE;
-        fputc(value, stdout);
-        Status &= ~PIO_T_STATUS_WRITE_BUSY;
-        Status |= PIO_T_STATUS_WRITE_DONE | PIO_T_STATUS_ATTN;
-        if (Command & PIO_T_CMD_INT_ENA) Machine_Signal_Interrupt();
+        Data = value;
+        pthread_cond_signal(&IO_Q_Cond);
     }
 
     pthread_mutex_unlock(&IO_Q_Lock);
@@ -117,6 +152,8 @@ static void set_word(int id, int addr, int value)
 //*************************************
 int PIO_T_Init()
 {
+    set_nonblock(1);
+
     IO_Q_Halt_Thread = 0;
 
     pthread_create(&IO_Q_Thread, NULL, terminal_device, NULL);
@@ -132,6 +169,7 @@ int PIO_T_Finish()
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread, NULL);
+    set_nonblock(0);
 
     return 0;
 }

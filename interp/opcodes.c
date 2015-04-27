@@ -78,6 +78,9 @@ void check_priv(Machine_State *cpu, char *inst_name)
 //***************************************
 static void do_rti(Machine_State *cpu)
 {
+    int flag;
+    flag = cpu->FLAG;
+
     check_priv(cpu, "RTI");
 
     cpu->FP = pop(cpu);
@@ -85,6 +88,8 @@ static void do_rti(Machine_State *cpu)
     cpu->LP = pop(cpu);
     cpu->BP = pop(cpu);
     cpu->FLAG = pop(cpu);
+
+    if (flag & FL_INT_PENDING) cpu->FLAG |= FL_INT_PENDING;
 
     //if (cpu->FLAG & FL_USER_MODE) 
         cpu->SP -= cpu->BP;
@@ -373,9 +378,9 @@ void Execute(Machine_State *cpu)
                 INC(IP, 1);
             break;
         case PUSHCVARIND_OP:
-            temp = GET_INTVAL(SP, -1);
-            DEBUG("PUSHCVARIND %d %d", GET_INTVAL(SP, -1), Get_Byte(temp));
-            SET_INTVAL(SP,-1, Get_Byte(temp));
+            temp = Get_Byte(GET_INTVAL(SP, -1));
+            DEBUG("PUSHCVARIND %d %d", GET_INTVAL(SP, -1), temp);
+            SET_INTVAL(SP,-1, temp);
             INC(IP, 1);
             break;
         case POPCVARIND_OP:

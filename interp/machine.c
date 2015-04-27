@@ -182,10 +182,10 @@ void Machine_Execute()
     }
 }
 //***************************************
-void Machine_Signal_Interrupt()
+void Machine_Signal_Interrupt(int from_hw)
 {
-    pthread_mutex_lock(&Machine_Lock);
+    if (from_hw) pthread_mutex_lock(&Machine_Lock);
     Regs.FLAG |= FL_INT_PENDING;
-    pthread_mutex_unlock(&Machine_Lock);
+    if (from_hw) pthread_mutex_unlock(&Machine_Lock);
 }
 
