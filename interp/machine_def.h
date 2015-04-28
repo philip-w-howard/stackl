@@ -40,6 +40,7 @@
 #define SHIFTR_OP   39
 #define PUSHVARIND_OP  40
 #define POPVARIND_OP   41
+#define COMP_OP     42
 
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1

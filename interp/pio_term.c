@@ -15,9 +15,11 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 static volatile int IO_Q_Halt_Thread = 0;
 static pthread_t IO_Q_Thread;
 
-static volatile int Status;
-static volatile int Command;
-static volatile int Data;
+static volatile int RDR;
+static volatile int XDR;
+static volatile int IER;
+static volatile int IIR;
+static volatile int XDR_Written;
 
 //************************************************
 // Enable/Disable nonblocking mode
@@ -63,28 +65,46 @@ static int kbhit()
     return hit;
 }
 //*************************************
+static void check_kb()
+{
+    if (kbhit()) 
+    {
+        pthread_mutex_lock(&IO_Q_Lock);
+        IIR |= PIO_T_IID_RECV | PIO_T_IID_INT;
+        RDR = fgetc(stdin);
+        pthread_mutex_unlock(&IO_Q_Lock);
+
+        if (IER & PIO_T_IE_RECV) Machine_Signal_Interrupt(1);
+    }
+}
+//*************************************
 static void *terminal_device(void *arg)
 {
     while (IO_Q_Halt_Thread == 0)
     {
         pthread_mutex_lock(&IO_Q_Lock);
-        while ( !IO_Q_Halt_Thread && Data == 0)
+        while ( !IO_Q_Halt_Thread && XDR_Written == 0)
         {
             pthread_cond_wait(&IO_Q_Cond, &IO_Q_Lock);
         }
 
-        if (Data != 0)
+        if (XDR_Written)
         {
-            fputc(Data, stdout);
-            fflush(stdout);
-            Status &= ~PIO_T_STATUS_WRITE_BUSY;
-            Status |= PIO_T_STATUS_WRITE_DONE | PIO_T_STATUS_ATTN;
-            Data = 0;
             pthread_mutex_unlock(&IO_Q_Lock);
-            if (Command & PIO_T_CMD_INT_ENA) Machine_Signal_Interrupt(1);
+            usleep(1000);       // ~9600 baud
+            fputc(XDR, stdout);
+            fflush(stdout);
+            pthread_mutex_lock(&IO_Q_Lock);
+
+            XDR_Written = 0;
+            IIR |= PIO_T_IID_XMIT | PIO_T_IID_INT;
+            pthread_mutex_unlock(&IO_Q_Lock);
+            if (IER & PIO_T_IE_XMIT) Machine_Signal_Interrupt(1);
         } else {
             pthread_mutex_unlock(&IO_Q_Lock);
         }
+
+        check_kb();
     }
     return NULL;
 }
@@ -93,27 +113,16 @@ static int get_byte(int id, int addr)
 {
     int value;
 
-    pthread_mutex_lock(&IO_Q_Lock);
+    check_kb();
 
+    pthread_mutex_lock(&IO_Q_Lock);
     if (addr == 0) 
-    {
-        if (kbhit()) Status |= PIO_T_STATUS_READ_DONE;
-        value = Status;
-        if (value & 0x0080) value |= 0xFFFFFF00;
-        Status = 0;
-    }
-    else if (addr == 4) 
-        value = Command;
-    else if (addr == 8)
-    {
-        //value = Data;
-        if (kbhit()) 
-        {
-            Data = fgetc(stdin);
-            Status &= ~PIO_T_STATUS_READ_DONE;
-        }
-        value = Data;
-    } 
+        value = RDR;
+    else if (addr == 1) 
+        value = IER;
+    else if (addr == 2)
+        value = IIR;
+
     pthread_mutex_unlock(&IO_Q_Lock);
 
     //printf("pio_term get_byte: %X %X\n", addr, value);
@@ -123,26 +132,31 @@ static int get_byte(int id, int addr)
 //***********************************
 static int get_word(int id, int addr)
 {
-    return get_byte(id, addr);
+    Machine_Check("pio_term registers are byte wide");
+    return 0;
 }
 //***********************************
 static void set_byte(int id, int addr, int value)
 {
+    check_kb();
+
     pthread_mutex_lock(&IO_Q_Lock);
 
     //printf("pio_term set byte: %X %X\n", addr, value);
 
     if (addr == 0) 
-        Status = 0;
-    else if (addr == 4) 
     {
-        Command = value;
-    }
-    else if (addr == 8)
-    {
-        Status |= PIO_T_STATUS_WRITE_BUSY;
-        Data = value;
+        XDR = value;
+        XDR_Written = 1;
         pthread_cond_signal(&IO_Q_Cond);
+    }
+    else if (addr == 1) 
+    {
+        IER = value;
+    }
+    else if (addr == 2)
+    {
+        IIR = value;
     }
 
     pthread_mutex_unlock(&IO_Q_Lock);
@@ -150,7 +164,7 @@ static void set_byte(int id, int addr, int value)
 //***********************************
 static void set_word(int id, int addr, int value)
 {
-    set_byte(id, addr, value);
+    Machine_Check("pio_term registers are byte wide");
 }
 //*************************************
 int PIO_T_Init()
@@ -158,10 +172,11 @@ int PIO_T_Init()
     set_nonblock(1);
 
     IO_Q_Halt_Thread = 0;
+    XDR_Written = 0;
 
     pthread_create(&IO_Q_Thread, NULL, terminal_device, NULL);
 
-    IO_Register_Handler(0, PIO_T_STATUS, 16,
+    IO_Register_Handler(0, PIO_T_RDR, 8,
             get_word, get_byte, set_word, set_byte);
 
     return 0;

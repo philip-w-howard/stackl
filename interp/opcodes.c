@@ -185,6 +185,11 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             INC(IP, 1);
             break;
+        case COMP_OP:
+            DEBUG("COMP");
+            SET_INTVAL(SP, -1, ~GET_INTVAL(SP, -1));
+            INC(IP, 1);
+            break;
         case NEG_OP:
             DEBUG("NEG");
             SET_INTVAL(SP, -1, -GET_INTVAL(SP, -1));
