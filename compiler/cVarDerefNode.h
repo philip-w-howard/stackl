@@ -15,10 +15,10 @@ using std::list;
 #include "parse.h"
 #include "codegen.h"
 
-class cVarDerefNode : public cExprNode
+class cVarDerefNode : public cVarRefNode
 {
     public:
-        cVarDerefNode(cVarRefNode *var) 
+        cVarDerefNode(cVarRefNode *var) : cVarRefNode(*var) 
         {
             mVar = var;
             mOffset = 0;

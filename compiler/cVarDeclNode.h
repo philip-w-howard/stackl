@@ -54,6 +54,7 @@ class cVarDeclNode : public cDeclNode
     virtual bool IsStruct() { return mType->IsStruct(); }
     virtual bool IsInt()    { return mType->IsInt(); }
     virtual bool IsGlobal() { return mGlobal; }
+    virtual cSymbol* GetVar() { return mId; }
 
     virtual int ComputeOffsets(int base)
     {

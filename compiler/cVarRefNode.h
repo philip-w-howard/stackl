@@ -20,7 +20,7 @@ using std::list;
 class cVarRefNode : public cExprNode
 {
     public:
-        cVarRefNode(cVarPartNode *var) 
+        cVarRefNode(cVarPartNode *var)
         {
             cDeclNode *baseDecl;
 

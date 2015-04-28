@@ -307,7 +307,8 @@ varref:   varref '.' varpart    { $$ = $1;
 varpart:  IDENTIFIER arrayval   { $$ = new cVarPartNode($1, $2); }
 
 lval:     varref                { $$ = $1; }
-/*        |   '*' varref          { $$ = new cVarDerefNode($2); } */
+        |   '*' varref          { $$ = new cVarDerefNode($2); } 
+/*        | var_decl              { $$ = new cVarRefNode(new cVarPartNode($1->GetVar(), NULL)); } */
 arrayval: arrayval '[' expr ']' 
                               { if ($1 == NULL)
                                   $$ = new cArrayValNode($3);
