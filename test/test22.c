@@ -22,8 +22,8 @@ int main()
     int h;
     h = 0xF0F0;
     int i;
-    i &= 0xFFFF;
-    i ^= 0x0F0F;
+    i = 0xFFFF;
+    i ^= 0xEEEE;
 
     printi(e); // 0x1111 or 4369
     prints("\n");
