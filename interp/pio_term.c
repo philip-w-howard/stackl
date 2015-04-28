@@ -173,6 +173,7 @@ int PIO_T_Init()
 
     IO_Q_Halt_Thread = 0;
     XDR_Written = 0;
+    IIR = PIO_T_IID_XMIT;
 
     pthread_create(&IO_Q_Thread, NULL, terminal_device, NULL);
 
