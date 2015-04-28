@@ -6,6 +6,7 @@
 #include "io_handler.h"
 #include "dma_term.h"
 #include "pio_term.h"
+#include "../version.h"
 
 char Input_File[200] = "";
 
@@ -29,7 +30,7 @@ void Process_Args(int argc, char **argv)
                 Set_Timer_Interval(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
             {
-                printf("stackl Beta %s %s\n", __DATE__, __TIME__);
+                printf("stackl %s %s %s\n", VERSION, __DATE__, __TIME__);
                 exit(0);
             }
             else if (strcmp(arg, "help") == 0)
