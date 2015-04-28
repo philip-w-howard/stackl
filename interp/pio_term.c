@@ -91,7 +91,7 @@ static void *terminal_device(void *arg)
         if (XDR_Written)
         {
             pthread_mutex_unlock(&IO_Q_Lock);
-            usleep(1000);       // ~9600 baud
+            usleep(10);       // ~100000 baud
             fputc(XDR, stdout);
             fflush(stdout);
             pthread_mutex_lock(&IO_Q_Lock);
