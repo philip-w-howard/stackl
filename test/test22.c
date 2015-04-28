@@ -14,14 +14,23 @@ int main()
     int e;
     e = a | b | c | d;
     int f;
-    f = e & 0x1111;
+    f = 0x1111;
+    f &= e;
     int g;
-    g = e & 0x0000;
+    g = 0;
+    g |= e & 0x0000;
+    int h;
+    h = 0xF0F0;
+    int i;
+    i &= 0xFFFF;
+    i ^= 0x0F0F;
 
     printi(e); // 0x1111 or 4369
     prints("\n");
     printi(f); // 0x1111 or 4369
     prints("\n");
     printi(g); // 0x0000 or 0
+    prints("\n");
+    printi(i); // 0x1111 or 4369
     prints("\n");
 }

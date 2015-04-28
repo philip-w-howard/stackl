@@ -110,6 +110,9 @@ identifier      {letter}({letter}|{digit}|"_")*
 "-="                        RETURN(MINUS_EQ);
 "*="                        RETURN(TIMES_EQ);
 "/="                        RETURN(DIVIDE_EQ);
+"|="                        RETURN(OR_EQ);
+"&="                        RETURN(AND_EQ);
+"^="                        RETURN(XOR_EQ);
 "asm"                       RETURN(ASM);
 "static"                    { RETURN(proc_unsupported()); }
 "const"                     { RETURN(CONST); }

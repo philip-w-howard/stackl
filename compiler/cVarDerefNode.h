@@ -11,8 +11,7 @@ using std::list;
 #include "cArrayValNode.h"
 #include "cVarDeclNode.h"
 #include "cSymbolTable.h"
-#include "cVarPartNode.h"
-
+#include "cVarRefNode.h"
 #include "parse.h"
 #include "codegen.h"
 
