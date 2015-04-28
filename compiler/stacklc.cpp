@@ -12,11 +12,12 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
-#include "lex.h"
-#include "codegen.h"
-
 #include <unistd.h>     // for include path
 #include <limits.h>     // for include path
+
+#include "lex.h"
+#include "codegen.h"
+#include "../version.h"
 
 char Include_Path[PATH_MAX] = "";
 
@@ -60,7 +61,7 @@ void Process_Args(int argc, char **argv)
                 Do_Boot_Code = 1;
             else if (strcmp(arg, "version") == 0)
             {
-                std::cout << "stacklc Beta " << __DATE__ << " " 
+                std::cout << "stacklc " << VERSION << " " <<__DATE__ << " " 
                     << __TIME__ << std::endl;
                 exit(0);
             }
