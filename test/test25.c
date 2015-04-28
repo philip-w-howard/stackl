@@ -37,9 +37,12 @@ int main()
     u = *v;
     int t;
     t = *u;
-
+  
     prints(e);
     printi(t);
+    //printi(z);
+    //*y = 7;
+    //printi(z);
     prints("\n");
 
     return 0;

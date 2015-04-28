@@ -60,7 +60,7 @@
 %token  AND OR
 %token  SIZE_OF
 %token  INC DEC
-%token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ
+%token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ AND_EQ OR_EQ XOR_EQ
 %token  ASM
 %token  DEFINE CONST
 
@@ -262,6 +262,15 @@ assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval DIVIDE_EQ expr   { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '/', $3));
                                 }
+        | lval OR_EQ expr   { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '|', $3));
+                                }
+        | lval AND_EQ expr   { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '&', $3));
+                                }
+        | lval XOR_EQ expr   { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, '^', $3));
+                                }
         | lval INC              { $$ = new cAssignNode($1,
                                         new cBinaryExprNode($1, '+',
                                             new cIntExprNode(1)));
@@ -298,6 +307,7 @@ varref:   varref '.' varpart    { $$ = $1;
 varpart:  IDENTIFIER arrayval   { $$ = new cVarPartNode($1, $2); }
 
 lval:     varref                { $$ = $1; }
+/*        |   '*' varref          { $$ = new cVarDerefNode($2); } */
 arrayval: arrayval '[' expr ']' 
                               { if ($1 == NULL)
                                   $$ = new cArrayValNode($3);
