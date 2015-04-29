@@ -13,7 +13,6 @@ int **x;
 int ***w;
 int **v;
 int *u;
-int *t;
 
 int main()
 {
@@ -22,27 +21,19 @@ int main()
     c = &b;
     d = *c;
     e = *b;
-
-    int z;
-    z = 12345;
-    int *y;
-    y = &z;
-    int **x;
-    x = &y;
-    int ***w;
-    w = &x;
-    int ** v;
-    v = *w;
-    int * u;
-    u = *v;
-    int t;
-    t = *u;
-  
     prints(e);
-    printi(t);
-    //printi(z);
-    //*y = 7;
-    //printi(z);
+
+    z = 12345;
+    y = &z;
+    x = &y;
+    w = &x;
+    v = *w;
+    u = *v;
+
+    printi(z);
+    prints("\n");
+    *u = 54321;
+    printi(z);
     prints("\n");
 
     return 0;

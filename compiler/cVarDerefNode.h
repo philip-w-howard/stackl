@@ -75,6 +75,34 @@ class cVarDerefNode : public cVarRefNode
             }
         }
 
+        virtual void GenerateLVal()
+        {
+            // places value at top of stack into *x
+            cVarPartNode *last = mList->back();
+
+            if (last->IsArrayRef() || last->GetDecl()->IsArray())
+            {
+                EmitOffset();
+                EmitInt(POPCVARIND_OP);
+            }
+            else 
+            {
+                //std::cout << last->Name() << " is not an array ref or array...\n";
+                if (mList->front()->IsGlobal())
+                {
+                    EmitInt(PUSH_OP);
+                    EmitGlobalRef(mBaseName);
+                    EmitInt(PUSH_OP);
+                    EmitInt(mOffset);
+                    EmitInt(PLUS_OP);
+                    EmitInt(PUSHVARIND_OP);
+                    EmitInt(POPVARIND_OP);
+                } else {
+                    EmitInt(POPVARIND_OP);
+                    EmitInt(mOffset);
+                }
+            }
+        }
     protected:
         cVarRefNode *mVar;
         int mOffset;
