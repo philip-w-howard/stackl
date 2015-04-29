@@ -150,7 +150,7 @@ class cVarRefNode : public cExprNode
                 {
                     // ptr[index] pushes (ptr + (size * index))
                     int deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size(); 
-                    
+
                     if (mList->front()->IsGlobal())
                     {
                         EmitInt(PUSH_OP);
@@ -175,7 +175,7 @@ class cVarRefNode : public cExprNode
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
                     int deref_size = last->GetDecl()->GetBaseType()->GetBaseType()->Size();
-                    
+
                     if (mList->front()->IsGlobal())
                     {
                         EmitInt(PUSH_OP);
@@ -234,10 +234,10 @@ class cVarRefNode : public cExprNode
                     //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->Size()  << "...\n";
                     deref_size = last->GetType()->GetBaseType()->Size();
                 }
-                
+
                 // array refs leave *x at top of stack 
                 EmitOffset();
-                
+
                 if(deref_size == 1)
                     EmitInt(PUSHCVARIND_OP);
                 else
@@ -247,7 +247,7 @@ class cVarRefNode : public cExprNode
             {
                 // arrays leave &x on top of stack
                 // push (mOffset + FP)
-                
+
                 if (mList->front()->IsGlobal())
                 {
                     EmitInt(PUSH_OP);
@@ -288,6 +288,7 @@ class cVarRefNode : public cExprNode
 
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
+                // TODO make this work with non characters...
                 EmitOffset();
                 EmitInt(POPCVARIND_OP);
             }

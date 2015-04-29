@@ -19,27 +19,13 @@ class cVarDerefNode : public cVarRefNode
 {
     public:
         cVarDerefNode(cVarRefNode *var) : cVarRefNode(*var) 
-        {
-            mVar = var;
-            mOffset = 0;
-        }
-
-        cDeclNode *GetType()
-        {
-            return mVar->GetType();
-        }
-
-        virtual int ComputeOffsets(int base)
-        {
-            mVar->ComputeOffsets(base);
-            mOffset = mVar->GetOffset();
-            return base;
-        }
+    {
+    }
 
         virtual std::string toString()
         {
-            std::string result = "&";
-            result += mVar->toString();
+            std::string result = "*";
+            result += mList->back()->toString();
 
             return result;
         }
@@ -47,15 +33,15 @@ class cVarDerefNode : public cVarRefNode
         virtual void GenerateCode()
         {
             int deref_size = -1;
-            if(mVar->GetType()->GetBaseType()->IsPointer())
-                deref_size = mVar->GetType()->GetBaseType()->GetPointsTo()->Size();
-            else if(mVar->GetType()->IsArray())
-                deref_size = mVar->GetType()->GetBaseType()->Size();
+            if(mList->back()->GetType()->GetBaseType()->IsPointer())
+                deref_size = mList->back()->GetType()->GetBaseType()->GetPointsTo()->Size();
+            else if(mList->back()->GetType()->IsArray())
+                deref_size = mList->back()->GetType()->GetBaseType()->Size();
 
-            if (mVar->IsGlobal())
+            if (mList->back()->IsGlobal())
             {
                 EmitInt(PUSH_OP);
-                EmitGlobalRef(mVar->Name());
+                EmitGlobalRef(mList->back()->Name());
                 EmitInt(PUSH_OP);
                 EmitInt(mOffset);
                 EmitInt(PLUS_OP);
@@ -103,8 +89,5 @@ class cVarDerefNode : public cVarRefNode
                 }
             }
         }
-    protected:
-        cVarRefNode *mVar;
-        int mOffset;
 };
 
