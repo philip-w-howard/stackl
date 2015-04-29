@@ -51,6 +51,7 @@ class cBlockNode : public cStmtNode
 
         virtual void GenerateCode()
         {
+            // TODO optimize for zero-sized blocks 
             if(mSize != 0)
             {
                 EmitInt(ADJSP_OP);
@@ -64,7 +65,7 @@ class cBlockNode : public cStmtNode
             if(mSize != 0)
             {
                 EmitInt(ADJSP_OP);
-                EmitInt(-mSize);
+                EmitInt(mSize);
             }
         }
     protected:

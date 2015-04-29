@@ -123,17 +123,24 @@ class cFuncDeclNode : public cDeclNode
 
         EmitComment(mId->Name() + "\n");
         SetLabelValue(mId->Name());
-
+        int adj_size;
         if (mDeclsSize != 0)
         {
+            adj_size = (mDeclsSize / WORD_SIZE * WORD_SIZE) + WORD_SIZE;
             EmitInt(ADJSP_OP);
-            EmitInt(mDeclsSize);
+            EmitInt(adj_size);
         }
 
         if (mStmts != NULL) mStmts->GenerateCode();
 
         cReturnNode *ret = new cReturnNode(new cIntExprNode(0));
         ret->GenerateCode();
+        
+        if(mDeclsSize != 0);
+        {
+            EmitInt(ADJSP_OP);
+            EmitInt(-adj_size);
+        }
     }
   protected:
     cSymbol *mReturnType;       // return type of function
