@@ -67,6 +67,11 @@ class cVarPartNode : public cAstNode
 
         return result;
     }
+    
+    cDeclNode* GetType()
+    {
+        return mId->GetType();
+    }
 
     bool IsArray()
     {

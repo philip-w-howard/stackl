@@ -224,11 +224,17 @@ class cVarRefNode : public cExprNode
             else if (last->IsArrayRef())
             {
                 int deref_size;
-                if(last->GetDecl()->GetBaseType()->IsPointer())
-                    deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size();
+                if(last->GetType()->GetBaseType()->IsPointer())
+                {
+                    //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->GetPointsTo()->Size()  << "...\n";
+                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size();
+                }
                 else
-                    deref_size = last->GetDecl()->GetBaseType()->Size();
-                 
+                {
+                    //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->Size()  << "...\n";
+                    deref_size = last->GetType()->GetBaseType()->Size();
+                }
+                
                 // array refs leave *x at top of stack 
                 EmitOffset();
                 
@@ -250,6 +256,7 @@ class cVarRefNode : public cExprNode
                     EmitInt(mOffset);
                     EmitInt(PLUS_OP);
                 } else {
+                    //std::cout << mDepthDecl->Name() << " is an array on right side...\n";
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PUSHFP_OP);
@@ -286,6 +293,7 @@ class cVarRefNode : public cExprNode
             }
             else 
             {
+                //std::cout << last->Name() << " is not an array ref or array...\n";
                 if (mList->front()->IsGlobal())
                 {
                     EmitInt(PUSH_OP);
