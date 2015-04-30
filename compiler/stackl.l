@@ -30,11 +30,11 @@ static int File_Depth = 0;
 %option nounput
 %option yylineno
 
-/* the "incl" state is used for picking up the name
+/* the "INCLUDE" state is used for picking up the name
    * of an include file
    */
-%x incl
-%x c_comment
+%x INCLUDE
+%x C_COMMENT
 
 apost           [']
 quote           [\"]
@@ -53,13 +53,14 @@ identifier      {letter}({letter}|{digit}|"_")*
 "//"(.)*$                   {}
 {whitespace}+               {}
 
-"/*"                BEGIN(c_comment);
-<c_comment>"*/"     BEGIN(INITIAL);
-<c_comment>.        {}
+"/*"                BEGIN(C_COMMENT);
+<C_COMMENT>"*/"     BEGIN(INITIAL);
+<C_COMMENT>[ \t\n\r]+       {}
+<C_COMMENT>.                {}
 
-"#include"          BEGIN(incl);
-<incl>[ \t]*      /* eat the whitespace */
-<incl>[^ \t\n]+   { /* got the include file name */
+"#include"          BEGIN(INCLUDE);
+<INCLUDE>[ \t]*      /* eat the whitespace */
+<INCLUDE>[^ \t\n]+   { /* got the include file name */
                     open_input(yytext);
                     BEGIN(INITIAL);
                   }
