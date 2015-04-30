@@ -21,7 +21,17 @@ class cAsmNode : public cStmtNode
     cAsmNode(int code, cParamNode *params) : cStmtNode()
     {
         mCode = code;
+        mCode2 = 0;
         mParams = params;
+        mTwoWord = false;
+    }
+
+    cAsmNode(int code, int code2, cParamNode *params) : cStmtNode()
+    {
+        mCode = code;
+        mCode2 = code2;
+        mParams = params;
+        mTwoWord = true;
     }
 
     virtual std::string toString()
@@ -42,9 +52,12 @@ class cAsmNode : public cStmtNode
     {
         if (mParams != NULL) mParams->GenerateCode();
         EmitInt(mCode);
+        if (mTwoWord) EmitInt(mCode2);
     }
   protected:
     int mCode;              // the opcode to be emitted
+    int mCode2;             // 2nd opcode for 2 word instructions
+    bool mTwoWord;          // true of 2 word instruction
     cParamNode *mParams;    // items to push onto the stack prior to emitting
                             // the opcode
 };

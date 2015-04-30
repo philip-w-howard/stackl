@@ -9,7 +9,7 @@ int main();
 int interrupt()
 {
     prints("Interrupt\n");
-    asm(31);        // RTI_OP
+    asm(RTI_OP);        // RTI_OP
 }
 
 int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
@@ -19,8 +19,7 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
     {
         asm(OUTS_OP, parm1);
     } else if (op == EXIT_CALL) {
-        asm(POPREG_OP, 1); // halt state
-        asm(FLAG_REG);
+        asm2(POPREG_OP, FLAG_REG, 1); // halt state
     } else {
         asm(TRAPTOC_OP);
         asm(POP_OP);
@@ -45,7 +44,6 @@ int syscall(int size, int op, int parm1)
         asm(INP_OP, &io_blk);
         while(io_blk.status != 4)
         {
-            asm(NOP);
         }
     } else {
         asm(TRAP_OP);

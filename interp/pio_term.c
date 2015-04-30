@@ -94,6 +94,7 @@ static void *terminal_device(void *arg)
             usleep(10);       // ~100000 baud
             fputc(XDR, stdout);
             fflush(stdout);
+
             pthread_mutex_lock(&IO_Q_Lock);
 
             XDR_Written = 0;
@@ -104,7 +105,7 @@ static void *terminal_device(void *arg)
             pthread_mutex_unlock(&IO_Q_Lock);
         }
 
-        check_kb();
+        //check_kb();
     }
     return NULL;
 }
@@ -113,7 +114,7 @@ static int get_byte(int id, int addr)
 {
     int value;
 
-    check_kb();
+    //check_kb();
 
     pthread_mutex_lock(&IO_Q_Lock);
     if (addr == 0) 
@@ -121,7 +122,10 @@ static int get_byte(int id, int addr)
     else if (addr == 1) 
         value = IER;
     else if (addr == 2)
+    {
         value = IIR;
+        IIR = 0;
+    }
 
     pthread_mutex_unlock(&IO_Q_Lock);
 
@@ -138,7 +142,7 @@ static int get_word(int id, int addr)
 //***********************************
 static void set_byte(int id, int addr, int value)
 {
-    check_kb();
+    //check_kb();
 
     pthread_mutex_lock(&IO_Q_Lock);
 
@@ -156,7 +160,7 @@ static void set_byte(int id, int addr, int value)
     }
     else if (addr == 2)
     {
-        IIR = value;
+        //IIR = value;
     }
 
     pthread_mutex_unlock(&IO_Q_Lock);
@@ -169,7 +173,7 @@ static void set_word(int id, int addr, int value)
 //*************************************
 int PIO_T_Init()
 {
-    set_nonblock(1);
+    //set_nonblock(1);
 
     IO_Q_Halt_Thread = 0;
     XDR_Written = 0;
@@ -188,7 +192,7 @@ int PIO_T_Finish()
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread, NULL);
-    set_nonblock(0);
+    //set_nonblock(0);
 
     return 0;
 }

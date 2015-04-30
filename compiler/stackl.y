@@ -61,7 +61,7 @@
 %token  SIZE_OF
 %token  INC DEC
 %token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ AND_EQ OR_EQ XOR_EQ
-%token  ASM
+%token  ASM ASM2
 %token  DEFINE CONST
 
 %type <decls> program
@@ -291,6 +291,10 @@ asm_stmt : ASM '(' INT_VAL ')'
                                 { $$ = new cAsmNode($3, NULL); }
         | ASM '(' INT_VAL ',' params ')'
                                 { $$ = new cAsmNode($3, $5); }
+        | ASM2 '(' INT_VAL ',' INT_VAL ')' 
+                                { $$ = new cAsmNode($3, $5, NULL); }
+        | ASM2 '(' INT_VAL  ',' INT_VAL ',' params ')'
+                                { $$ = new cAsmNode($3, $5, $7); }
 func_call:  IDENTIFIER '(' params ')' 
                                 { $$ = new cFuncCallNode($1, $3); }
 

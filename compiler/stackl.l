@@ -114,6 +114,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 "&="                        RETURN(AND_EQ);
 "^="                        RETURN(XOR_EQ);
 "asm"                       RETURN(ASM);
+"asm2"                      RETURN(ASM2);
 "static"                    { RETURN(proc_unsupported()); }
 "const"                     { RETURN(CONST); }
 "#define"                   { RETURN(DEFINE); }

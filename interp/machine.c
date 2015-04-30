@@ -52,6 +52,11 @@ int Set_User_Mode(int value)
 //***************************************
 static int validate_address(int address, int is_char)
 {
+    if (address < 0)
+    {
+        Machine_Check("Invalid address at %d\n", address);
+    }
+
     if ( (address & 0x0003) && !is_char)
     {
         Machine_Check("misaligned address %d\n", address);
