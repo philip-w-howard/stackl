@@ -146,10 +146,10 @@ class cVarRefNode : public cExprNode
             {
                 cArrayValNode *index = last->GetArrayVal();
 
-                if(last->GetDecl()->GetBaseType()->IsPointer())
+                if(last->GetType()->GetBaseType()->IsPointer())
                 {
                     // ptr[index] pushes (ptr + (size * index))
-                    int deref_size = last->GetDecl()->GetBaseType()->GetPointsTo()->Size(); 
+                    int deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
 
                     if (mList->front()->IsGlobal())
                     {
@@ -174,7 +174,7 @@ class cVarRefNode : public cExprNode
                 else
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
-                    int deref_size = last->GetDecl()->GetBaseType()->GetBaseType()->Size();
+                    int deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
 
                     if (mList->front()->IsGlobal())
                     {
@@ -197,7 +197,7 @@ class cVarRefNode : public cExprNode
                     EmitInt(PLUS_OP);
                 }
             }
-            else if(last->GetDecl()->GetBaseType()->IsArray())
+            else if(last->GetType()->GetBaseType()->IsArray())
             {
                 // arr pushes (FP + offset)
                 EmitInt(PUSH_OP);
