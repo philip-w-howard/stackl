@@ -13,12 +13,13 @@ static pthread_mutex_t IO_Q_Lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 
 static volatile int IO_Q_Halt_Thread = 0;
-static pthread_t IO_Q_Thread;
+static pthread_t IO_Q_Thread_1;
+static pthread_t IO_Q_Thread_2;
 
-static volatile int RDR;
-static volatile int XDR;
-static volatile int IER;
-static volatile int IIR;
+static volatile int RDR_Reg;
+static volatile int XDR_Reg;
+static volatile int IER_Reg;
+static volatile int IIR_Reg;
 static volatile int XDR_Written;
 
 //************************************************
@@ -57,7 +58,7 @@ static int kbhit()
     struct timeval tv;
     fd_set fds;
     tv.tv_sec = 0;
-    tv.tv_usec = 0;
+    tv.tv_usec = 250000;
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
     select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
@@ -65,20 +66,7 @@ static int kbhit()
     return hit;
 }
 //*************************************
-static void check_kb()
-{
-    if (kbhit()) 
-    {
-        pthread_mutex_lock(&IO_Q_Lock);
-        IIR |= PIO_T_IID_RECV | PIO_T_IID_INT;
-        RDR = fgetc(stdin);
-        pthread_mutex_unlock(&IO_Q_Lock);
-
-        if (IER & PIO_T_IE_RECV) Machine_Signal_Interrupt(1);
-    }
-}
-//*************************************
-static void *terminal_device(void *arg)
+static void *terminal_output(void *arg)
 {
     while (IO_Q_Halt_Thread == 0)
     {
@@ -92,20 +80,39 @@ static void *terminal_device(void *arg)
         {
             pthread_mutex_unlock(&IO_Q_Lock);
             usleep(10);       // ~100000 baud
-            fputc(XDR, stdout);
+            fputc(XDR_Reg, stdout);
             fflush(stdout);
 
             pthread_mutex_lock(&IO_Q_Lock);
 
             XDR_Written = 0;
-            IIR |= PIO_T_IID_XMIT | PIO_T_IID_INT;
+            IIR_Reg |= PIO_T_IID_XMIT | PIO_T_IID_INT;
             pthread_mutex_unlock(&IO_Q_Lock);
-            if (IER & PIO_T_IE_XMIT) Machine_Signal_Interrupt(1);
+            if (IER_Reg & PIO_T_IE_XMIT) Machine_Signal_Interrupt(1);
         } else {
             pthread_mutex_unlock(&IO_Q_Lock);
         }
+    }
+    return NULL;
+}
+//*************************************
+static void *terminal_input(void *arg)
+{
+    int need_interrupt;
 
-        //check_kb();
+    while (IO_Q_Halt_Thread == 0)
+    {
+        if (kbhit()) 
+        {
+            pthread_mutex_lock(&IO_Q_Lock);
+            IIR_Reg |= PIO_T_IID_RECV | PIO_T_IID_INT;
+            RDR_Reg = fgetc(stdin);
+            need_interrupt =  (IER_Reg & PIO_T_IE_RECV);
+
+            pthread_mutex_unlock(&IO_Q_Lock);
+
+            if (need_interrupt) Machine_Signal_Interrupt(1);
+        }
     }
     return NULL;
 }
@@ -114,17 +121,15 @@ static int get_byte(int id, int addr)
 {
     int value;
 
-    //check_kb();
-
     pthread_mutex_lock(&IO_Q_Lock);
     if (addr == 0) 
-        value = RDR;
+        value = RDR_Reg;
     else if (addr == 1) 
-        value = IER;
+        value = IER_Reg;
     else if (addr == 2)
     {
-        value = IIR;
-        IIR = 0;
+        value = IIR_Reg;
+        IIR_Reg = 0;
     }
 
     pthread_mutex_unlock(&IO_Q_Lock);
@@ -142,25 +147,23 @@ static int get_word(int id, int addr)
 //***********************************
 static void set_byte(int id, int addr, int value)
 {
-    //check_kb();
-
     pthread_mutex_lock(&IO_Q_Lock);
 
     //printf("pio_term set byte: %X %X\n", addr, value);
 
     if (addr == 0) 
     {
-        XDR = value;
+        XDR_Reg = value;
         XDR_Written = 1;
         pthread_cond_signal(&IO_Q_Cond);
     }
     else if (addr == 1) 
     {
-        IER = value;
+        IER_Reg = value;
     }
     else if (addr == 2)
     {
-        //IIR = value;
+        //IIR_Reg = value;
     }
 
     pthread_mutex_unlock(&IO_Q_Lock);
@@ -173,13 +176,14 @@ static void set_word(int id, int addr, int value)
 //*************************************
 int PIO_T_Init()
 {
-    //set_nonblock(1);
+    set_nonblock(1);
 
     IO_Q_Halt_Thread = 0;
     XDR_Written = 0;
-    IIR = PIO_T_IID_XMIT;
+    IIR_Reg = PIO_T_IID_XMIT;
 
-    pthread_create(&IO_Q_Thread, NULL, terminal_device, NULL);
+    pthread_create(&IO_Q_Thread_1, NULL, terminal_output, NULL);
+    //pthread_create(&IO_Q_Thread_2, NULL, terminal_input, NULL);
 
     IO_Register_Handler(0, PIO_T_RDR, 8,
             get_word, get_byte, set_word, set_byte);
@@ -191,8 +195,9 @@ int PIO_T_Finish()
 {
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
-    pthread_join(IO_Q_Thread, NULL);
-    //set_nonblock(0);
+    pthread_join(IO_Q_Thread_1, NULL);
+    //pthread_join(IO_Q_Thread_2, NULL);
+    set_nonblock(0);
 
     return 0;
 }
