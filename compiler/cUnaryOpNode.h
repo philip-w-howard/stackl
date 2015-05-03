@@ -16,12 +16,13 @@
 #include "cSymbolTable.h"
 #include "codegen.h"
 
-class cUnaryMinusNode : public cExprNode
+class cUnaryOpNode : public cExprNode
 {
   public:
-    cUnaryMinusNode(cExprNode *expr)
+    cUnaryOpNode(cExprNode *expr, char op)
     {
         mExpr = expr;
+        mOp = op;
     }
 
     // determine type based on types of operands
@@ -33,7 +34,9 @@ class cUnaryMinusNode : public cExprNode
 
     virtual std::string toString()
     {
-        std::string result("(EXPR: - ");
+        std::string result("(EXPR: ");
+        result += mOp;
+        result += " ";
         result += mExpr->toString();
         result += ")";
 
@@ -49,9 +52,13 @@ class cUnaryMinusNode : public cExprNode
     virtual void GenerateCode()
     {
         mExpr->GenerateCode();
-        EmitInt(NEG_OP);
+        if (mOp == '-')
+            EmitInt(NEG_OP);
+        else if (mOp == '~')
+            EmitInt(COMP_OP);
     }
   protected:
     cExprNode *mExpr;           // expression
+    char      mOp;              // operator
 };
 

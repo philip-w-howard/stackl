@@ -12,7 +12,7 @@
 #include "cAstNode.h"
 #include "cBlockNode.h"
 #include "cIntExprNode.h"
-#include "cUnaryMinusNode.h"
+#include "cUnaryOpNode.h"
 #include "cPrintNode.h"
 #include "cAsmNode.h"
 #include "cSizeOfNode.h"

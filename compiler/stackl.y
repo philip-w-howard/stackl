@@ -358,7 +358,8 @@ term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
         |   value               { $$ = $1; }
 
 value:  fact                    { $$ = $1; }
-        | '-' fact              { $$ = new cUnaryMinusNode($2); }
+        | '-' fact              { $$ = new cUnaryOpNode($2, '-'); }
+        | '~' fact              { $$ = new cUnaryOpNode($2, '~'); }
 
 fact:        '(' ccomp ')'      { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }

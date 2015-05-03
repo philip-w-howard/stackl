@@ -190,5 +190,17 @@ int main()
     else
         prints("pre DEC broken\n");
 
+    z = 0xBAD;
+    z = ~z;
+    if (z == 0xF452)
+        prints("Complement works\n");
+    else
+        prints("Complement works\n");
+    //z ~= z;
+    z = ~z;
+    if (z == 0xBAD)
+        prints("Complement works\n");
+    else
+        prints("Complement works\n");
     return 0;
 }
