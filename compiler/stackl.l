@@ -114,6 +114,11 @@ identifier      {letter}({letter}|{digit}|"_")*
 "|="                        RETURN(OR_EQ);
 "&="                        RETURN(AND_EQ);
 "^="                        RETURN(XOR_EQ);
+"<<="                       RETURN(LEFT_EQ);
+">>="                       RETURN(RIGHT_EQ);
+"->"                        RETURN(PTR);
+"<<"                        RETURN(LEFT);
+">>"                        RETURN(RIGHT);
 "asm"                       RETURN(ASM);
 "asm2"                      RETURN(ASM2);
 "static"                    { RETURN(proc_unsupported()); }

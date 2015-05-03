@@ -60,7 +60,9 @@
 %token  AND OR
 %token  SIZE_OF
 %token  INC DEC
-%token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ AND_EQ OR_EQ XOR_EQ
+%token  PLUS_EQ MINUS_EQ TIMES_EQ DIVIDE_EQ AND_EQ OR_EQ XOR_EQ 
+%token  LEFT_EQ RIGHT_EQ
+%token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
 
@@ -262,14 +264,20 @@ assign:   lval '=' expr         { $$ = new cAssignNode($1, $3); }
         | lval DIVIDE_EQ expr   { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '/', $3));
                                 }
-        | lval OR_EQ expr   { $$ = new cAssignNode($1, 
+        | lval OR_EQ expr       { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '|', $3));
                                 }
-        | lval AND_EQ expr   { $$ = new cAssignNode($1, 
+        | lval AND_EQ expr      { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '&', $3));
                                 }
-        | lval XOR_EQ expr   { $$ = new cAssignNode($1, 
+        | lval XOR_EQ expr      { $$ = new cAssignNode($1, 
                                         new cBinaryExprNode($1, '^', $3));
+                                }
+        | lval LEFT_EQ expr     { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, LEFT, $3));
+                                }
+        | lval RIGHT_EQ expr    { $$ = new cAssignNode($1, 
+                                        new cBinaryExprNode($1, RIGHT, $3));
                                 }
         | lval INC              { $$ = new cAssignNode($1,
                                         new cBinaryExprNode($1, '+',
@@ -307,6 +315,7 @@ varref:   varref '.' varpart    { $$ = $1;
         | varpart               { $$ = new cVarRefNode($1); 
                                   if ($$->SemanticError()) YYERROR;
                                 }
+/* Need to add PTR */
 
 varpart:  IDENTIFIER arrayval   { $$ = new cVarPartNode($1, $2); }
 
@@ -355,6 +364,8 @@ expr:       expr '+' term       { $$ = new cBinaryExprNode($1, '+', $3); }
 term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
         |   term '/' value      { $$ = new cBinaryExprNode($1, '/', $3); }
         |   term '%' value      { $$ = new cBinaryExprNode($1, '%', $3); }
+        |   term LEFT value     { $$ = new cBinaryExprNode($1, LEFT, $3); }
+        |   term RIGHT value    { $$ = new cBinaryExprNode($1, RIGHT, $3); }
         |   value               { $$ = $1; }
 
 value:  fact                    { $$ = $1; }

@@ -192,15 +192,42 @@ int main()
 
     z = 0xBAD;
     z = ~z;
-    if (z == 0xF452)
+    if (z == 0xFFFFF452)
         prints("Complement works\n");
     else
-        prints("Complement works\n");
-    //z ~= z;
+        prints("Complement broken\n");
+
     z = ~z;
     if (z == 0xBAD)
         prints("Complement works\n");
     else
-        prints("Complement works\n");
+        prints("Complement broken\n");
+    
+    z = 0x0555 << 1;
+    if (z == 0x0AAA)
+        prints("shift left works\n");
+    else
+        prints("shift left broken\n");
+    
+    x = z >> 1;
+    if (x == 0x0555)
+        prints("shift right works\n");
+    else
+        prints("shift right broken\n");
+
+    z = x;
+
+    z <<= 4;
+    if (z == 0x5550)
+        prints("shift left equal works\n");
+    else
+        prints("shift left equal broken\n");
+
+    z >>= 3;
+    if (z == 0x0AAA)
+        prints("shift right equal works\n");
+    else
+        prints("shift right equal broken\n");
+
     return 0;
 }

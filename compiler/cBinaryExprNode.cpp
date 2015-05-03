@@ -32,6 +32,8 @@ std::string cBinaryExprNode::StrOp()
         case LE: return ("<=");
         case LT: return ("<"); 
         case GT: return (">"); 
+        case LEFT: return ("<<"); 
+        case RIGHT: return (">>"); 
     }
     return (" UnrecognizedOperator "); 
 }
@@ -56,6 +58,8 @@ int cBinaryExprNode::IntOp()
         case LE:  return LE_OP;
         case LT:  return LT_OP;
         case GT:  return GT_OP;
+        case LEFT: return SHIFTL_OP;
+        case RIGHT: return SHIFTR_OP;
     }
     return ILLEGAL_OP;
 }
