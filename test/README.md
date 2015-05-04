@@ -1,7 +1,7 @@
 The test cases in this directory can be used as regression tests to ensure newly added functionality
 does not break things that worked previously. The regression tests can be ran using the ./regress
 found in the directory. Below is a listing of what each test was designed to ensure following tests
-could use properly:
+could use properly. Please keep in mind that both the tests and this file are works in progress.
 
 TESTS
     1. printi; prints
@@ -38,7 +38,6 @@ TESTS
     5. while loops
     6. for loops
     7. function calls; return statements
-    8. prints
     9. arrays; pointers; array[x] assignment; array[x] reference; ptr[x] assignment; ptr[x] reference
     10. strcpy; strncpy; strchr
     11. strcmp

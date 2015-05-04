@@ -1,28 +1,3 @@
-EQ works
-NE works
-AND works
-OR works
-GT works
-LT works
-GE works
-LE works
-PLUS works
-MINUS works
-TIMES works
-DIVIDE works
-MOD works
-NEG works
-PLUS_EQ works
-MINUS_EQ works
-TIMES_EQ works
-DIVIDE_EQ works
-post INC works
-pre INC works
-post DEC works
-pre DEC works
-Complement works
-Complement works
-shift left works
-shift right works
-shift left equal works
-shift right equal works
+1
+3
+
