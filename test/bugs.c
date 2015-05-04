@@ -3,6 +3,8 @@
 
 int main()
 {
+    // tests issue where an array reference on a character array
+    // would cause a machine check/not function properly
     char buff[10];
     strcpy(buff, "0123456789");
 
