@@ -16,5 +16,15 @@ int main()
     if(buff[3] != '3') prints("Array index 3 broken\n");
     if(buff[4] != '4') prints("Array index 4 broken\n");
 
+    // tests pointer dereference
+    // Generates a misaligned address error because it does a word access
+    // instead of a byte access.
+    // ALSO: Does not seem to push the lval prior to the pop The result is that
+    // the 2 is interpreted as the destingation of the assignment, and the data
+    // is whatever was on the stack prior to this code snippet.
+    char *ier_reg;
+    ier_reg = 0xE000001;
+    *ier_reg = *ier_reg | 2;
+
     return 0;
 }
