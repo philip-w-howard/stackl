@@ -175,7 +175,7 @@ class cVarRefNode : public cExprNode
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
                     int deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
-
+                    
                     if (mList->front()->IsGlobal())
                     {
                         EmitInt(PUSH_OP);
@@ -189,7 +189,6 @@ class cVarRefNode : public cExprNode
                         EmitInt(PLUS_OP);
                     }
                     EmitInt(PUSH_OP);
-                    //EmitInt(1);
                     EmitInt(deref_size);
                     index->GetIndex(0)->GenerateCode();
                     EmitInt(TIMES_OP);
@@ -232,7 +231,7 @@ class cVarRefNode : public cExprNode
                 else
                 {
                     //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->Size()  << "...\n";
-                    deref_size = last->GetType()->GetBaseType()->Size();
+                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
                 }
 
                 // array refs leave *x at top of stack 
@@ -288,9 +287,19 @@ class cVarRefNode : public cExprNode
 
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
-                // TODO make this work with non characters...
+
+                // TODO make this not have to call back to multiple GetBaseType()s...
+                int deref_size;
+                if(last->GetType()->GetBaseType()->IsPointer())
+                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+                else
+                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+
+                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->GetBaseType()->GetBaseType()->Name()  << " of size " << deref_size  << "...\n";
                 EmitOffset();
-                EmitInt(POPCVARIND_OP);
+
+                if(deref_size == 1)  EmitInt(POPCVARIND_OP);
+                else EmitInt(POPVARIND_OP);
             }
             else 
             {
