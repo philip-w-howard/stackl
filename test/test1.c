@@ -1,7 +1,7 @@
 #include <string.h>
 #include <system.h>
 // Test main
-// test print and prints
+// test printi and prints
 int main()
 {
     printi(5);
