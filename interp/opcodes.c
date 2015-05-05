@@ -432,7 +432,7 @@ void Execute(Machine_State *cpu)
             INC(IP, 2);
             break;
         case POPCVAR_OP:
-            DEBUG("POPVVAR %d", GET_INTVAL(IP,1));
+            DEBUG("POPCVAR %d", GET_INTVAL(IP,1));
             temp = cpu->FP + GET_INTVAL(IP, 1);
             INC(SP, -1);
             Set_Byte(temp, Get_Byte(cpu->SP));

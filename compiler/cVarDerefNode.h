@@ -32,11 +32,11 @@ class cVarDerefNode : public cVarRefNode
 
         virtual void GenerateCode()
         {
-            int deref_size = -1;
+            int deref_size;
             if(mList->back()->GetType()->GetBaseType()->IsPointer())
-                deref_size = mList->back()->GetType()->GetBaseType()->GetPointsTo()->Size();
-            else if(mList->back()->GetType()->IsArray())
-                deref_size = mList->back()->GetType()->GetBaseType()->Size();
+                deref_size = mList->back()->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+            else
+                deref_size = mList->back()->GetType()->GetBaseType()->GetBaseType()->Size();
 
             if (mList->back()->IsGlobal())
             {
@@ -46,19 +46,16 @@ class cVarDerefNode : public cVarRefNode
                 EmitInt(mOffset);
                 EmitInt(PLUS_OP);
                 EmitInt(PUSHVARIND_OP);
-                if(deref_size == 1)
-                    EmitInt(PUSHCVARIND_OP);
-                else
-                    EmitInt(PUSHVARIND_OP);
-            } else {
-
+            }
+            else
+            {
                 EmitInt(PUSHVAR_OP);
                 EmitInt(mOffset);
-                if(deref_size == 1)
-                    EmitInt(PUSHCVARIND_OP);
-                else
-                    EmitInt(PUSHVARIND_OP);
             }
+            if(deref_size == 1)
+                EmitInt(PUSHCVARIND_OP);
+            else
+                EmitInt(PUSHVARIND_OP);
         }
 
         virtual void GenerateLVal()
@@ -66,14 +63,30 @@ class cVarDerefNode : public cVarRefNode
             // places value at top of stack into *x
             cVarPartNode *last = mList->back();
 
+            //std::cout << "generating left-side deref...\n";
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
+                int deref_size;
+                if(last->GetType()->GetBaseType()->IsPointer())
+                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+                else
+                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+
+                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->GetBaseType()->GetBaseType()->Name()  << " of size " << deref_size  << "...\n";
+
                 EmitOffset();
-                EmitInt(POPCVARIND_OP);
+
+                if(deref_size == 1) EmitInt(POPCVARIND_OP);
+                else EmitInt(POPVARIND_OP);
             }
             else 
             {
-                //std::cout << last->Name() << " is not an array ref or array...\n";
+                int deref_size;
+                if(last->GetType()->GetBaseType()->IsPointer())
+                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+                else
+                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+
                 if (mList->front()->IsGlobal())
                 {
                     EmitInt(PUSH_OP);
@@ -82,11 +95,18 @@ class cVarDerefNode : public cVarRefNode
                     EmitInt(mOffset);
                     EmitInt(PLUS_OP);
                     EmitInt(PUSHVARIND_OP);
-                    EmitInt(POPVARIND_OP);
                 } else {
-                    EmitInt(POPVARIND_OP);
+                    // push address
+                    EmitInt(PUSHVAR_OP);
                     EmitInt(mOffset);
                 }
+
+                // pop SP - 2 (expr val) into SP - 1 (*ptr)
+                if(deref_size == 1)
+                    EmitInt(POPCVARIND_OP);
+                else
+                    EmitInt(POPVARIND_OP);
+
             }
         }
 };

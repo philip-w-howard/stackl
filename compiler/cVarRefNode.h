@@ -175,7 +175,7 @@ class cVarRefNode : public cExprNode
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
                     int deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
-                    
+
                     if (mList->front()->IsGlobal())
                     {
                         EmitInt(PUSH_OP);
@@ -254,7 +254,9 @@ class cVarRefNode : public cExprNode
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PLUS_OP);
-                } else {
+                }
+                else
+                {
                     //std::cout << mDepthDecl->Name() << " is an array on right side...\n";
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
@@ -265,6 +267,9 @@ class cVarRefNode : public cExprNode
             else 
             {
                 // non-arrays leave 'x' on top of stack
+                int size;
+                size = last->GetType()->GetBaseType()->Size();
+
                 if (mList->front()->IsGlobal())
                 {
                     EmitInt(PUSH_OP);
@@ -272,9 +277,17 @@ class cVarRefNode : public cExprNode
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PLUS_OP);
-                    EmitInt(PUSHVARIND_OP);
-                } else {
-                    EmitInt(PUSHVAR_OP);
+                    if(size == 1)
+                        EmitInt(PUSHCVARIND_OP);
+                    else
+                        EmitInt(PUSHVARIND_OP);
+                }
+                else
+                {
+                    if(size == 1)
+                        EmitInt(PUSHCVAR_OP);
+                    else
+                        EmitInt(PUSHVAR_OP);
                     EmitInt(mOffset);
                 }
             }
@@ -287,7 +300,6 @@ class cVarRefNode : public cExprNode
 
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
-
                 // TODO make this not have to call back to multiple GetBaseType()s...
                 int deref_size;
                 if(last->GetType()->GetBaseType()->IsPointer())
@@ -304,6 +316,9 @@ class cVarRefNode : public cExprNode
             else 
             {
                 //std::cout << last->Name() << " is not an array ref or array...\n";
+                int size;
+                size = last->GetType()->GetBaseType()->Size();
+
                 if (mList->front()->IsGlobal())
                 {
                     EmitInt(PUSH_OP);
@@ -311,9 +326,19 @@ class cVarRefNode : public cExprNode
                     EmitInt(PUSH_OP);
                     EmitInt(mOffset);
                     EmitInt(PLUS_OP);
-                    EmitInt(POPVARIND_OP);
-                } else {
-                    EmitInt(POPVAR_OP);
+
+                    if(size == 1)
+                        EmitInt(POPCVARIND_OP);
+                    else
+                        EmitInt(POPVARIND_OP);
+                }
+                else
+                {
+                    if(size == 1)
+                        EmitInt(POPCVAR_OP);
+                    else
+                        EmitInt(POPVAR_OP);
+
                     EmitInt(mOffset);
                 }
             }
