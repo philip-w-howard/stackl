@@ -59,7 +59,12 @@ class cVarDeclNode : public cDeclNode
     virtual int ComputeOffsets(int base)
     {
         mType->ComputeOffsets(base);
-        mOffset = base;
+        if(mType->GetBaseType() == symbolTableRoot->Lookup("char")->GetType())
+            mOffset = base;
+        else if(base % WORD_SIZE != 0)
+            mOffset = base / WORD_SIZE * WORD_SIZE + WORD_SIZE;
+        else
+            mOffset = base;
         mSize = ComputeSize();
 
         return mOffset+mSize;

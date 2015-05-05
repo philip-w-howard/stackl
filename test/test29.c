@@ -7,10 +7,10 @@ int g_d;
 int* g_b;
 int* g_e;
 char* g_v;
-char* g_y;
 char g_x;
 char g_z;
 char g_w;
+char* g_y;
 
 int main()
 {
@@ -20,8 +20,8 @@ int main()
     int* b; // 12
     int* e; // 16
     char* v; // 20
-    char* y; // 24
     char x; // 28
+    char* y; // 24
     char z; // 29
     char w; // 30
 
