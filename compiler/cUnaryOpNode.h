@@ -56,6 +56,8 @@ class cUnaryOpNode : public cExprNode
             EmitInt(NEG_OP);
         else if (mOp == '~')
             EmitInt(COMP_OP);
+        else if (mOp == '!')
+            EmitInt(NOT_OP);
     }
   protected:
     cExprNode *mExpr;           // expression

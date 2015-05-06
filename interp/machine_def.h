@@ -12,7 +12,7 @@
 #define LE_OP       11
 #define AND_OP      12
 #define OR_OP       13
-//#define PRINT_OP    14
+#define NOT_OP      14
 #define SWAP_OP     15
 #define DUP_OP      16
 #define HALT_OP     17
@@ -33,9 +33,9 @@
 #define CALLI_OP    32
 #define PUSHREG_OP  33
 #define POPREG_OP   34
-#define LAND_OP     35
-#define LOR_OP      36
-#define LXOR_OP     37
+#define BAND_OP     35
+#define BOR_OP      36
+#define BXOR_OP     37
 #define SHIFTL_OP   38
 #define SHIFTR_OP   39
 #define PUSHVARIND_OP  40

@@ -56,7 +56,7 @@
 %token  TYPEDEF STRUCT
 %token  RETURN
 %token  JUNK_TOKEN
-%token  EQ NE LT GT GE LE
+%token  EQ NE GE LE
 %token  AND OR
 %token  SIZE_OF
 %token  INC DEC
@@ -91,12 +91,22 @@
 %type <arrayVal> arrayval
 %type <param> params
 %type <expr> param
-%type <expr> ccomp
-%type <expr> comp
+%type <expr> primary_expression
+%type <expr> deref_expression
+%type <expr> postfix_expression
+%type <expr> unary_expression
+%type <expr> cast_expression
+%type <expr> multiplicative_expression
+%type <expr> additive_expression
+%type <expr> shift_expression
+%type <expr> relational_expression
+%type <expr> equality_expression
+%type <expr> and_expression
+%type <expr> exclusive_or_expression
+%type <expr> inclusive_or_expression
+%type <expr> logical_and_expression
+%type <expr> logical_or_expression
 %type <expr> expr
-%type <expr> term
-%type <expr> value
-%type <expr> fact
 %type <varRef> varref
 %type <varPart> varpart
 %type <string_lit> string_lit
@@ -234,13 +244,13 @@ stmts:      stmts stmt          { $$ = $1;
 
 stmt:       decl                { $$ = $1; }
         |   ';'                 { $$ = NULL; }
-        |   IF '(' ccomp ')' stmt ELSE stmt
+        |   IF '(' expr ')' stmt ELSE stmt
                                 { $$ = new cIfNode($3, $5, $7); }
-        |   IF '(' ccomp ')' stmt
+        |   IF '(' expr ')' stmt
                                 { $$ = new cIfNode($3, $5, NULL); }
-        |   FOR '(' assign ';' ccomp ';' assign ')' stmt
+        |   FOR '(' assign ';' expr ';' assign ')' stmt
                                 { $$ = new cForNode($3, $5, $7, $9); }
-        |   WHILE '(' ccomp ')' stmt
+        |   WHILE '(' expr ')' stmt
                                 { $$ = new cWhileNode($3, $5); }
         |   assign ';'          { $$ = $1; }
         |   func_call ';'       { $$ = new cFuncStmtNode($1); }
@@ -342,45 +352,170 @@ params:     params',' param
 param:      expr                { $$ = $1; }
         |   string_lit          { $$ = $1; }
 
-ccomp:      ccomp OR comp       { $$ = new cShortCircuitNode($1, OR, $3, true); }
-        |   ccomp AND comp      { $$ = new cShortCircuitNode($1, AND, $3, false); }
-        |   comp                { $$ = $1; }
-comp:       comp EQ expr        { $$ = new cBinaryExprNode($1, EQ, $3); }
-        |   comp NE expr        { $$ = new cBinaryExprNode($1, NE, $3); }
-        |   comp GT expr        { $$ = new cBinaryExprNode($1, GT, $3); }
-        |   comp LT expr        { $$ = new cBinaryExprNode($1, LT, $3); }
-        |   comp LE expr        { $$ = new cBinaryExprNode($1, LE, $3); }
-        |   comp GE expr        { $$ = new cBinaryExprNode($1, GE, $3); }
-        |   expr                { $$ = $1; }
-expr:       expr '+' term       { $$ = new cBinaryExprNode($1, '+', $3); }
-        |   expr '-' term       { $$ = new cBinaryExprNode($1, '-', $3); }
-        |   expr '&' term       { $$ = new cBinaryExprNode($1, '&', $3); }
-        |   expr '|' term       { $$ = new cBinaryExprNode($1, '|', $3); }
-        |   expr '^' term       { $$ = new cBinaryExprNode($1, '^', $3); }
-        |   '&' varref          { $$ = new cVarAddrNode($2); }
-        |   '*' varref          { $$ = new cVarDerefNode($2); }
-        |   term                { $$ = $1; }
 
-term:       term '*' value      { $$ = new cBinaryExprNode($1, '*', $3); }
-        |   term '/' value      { $$ = new cBinaryExprNode($1, '/', $3); }
-        |   term '%' value      { $$ = new cBinaryExprNode($1, '%', $3); }
-        |   term LEFT value     { $$ = new cBinaryExprNode($1, LEFT, $3); }
-        |   term RIGHT value    { $$ = new cBinaryExprNode($1, RIGHT, $3); }
-        |   value               { $$ = $1; }
-
-value:  fact                    { $$ = $1; }
-        | '-' fact              { $$ = new cUnaryOpNode($2, '-'); }
-        | '~' fact              { $$ = new cUnaryOpNode($2, '~'); }
-
-fact:        '(' ccomp ')'      { $$ = $2; }
-        |   INT_VAL             { $$ = new cIntExprNode($1); }
+primary_expression
+        :   INT_VAL             { $$ = new cIntExprNode($1); }
         |   varref              { $$ = $1; }
-        |   func_call           { $$ = $1; }
+
+        /* grammar calls for these. For now with the defs above
+	: IDENTIFIER
+	| CONSTANT              { $$ = new cIntExprNode($1); }
+        */
+
+        /* handled separately for now
+	| STRING_LITERAL        { $$ = new cStringLitNode($1); }
+        */
+	| '(' expr ')'    { $$ = $2; }
+
+        /* Only allow specific SIZEOFs
+	| SIZEOF deref_expression
+	| SIZEOF '(' deref_expression ')'
+	| SIZEOF '(' type_name ')'
+        */
         |   SIZE_OF '(' IDENTIFIER ')' { $$ = new cSizeOfNode($3); }
         |   SIZE_OF '(' type ')' { $$ = new cSizeOfNode($3); }
         |   SIZE_OF IDENTIFIER { $$ = new cSizeOfNode($2); }
+	;
+
+deref_expression
+	: primary_expression
+            { $$ = $1; }
+        /* Not implemented yet
+	| deref_expression '[' expression ']'
+	| deref_expression '.' IDENTIFIER
+	| deref_expression PTR_OP IDENTIFIER
+        */
+
+        /* should be deref_expr, but we only allow varref for now
+	| '&' deref_expression
+	| '*' deref_expression
+        */
+        | '&' varref            { $$ = new cVarAddrNode($2); }
+        | '*' varref            { $$ = new cVarDerefNode($2); }
+
+postfix_expression
+	: deref_expression
+            { $$ = $1; }
+        /* INC/DEC handled in assign for now
+	| postfix_expression INC
+	| postfix_expression DEC
+        */
+	;
+
+unary_expression
+	: postfix_expression
+            { $$ = $1; }
+        /* INC/DEC handled in assign for now
+	| INC unary_expression
+	| DEC unary_expression
+        */
+        | '+' cast_expression   { $$ = $2; }
+        | '-' cast_expression   { $$ = new cUnaryOpNode($2, '-'); }
+        | '~' cast_expression   { $$ = new cUnaryOpNode($2, '~'); }
+        | '!' cast_expression   { $$ = new cUnaryOpNode($2, '!'); }
+	;
+
+cast_expression
+	: unary_expression
+            { $$ = $1; }
+	| func_call             { $$ = $1; }
+	| '(' TYPE_ID ')' cast_expression      
+                { semantic_error("Type casts not implemented"); }
+	;
+
+multiplicative_expression
+	: cast_expression
+            { $$ = $1; }
+	| multiplicative_expression '*' cast_expression
+            { $$ = new cBinaryExprNode($1, '*', $3); }
+	| multiplicative_expression '/' cast_expression
+            { $$ = new cBinaryExprNode($1, '/', $3); }
+	| multiplicative_expression '%' cast_expression
+            { $$ = new cBinaryExprNode($1, '%', $3); }
+	;
+
+additive_expression
+	: multiplicative_expression
+            { $$ = $1; }
+	| additive_expression '+' multiplicative_expression
+            { $$ = new cBinaryExprNode($1, '+', $3); }
+	| additive_expression '-' multiplicative_expression
+            { $$ = new cBinaryExprNode($1, '-', $3); }
+	;
+
+shift_expression
+	: additive_expression
+            { $$ = $1; }
+	| shift_expression LEFT additive_expression
+            { $$ = new cBinaryExprNode($1, LEFT, $3); }
+	| shift_expression RIGHT additive_expression
+            { $$ = new cBinaryExprNode($1, RIGHT, $3); }
+	;
+
+relational_expression
+	: shift_expression
+            { $$ = $1; }
+	| relational_expression '<' shift_expression
+            { $$ = new cBinaryExprNode($1, '<', $3); }
+	| relational_expression '>' shift_expression
+            { $$ = new cBinaryExprNode($1, '>', $3); }
+	| relational_expression LE shift_expression
+            { $$ = new cBinaryExprNode($1, LE, $3); }
+	| relational_expression GE shift_expression
+            { $$ = new cBinaryExprNode($1, GE, $3); }
+	;
+
+equality_expression
+	: relational_expression
+            { $$ = $1; }
+	| equality_expression EQ relational_expression
+            { $$ = new cBinaryExprNode($1, EQ, $3); }
+	| equality_expression NE relational_expression
+            { $$ = new cBinaryExprNode($1, NE, $3); }
+	;
+
+and_expression
+	: equality_expression
+            { $$ = $1; }
+	| and_expression '&' equality_expression
+            { $$ = new cBinaryExprNode($1, '&', $3); }
+	;
+
+exclusive_or_expression
+	: and_expression
+            { $$ = $1; }
+	| exclusive_or_expression '^' and_expression
+            { $$ = new cBinaryExprNode($1, '^', $3); }
+	;
+
+inclusive_or_expression
+	: exclusive_or_expression
+            { $$ = $1; }
+	| inclusive_or_expression '|' exclusive_or_expression
+            { $$ = new cBinaryExprNode($1, '|', $3); }
+	;
+
+logical_and_expression
+	: inclusive_or_expression
+            { $$ = $1; }
+	| logical_and_expression AND inclusive_or_expression
+            { $$ = new cShortCircuitNode($1, AND, $3, false); }
+	;
+
+logical_or_expression
+	: logical_and_expression
+            { $$ = $1; }
+	| logical_or_expression OR logical_and_expression
+            { $$ = new cShortCircuitNode($1, OR, $3, true); }
+
+	;
+
+expr
+	: logical_or_expression
+	;
 
 string_lit: STRING_LIT          { $$ = new cStringLitNode($1); }
+
 %%
 
 int yyerror(const char *msg)

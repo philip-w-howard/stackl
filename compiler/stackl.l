@@ -44,7 +44,7 @@ whitespace      [ \t\n\r]
 letter          [A-Za-z]
 digit           [0-9]
 punctuation     [(){}\[\];,\.]
-operator        [+\-*/%=&|~]
+operator        [+\-*/%=&|~!]
 integer         0|([1-9][0-9]*)
 hexint          0x([0-9a-fA-F])+
 identifier      {letter}({letter}|{digit}|"_")*
@@ -103,8 +103,8 @@ identifier      {letter}({letter}|{digit}|"_")*
 "!="                        RETURN(NE);
 ">="                        RETURN(GE);
 "<="                        RETURN(LE);
-"<"                         RETURN(LT);
-">"                         RETURN(GT);
+"<"                         RETURN('<');
+">"                         RETURN('>');
 "++"                        RETURN(INC);
 "--"                        RETURN(DEC);
 "+="                        RETURN(PLUS_EQ);

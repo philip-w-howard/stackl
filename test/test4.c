@@ -33,11 +33,11 @@ int main()
     // AND
     if (5 && 4)
         if (4 && 0)
-           prints("AND broken\n");
+           prints("AND 1 broken\n");
        else
            prints("AND works\n");
     else
-        prints("AND broken\n");
+        prints("AND 2 broken\n");
 
     // OR
     if ( (0 || 1) && (1 || 0) && (1 || 1))

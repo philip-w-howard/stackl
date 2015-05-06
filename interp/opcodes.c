@@ -185,6 +185,11 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             INC(IP, 1);
             break;
+        case NOT_OP:
+            DEBUG("NOT");
+            SET_INTVAL(SP, -1, !GET_INTVAL(SP, -1));
+            INC(IP, 1);
+            break;
         case COMP_OP:
             DEBUG("COMP");
             SET_INTVAL(SP, -1, ~GET_INTVAL(SP, -1));
@@ -243,20 +248,20 @@ void Execute(Machine_State *cpu)
             INC(SP, -1);
             INC(IP, 1);
             break;
-        case LAND_OP:
-            DEBUG("LAND");
+        case BAND_OP:
+            DEBUG("BAND");
             SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) & GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
             break;
-        case LOR_OP:
-            DEBUG("LOR");
+        case BOR_OP:
+            DEBUG("BOR");
             SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) | GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
             break;
-        case LXOR_OP:
-            DEBUG("LXOR");
+        case BXOR_OP:
+            DEBUG("BXOR");
             SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) ^ GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
