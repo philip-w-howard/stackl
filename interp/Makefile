@@ -2,6 +2,7 @@ COPTS=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
+	 vmem.o \
 	 loader.o \
 	 io_handler.o \
 	 dma_term.o \

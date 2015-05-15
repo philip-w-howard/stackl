@@ -7,11 +7,12 @@
 #include "machine_def.h"
 #include "opcodes.h"
 #include "machine.h"
+#include "vmem.h"
 #include "io_handler.h"
 
 #define WORD_SIZE 4
-#define GET_INTVAL(reg, off) (Get_Word(cpu-> reg + OFFSET(off)))
-#define SET_INTVAL(reg, off, val) (Set_Word(cpu-> reg + OFFSET(off), val))
+#define GET_INTVAL(reg, off) (Get_Word(cpu, cpu-> reg + OFFSET(off)))
+#define SET_INTVAL(reg, off, val) (Set_Word(cpu, cpu-> reg + OFFSET(off), val))
 #define INC(reg, amount)    cpu-> reg += amount*WORD_SIZE;
 #define OFFSET(v)           ((v)*WORD_SIZE)
 
@@ -58,14 +59,14 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
 //***************************************
 static void push(Machine_State *cpu, int value)
 {
-    Set_Word(cpu->SP, value);
+    Set_Word(cpu, cpu->SP, value);
     cpu->SP += WORD_SIZE;
 }
 //***************************************
 static int pop(Machine_State *cpu)
 {
     cpu->SP -= WORD_SIZE;
-    return Get_Word(cpu->SP);
+    return Get_Word(cpu, cpu->SP);
 }
 //***********************************
 void check_priv(Machine_State *cpu, char *inst_name)
@@ -122,7 +123,7 @@ static void interrupt(Machine_State *cpu, int vector)
     }
 
     // ISR is at vector
-    cpu->IP = Get_Word(vector*WORD_SIZE);
+    cpu->IP = Get_Word(cpu, vector*WORD_SIZE);
 }
 //***************************************
 void Execute(Machine_State *cpu)
@@ -337,14 +338,14 @@ void Execute(Machine_State *cpu)
             DEBUG("OUTS %d", GET_INTVAL(SP,-1));
             check_priv(cpu, "OUTS");
             temp = pop(cpu);
-            printf("%s", (char *)Get_Addr(temp));
+            printf("%s", (char *)Get_Addr(cpu, temp));
             INC(IP, 1);
             break;
         case INP_OP:
             temp = GET_INTVAL(SP, -1);
-            DEBUG("INP %d %d", Get_Word(temp), Get_Word(temp+4));
+            DEBUG("INP %d %d", Get_Word(cpu, temp), Get_Word(cpu, temp+4));
             check_priv(cpu, "INP");
-            Schedule_IO(temp);
+            Schedule_IO(cpu, temp);
             INC(SP, 1);
             INC(IP, 1);
             break;
@@ -388,7 +389,7 @@ void Execute(Machine_State *cpu)
                 INC(IP, 1);
             break;
         case PUSHCVARIND_OP:
-            temp = Get_Byte(GET_INTVAL(SP, -1));
+            temp = Get_Byte(cpu, GET_INTVAL(SP, -1));
             DEBUG("PUSHCVARIND %d %d", GET_INTVAL(SP, -1), temp);
             SET_INTVAL(SP,-1, temp);
             INC(IP, 1);
@@ -396,12 +397,12 @@ void Execute(Machine_State *cpu)
         case POPCVARIND_OP:
             DEBUG("POPCVARIND %d %d", GET_INTVAL(SP, -2), GET_INTVAL(SP, -1));
             temp = GET_INTVAL(SP, -1);
-            Set_Byte(temp, GET_INTVAL(SP, -2));
+            Set_Byte(cpu, temp, GET_INTVAL(SP, -2));
             INC(SP, -2);
             INC(IP, 1);
             break;
         case PUSHVARIND_OP:
-            temp = Get_Word(GET_INTVAL(SP, -1));
+            temp = Get_Word(cpu, GET_INTVAL(SP, -1));
             DEBUG("PUSHVARIND %d %d", GET_INTVAL(SP, -1), temp);
             SET_INTVAL(SP,-1, temp);
             INC(IP, 1);
@@ -409,15 +410,15 @@ void Execute(Machine_State *cpu)
         case POPVARIND_OP:
             DEBUG("POPVARIND %d %d", GET_INTVAL(SP, -2), GET_INTVAL(SP, -1));
             temp = GET_INTVAL(SP, -1);
-            Set_Word(temp, GET_INTVAL(SP, -2));
+            Set_Word(cpu, temp, GET_INTVAL(SP, -2));
             INC(SP, -2);
             INC(IP, 1);
             break;
         case PUSHVAR_OP:
             temp = cpu->FP + GET_INTVAL(IP, 1);
-            DEBUG("PUSHVAR %d %d", GET_INTVAL(IP, 1), Get_Word(temp));
+            DEBUG("PUSHVAR %d %d", GET_INTVAL(IP, 1), Get_Word(cpu, temp));
             INC(IP, 1);
-            SET_INTVAL(SP,0, Get_Word(temp));
+            SET_INTVAL(SP,0, Get_Word(cpu, temp));
             INC(SP, 1);
             INC(IP, 1);
             break;
@@ -426,13 +427,13 @@ void Execute(Machine_State *cpu)
             INC(IP, 1);
             temp = cpu->FP + GET_INTVAL(IP, 0);
             INC(SP, -1);
-            Set_Word(temp, GET_INTVAL(SP,0));
+            Set_Word(cpu, temp, GET_INTVAL(SP,0));
             INC(IP,1);
             break;
         case PUSHCVAR_OP:
             temp = cpu->FP + GET_INTVAL(IP, 1);
-            DEBUG("PUSHCVAR %d %d", GET_INTVAL(IP, 1), Get_Byte(temp));
-            Set_Byte(cpu->SP, Get_Byte(temp));
+            DEBUG("PUSHCVAR %d %d", GET_INTVAL(IP, 1), Get_Byte(cpu, temp));
+            Set_Byte(cpu, cpu->SP, Get_Byte(cpu, temp));
             INC(SP, 1);
             INC(IP, 2);
             break;
@@ -440,7 +441,7 @@ void Execute(Machine_State *cpu)
             DEBUG("POPCVAR %d", GET_INTVAL(IP,1));
             temp = cpu->FP + GET_INTVAL(IP, 1);
             INC(SP, -1);
-            Set_Byte(temp, Get_Byte(cpu->SP));
+            Set_Byte(cpu, temp, Get_Byte(cpu, cpu->SP));
             INC(IP,2);
             break;
         case SETMODE_OP:

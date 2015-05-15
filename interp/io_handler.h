@@ -17,7 +17,7 @@ typedef struct
 
 void Init_IO();
 void Finish_IO();
-void Schedule_IO(int io_blk_addr);
+void Schedule_IO(Machine_State *cpu, int io_blk_addr);
 int IO_Get_Word(int address);
 void IO_Set_Word(int address, int value);
 int IO_Get_Byte(int address);

@@ -13,12 +13,6 @@ typedef struct
     int FLAG;       // FLAG register (bits defined above)
 } Machine_State;
 
-int Get_Word(int address);
-void Set_Word(int address, int value);
-int Get_Byte(int address);
-void Set_Byte(int address, int value);
-void *Get_Addr(int addess);
-
 int Is_User_Mode();
 int Set_User_Mode(int value);
 

@@ -5,6 +5,7 @@
 #include "machine_def.h"
 #include "opcodes.h"
 #include "machine.h"
+#include "vmem.h"
 #include "loader.h"
 
 static int Do_Debug = 0;
@@ -31,15 +32,18 @@ static void debug_print(int location, const char *fmt, ...)
 
 void MemCpy(int addr, char *sptr)
 {
+    Machine_State cpu;
+    Get_Machine_State(&cpu);
+
     while (*sptr)
     {
-        Set_Byte(addr, *sptr);
+        Set_Byte(&cpu, addr, *sptr);
         addr++;
         sptr++;
     }
 
     // do one more to get the NULL
-    Set_Byte(addr, *sptr);
+    Set_Byte(&cpu, addr, *sptr);
 }
 
 char *format_string(char *str)
@@ -93,7 +97,6 @@ char *format_string(char *str)
 //int Load(Machine_State *cpu, const char *filename, int base, int top)
 int Load(const char *filename)
 {
-    Machine_State cpu;
     int base;
     int top;
     int loc;
@@ -103,6 +106,7 @@ int Load(const char *filename)
     char *sptr;
     int  slen;
 
+    Machine_State cpu;
     Get_Machine_State(&cpu);
     base = cpu.BP;
     top  = cpu.LP;
@@ -128,7 +132,7 @@ int Load(const char *filename)
                 fscanf(input, "%d %d", &byte, &value);
                 byte += base;
                 DEBUG(byte, "D: %d", value);
-                Set_Word(byte, value);
+                Set_Word(&cpu, byte, value);
                 byte += WORD_SIZE;
                 max_byte = max_byte>byte ? max_byte : byte;
                 if (max_byte > top)
@@ -146,7 +150,7 @@ int Load(const char *filename)
                     fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_byte);
                     exit(-1);
                 }
-                Set_Word(loc, value);
+                Set_Word(&cpu, loc, value);
                 break;
             case 'G':
                 fscanf(input, "%d %s %d", &byte, string, &slen);
@@ -154,7 +158,7 @@ int Load(const char *filename)
                 DEBUG(byte, "G: %s %d %d", string, byte, slen);
                 while (slen > 0)
                 {
-                    Set_Word(byte, value);
+                    Set_Word(&cpu, byte, value);
                     byte += WORD_SIZE;
                     slen -= WORD_SIZE;
                 }

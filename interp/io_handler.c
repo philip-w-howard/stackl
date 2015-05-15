@@ -6,6 +6,7 @@
 
 #include "machine_def.h"
 #include "syscodes.h"
+#include "vmem.h"
 #include "io_handler.h"
 #include "loader.h"
 
@@ -69,11 +70,11 @@ static void *IO_Processor(void *arg)
 
             pthread_mutex_unlock(&IO_Q_Lock);
 
-            io_op = Get_Word(io_blk_addr);
+            io_op = xGet_Word(io_blk_addr);
             io_op &= ~IO_FLAGS;
 
-            addr = Get_Addr( Get_Word(io_blk_addr + WORD_SIZE));
-            Set_Word(io_blk_addr, io_op | IO_PENDING);
+            addr = xGet_Addr( xGet_Word(io_blk_addr + WORD_SIZE));
+            xSet_Word(io_blk_addr, io_op | IO_PENDING);
 
             switch (io_op)
             {
@@ -89,7 +90,7 @@ static void *IO_Processor(void *arg)
                 case EXEC_CALL:
                     status = Load( (char *)addr );
                     if (status == 0) io_op |= IO_ERROR;
-                    Set_Word(io_blk_addr + 2*WORD_SIZE, status);
+                    xSet_Word(io_blk_addr + 2*WORD_SIZE, status);
                     break;
                 default:
                     fprintf(stderr, "Invalid IO code: %d\n", io_op);
@@ -99,7 +100,7 @@ static void *IO_Processor(void *arg)
             }
 
             io_op |= IO_COMPLETE;
-            Set_Word(io_blk_addr, io_op);
+            xSet_Word(io_blk_addr, io_op);
         } else {
             // No data to grab, just release the lock
             pthread_mutex_unlock(&IO_Q_Lock);
@@ -130,7 +131,7 @@ void Finish_IO()
     pthread_join(IO_Q_Thread, NULL);
 }
 //*************************************
-void Schedule_IO(int io_blk_addr)
+void Schedule_IO(Machine_State *cpu, int io_blk_addr)
 {
     int op;
 
@@ -139,10 +140,10 @@ void Schedule_IO(int io_blk_addr)
 
     IO_Q[IO_Q_Head].io_blk_addr = io_blk_addr;
 
-    op = Get_Word(io_blk_addr);
+    op = Get_Word(cpu, io_blk_addr);
     op &= ~IO_FLAGS;
     op |= IO_QUEUED;
-    Set_Word(io_blk_addr, op);
+    Set_Word(cpu, io_blk_addr, op);
 
     IO_Q_Head++;
     IO_Q_Head %= IO_Q_SIZE;
