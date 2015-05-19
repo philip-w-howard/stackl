@@ -40,7 +40,7 @@ static void *terminal_device(void *arg)
             Status |= DMA_T_STATUS_READ_BUSY;
 
             size = Size;
-            buffer = (char *)xGet_Addr(Address);
+            buffer = (char *)Abs_Get_Addr(Address);
             if (buffer == NULL) Machine_Check("DMA_T read to invalid address");
 
             pthread_mutex_unlock(&IO_Q_Lock);
@@ -97,7 +97,7 @@ static void set_word(int id, int addr, int value)
         Command = value;
         if (Command & DMA_T_CMD_START_WRITE)
         {
-            char *buffer = xGet_Addr(Address);
+            char *buffer = Abs_Get_Addr(Address);
             if (buffer == NULL) Machine_Check("DMA_T write from invalid address");
             printf("%s", buffer);
             Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);

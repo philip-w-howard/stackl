@@ -29,7 +29,7 @@ static int validate_address(Machine_State *regs, int address, int is_char)
         exit(-1);
     }
 
-    if (regs->FLAG & FL_USER_MODE)
+    if (regs != NULL && (regs->FLAG & FL_USER_MODE))
     {
         if (address < 0 || (address+WORD_SIZE) > regs->LP - regs->BP)
         {
@@ -107,37 +107,27 @@ void Init_Memory(int mem_size)
     memset(Memory, 0x79, Memory_Size);
 }
 //***************************************
-int xGet_Word(int address)
+int Abs_Get_Word(int address)
 {
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    return Get_Word(&cpu, address);
+    return Get_Word(NULL, address);
 }
 //***************************************
-void xSet_Word(int address, int value)
+void Abs_Set_Word(int address, int value)
 {
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    return Set_Word(&cpu, address, value);
+    return Set_Word(NULL, address, value);
 }
 //***************************************
-int xGet_Byte(int address)
+int Abs_Get_Byte(int address)
 {
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    return Get_Byte(&cpu, address);
+    return Get_Byte(NULL, address);
 }
 //***************************************
-void xSet_Byte(int address, int value)
+void Abs_Set_Byte(int address, int value)
 {
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    return Set_Byte(&cpu, address, value);
+    return Set_Byte(NULL, address, value);
 }
 //***************************************
-void *xGet_Addr(int address)
+void *Abs_Get_Addr(int address)
 {
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    return Get_Addr(&cpu, address);
+    return Get_Addr(NULL, address);
 }

@@ -70,11 +70,11 @@ static void *IO_Processor(void *arg)
 
             pthread_mutex_unlock(&IO_Q_Lock);
 
-            io_op = xGet_Word(io_blk_addr);
+            io_op = Abs_Get_Word(io_blk_addr);
             io_op &= ~IO_FLAGS;
 
-            addr = xGet_Addr( xGet_Word(io_blk_addr + WORD_SIZE));
-            xSet_Word(io_blk_addr, io_op | IO_PENDING);
+            addr = Abs_Get_Addr( Abs_Get_Word(io_blk_addr + WORD_SIZE));
+            Abs_Set_Word(io_blk_addr, io_op | IO_PENDING);
 
             switch (io_op)
             {
@@ -90,7 +90,7 @@ static void *IO_Processor(void *arg)
                 case EXEC_CALL:
                     status = Load( (char *)addr );
                     if (status == 0) io_op |= IO_ERROR;
-                    xSet_Word(io_blk_addr + 2*WORD_SIZE, status);
+                    Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                     break;
                 default:
                     fprintf(stderr, "Invalid IO code: %d\n", io_op);
@@ -100,7 +100,7 @@ static void *IO_Processor(void *arg)
             }
 
             io_op |= IO_COMPLETE;
-            xSet_Word(io_blk_addr, io_op);
+            Abs_Set_Word(io_blk_addr, io_op);
         } else {
             // No data to grab, just release the lock
             pthread_mutex_unlock(&IO_Q_Lock);
