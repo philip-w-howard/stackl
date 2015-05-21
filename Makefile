@@ -20,6 +20,7 @@ clean:
 	$(MAKE) -C compiler clean
 	$(MAKE) -C interp clean
 	rm -f stackl
+	rm -f makebin
 	rm -f stacklc
 	rm -f out
 

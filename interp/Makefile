@@ -18,7 +18,9 @@ all: stackl makebin
 
 clean:
 	rm -f $(OBJS)
+	rm -f $(BINOBJS)
 	rm -f stackl
+	rm -f makebin
 
 .c.o:
 	gcc $(COPTS) $? -o $@
