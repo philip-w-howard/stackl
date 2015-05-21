@@ -212,3 +212,17 @@ int Disk_Finish()
 
     return 0;
 }
+//*************************************
+int Disk_Load_Boot_Block()
+{
+    int status;
+    void *buffer;
+
+    buffer = Abs_Get_Addr(0);
+
+    lseek(Disk_fd, 0, SEEK_SET);
+    status = read(Disk_fd, buffer, DISK_BLOCK_SIZE);
+    if (status != DISK_BLOCK_SIZE) return 1;
+
+    return 0;
+}

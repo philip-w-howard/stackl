@@ -20,3 +20,4 @@
 
 int Disk_Init();
 int Disk_Finish();
+int Disk_Load_Boot_Block();

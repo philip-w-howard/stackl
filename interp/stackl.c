@@ -11,6 +11,9 @@
 
 static char Input_File[200] = "";
 static int Memory_Size = 0;
+static int Use_Disk = 1;
+static int Boot_Disk = 1;
+
 
 static const char *HELP_STR =
  "stackl [-opcodes] [-help] [-version] [-loader]\n"
@@ -33,6 +36,8 @@ void Process_Args(int argc, char **argv)
                 Loader_Debug();
             else if (argv[ii][1] == 'M')
                 Memory_Size = atoi(&argv[ii][2]);
+            else if (strcmp(arg, "nodisk") == 0)
+                Use_Disk = 0;
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "opcodes") == 0)
@@ -54,6 +59,9 @@ void Process_Args(int argc, char **argv)
         {
             // assume input file name
             strcpy(Input_File, argv[ii]);
+
+            // If we're given a file to run, we won't boot from the disk
+            Boot_Disk = 0;
         }
     }
 }
@@ -63,40 +71,36 @@ int main(int argc, char **argv)
 
     Process_Args(argc, argv);
 
-    if (strlen(Input_File) == 0)
-    {
-        printf("Need to specify an executable file\n");
-        return 1;
-    } 
 
     Init_Machine(Memory_Size);
     Init_IO();
     PIO_T_Init();
     DMA_T_Init();
-    Disk_Init();
-    //Sched_Init();
+    if (Use_Disk) Disk_Init();
 
-    /*
-    result = Sched_Fork();
-    if (result == -1)
+
+    if (Boot_Disk && Use_Disk)
     {
-        printf("Unable to fork initial process\n");
-        return 2;
+        Boot_From_Disk();
     }
-    */
-
-    result = Boot(Input_File);
-    if (result != 0) 
+    else if (strlen(Input_File) == 0)
     {
-        printf("Unable to execute %s\n", Input_File);
-        return 3;
+        printf("Need to specify an executable file\n");
+        return 1;
+    } 
+    else
+    {
+        result = Boot(Input_File);
+        if (result != 0) 
+        {
+            printf("Unable to execute %s\n", Input_File);
+            return 3;
+        }
     }
-
-    //Schedule();
 
     Machine_Execute();
 
-    Disk_Finish();
+    if (Use_Disk) Disk_Finish();
     DMA_T_Finish();
     PIO_T_Finish();
     Finish_IO();

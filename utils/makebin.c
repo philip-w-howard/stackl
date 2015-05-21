@@ -1,13 +1,17 @@
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "machine_def.h"
-#include "opcodes.h"
-#include "machine.h"
-#include "vmem.h"
-#include "loader.h"
-#include "disk.h"
+#include <stdio.h>
+#include "../version.h"
+
+#define WORD_SIZE 4
+
+static char Input_File[200] = "";
+static int Memory_Size = 65536;
+static char *Memory;
+
+static const char *HELP_STR =
+ "stackl [-help] [-version] [-loader] [-M<mem size>]\n";
 
 static int Do_Debug = 0;
 
@@ -29,22 +33,6 @@ static void debug_print(int location, const char *fmt, ...)
     sprintf(format, "Loading at %d: %s\n", location, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
-}
-
-void MemCpy(int addr, char *sptr)
-{
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-
-    while (*sptr)
-    {
-        Set_Byte(&cpu, addr, *sptr);
-        addr++;
-        sptr++;
-    }
-
-    // do one more to get the NULL
-    Set_Byte(&cpu, addr, *sptr);
 }
 
 char *format_string(char *str)
@@ -95,11 +83,8 @@ char *format_string(char *str)
     return str;
 }
 //***************************************
-//int Load(Machine_State *cpu, const char *filename, int base, int top)
 int Load_Text(const char *filename)
 {
-    int base;
-    int top;
     int loc;
     int value;
     char record_type[20];
@@ -107,13 +92,8 @@ int Load_Text(const char *filename)
     char *sptr;
     int  slen;
 
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    base = cpu.BP;
-    top  = cpu.LP;
-
-    int byte = base;
-    int max_byte = byte;
+    int addr = 0;
+    int max_addr = addr;
     FILE *input = fopen(filename, "r");
 
     if (input == NULL) 
@@ -131,13 +111,12 @@ int Load_Text(const char *filename)
         switch (record_type[0])
         {
             case 'D':
-                fscanf(input, "%d %d", &byte, &value);
-                byte += base;
-                DEBUG(byte, "D: %d", value);
-                Set_Word(&cpu, byte, value);
-                byte += WORD_SIZE;
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
+                fscanf(input, "%d %d", &addr, &value);
+                DEBUG(addr, "D: %d", value);
+                *(int *)&Memory[addr] = value;
+                addr += WORD_SIZE;
+                max_addr = max_addr>addr ? max_addr : addr;
+                if (max_addr > Memory_Size)
                 {
                     fprintf(stderr, "Memory overflow while loading\n");
                     exit(-1);
@@ -145,38 +124,35 @@ int Load_Text(const char *filename)
                 break;
             case 'F':
                 fscanf(input, "%d %d", &loc, &value);
-                loc += base;
                 DEBUG(loc, "F: %d", value);
-                if (loc >= max_byte)
+                if (loc >= max_addr)
                 {
-                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_byte);
+                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_addr);
                     exit(-1);
                 }
-                Set_Word(&cpu, loc, value);
+                *(int *)&Memory[loc] = value;
                 break;
             case 'G':
-                fscanf(input, "%d %s %d", &byte, string, &slen);
-                byte += base;
-                DEBUG(byte, "G: %s %d %d", string, byte, slen);
+                fscanf(input, "%d %s %d", &addr, string, &slen);
+                DEBUG(addr, "G: %s %d %d", string, addr, slen);
                 while (slen > 0)
                 {
-                    Set_Word(&cpu, byte, value);
-                    byte += WORD_SIZE;
+                    *(int *)&Memory[addr] = value;
+                    addr += WORD_SIZE;
                     slen -= WORD_SIZE;
                 }
 
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
+                max_addr = max_addr>addr ? max_addr : addr;
+                if (max_addr > Memory_Size)
                 {
                     fprintf(stderr, "Memory overflow while loading\n");
                     exit(-1);
                 }
                 break;
             case 'S':
-                fscanf(input, "%d", &byte);
-                byte += base;
+                fscanf(input, "%d", &addr);
                 fgets(string, sizeof(string), input);
-                DEBUG(byte, "S: %s", input);
+                DEBUG(addr, "S: %s", input);
                 slen = strlen(string);
                 if (string[slen - 1] != '\n')
                 {
@@ -187,10 +163,10 @@ int Load_Text(const char *filename)
                 sptr = format_string(string);
                 slen = strlen(sptr);
 
-                MemCpy(byte, sptr);
-                byte += ((slen + WORD_SIZE)/WORD_SIZE)*WORD_SIZE;
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
+                strcpy((char *)&Memory[addr], sptr);
+                addr += ((slen + WORD_SIZE)/WORD_SIZE)*WORD_SIZE;
+                max_addr = max_addr>addr ? max_addr : addr;
+                if (max_addr > Memory_Size)
                 {
                     fprintf(stderr, "Memory overflow while loading\n");
                     exit(-1);
@@ -208,81 +184,96 @@ int Load_Text(const char *filename)
         fscanf(input, "%s", record_type);
     }
 
-    return max_byte;
-}
-
-int Load(const char *filename)
-{
-    int top;
-    int value;
-    int addr;
-    int max_addr = 0;
-    FILE *input = fopen(filename, "r");
-    char string[256];
-
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    addr = cpu.BP;
-    top  = cpu.LP;
-
-    if (input == NULL) 
-    {
-        strcpy(string, filename);
-        strcat(string, ".slb");
-        input = fopen(string, "r");
-        if (input == NULL) return 0;
-    }
-
-    while (fread(&value, 4, 1, input) == 1)
-    {
-        DEBUG(addr, "D: %d", value);
-        Set_Word(&cpu, addr, value);
-        addr += WORD_SIZE;
-        max_addr = max_addr>addr ? max_addr : addr;
-        if (max_addr > top)
-        {
-            fprintf(stderr, "Memory overflow while loading\n");
-            exit(-1);
-        }
-    }
-
     return max_addr;
 }
 
-int Boot(const char *filename)
+// Process command line args
+void Process_Args(int argc, char **argv)
+{
+    int ii;
+    for (ii=1; ii<argc; ii++)
+    {
+        if (argv[ii][0] == '-')
+        {
+            char *arg = &argv[ii][1];
+            if (strcmp(arg, "help") == 0)
+            {
+                printf(HELP_STR);
+                exit(0);
+            }
+            else if (strcmp(arg, "loader") == 0)
+                Loader_Debug();
+            else if (argv[ii][1] == 'M')
+                Memory_Size = atoi(&argv[ii][2]);
+            else if (strcmp(arg, "version") == 0)
+            {
+                printf("makebin %s %s %s\n", VERSION, __DATE__, __TIME__);
+                exit(0);
+            }
+            else
+            {
+                printf("Unrecognized option %s\n", argv[ii]);
+                exit(-1);
+            }
+        }
+        else
+        {
+            // assume input file name
+            strcpy(Input_File, argv[ii]);
+        }
+    }
+}
+int main(int argc, char **argv)
 {
     int top;
-    Machine_State cpu;
-
-    Get_Machine_State(&cpu);
-    cpu.SP = cpu.LP - 8;
-    cpu.FP = cpu.SP;
-    Set_Machine_State(&cpu);
-
-    top = Load(filename);
-    if (top == 0) return 1;
-
-    cpu.SP = top + WORD_SIZE;
-    cpu.FP = cpu.SP;
-    cpu.IP = cpu.BP + 2*WORD_SIZE;
-    Set_Machine_State(&cpu);
-
-    return 0;
-}
-
-int Boot_From_Disk()
-{
-    Machine_State cpu;
     int status;
 
-    status = Disk_Load_Boot_Block();
-    if (status != 0) Machine_Check("Invalid boot block");
+    Process_Args(argc, argv);
 
-    Get_Machine_State(&cpu);
-    cpu.SP = 1024;
-    cpu.FP = cpu.SP;
-    cpu.IP = 2*WORD_SIZE;
-    Set_Machine_State(&cpu);
+    if (strlen(Input_File) == 0)
+    {
+        printf("Need to specify an executable file\n");
+        return 1;
+    } 
+
+    Memory = (char *)malloc(Memory_Size);
+    if (Memory == NULL)
+    {
+        printf("Unable to allocate memory\n");
+        exit(1);
+    }
+
+    top = Load_Text(Input_File);
+    if (top == 0) 
+    {
+        printf("Unable to convert %s\n", Input_File);
+        return 3;
+    }
+
+    char *extension = strstr(Input_File, ".sl");
+    if (extension != NULL)
+        strcpy(extension, ".slb");
+    else
+        strcat(Input_File, ".slb");
+
+    void *start_addr = &Memory[0];
+
+    FILE *bin_file = fopen(Input_File, "wb");
+
+    if (bin_file == NULL)
+    {
+        printf("Unable to open output file\n");
+        return 4;
+    }
+
+    status = fwrite(start_addr, top, 1, bin_file);
+    if (status != 1)
+    {
+        printf("Unable to create output file\n");
+        return 4;
+    }
+
+    fclose(bin_file);
 
     return 0;
 }
