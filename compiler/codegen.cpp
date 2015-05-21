@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string.h>
 #include "codegen.h"
 #include "cFixupTable.h"
 #include "../interp/syscodes.h"
@@ -24,6 +25,7 @@ static int Location = 0;
 
 const std::string cFixupTable::GlobalLabel = "$global$";
 
+static char Filename[255];
 //*****************************************
 // Open output files and write the prefix
 bool InitOutput(const char *filename)
@@ -34,6 +36,8 @@ bool InitOutput(const char *filename)
         std::cerr << "Unable to open output file." << std::endl;
         return false;
     }
+
+    strcpy(Filename, filename);
 
     // Leave room for ISR address (if any)
     SetLabelRef("interrupt");
@@ -54,6 +58,15 @@ bool FinalizeOutput()
 
     Output << "X\n";
     Output.close();
+
+    char makebin[500];
+    strcpy(makebin, "makebin ");
+    strcat(makebin, Filename);
+
+    int result = system(makebin);
+
+    if (result < 0) return false;
+
     return true;
 }
 //*****************************************

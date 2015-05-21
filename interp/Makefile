@@ -9,7 +9,12 @@ OBJS=stackl.o \
 	 pio_term.o \
 	 disk.o \
 
-all: stackl
+BINOBJS=makebin.o \
+	 vmem.o \
+	 loader.o \
+	 machine.o \
+
+all: stackl makebin
 
 clean:
 	rm -f $(OBJS)
@@ -20,4 +25,7 @@ clean:
 
 stackl: $(OBJS)
 	gcc $(OBJS) -o stackl -lpthread
+
+makebin: $(BINOBJS)
+	gcc $(BINOBJS) -o makebin -lpthread
 

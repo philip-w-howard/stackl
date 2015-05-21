@@ -95,7 +95,7 @@ char *format_string(char *str)
 }
 //***************************************
 //int Load(Machine_State *cpu, const char *filename, int base, int top)
-int Load(const char *filename)
+int Load_Text(const char *filename)
 {
     int base;
     int top;
@@ -114,6 +114,7 @@ int Load(const char *filename)
     int byte = base;
     int max_byte = byte;
     FILE *input = fopen(filename, "r");
+
     if (input == NULL) 
     {
         strcpy(string, filename);
@@ -207,6 +208,44 @@ int Load(const char *filename)
     }
 
     return max_byte;
+}
+
+int Load(const char *filename)
+{
+    int top;
+    int value;
+    int addr;
+    int max_addr = 0;
+    FILE *input = fopen(filename, "r");
+    char string[256];
+
+    Machine_State cpu;
+    Get_Machine_State(&cpu);
+    addr = cpu.BP;
+    top  = cpu.LP;
+
+    if (input == NULL) 
+    {
+        strcpy(string, filename);
+        strcat(string, ".slb");
+        input = fopen(string, "r");
+        if (input == NULL) return 0;
+    }
+
+    while (fread(&value, 4, 1, input) == 1)
+    {
+        DEBUG(addr, "D: %d", value);
+        Set_Word(&cpu, addr, value);
+        addr += WORD_SIZE;
+        max_addr = max_addr>addr ? max_addr : addr;
+        if (max_addr > top)
+        {
+            fprintf(stderr, "Memory overflow while loading\n");
+            exit(-1);
+        }
+    }
+
+    return max_addr;
 }
 
 int Boot(const char *filename)

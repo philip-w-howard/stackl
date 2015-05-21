@@ -12,6 +12,7 @@ INCLUDES = startup.h \
 all: compiler interp execs
 
 release: all
+	cp makebin $(RELEASE)
 	cp stackl $(RELEASE)
 	cp stacklc $(RELEASE)
 	cp $(INCLUDES) $(RELEASE)
@@ -31,6 +32,7 @@ interp:
 execs: compiler interp 
 	cp compiler/stacklc .
 	cp interp/stackl .
+	cp interp/makebin .
 	cp interp/syscodes.h .
 	cp interp/machine_def.h .
 	cp interp/dma_term.h .

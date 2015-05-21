@@ -70,8 +70,8 @@ class cConstDeclNode : public cDeclNode
 
     virtual void GenerateCode()
     {
-        EmitInt(PUSH_OP);
-        EmitInt(mValue);
+        //EmitInt(PUSH_OP);
+        //EmitInt(mValue);
     }
 
   protected:

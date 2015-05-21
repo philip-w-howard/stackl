@@ -5,3 +5,4 @@
 void Loader_Debug();
 int Boot(const char *filename);
 int Load(const char *filename);
+int Load_Text(const char *filename);
