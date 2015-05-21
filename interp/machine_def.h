@@ -71,4 +71,5 @@
 #define FL_INT_MODE     0x0004
 #define FL_INT_DIS      0x0008
 #define FL_INT_PENDING  0x0010
+#define FL_VMEM         0x0020
 

@@ -7,6 +7,7 @@ OBJS=stackl.o \
 	 io_handler.o \
 	 dma_term.o \
 	 pio_term.o \
+	 disk.o \
 
 all: stackl
 

@@ -78,9 +78,11 @@ static void *IO_Processor(void *arg)
 
             switch (io_op)
             {
+                /*
                 case GETL_CALL:
                     gets((char *)addr);
                     break;
+                */
                 case GETS_CALL:
                     scanf("%s", (char *)addr);
                     break;

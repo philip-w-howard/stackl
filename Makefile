@@ -4,6 +4,8 @@ INCLUDES = startup.h \
 	   string.h \
 	   syscodes.h \
 	   machine_def.h \
+	   dma_term.h \
+	   disk.h \
 
 .PHONY: compiler interp
 
@@ -31,3 +33,5 @@ execs: compiler interp
 	cp interp/stackl .
 	cp interp/syscodes.h .
 	cp interp/machine_def.h .
+	cp interp/dma_term.h .
+	cp interp/disk.h .

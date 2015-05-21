@@ -1,5 +1,6 @@
 #include <syscodes.h>
 #include <machine_def.h>
+#include <dma_term.h>
 
 int main();
 
@@ -30,6 +31,21 @@ int do_inp(int op, int param)
     return 0;
 }
 
+int do_inp2(int op, int parm1, int parm2)
+{
+    int status;
+    status = 0;
+    asm(POPVARIND_OP, DMA_T_ADDR, parm1);
+    asm(POPVARIND_OP, DMA_T_SIZE, parm2);
+    asm(POPVARIND_OP, DMA_T_CMD, DMA_T_CMD_START_READ);
+    while(status >= 0)
+    {
+        status = asm(PUSHVARIND_OP, DMA_T_STATUS);
+    }
+
+    return 0;
+}
+
 int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
         int size, int op, int parm1)
 {
@@ -39,7 +55,9 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
     } else if (op == EXIT_CALL) {
         asm(POPREG_OP, 1); // halt state
         asm(FLAG_REG);
-    } else if (op == GETL_CALL || op == GETS_CALL || op == GETI_CALL) {
+    } else if (op == GETL_CALL) {
+        do_inp2(op, parm1);
+    } else if (op == GETS_CALL || op == GETI_CALL) {
         do_inp(op, parm1);
     //} else {
     //    asm(TRAPTOC_OP);

@@ -6,9 +6,15 @@
 #include "io_handler.h"
 #include "dma_term.h"
 #include "pio_term.h"
+#include "disk.h"
 #include "../version.h"
 
-char Input_File[200] = "";
+static char Input_File[200] = "";
+static int Memory_Size = 0;
+
+static const char *HELP_STR =
+ "stackl [-opcodes] [-help] [-version] [-loader]\n"
+ "       [-M<mem size>] [-N<num instr>] [-T<timer interval>]\n";
 
 void Process_Args(int argc, char **argv)
 {
@@ -18,24 +24,24 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "opcodes") == 0)
-                Opcodes_Debug();
-//            else if (strcmp(arg, "sched") == 0)
-//                Sched_Debug();
+            if (strcmp(arg, "help") == 0)
+            {
+                printf(HELP_STR);
+                exit(0);
+            }
             else if (strcmp(arg, "loader") == 0)
                 Loader_Debug();
+            else if (argv[ii][1] == 'M')
+                Memory_Size = atoi(&argv[ii][2]);
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
+            else if (strcmp(arg, "opcodes") == 0)
+                Opcodes_Debug();
             else if (argv[ii][1] == 'T')
                 Set_Timer_Interval(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
             {
                 printf("stackl %s %s %s\n", VERSION, __DATE__, __TIME__);
-                exit(0);
-            }
-            else if (strcmp(arg, "help") == 0)
-            {
-                printf("stackl -version -help -opcodes -loader <file>\n");
                 exit(0);
             }
             else
@@ -63,10 +69,11 @@ int main(int argc, char **argv)
         return 1;
     } 
 
-    Init_Machine(0);
+    Init_Machine(Memory_Size);
     Init_IO();
-    DMA_T_Init();
     PIO_T_Init();
+    DMA_T_Init();
+    Disk_Init();
     //Sched_Init();
 
     /*
@@ -89,6 +96,7 @@ int main(int argc, char **argv)
 
     Machine_Execute();
 
+    Disk_Finish();
     DMA_T_Finish();
     PIO_T_Finish();
     Finish_IO();
