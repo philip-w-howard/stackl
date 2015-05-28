@@ -46,7 +46,7 @@ class cArrayValNode: public cAstNode
 
     int ComputeOffsets(int base)
     {
-        mList->front()->ComputeOffsets(base);
+        ListComputeOffsets(mList, base);
 
         return base;
     }

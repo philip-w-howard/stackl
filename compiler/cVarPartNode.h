@@ -79,6 +79,12 @@ class cVarPartNode : public cAstNode
         return mId->GetType()->IsArray();
     }
 
+    virtual int ComputeOffsets(int base)
+    {
+        if (mArrayPart != NULL) base = mArrayPart->ComputeOffsets(base);
+        return base;
+    }
+
   protected:
     cSymbol *mId;               // identifier for this item
     cArrayValNode *mArrayPart;  // array indeces (NULL if not an array)
