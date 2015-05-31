@@ -173,7 +173,7 @@ global_decls: global_decls global_decl
                                 }
         | global_decl           { $$ = new cDeclsNode($1); }
 global_decl: func_decl          { $$ = $1; }
-        | struct_decl           { $$ = $1; }
+        | struct_decl ';'       { $$ = $1; }
         | CONST type IDENTIFIER '=' INT_VAL ';'
                                 { $$ = new cConstDeclNode($3, $5); }
         | DEFINE IDENTIFIER INT_VAL
