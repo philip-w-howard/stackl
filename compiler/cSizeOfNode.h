@@ -21,7 +21,7 @@ class cSizeOfNode : public cExprNode
     public:
         cSizeOfNode(cSymbol *id)
         {
-            mType = id->GetType()->GetBaseType();
+            mType = id->GetType();
             mSize = mType->Size();
         }
 

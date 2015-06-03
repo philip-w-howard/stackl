@@ -26,8 +26,8 @@ class cAssignNode : public cStmtNode
         if (!lval->GetType()->CompatibleWith(expr->GetType()))
         {
             semantic_error("Cannot assign " + 
-                    expr->GetType()->GetBaseType()->Name() +
-                    " to " + lval->GetType()->GetBaseType()->Name());
+                    expr->GetType()->Name() +
+                    " to " + lval->GetType()->Name());
         }
     }
 

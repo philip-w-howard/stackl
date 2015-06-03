@@ -32,11 +32,13 @@ class cVarDerefNode : public cVarRefNode
 
         virtual void GenerateCode()
         {
+            cVarPartNode* last = mList->back();
+
             int deref_size;
-            if(mList->back()->GetType()->GetBaseType()->IsPointer())
-                deref_size = mList->back()->GetType()->GetBaseType()->GetPointsTo()->Size(); 
-            else
-                deref_size = mList->back()->GetType()->GetBaseType()->GetBaseType()->Size();
+            if(last->GetType()->IsPointer())
+                deref_size = last->GetType()->GetPointsTo()->Size(); 
+            else if(last->GetType()->IsArray())
+                deref_size = last->GetType()->GetArrayElementType()->Size();
 
             if (mList->back()->IsGlobal())
             {
@@ -67,10 +69,10 @@ class cVarDerefNode : public cVarRefNode
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
                 int deref_size;
-                if(last->GetType()->GetBaseType()->IsPointer())
-                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
-                else
-                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+                if(last->GetType()->IsPointer())
+                    deref_size = last->GetType()->GetPointsTo()->Size(); 
+                else if(last->GetType()->IsArray())
+                    deref_size = last->GetType()->GetArrayElementType()->Size();
 
                 //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->GetBaseType()->GetBaseType()->Name()  << " of size " << deref_size  << "...\n";
 
@@ -82,10 +84,10 @@ class cVarDerefNode : public cVarRefNode
             else 
             {
                 int deref_size;
-                if(last->GetType()->GetBaseType()->IsPointer())
-                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+                if(last->GetType()->IsPointer())
+                    deref_size = last->GetType()->GetPointsTo()->Size(); 
                 else
-                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+                    deref_size = last->GetType()->Size();
 
                 if (mList->front()->IsGlobal())
                 {

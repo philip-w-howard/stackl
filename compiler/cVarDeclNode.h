@@ -49,12 +49,6 @@ class cVarDeclNode : public cDeclNode
         return mType;
     }
 
-    // return the decl of the type
-    virtual cDeclNode *GetBaseType()
-    {
-        return mType;
-    }
-
     virtual bool IsArray()  { return mType->IsArray(); }
     virtual bool IsStruct() { return mType->IsStruct(); }
     virtual bool IsInt()    { return mType->IsInt(); }
@@ -64,7 +58,7 @@ class cVarDeclNode : public cDeclNode
     virtual int ComputeOffsets(int base)
     {
         mType->ComputeOffsets(base);
-        if(mType->GetBaseType() == symbolTableRoot->Lookup("char")->GetType())
+        if(mType->GetType() == symbolTableRoot->Lookup("char")->GetDecl())
             mOffset = base;
         else if(base % WORD_SIZE != 0)
             mOffset = base / WORD_SIZE * WORD_SIZE + WORD_SIZE;
@@ -117,7 +111,7 @@ class cVarDeclNode : public cDeclNode
 
         if (mType->IsArray())
         {
-            size = mType->GetBaseType()->Size();
+            size = mType->GetArrayElementType()->Size();
             cArrayDeclNode *array = dynamic_cast<cArrayDeclNode *>(mType);
             size *= array->NumElements();
             size = ((size + WORD_SIZE - 1)/WORD_SIZE) * WORD_SIZE;

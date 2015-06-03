@@ -15,7 +15,6 @@ class cDeclNode : public cStmtNode
         std::string TypeId();
         std::string Name();
 
-        virtual cDeclNode *GetBaseType()=0;
         virtual cDeclNode *GetArrayElementType() { return NULL; }
         virtual cDeclNode *GetType()=0;
 
