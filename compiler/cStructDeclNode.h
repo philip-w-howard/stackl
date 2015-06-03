@@ -26,12 +26,14 @@ class cStructDeclNode : public cDeclNode
         mSymTab = symTab;
         mId = id;
         mDecls = decls;
-        id->SetType(this);
+        id->SetDecl(this);
         mSize = 0;
 
         symbolTableRoot->Insert(id);
     }
 
+    virtual cDeclNode* GetType() { return this; }
+    virtual cDeclNode* GetBaseType() { return this; }
     virtual bool IsStruct() { return true; }
     virtual bool IsType()   { return true; }
 

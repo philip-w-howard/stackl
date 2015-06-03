@@ -32,7 +32,7 @@ class cBinaryExprNode : public cExprNode
     {
         cDeclNode *leftType  = mLeftExpr->GetType();
         cDeclNode *rightType = mRightExpr->GetType();
-        cDeclNode *intType   = symbolTableRoot->Lookup("int")->GetType();
+        cDeclNode *intType   = symbolTableRoot->Lookup("int")->GetDecl();
 
         if (leftType == rightType) return leftType;
         return intType;

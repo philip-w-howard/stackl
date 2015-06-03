@@ -15,7 +15,9 @@ class cDeclNode : public cStmtNode
         std::string TypeId();
         std::string Name();
 
-        virtual cDeclNode *GetBaseType() { return this; }
+        virtual cDeclNode *GetBaseType()=0;
+        virtual cDeclNode *GetArrayElementType() { return NULL; }
+        virtual cDeclNode *GetType()=0;
 
         virtual bool IsType()       { return false; }
         virtual bool IsFunc()       { return false; }
@@ -35,8 +37,8 @@ class cDeclNode : public cStmtNode
         virtual int GetPtrLevel() { return 0; }
         virtual bool CompatibleWith(cDeclNode *other)
         {
-            cDeclNode *left = GetBaseType();
-            cDeclNode *right = other->GetBaseType();
+            cDeclNode *leftType = GetType();
+            cDeclNode *rightType = other->GetType();
 
             // acceptable assignments:
             // foo abc = foo xyz
@@ -44,29 +46,29 @@ class cDeclNode : public cStmtNode
             // foo * abc = foo * xyz
             // foo * abc = 123456
 
-            if (left == right)
+            if (leftType == rightType)
                 return true;
             if(IsArray())
-                if(right->IsPointer() && right->GetPointsTo() == GetBaseType())
+                if(rightType->IsPointer() && rightType->GetPointsTo() == leftType)
                     return true;
-            if(other->IsArray() && right->IsPointer())
+            if(other->IsArray() && rightType->IsPointer())
                 return true;
-            if(left->IsPointer())
+            if(leftType->IsPointer())
             {
-                if(right->IsPointer())
+                if(rightType->IsPointer())
                     return true;
-                if(right->IsArray())
+                if(rightType->IsArray())
                     return true;
-                if(right->IsInt())
+                if(rightType->IsInt())
                     return true;
-                if(left->GetPointsTo() == right)
+                if(leftType->GetPointsTo() == rightType)
                     return true;
             }
-            if (left->IsInt() && right->IsInt() && left->Size() >= right->Size())
+            if (leftType->IsInt() && rightType->IsInt() && leftType->Size() >= rightType->Size())
                 return true;
-            if(right->IsPointer())
+            if(rightType->IsPointer())
             {
-                if(right->GetPointsTo() == left)
+                if(rightType->GetPointsTo() == leftType)
                     return true;
             }
 

@@ -25,11 +25,12 @@ class cFuncCallNode : public cExprNode
     // params are the parameters in the call
     cFuncCallNode(cSymbol *id, cParamNode *params)  : cExprNode()
     {
+        // func is the function being called
         cSymbol *func = symbolTableRoot->Lookup(id->Name());
 
         if (func != NULL)
         {
-            if (!func->GetType()->IsFunc())
+            if (!func->GetDecl()->IsFunc())
             {
                 semantic_error(id->Name() + " is not a function");
             }
@@ -48,7 +49,7 @@ class cFuncCallNode : public cExprNode
     // return the type of the returned value
     virtual cDeclNode *GetType()
     {
-        return mId->GetType()->GetBaseType();
+        return mId->GetType();
     }
 
     virtual std::string toString()

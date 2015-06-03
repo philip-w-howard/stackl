@@ -21,7 +21,7 @@ class cSymbol
         {
             name = n; 
             sequence = ++totalSymbols;
-            mType = NULL;
+            mDecl = NULL;
         }
 
         // return the name of the symbol
@@ -31,12 +31,16 @@ class cSymbol
         int Id() { return sequence; }
 
         // Indicate what type of thing this symbol is
-        void SetType(cDeclNode *type)
-        { mType = type; }
+        void SetDecl(cDeclNode *decl)
+        { mDecl = decl; }
 
-        // return the declaration of this symbol
+        // return the declaration of the symbol
+        cDeclNode *GetDecl()
+        { return mDecl; }
+
+        // return the type of the symbol
         cDeclNode *GetType()
-        { return mType; }
+        { return mDecl->GetType(); }
 
         // return a string representation of the symbol
         virtual std::string toString()
@@ -51,7 +55,7 @@ class cSymbol
     protected:
         std::string name;           // name of the symbol
         int sequence;               // unique ID for symbol
-        cDeclNode *mType;           // Declaration of this ID
+        cDeclNode *mDecl;           // Declaration of this ID
         static int totalSymbols;    // STATIC: keeps track of total number of
                                     // symbols that have been created. Used
                                     // to assign sequence: unique ID

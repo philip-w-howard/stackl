@@ -37,11 +37,14 @@ class cConstDeclNode : public cDeclNode
         // in the current scope.
         id = symbolTableRoot->Insert(id);
 
-        mType = symbolTableRoot->Lookup("int")->GetType();
+        mType = symbolTableRoot->Lookup("int")->GetDecl();
         mId = id;
-        mId->SetType(this);
+        mId->SetDecl(this);
         mValue = value;
     }
+
+    virtual cDeclNode *GetType()
+    { return mType; }
 
     // return the decl of the type
     virtual cDeclNode *GetBaseType()

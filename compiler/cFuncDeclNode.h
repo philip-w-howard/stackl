@@ -50,8 +50,13 @@ class cFuncDeclNode : public cDeclNode
             mHasStmts = false;
             mStmts = NULL;
             mParamsSet = false;
-            mId->SetType(this);
+            mId->SetDecl(this);
         }
+    }
+
+    virtual cDeclNode *GetType()
+    {
+        return mReturnType->GetType();
     }
 
     // return the type of the return value

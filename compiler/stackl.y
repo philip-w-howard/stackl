@@ -152,14 +152,14 @@ var_decl:   type IDENTIFIER
                                     cSymbol *sym = new cSymbol("carray");
                                     cArrayDeclNode *arr = new cArrayDeclNode(
                                             $1, sym, $3);
-                                    sym->SetType(arr);
+                                    sym->SetDecl(arr);
                                     $$ = new cVarDeclNode(sym, $2);
                                 }
 type:   type '*' {
                         std::string new_type = $1->Name();
                         new_type += "*";
                         cSymbol* sym = new cSymbol(new_type);
-                        sym->SetType(new cBaseDeclNode(sym, 4, true, false, false, $1->GetType()));
+                        sym->SetDecl(new cBaseDeclNode(sym, 4, true, false, false, $1->GetType()));
                         symbolTableRoot->InsertRoot(sym);
                         $$ = sym;
                }

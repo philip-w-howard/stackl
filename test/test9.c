@@ -8,14 +8,11 @@ int main()
     char carr1[51];
 
     cptr = carr;
-    carr[0] = 'x';
-    cptr[1] = 'x';
-    carr[2] = '\n';
+    cptr[0] = 'x';
+    carr[1] = 'x';
+    cptr[2] = '\n';
     carr[3] = 0;
     prints(carr);
-    //printc(carr[0]);
-    //printc(carr[1]);
-    //printc(carr[2]);
     prints(cptr);
     prints("The end\n");
 

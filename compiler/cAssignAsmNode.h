@@ -28,7 +28,7 @@ class cAssignAsmNode : public cStmtNode
            )
         {
             semantic_error("Cannot assign int to " + 
-                    lval->GetType()->GetBaseType()->Name());
+                    lval->GetType()->Name());
         }
     }
 

@@ -41,7 +41,12 @@ class cVarDeclNode : public cDeclNode
 
         mType = type->GetType();
         mId = id;
-        mId->SetType(this);
+        mId->SetDecl(this);
+    }
+
+    virtual cDeclNode *GetType()
+    {
+        return mType;
     }
 
     // return the decl of the type

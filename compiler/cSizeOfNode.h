@@ -29,7 +29,7 @@ class cSizeOfNode : public cExprNode
         {
             if(isChar)
             {
-                mType = symbolTableRoot->Lookup("char")->GetType()->GetBaseType();
+                mType = symbolTableRoot->Lookup("char")->GetDecl();
                 mSize = mType->Size();
             }
             else
@@ -37,7 +37,7 @@ class cSizeOfNode : public cExprNode
                 // ints are considered types, chars are just ints CHAR
                 // for whatever reason, fix in future; as it stands, this
                 // will never be invoked
-                mType = symbolTableRoot->Lookup("int")->GetType();
+                mType = symbolTableRoot->Lookup("int")->GetDecl();
                 mSize = mType->Size();
             }
         }
@@ -61,7 +61,7 @@ class cSizeOfNode : public cExprNode
 
         virtual cDeclNode* GetType()
         {
-            return symbolTableRoot->Lookup("int")->GetType(); 
+            return symbolTableRoot->Lookup("int")->GetDecl(); 
         }
 
     private:

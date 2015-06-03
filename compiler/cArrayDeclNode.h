@@ -31,15 +31,22 @@ class cArrayDeclNode : public cDeclNode
 
         mType = type->GetType();
         mId = id;
-        mId->SetType(this);
+        mId->SetDecl(this);
         mArraySpec = array;
         mPtrLevel = mType->GetPtrLevel() + 1;
     }
 
     virtual int GetPtrLevel() { return mPtrLevel;}
+    virtual cDeclNode *GetType() { return this; }
 
     // return the type of an element of the array
     virtual cDeclNode *GetBaseType()
+    {
+        return mType;
+    }
+    
+    // return the type of an element of the array
+    virtual cDeclNode *GetArrayElementType()
     {
         return mType;
     }

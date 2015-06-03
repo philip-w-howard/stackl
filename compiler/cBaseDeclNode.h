@@ -32,6 +32,9 @@ class cBaseDeclNode : public cDeclNode
             mPtrLevel = pointsTo->GetPtrLevel() + 1;
     }
 
+    virtual cDeclNode* GetBaseType() { return this; }
+    virtual cDeclNode* GetType() { return this; }
+    
     virtual cDeclNode* GetPointsTo() { return mPointsTo; }
     virtual bool IsChar()       { return (mSize==1); }
     virtual bool IsInt()        { return true; }

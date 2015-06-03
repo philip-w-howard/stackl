@@ -31,15 +31,26 @@ class cVarRefNode : public cExprNode
             }
             else
             {
+                // set name of this variable reference to the name
+                // of the variable it references
                 mBaseName = var->Name();
                 mName = var->Name();
+
+                // create the list of varparts that make up the varref
                 mList = new list<cVarPartNode *>();
+
+                // add the first varpart to the varref
                 mList->push_back(var);
-                baseDecl = var->GetDecl();
-                if (!baseDecl->IsArray())
-                    baseDecl = baseDecl->GetBaseType();
+
+                // get the type of the first variable
+                baseDecl = var->GetType();
+                
+                // if the type of the first varpart is an array
+                // and we're referencing part of it, get the type of
+                // the element
                 if (baseDecl->IsArray() && var->IsArrayRef())
-                    baseDecl = baseDecl->GetBaseType();
+                    baseDecl = baseDecl->GetArrayElementType();
+                
                 mDepthDecl = baseDecl;
             }
 
@@ -63,12 +74,10 @@ class cVarRefNode : public cExprNode
                 }
                 else
                 {
-                    mDepthDecl = sField->GetType();
+                    mDepthDecl = sField->GetDecl();
                     field->SetField(mDepthDecl);
-                    if (!mDepthDecl->IsArray())
-                        mDepthDecl = mDepthDecl->GetBaseType();
                     if (mDepthDecl->IsArray() && field->IsArrayRef())
-                        mDepthDecl = mDepthDecl->GetBaseType();
+                        mDepthDecl = mDepthDecl->GetArrayElementType();
                     mList->push_back(field);
                     field->UpdateSymbol(sField);
                     field->SetDecl(base);
@@ -80,7 +89,7 @@ class cVarRefNode : public cExprNode
 
         virtual cDeclNode *GetType()
         {
-            return mDepthDecl;
+            return mDepthDecl->GetType();
         }
 
         int GetOffset() { return mOffset; }
@@ -110,7 +119,7 @@ class cVarRefNode : public cExprNode
             }
 
             if (mDepthDecl->IsArray())
-                mSize = mDepthDecl->GetBaseType()->Size();
+                mSize = mDepthDecl->GetType()->Size();
             else
                 mSize = mDepthDecl->Size();
 
@@ -146,10 +155,10 @@ class cVarRefNode : public cExprNode
             {
                 cArrayValNode *index = last->GetArrayVal();
 
-                if(last->GetType()->GetBaseType()->IsPointer())
+                if(last->GetType()->IsPointer())
                 {
                     // ptr[index] pushes (ptr + (size * index))
-                    int deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
+                    int deref_size = last->GetType()->GetPointsTo()->Size(); 
 
                     if (mList->front()->IsGlobal())
                     {
@@ -171,10 +180,10 @@ class cVarRefNode : public cExprNode
 
                     EmitInt(PLUS_OP);
                 }
-                else
+                else if(last->GetType()->IsArray())
                 {
                     // arr[index] pushes ((FP + offset) + (size * index))
-                    int deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+                    int deref_size = last->GetType()->GetArrayElementType()->Size();
 
                     if (mList->front()->IsGlobal())
                     {
@@ -196,7 +205,7 @@ class cVarRefNode : public cExprNode
                     EmitInt(PLUS_OP);
                 }
             }
-            else if(last->GetType()->GetBaseType()->IsArray())
+            else if(last->GetType()->IsArray())
             {
                 // arr pushes (FP + offset)
                 EmitInt(PUSH_OP);
@@ -223,16 +232,18 @@ class cVarRefNode : public cExprNode
             else if (last->IsArrayRef())
             {
                 int deref_size;
-                if(last->GetType()->GetBaseType()->IsPointer())
+                if(last->GetType()->IsPointer())
                 {
                     //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->GetPointsTo()->Size()  << "...\n";
-                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size();
+                    deref_size = last->GetType()->GetPointsTo()->Size();
+                }
+                else if(last->GetType()->IsArray())
+                {
+                    //std::cout << last->Name() << "[] is an array ref of size " << last->GetType()->Size()  << "...\n";
+                    deref_size = last->GetType()->GetArrayElementType()->Size();
                 }
                 else
-                {
-                    //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->Size()  << "...\n";
-                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
-                }
+                    std::cout << last->Name() << "[] is an unknown array ref of size " << last->GetType()->Size()  << "...\n";
 
                 // array refs leave *x at top of stack 
                 EmitOffset();
@@ -268,7 +279,7 @@ class cVarRefNode : public cExprNode
             {
                 // non-arrays leave 'x' on top of stack
                 int size;
-                size = last->GetType()->GetBaseType()->Size();
+                size = last->GetType()->Size();
 
                 if (mList->front()->IsGlobal())
                 {
@@ -300,24 +311,25 @@ class cVarRefNode : public cExprNode
 
             if (last->IsArrayRef() || last->GetDecl()->IsArray())
             {
-                // TODO make this not have to call back to multiple GetBaseType()s...
                 int deref_size;
-                if(last->GetType()->GetBaseType()->IsPointer())
-                    deref_size = last->GetType()->GetBaseType()->GetPointsTo()->Size(); 
-                else
-                    deref_size = last->GetType()->GetBaseType()->GetBaseType()->Size();
+                if(last->GetType()->IsPointer())
+                    deref_size = last->GetType()->GetPointsTo()->Size(); 
+                else if(last->GetType()->IsArray())
+                    deref_size = last->GetType()->GetArrayElementType()->Size();
 
-                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->GetBaseType()->GetBaseType()->Name()  << " of size " << deref_size  << "...\n";
+                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->Name()  << " of size " << deref_size  << "...\n";
                 EmitOffset();
 
-                if(deref_size == 1)  EmitInt(POPCVARIND_OP);
-                else EmitInt(POPVARIND_OP);
+                if(deref_size == 1)
+                    EmitInt(POPCVARIND_OP);
+                else
+                    EmitInt(POPVARIND_OP);
             }
             else 
             {
                 //std::cout << last->Name() << " is not an array ref or array...\n";
                 int size;
-                size = last->GetType()->GetBaseType()->Size();
+                size = last->GetType()->Size();
 
                 if (mList->front()->IsGlobal())
                 {

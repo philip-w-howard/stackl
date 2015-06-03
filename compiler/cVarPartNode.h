@@ -24,7 +24,7 @@ class cVarPartNode : public cAstNode
     {
         mId = var;
         mArrayPart = arrayPart;     // NULL if this isn't an array ref
-        mDecl = mId->GetType();
+        mDecl = mId->GetDecl();
     }
 
     // return the declaration for this item
