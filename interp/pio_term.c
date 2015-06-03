@@ -36,14 +36,14 @@ static void set_nonblock(int nonblock)
     if (nonblock)
     {
         //turn off canonical mode
-        ttystate.c_lflag &= ~ICANON;
+        ttystate.c_lflag &= ~(ICANON | ECHO);
         //minimum of number input read.
         ttystate.c_cc[VMIN] = 1;
     }
     else
     {
         //turn on canonical mode
-        ttystate.c_lflag |= ICANON;
+        ttystate.c_lflag |= ICANON | ECHO;
     }
     //set the terminal attributes.
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
@@ -183,7 +183,7 @@ int PIO_T_Init()
     IIR_Reg = PIO_T_IID_XMIT;
 
     pthread_create(&IO_Q_Thread_1, NULL, terminal_output, NULL);
-    //pthread_create(&IO_Q_Thread_2, NULL, terminal_input, NULL);
+    pthread_create(&IO_Q_Thread_2, NULL, terminal_input, NULL);
 
     IO_Register_Handler(0, PIO_T_RDR, 8,
             get_word, get_byte, set_word, set_byte);
@@ -196,7 +196,7 @@ int PIO_T_Finish()
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread_1, NULL);
-    //pthread_join(IO_Q_Thread_2, NULL);
+    pthread_join(IO_Q_Thread_2, NULL);
     set_nonblock(0);
 
     return 0;

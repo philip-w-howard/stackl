@@ -349,6 +349,7 @@ void Execute(Machine_State *cpu)
             INC(SP, 1);
             INC(IP, 1);
             break;
+        /*
         case TRAPTOC_OP:
             DEBUG("TRAPTOC_OP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             {
@@ -366,6 +367,7 @@ void Execute(Machine_State *cpu)
                 INC(SP, 1);
             }
             break;
+        */
         case TRAP_OP:
             DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             INC(IP, 1);
@@ -602,6 +604,14 @@ void Execute(Machine_State *cpu)
             DEBUG("DUP");
             SET_INTVAL(SP, 0, GET_INTVAL(SP, -1));
             INC(SP, 1);
+            INC(IP,1);
+            break;
+        case TRACE_ON_OP:
+            Do_Debug = 1;
+            INC(IP,1);
+            break;
+        case TRACE_OFF_OP:
+            Do_Debug = 0;
             INC(IP,1);
             break;
         default:

@@ -2,22 +2,30 @@ Bugs:
 
 Todo:
 
+malloc
+lock
+cond variable?
+semaphore?
+
+exec from disk running in machine
+
+file system
+
 test dma_term
     print works
 
-Patched-up Binary exe file
-
-copy to disk utility
-
-Implement Disk IO
-   from Host 
-   from Local
 Implement Process Control Block in Machine mem
 Implement load in machine: requires disk I/O
 Implement fork() in machine
 Implement sched in machine
 
 Done:
+Implement Disk IO
+   from Local
+Patched-up Binary exe file
+
+copy to disk utility
+
 exec() works in machine
    Using C Load()
 update exe format

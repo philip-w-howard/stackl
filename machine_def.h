@@ -42,6 +42,9 @@
 #define POPVARIND_OP   41
 #define COMP_OP     42
 
+#define TRACE_ON_OP  98
+#define TRACE_OFF_OP 99
+
 #define ILLEGAL_OP  127
 #define PUSH_OP     -1
 #define JUMP_OP     -2

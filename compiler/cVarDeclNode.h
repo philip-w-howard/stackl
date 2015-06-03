@@ -44,6 +44,11 @@ class cVarDeclNode : public cDeclNode
         mId->SetDecl(this);
     }
 
+    void SetGlobal()
+    {
+        mGlobal = true;
+    }
+
     virtual cDeclNode *GetType()
     {
         return mType;

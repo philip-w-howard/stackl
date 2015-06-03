@@ -53,8 +53,7 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
     {
         asm(OUTS_OP, parm1);
     } else if (op == EXIT_CALL) {
-        asm(POPREG_OP, 1); // halt state
-        asm(FLAG_REG);
+        asm(HALT_OP);
     } else if (op == GETL_CALL) {
         do_inp2(op, parm1);
     } else if (op == GETS_CALL || op == GETI_CALL) {
@@ -69,15 +68,11 @@ int systrap(// int SP, int FLAG, int FP, int IP, int LP, int BP,
 int syscall(int size, int op, int parm1)
 {
     int mode;
-    asm(PUSHREG_OP);
-    asm(FLAG_REG);
-    mode = asm(NOP);
+    mode = asm2(PUSHREG_OP, FLAG_REG);
 
-    if (mode == 2)  // user mode
+    if (mode & 2)  // user mode
     {
-        asm(PUSHREG_OP);
-        asm(BP_REG);
-        parm1 = asm(PLUS_OP, parm1);
+        parm1 = asm2(PUSHREG_OP, BP_REG);
     }
 
     asm(TRAP_OP);

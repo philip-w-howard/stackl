@@ -180,8 +180,7 @@ global_decl: func_decl          { $$ = $1; }
                                 { $$ = new cConstDeclNode($2, $3); }
         | DEFINE IDENTIFIER '-' INT_VAL
                                 { $$ = new cConstDeclNode($2, -$4); }
-        | type IDENTIFIER ';' 
-                                { $$ = new cVarDeclNode($1, $2, true); }
+        | var_decl ';'          { $1->SetGlobal(); $$ = $1; }
         | UNSUPPORTED           { 
                                     semantic_error(std::string(yytext) + 
                                             " is not supported");

@@ -13,7 +13,9 @@ static char Input_File[200] = "";
 static int Memory_Size = 0;
 static int Use_Disk = 1;
 static int Boot_Disk = 1;
-
+static int Use_PIO_Term = 1;
+static int Use_DMA_Term = 0;
+static int Use_Inp_Instr = 0;
 
 static const char *HELP_STR =
  "stackl [-opcodes] [-help] [-version] [-loader]\n"
@@ -27,17 +29,26 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "help") == 0)
+            if (strcmp(arg, "dma_term") == 0)
+            {
+                Use_PIO_Term = 0;
+                Use_DMA_Term = 1;
+            }
+            else if (strcmp(arg, "help") == 0)
             {
                 printf(HELP_STR);
                 exit(0);
             }
+            else if (strcmp(arg, "inp") == 0)
+                Use_Inp_Instr = 1;
             else if (strcmp(arg, "loader") == 0)
                 Loader_Debug();
             else if (argv[ii][1] == 'M')
                 Memory_Size = atoi(&argv[ii][2]);
             else if (strcmp(arg, "nodisk") == 0)
                 Use_Disk = 0;
+            else if (strcmp(arg, "nopio_term") == 0)
+                Use_PIO_Term = 0;
             else if (argv[ii][1] == 'N')
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "opcodes") == 0)
@@ -73,9 +84,9 @@ int main(int argc, char **argv)
 
 
     Init_Machine(Memory_Size);
-    Init_IO();
-    PIO_T_Init();
-    DMA_T_Init();
+    Init_IO(Use_Inp_Instr);
+    if (Use_PIO_Term) PIO_T_Init();
+    if (Use_DMA_Term) DMA_T_Init();
     if (Use_Disk) Disk_Init();
 
 
@@ -101,8 +112,8 @@ int main(int argc, char **argv)
     Machine_Execute();
 
     if (Use_Disk) Disk_Finish();
-    DMA_T_Finish();
-    PIO_T_Finish();
+    if (Use_DMA_Term) DMA_T_Finish();
+    if (Use_PIO_Term) PIO_T_Finish();
     Finish_IO();
 
     return 0;

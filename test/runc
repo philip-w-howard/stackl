@@ -3,7 +3,7 @@ RETVAL=$?
 [ $RETVAL -ne 0 ] && echo $1 FAILED
 [ $RETVAL -ne 0 ] && exit $RETVAL
 
-stackl test/$1.slb > out
+stackl test/$1.slb -nopio_term > out
 RETVAL=$?
 [ $RETVAL -ne 0 ] && echo $1 FAILED && exit $RETVAL
 

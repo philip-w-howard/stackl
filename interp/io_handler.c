@@ -38,7 +38,9 @@ typedef struct handler_s
     struct handler_s *next;
 } handler_t;
 
-handler_t *Handler_List;
+static handler_t *Handler_List;
+
+static int Allow_INP_Instr = 0;
 
 //*************************************
 static void *IO_Processor(void *arg)
@@ -78,16 +80,23 @@ static void *IO_Processor(void *arg)
 
             switch (io_op)
             {
-                /*
                 case GETL_CALL:
-                    gets((char *)addr);
+                    if (Allow_INP_Instr)
+                        gets((char *)addr);
+                    else
+                        Machine_Check("Invalid IO code: %d", io_op);
                     break;
-                */
                 case GETS_CALL:
-                    scanf("%s", (char *)addr);
+                    if (Allow_INP_Instr)
+                        scanf("%s", (char *)addr);
+                    else
+                        Machine_Check("Invalid IO code: %d", io_op);
                     break;
                 case GETI_CALL:
-                    scanf("%d", (int *)addr);
+                    if (Allow_INP_Instr)
+                        scanf("%d", (int *)addr);
+                    else
+                        Machine_Check("Invalid IO code: %d", io_op);
                     break;
                 case EXEC_CALL:
                     status = Load( (char *)addr );
@@ -95,9 +104,7 @@ static void *IO_Processor(void *arg)
                     Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                     break;
                 default:
-                    fprintf(stderr, "Invalid IO code: %d\n", io_op);
-                    fprintf(stderr, "System halting\n");
-                    exit(-1);
+                    Machine_Check("Invalid IO code: %d", io_op);
                     break;
             }
 
@@ -113,8 +120,10 @@ static void *IO_Processor(void *arg)
     return NULL;
 }
 //*************************************
-void Init_IO()
+void Init_IO(int allow_INP)
 {
+    Allow_INP_Instr = allow_INP;
+
     IO_Q_Head = 0;
     IO_Q_Tail = 0;
     IO_Q_Halt_Thread = 0;

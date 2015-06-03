@@ -4,6 +4,7 @@ INCLUDES = startup.h \
 	   string.h \
 	   syscodes.h \
 	   machine_def.h \
+	   pio_term.h \
 	   dma_term.h \
 	   disk.h \
 
@@ -41,6 +42,7 @@ execs: compiler interp
 	cp interp/stackl .
 	cp interp/syscodes.h .
 	cp interp/machine_def.h .
+	cp interp/pio_term.h .
 	cp interp/dma_term.h .
 	cp interp/disk.h .
 	cp utils/makebin .
