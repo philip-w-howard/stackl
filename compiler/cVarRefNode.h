@@ -234,7 +234,7 @@ class cVarRefNode : public cExprNode
                 int deref_size;
                 if(last->GetType()->IsPointer())
                 {
-                    //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetBaseType()->GetPointsTo()->Size()  << "...\n";
+                    //std::cout << last->Name() << "[] is a ptr of size " << last->GetType()->GetPointsTo()->Size()  << "...\n";
                     deref_size = last->GetType()->GetPointsTo()->Size();
                 }
                 else if(last->GetType()->IsArray())

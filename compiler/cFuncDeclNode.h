@@ -59,12 +59,6 @@ class cFuncDeclNode : public cDeclNode
         return mReturnType->GetType();
     }
 
-    // return the type of the return value
-    virtual cDeclNode *GetBaseType()
-    {
-        return mReturnType->GetType();
-    }
-
     virtual bool IsFunc()   { return true; }
 
     // size of the returned value

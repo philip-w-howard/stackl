@@ -33,7 +33,6 @@ class cStructDeclNode : public cDeclNode
     }
 
     virtual cDeclNode* GetType() { return this; }
-    virtual cDeclNode* GetBaseType() { return this; }
     virtual bool IsStruct() { return true; }
     virtual bool IsType()   { return true; }
 

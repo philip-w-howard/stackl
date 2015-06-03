@@ -74,7 +74,7 @@ class cVarDerefNode : public cVarRefNode
                 else if(last->GetType()->IsArray())
                     deref_size = last->GetType()->GetArrayElementType()->Size();
 
-                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->GetBaseType()->GetBaseType()->Name()  << " of size " << deref_size  << "...\n";
+                //std::cout << last->Name() << " is an array ref, refing " << last->GetType()->Name()  << " of size " << deref_size  << "...\n";
 
                 EmitOffset();
 

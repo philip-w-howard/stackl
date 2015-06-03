@@ -46,12 +46,6 @@ class cConstDeclNode : public cDeclNode
     virtual cDeclNode *GetType()
     { return mType; }
 
-    // return the decl of the type
-    virtual cDeclNode *GetBaseType()
-    {
-        return mType;
-    }
-
     virtual bool IsInt()    { return true; }
     virtual bool IsConst()    { return true; }
 

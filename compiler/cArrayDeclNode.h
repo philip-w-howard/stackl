@@ -38,12 +38,6 @@ class cArrayDeclNode : public cDeclNode
 
     virtual int GetPtrLevel() { return mPtrLevel;}
     virtual cDeclNode *GetType() { return this; }
-
-    // return the type of an element of the array
-    virtual cDeclNode *GetBaseType()
-    {
-        return mType;
-    }
     
     // return the type of an element of the array
     virtual cDeclNode *GetArrayElementType()
