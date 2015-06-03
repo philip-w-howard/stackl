@@ -1,3 +1,3 @@
 #pragma once
-#define VERSION "V0.4.2"
+#define VERSION "V0.5.0"
 

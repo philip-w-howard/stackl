@@ -47,3 +47,17 @@ std::string ListToString(list<Type> *mList, bool lineFeeds)
     }
     return result;
 }
+//*********************************************
+// Perform the toSting function on a list of AST nodes
+// lineFeeds will place a \n between items if set to true
+template <class Type>
+int ListComputeOffsets(list<Type> *mList, int offset)
+{
+    typename list<Type>::iterator it; 
+
+    for (it=mList->begin(); it != mList->end(); it++)
+    {
+        offset = (*it)->ComputeOffsets(offset);
+    }
+    return offset;
+}
