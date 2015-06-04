@@ -3,6 +3,7 @@
 
 int main()
 {
-    prints("Unused test\n");
+    exec("test/test14.sl");
+    prints("exec failed\n");
     return 0;
 }
