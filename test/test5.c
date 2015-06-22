@@ -1,13 +1,12 @@
-#include <string.h>
-#include <system.h>
+//#include <string.h>
+//#include <system.h>
 int main()
 {
     int ii;
     ii = 0;
     while (ii < 3)
     {
-        printi(ii);
-        prints("\n");
+        sys_prints("while loop\n");
         ii = ii + 1;
     }
 }

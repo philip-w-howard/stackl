@@ -1,5 +1,7 @@
+// Check short circuit nature of || and &&
+//
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 int DoNotPrintMe()
 {

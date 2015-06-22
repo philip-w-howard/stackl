@@ -1,5 +1,8 @@
+// Check sizeof
+// NOTE: This test is incomplete
+//
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 int main()
 {

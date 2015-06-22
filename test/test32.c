@@ -1,5 +1,7 @@
+// Test global arrays or structs of arrays of structs
+//
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 typedef struct
 {
@@ -51,14 +53,23 @@ int main()
         index++;
     }
 
+    index--;
     while (index > 0)
     {
         index--;
-        if (datap[index-1] != index) 
+        if (datap[index] != index+1) 
         {
             prints("Error at offset ");
             printi(index);
+            prints(" ");
+            printi(datap[index]);
             prints("\n");
+        }
+        else
+        {
+            prints("Data at index ");
+            printi(index);
+            prints(" is OK\n");
         }
     }
 

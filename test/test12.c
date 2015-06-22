@@ -1,6 +1,7 @@
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
+// additional string library tests
 int main()
 {
     char str1[10];

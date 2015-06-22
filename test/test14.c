@@ -1,9 +1,10 @@
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 const int ONE = 1;
 #define TWO 2
 
+// const decls
 int main()
 {
     int aa;

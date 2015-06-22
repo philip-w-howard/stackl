@@ -1,5 +1,7 @@
+// Test arrays of structs
+//
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 typedef struct
 {
@@ -22,7 +24,7 @@ int main()
     struct2_t data[3];
     int *datap;
 
-    datap = data;
+    datap = &data[0].a[0];
 
     index = 1;
     for (ii=0; ii<3; ii++)
@@ -52,14 +54,23 @@ int main()
         index++;
     }
 
+    index--;
     while (index > 0)
     {
         index--;
-        if (datap[index-1] != index) 
+        if (datap[index] != index+1) 
         {
             prints("Error at offset ");
             printi(index);
+            prints(" ");
+            printi(datap[index]);
             prints("\n");
+        }
+        else
+        {
+            prints("Data at index ");
+            printi(index);
+            prints(" is OK\n");
         }
     }
 

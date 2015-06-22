@@ -1,30 +1,20 @@
 #include <string.h>
-#include <system.h>
-int f2();
-int f1(int a, int b);
-int f1(int a, int b)
-{
-    printi(a + b);
-    prints("\n");
-}
+#include <io.h>
 int main()
 {
-    int ret;
-    printi(0);
+    int x;
+
+    x = 1234;
+    printi(x);
     prints("\n");
-    f1(5, 8);
-    ret = f2();
-    printi(3);
+
+    x = 0;
+    printi(x);
     prints("\n");
-    printi(ret);
+
+    x = -789;
+    printi(x);
     prints("\n");
-    ret = 2*f2() - 3;
-    printi(ret);
-    prints("\n");
-}
-int f2()
-{
-    printi(2);
-    prints("\n");
-    return 4;
+
+    return 0;
 }

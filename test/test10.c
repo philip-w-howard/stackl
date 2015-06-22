@@ -1,6 +1,7 @@
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
+// test string library
 int main()
 {
     char *ptr;

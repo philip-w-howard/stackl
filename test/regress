@@ -5,4 +5,4 @@ for test in `seq 1 32`; do
 done
 
 #test/runspecial test2001 -boot < test/test2001.input
-test/runspecial test1000 -boot -T600
+#test/runspecial test1000 -boot -T600

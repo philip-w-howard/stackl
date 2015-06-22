@@ -1,6 +1,7 @@
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
+// basic struct tests
 int main()
 {
     typedef struct

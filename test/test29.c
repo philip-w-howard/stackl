@@ -1,5 +1,5 @@
 #include <string.h>
-#include <system.h>
+#include <io.h>
 
 int g_a;
 int g_c;

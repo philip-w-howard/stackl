@@ -1,0 +1,37 @@
+Debug remaining tests
+const optimizations
+multi-D arrays
+redo test suite
+
+Add semantic checks
+
+cSymbol has Decl
+    types: cTypeDecl
+    func:  cFuncDecl
+        return type
+    var:   cVarDecl
+        base type
+
+cExpr
+    GetType
+        Binary: result type
+        Int:    sym("int")->GetDecl
+        Var:    mType->GetDecl
+
+FOR should be:
+    FOR '(' expr ';' expr ';' expr ')' stmt
+
+stmt should include:
+    expr ';'
+    BREAK ';'
+    CONTINUE ';'
+
+expr should include assign as operators
+
+throw semantic_error on ',' in expr list
+
+allow structs separate from typedef?
+
+static vars at global and local level
+
+

@@ -1,0 +1,36 @@
+#pragma once
+
+#include <string>
+
+#include "cStmt.h"
+#include "cSymbol.h"
+
+class cTypeDecl;
+class cVarDecl;
+class cFuncDecl;
+class cDecl : public cStmt
+{
+  public:
+    cDecl(cSymbol *name) 
+    {
+        mName = name;
+    }
+
+    virtual bool IsType()   { return false; }
+    virtual bool IsVar()    { return false; }
+    virtual bool IsFunc()   { return false; }
+    cSymbol *GetSymbol()    { return mName; }
+    virtual cTypeDecl *GetType();
+    virtual cVarDecl  *GetVar();
+    virtual cFuncDecl *GetFunc();
+
+    virtual std::string toString()
+    {
+        return "Decl " + mName->toString();
+    }
+
+
+  protected:
+    cSymbol *mName;
+};
+
