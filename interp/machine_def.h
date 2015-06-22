@@ -42,19 +42,20 @@
 #define POPVARIND_OP   41
 #define COMP_OP     42
 
-#define TRACE_ON_OP  98
-#define TRACE_OFF_OP 99
+#define PUSH_OP     64
+#define JUMP_OP     65
+#define JUMPE_OP    66
+#define PUSHVAR_OP  67
+#define POPVAR_OP   68
+#define ADJSP_OP    69
+#define CALL_OP     70
+#define PUSHCVAR_OP 71
+#define POPCVAR_OP  72
+
+#define TRACE_ON_OP  125
+#define TRACE_OFF_OP 126
 
 #define ILLEGAL_OP  127
-#define PUSH_OP     -1
-#define JUMP_OP     -2
-#define JUMPE_OP    -3
-#define PUSHVAR_OP  -4
-#define POPVAR_OP   -5
-#define ADJSP_OP    -6
-#define CALL_OP     -7
-#define PUSHCVAR_OP -8
-#define POPCVAR_OP  -9
 
 
 // Register definitions for SAVEREG and RESTREG

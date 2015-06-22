@@ -2,6 +2,9 @@ Bugs:
 
 Todo:
 
+switch from word-code to byte-code
+Figure better way to number opcodes
+
 malloc
 lock
 cond variable?
@@ -15,11 +18,11 @@ test dma_term
     print works
 
 Implement Process Control Block in Machine mem
-Implement load in machine: requires disk I/O
 Implement fork() in machine
 Implement sched in machine
 
 Done:
+Implement load in machine: requires disk I/O
 Implement Disk IO
    from Local
 Patched-up Binary exe file

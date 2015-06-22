@@ -11,9 +11,9 @@
 
 static char Input_File[200] = "";
 static int Memory_Size = 0;
-static int Use_Disk = 1;
-static int Boot_Disk = 1;
-static int Use_PIO_Term = 1;
+static int Use_Disk = 0;        // 1
+static int Boot_Disk = 0;       // 1
+static int Use_PIO_Term = 0;    // 1
 static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
 
