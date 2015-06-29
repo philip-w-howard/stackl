@@ -12,8 +12,8 @@ class cArrayType : public cTypeDecl
   public:
     cArrayType(cSymbol *name, int size) : cTypeDecl(name, WORD_SIZE)
     {
+        name = symbolTableRoot->InsertRoot(name);
         name->SetDecl(this);
-        symbolTableRoot->Insert(name);
         mSize = size;
     }
 
@@ -34,8 +34,9 @@ class cArrayType : public cTypeDecl
         return dynamic_cast<cTypeDecl*>(sym->GetDecl());
     }
 
-    virtual bool IsArray() { return true; }
-    virtual int  Size() { return ParentType()->Size() * mSize; }
+    virtual bool IsArray()      { return true; }
+    virtual int  Size()         { return ParentType()->Size() * mSize; }
+    virtual int  ElementSize()  { return ParentType()->Size(); }
 
     virtual std::string toString()
     {
@@ -47,8 +48,22 @@ class cArrayType : public cTypeDecl
 
     static cArrayType *ArrayType(cTypeDecl *base, int size)
     {
-        std::string name = base->GetSymbol()->Name() + 
-            "[" + std::to_string(size) + "]";
+        std::string name;
+
+        if (base->IsArray())
+        {
+            ArrayType(base->ParentType(), size);
+
+            std::string basename = base->GetSymbol()->Name();
+            name = basename.insert(basename.find("["), 
+                    "[" + std::to_string(size) + "]");
+        }
+        else
+        {
+            name = base->GetSymbol()->Name() + 
+                "[" + std::to_string(size) + "]";
+        }
+
         cSymbol *sym = symbolTableRoot->Lookup(name);
         if (sym == NULL) 
         {

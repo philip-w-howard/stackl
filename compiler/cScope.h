@@ -13,6 +13,8 @@
 #include "cSymbol.h"
 #include <unordered_map>
 
+using std::unordered_map;
+
 class cScope
 {
   public:
@@ -31,7 +33,7 @@ class cScope
     // Look for a symbol. Returns NULL if symbol is not found.
     cSymbol *Lookup(std::string name)
     {
-        std::unordered_map<std::string, cSymbol*>::const_iterator found;
+        unordered_map<std::string, cSymbol*>::const_iterator found;
         found = mSymTab.find(name);
         if (found != mSymTab.end()) return found->second;
 
@@ -43,9 +45,23 @@ class cScope
     {
         return mParent;
     }
+
+    std::string toString()
+    {
+        std::string result;
+
+        for (unordered_map<std::string, cSymbol*>::iterator it =mSymTab.begin();
+                it != mSymTab.end(); it++)
+        {
+            result += (*it).first + ": " + (*it).second->toString() + "\n";
+        }
+
+        return result;
+    }
+
   protected:
     // pointer to a hash table used to store info
-    std::unordered_map<std::string, cSymbol*> mSymTab;
+    unordered_map<std::string, cSymbol*> mSymTab;
 
     cScope *mParent;      // Pointer to higher scope table
 };

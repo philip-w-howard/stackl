@@ -21,19 +21,34 @@ class cVarDecl : public cDecl
         mIsGlobal   = false;
     }
 
-    cVarDecl(cTypeDecl *type, cSymbol *name, int arraySize) : cDecl(name)
+    cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl(base->mName)
     {
-        name->SetDecl(this);
-        symbolTableRoot->Insert(name);
+        if (!arraySize->IsConst())
+        {
+            ThrowSemanticError("Array dimention must be a const");
+            return;
+        }
 
-        mType       = cArrayType::ArrayType(type, arraySize);
+        int size = arraySize->ConstValue();
+        
+        base->mName->SetDecl(this);
+
+        mType       = cArrayType::ArrayType(base->mType, size);
         mExpr       = NULL;
         mOffset     = 0;
         mIsGlobal   = false;
     }
 
-    void SetInit(cExpr *init) { mExpr = init; }
-    void SetGlobal()          { mIsGlobal = true; }
+    void SetInit(cExpr *init) 
+    { 
+        if (mType->IsArray() || mType->IsStruct())
+        {
+            ThrowSemanticError("Cannot initialize arrays or structs");
+            return;
+        }
+        mExpr = init; 
+    }
+    void SetGlobal()        { mIsGlobal = true; }
 
     virtual bool IsGlobal() { return mIsGlobal; }
     virtual bool IsConst()  { return mExpr!=NULL && mExpr->IsConst(); }

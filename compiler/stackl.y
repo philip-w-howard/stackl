@@ -69,7 +69,7 @@
 %type <struct_decl>     struct_decl
 %type <var_decl>        var_decl
 %type <var_decl>        paramspec
-%type <int_val>         arrayspec
+/* %type <int_val>         arrayspec */
 %type <func_decl>       func_decl
 %type <func_decl>       func_header
 %type <func_decl>       func_prefix
@@ -155,9 +155,9 @@ var_decl:   type IDENTIFIER
                 $$ = new cVarDecl($1, $2); 
                 if ($$->HasSemanticError()) YYERROR;
             }
-        |   type IDENTIFIER arrayspec
+        |   var_decl '[' constant_expression ']'
             { 
-                $$ = new cVarDecl($1, $2, $3); 
+                $$ = new cVarDecl($1, $3); 
                 if ($$->HasSemanticError()) YYERROR;
             }
 type:   type '*'
@@ -284,12 +284,12 @@ arrayspec:  arrayspec '[' INT_VAL ']'
                                 $$ = $1;
                                 $1->AddNode($3);
                             }
- */
 arrayspec:  '[' constant_expression ']'
             { 
                 $$ = $2->ConstValue(); 
                 //if ($$->HasSemanticError()) YYERROR;
             }
+ */
 
 stmts:      stmts stmt
             { 
@@ -754,5 +754,6 @@ int semantic_error(std::string msg)
 void fatal_error(std::string msg)
 {
     std::cerr << "Internal compiler error " << msg << std::endl;
+    //std::cerr << symbolTableRoot->toString() << std::endl;
     exit(1);
 }

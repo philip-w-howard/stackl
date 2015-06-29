@@ -1,5 +1,11 @@
 BUGS
 
+  *ptr1++ = *ptr2++
+  does not seem to work
+
+  variable initialization does not always work
+  char *ptr = ptr2
+
 
 TODO
 

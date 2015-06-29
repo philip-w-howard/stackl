@@ -18,6 +18,7 @@ class cTypeDecl : public cDecl
     virtual bool IsPointer(){ return false; }
     virtual bool IsArray()  { return false; }
 
+    virtual int ElementSize()       { return mSize; }
     virtual int Size()              { return mSize; }
 
     virtual cTypeDecl *GetType()    { return this; }

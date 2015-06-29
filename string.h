@@ -2,7 +2,7 @@ int strlen(char *str)
 {
     int count;
     count = 0;
-    while (str[0] != 0)
+    while (*str != 0)
     {
         count++;
         str++;
@@ -13,25 +13,30 @@ int strlen(char *str)
 
 char * strcpy(char *dest, char *src)
 {
-    int count;
-    count = 0;
-    while (src[count] != 0)
+    char *dst;
+    dst = dest;
+    while (*src != 0)
     {
-        dest[count] = src[count];
-        count++;
+        *dst = *src;
+        dst++; 
+        src++;
     }
-    dest[count] = 0;
+    *dst = 0;
 
     return dest;
 }
 
 char * strncpy(char *dest, char *src, int size)
 {
+    char *dst;
+    dst = dest;
     int count;
     count = 0;
-    while (src[count] != 0 && count < size)
+    while (*src != 0 && count < size)
     {
-        dest[count] = src[count];
+        *dst = *src;
+        dst++;
+        src++;
         count++;
     }
     for (count = count; count < size; count++)
@@ -44,12 +49,12 @@ char * strncpy(char *dest, char *src, int size)
 
 char * strchr(char *haystack, int needle)
 {
-    while (haystack[0] != needle && haystack[0] != 0)
+    while (*haystack != needle && *haystack)
     {
         haystack++;
     }
 
-    if (haystack[0] != needle) return 0;
+    if (*haystack != needle) return 0;
 
     return haystack;
 }
@@ -58,12 +63,12 @@ int strcmp(char *str1, char *str2)
 {
     int index;
     int result;
-    index = 0;
-    while (str1[index] != 0 || str2[index] != 0)
+    while (*str1 != 0 || *str2 != 0)
     {
-        result = str1[index] - str2[index];
+        result = *str1 - *str2;
         if (result != 0) return result;
-        index++;
+        str1++;
+        str2++;
     }
     return 0;
 }
@@ -80,7 +85,7 @@ char *strrev(char *str)
     start = str;
 
     // find the end of the string
-    while (end[0])
+    while (*end)
     {
         end++;
     }
@@ -88,9 +93,9 @@ char *strrev(char *str)
 
     while (start < end)
     {
-        temp = start[0];
-        start[0] = end[0];
-        end[0] = temp;
+        temp = *start;
+        *start = *end;
+        *end = temp;
         start++;
         end--;
     }
@@ -120,17 +125,17 @@ char *itostr(int value, char *str)
 
     while (value > 0)
     {
-        ptr[0] = (value % 10) + '0';
+        *ptr = (value % 10) + '0';
         ptr++;
         value /= 10;
     }
 
     if (minus) 
     {
-        ptr[0] = '-';
+        *ptr = '-';
         ptr++;
     }
-    ptr[0] = 0;
+    *ptr = 0;
 
     strrev(str);
     return str;

@@ -1,6 +1,8 @@
-Debug remaining tests
 const optimizations
 multi-D arrays
+   mBaseType for multi-D arrays is not correct
+   mBaseType for cArrayRef[3][2] on second index
+
 redo test suite
 
 Add semantic checks

@@ -25,7 +25,9 @@ class cSymbolTable
     // the preexisting symbol. Otherwise, return new symbol
     cSymbol *Insert(cSymbol *symbol);
 
+    // Insert in the root symbol table
     cSymbol *InsertRoot(cSymbol *symbol);
+
     // Look for a symbol. Returns NULL if symbol is not found.
     cSymbol *Lookup(std::string name);
 
@@ -43,6 +45,12 @@ class cSymbolTable
 
     // create a default table with symbols for base types
     void InitDefaultTable();
+
+    std::string toString()
+    {
+        return "symtable: " + mScope->toString();
+    }
+
   protected:
     // pointer to a hash table used to store info
     cScope *mScope;

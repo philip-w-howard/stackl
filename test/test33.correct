@@ -1,0 +1,14 @@
+Setting 0 0 to 1
+Setting 0 1 to 2
+Setting 1 0 to 3
+Setting 1 1 to 4
+Setting 2 0 to 5
+Setting 2 1 to 6
+Index reached 7
+Data at index 5 is OK
+Data at index 4 is OK
+Data at index 3 is OK
+Data at index 2 is OK
+Data at index 1 is OK
+Data at index 0 is OK
+Test complete
