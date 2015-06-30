@@ -57,6 +57,7 @@ class cArrayType : public cTypeDecl
             std::string basename = base->GetSymbol()->Name();
             name = basename.insert(basename.find("["), 
                     "[" + std::to_string(size) + "]");
+            size = base->cTypeDecl::Size();
         }
         else
         {

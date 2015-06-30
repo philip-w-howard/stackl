@@ -82,7 +82,7 @@ static void *IO_Processor(void *arg)
             {
                 case GETL_CALL:
                     if (Allow_INP_Instr)
-                        gets((char *)addr);
+                        fgets((char *)addr, 256, stdin);
                     else
                         Machine_Check("Invalid IO code: %d", io_op);
                     break;
