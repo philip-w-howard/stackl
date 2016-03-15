@@ -14,7 +14,6 @@
 using std::list;
 
 #include "cStmt.h"
-#include "cAstList.h"
 #include "cDecl.h"
 
 using std::list;
@@ -25,33 +24,30 @@ class cStmtsList : public cStmt
     // constructor places first decl in list
     cStmtsList(cStmt *stmt) : cStmt()
     {
-        mList = new list<cStmt *>();
-        mList->push_back(stmt);
+        AddChild(stmt);
     }
 
     // add a declaration to the list
     virtual void AddNode(cStmt *stmt) 
     {
-        mList->push_back(stmt);
+        AddChild(stmt);
     }
 
     // add a list of stmts to this list
     void AddList(cStmtsList *stmts)
     {
-        for (list<cStmt *>::iterator it = stmts->mList->begin(); 
-            it != stmts->mList->end(); it++)
+        for (int ii=0; ii<stmts->NumChildren(); ii++)
         {
-            AddNode( (*it) );
+            AddChild( stmts->GetChild(ii) );
         }
     }
 
     virtual int Size()
     {
         int size = 0;
-        for (list<cStmt *>::iterator it = mList->begin(); 
-            it != mList->end(); it++)
+        for (int ii=0; ii<NumChildren(); ii++)
         {
-            size += (*it)->Size();
+            size += GetStmt(ii)->Size();
         }
 
         return size;
@@ -59,8 +55,8 @@ class cStmtsList : public cStmt
 
     virtual std::string toString()
     {
-        std::string result("STMTS:\n{\n");
-        result += ListToString<cStmt *>(mList, true);
+        std::string result("STMTS:\n{NOT IMPLEMENTED\n");
+        //result += ListToString<cStmt *>(mList, true);
         result += "}\n";
 
         return result;
@@ -68,8 +64,8 @@ class cStmtsList : public cStmt
 
     virtual int ComputeOffsets(int base)
     {
-        for (list<cStmt *>::iterator it = mList->begin(); 
-            it != mList->end(); it++)
+        for (cAstNode::iterator it = FirstChild();
+            it != LastChild(); it++)
         {
             base = (*it)->ComputeOffsets(base);
         }
@@ -79,14 +75,13 @@ class cStmtsList : public cStmt
 
     virtual void GenerateCode()
     {
-        for (list<cStmt *>::iterator it = mList->begin(); 
-            it != mList->end(); it++)
+        for (cAstNode::iterator it = FirstChild();
+            it != LastChild(); it++)
         {
             (*it)->GenerateCode();
         }
     }
 
-  protected:
-    list<cStmt *> *mList;       // list of delcarations
+    cStmt *GetStmt(int index) { return (cStmt*)GetChild(index); }
 };
 

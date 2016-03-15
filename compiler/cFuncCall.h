@@ -42,7 +42,7 @@ class cFuncCall : public cVarRef
         if (mParams != NULL) mParams->GenerateCode();
 
         EmitInt(CALL_OP);
-        SetLabelRef(mFunc->GetSymbol()->Name());
+        SetLabelRef(mFunc->GetName()->Name());
 
         // Need to pop the args off the stack without affecting the return val
         if (mParams != NULL)

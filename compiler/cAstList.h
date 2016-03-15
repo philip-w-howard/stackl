@@ -11,6 +11,8 @@
 
 #include <list>
 
+#error "cAstList is no longer used"
+
 using std::list;
 
 //*********************************************

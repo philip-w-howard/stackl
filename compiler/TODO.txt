@@ -36,4 +36,51 @@ allow structs separate from typedef?
 
 static vars at global and local level
 
-
+// Get prepared for visitor pattern:
+cAddressExpr.h      done
+cArrayRef.h         done
+cArrayType.h
+cAsmNode.h
+cAssignExpr.h
+cAstList.h          done: no longer used
+cAstNode.h          done
+cBaseDeclNode.h
+cBinaryExpr.h
+cDecl.h             done
+cDeclsList.h
+cExpr.h
+cExprStmt.h
+cFixupTable.h
+cForStmt.h
+cFuncCall.h
+cFuncDecl.h
+cIfStmt.h
+cIntExpr.h
+cNopStmt.h
+cParams.h
+cPointerDeref.h
+cPointerType.h
+cPostfixExpr.h
+cPrefixExpr.h
+cReturnStmt.h
+cScope.h
+cShortCircuitExpr.h
+cSizeofExpr.h
+cStmt.h
+cStmtsList.h
+cStringLit.h
+cStructDeref.h
+cStructRef.h
+cStructType.h
+cSymbol.h           done
+cSymbolTable.h
+cTypeDecl.h         done
+cUnaryExpr.h
+cVarDecl.h          in progress
+cVarRef.h
+cVisitor.h
+cWhileStmt.h
+codegen.h
+lex.h
+parse.h
+parser.h

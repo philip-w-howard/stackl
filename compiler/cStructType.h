@@ -34,7 +34,7 @@ class cStructType : public cTypeDecl
     virtual std::string toString()
     {
         std::string result;
-        result = "struct: " + mName->toString() + "\n";
+        result = "struct: " + GetName()->toString() + "\n";
         result += mDecls->toString();
         result += "\n";
 

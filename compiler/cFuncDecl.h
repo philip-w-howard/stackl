@@ -42,7 +42,7 @@ class cFuncDecl : public cTypeDecl
     virtual std::string toString()
     {
         std::string result;
-        result = "function: " + mName->toString();
+        result = "function: " + GetName()->toString();
         if (mParams != NULL)
             result += "( " + mParams->toString() + " )";
         else
@@ -79,8 +79,8 @@ class cFuncDecl : public cTypeDecl
     {
         if (!mHasStatements) return;
 
-        EmitComment(GetSymbol()->Name() + "\n");
-        SetLabelValue(GetSymbol()->Name());
+        EmitComment(GetName()->Name() + "\n");
+        SetLabelValue(GetName()->Name());
         int adj_size = (mDeclsSize / WORD_SIZE * WORD_SIZE) + WORD_SIZE;
         if (mDeclsSize != 0)
         {

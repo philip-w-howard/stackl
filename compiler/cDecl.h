@@ -11,26 +11,22 @@ class cFuncDecl;
 class cDecl : public cStmt
 {
   public:
-    cDecl(cSymbol *name) 
-    {
-        mName = name;
-    }
+    cDecl() {}
 
     virtual bool IsType()   { return false; }
     virtual bool IsVar()    { return false; }
     virtual bool IsFunc()   { return false; }
-    cSymbol *GetSymbol()    { return mName; }
+    virtual bool IsStruct() { return false; }
+    virtual bool IsPointer(){ return false; }
+    virtual bool IsArray()  { return false; }
+    virtual cSymbol *GetName()      = 0;
     virtual cTypeDecl *GetType();
     virtual cVarDecl  *GetVar();
     virtual cFuncDecl *GetFunc();
 
     virtual std::string toString()
     {
-        return "Decl " + mName->toString();
+        return "Decl " + GetName()->toString();
     }
-
-
-  protected:
-    cSymbol *mName;
 };
 

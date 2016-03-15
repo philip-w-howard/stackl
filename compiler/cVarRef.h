@@ -50,7 +50,7 @@ class cVarRef : public cExpr
         if (var->IsGlobal())
         {
             EmitInt(PUSH_OP);
-            EmitGlobalRef(var->GetSymbol()->Name());
+            EmitGlobalRef(var->GetName()->Name());
             EmitInt(PUSH_OP);
             EmitInt(var->GetOffset());
             EmitInt(PLUS_OP);

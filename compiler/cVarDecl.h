@@ -10,18 +10,20 @@
 class cVarDecl : public cDecl
 {
   public:
-    cVarDecl(cTypeDecl *type, cSymbol *name) : cDecl(name)
+    cVarDecl(cTypeDecl *type, cSymbol *name) : cDecl()
     {
+        // FIX THIS semantic check for "already defined"
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
 
-        mType       = type;
-        mExpr       = NULL;
+        AddChild(type);
+        AddChild(name);
+        AddChild(nullptr);  // mExpr
         mOffset     = 0;
         mIsGlobal   = false;
     }
 
-    cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl(base->mName)
+    cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl()
     {
         if (!arraySize->IsConst())
         {
@@ -30,43 +32,41 @@ class cVarDecl : public cDecl
         }
 
         int size = arraySize->ConstValue();
+        AddChild(cArrayType::ArrayType(base->GetType(), size));
+        AddChild(base->GetName());
+        AddChild(arraySize);
         
-        base->mName->SetDecl(this);
+        base->GetName()->SetDecl(this);
 
-        mType       = cArrayType::ArrayType(base->mType, size);
-        mExpr       = NULL;
         mOffset     = 0;
         mIsGlobal   = false;
     }
 
     void SetInit(cExpr *init) 
     { 
-        if (mType->IsArray() || mType->IsStruct())
+        if (GetType()->IsArray() || GetType()->IsStruct())
         {
             ThrowSemanticError("Cannot initialize arrays or structs");
             return;
         }
-        mExpr = init; 
+        SetChild(2, init); 
     }
     void SetGlobal()        { mIsGlobal = true; }
 
     virtual bool IsGlobal() { return mIsGlobal; }
-    virtual bool IsConst()  { return mExpr!=NULL && mExpr->IsConst(); }
-    virtual cExpr *GetInitValue() { return mExpr; }
-    virtual bool IsVar()    { return true; }
+    virtual bool IsConst()  
+        { return GetInit()!=nullptr && GetInit()->IsConst(); }
 
-    virtual cTypeDecl *GetType() 
-    { 
-        return mType;
-    }
+    virtual bool IsVar()    { return true; }
 
     virtual int GetOffset() { return mOffset; }
 
     virtual std::string toString()
     {
         std::string result;
-        result = "vardecl: " + mType->GetSymbol()->toString() + " : " 
-            + mName->toString() + " @ " + std::to_string(mOffset);
+        result = "vardecl: NOT IMPLEMENTED" ; 
+            //+ mType->GetSymbol()->toString() + " : " 
+            // + GetName()->toString() + " @ " + std::to_string(mOffset);
 
         return result;
     }
@@ -95,9 +95,10 @@ class cVarDecl : public cDecl
     virtual void GenerateCode()
     {}
 
+    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(1); }
+    virtual cTypeDecl* GetType(){ return (cTypeDecl*)GetChild(0); }
+    virtual cExpr*   GetInit()  { return (cExpr*)GetChild(2); }
   protected:
-    cTypeDecl *mType;
-    cExpr     *mExpr;
     int       mOffset;
     bool      mIsGlobal;
 };

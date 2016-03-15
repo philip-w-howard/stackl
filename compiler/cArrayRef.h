@@ -20,21 +20,18 @@ class cArrayRef : public cVarRef
 
         baseType = baseType->ParentType();
 
-        mBase = base;
-        mBaseType = baseType;
-        mIndex = index;
+        AddChild(base);
+        AddChild(index);
     }
-
-    virtual cTypeDecl *GetType() { return mBaseType; }
 
     virtual std::string toString()
     {
-        return mBase->toString() + " [ " + mIndex->toString() + " ] ";
+        return GetBase()->toString() + " [ " + GetIndex()->toString() + " ] ";
     }
 
     virtual void GenerateAddress()
     {
-        cVarRef *var = dynamic_cast<cVarRef*>(mBase);
+        cVarRef *var = dynamic_cast<cVarRef*>(GetBase());
         if (var == NULL) 
         {
             fatal_error("Generating address for cArrayRef "
@@ -42,18 +39,18 @@ class cArrayRef : public cVarRef
             return;
         }
 
-        if (mBase->GetType()->IsPointer())
+        if (GetType()->IsPointer())
             var->GenerateCode();
         else
             var->GenerateAddress();
 
-        mIndex->GenerateCode();
-        if (mBaseType->Size() == 1)
+        GetIndex()->GenerateCode();
+        if (GetType()->Size() == 1)
         {
             EmitInt(PLUS_OP);
         } else {
             EmitInt(PUSH_OP);
-            EmitInt(mBaseType->Size());
+            EmitInt(GetType()->Size());
             EmitInt(TIMES_OP);
             EmitInt(PLUS_OP);
         }
@@ -62,15 +59,15 @@ class cArrayRef : public cVarRef
     virtual void GenerateCode()
     {
         GenerateAddress();
-        if (mBaseType->Size() == 1)
+        if (GetType()->Size() == 1)
             EmitInt(PUSHCVARIND_OP);
         else
             EmitInt(PUSHVARIND_OP);
     }
 
-  protected:
-    cExpr       *mBase;
-    cTypeDecl   *mBaseType;
-    cExpr       *mIndex;
+
+    cExpr* GetBase()                { return (cExpr*)GetChild(0); }
+    virtual cTypeDecl *GetType()    { return GetBase()->GetType(); }
+    cExpr* GetIndex()               { return (cExpr*)GetChild(1); }
 };
 

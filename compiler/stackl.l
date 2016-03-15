@@ -160,7 +160,7 @@ static int proc_identifier(const char *name)
         if (decl->IsType()) return TYPE_ID;
         if (decl->IsVar() && decl->GetVar()->IsConst()) 
         {
-            yylval.int_val = decl->GetVar()->GetInitValue()->ConstValue();
+            yylval.int_val = decl->GetVar()->GetInit()->ConstValue();
             return INT_VAL;
         }
     }

@@ -25,7 +25,7 @@ class cBaseDeclNode : public cTypeDecl
 
     virtual std::string toString()
     {
-        return "Base Type " + mName->toString() + 
+        return "Base Type " + GetName()->toString() + 
             " size: " + std::to_string(mSize);
     }
 };

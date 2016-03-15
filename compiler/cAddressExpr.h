@@ -13,25 +13,24 @@ class cAddressExpr : public cExpr
         cVarRef *var = dynamic_cast<cVarRef*>(expr);
         if (var == NULL)
             ThrowSemanticError("Took the address of something that isn't a var");
-        mExpr = expr;
+        AddChild(expr);
     }
 
-    virtual cTypeDecl *GetType() { return mExpr->GetType(); }
+    virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
 
     virtual std::string toString()
     {
-       return "( & " + mExpr->toString() + ")";
+       return "( & " + GetExpr()->toString() + ")";
     }
     virtual void GenerateCode() 
     {
-        cVarRef *var = dynamic_cast<cVarRef*>(mExpr);
+        cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());
         if (var == NULL)
             fatal_error("address of without underlying cVarRef");
 
         var->GenerateAddress();
     }
 
-  protected:
-    cExpr *mExpr;
+    cExpr* GetExpr() { return (cExpr*)GetChild(0); }
 };
 

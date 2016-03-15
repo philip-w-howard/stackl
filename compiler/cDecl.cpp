@@ -3,6 +3,8 @@
 #include "cVarDecl.h"
 #include "cFuncDecl.h"
 
+// FIX THIS:: this is ugly. Does it actually get used?
+//
 cTypeDecl *cDecl::GetType()
 { 
     return dynamic_cast<cTypeDecl*>(this); 

@@ -14,7 +14,6 @@
 using std::list;
 
 #include "cStmtsList.h"
-#include "cAstList.h"
 #include "cDecl.h"
 #include "cTypeDecl.h"
 
@@ -31,18 +30,16 @@ class cDeclsList : public cStmtsList
     // add a declaration to the list
     virtual void AddNode(cDecl *decl) 
     {
-        cStmtsList::AddNode(decl);
+        AddChild(decl);
     }
 
     virtual std::string toString()
     {
         std::string result("DECLS:\n{\n");
-        result += ListToString<cStmt *>(mList, true);
+        result += "NOT IMPLEMENTED"; // ListToString<cStmt *>(mList, true);
         result += "}\n";
 
         return result;
     }
-
-  protected:
 };
 

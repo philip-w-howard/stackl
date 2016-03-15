@@ -14,7 +14,6 @@
 using std::list;
 
 #include "cAstNode.h"
-#include "cAstList.h"
 #include "cExpr.h"
 
 using std::list;
@@ -25,26 +24,24 @@ class cParams : public cAstNode
     // constructor places first decl in list
     cParams(cExpr *expr) : cAstNode()
     {
-        mList = new list<cExpr *>();
-        mList->push_back(expr);
+        AddChild(expr);
     }
 
     // add a declaration to the list
     virtual void AddNode(cExpr *expr) 
     {
-        mList->push_back(expr);
+        AddChild(expr);
     }
 
     virtual int Size()
     {
         int size = 0;
-        for (list<cExpr *>::iterator it = mList->begin(); 
-            it != mList->end(); it++)
+        for (int ii=0; ii<NumChildren(); ii++)
         {
-            if ( (*it)->GetType()->IsArray())
+            if ( GetParam(ii)->GetType()->IsArray())
                 size += WORD_SIZE;
             else
-                size += (*it)->Size();
+                size += GetParam(ii)->Size();
         }
 
         return size;
@@ -53,15 +50,15 @@ class cParams : public cAstNode
     virtual std::string toString()
     {
         std::string result;
-        result = ListToString<cExpr *>(mList, false);
+        result = "NOT IMPLEMENTED"; // ListToString<cExpr *>(mList, false);
 
         return result;
     }
 
     virtual int ComputeOffsets(int base)
     {
-        for (list<cExpr *>::iterator it = mList->begin(); 
-            it != mList->end(); it++)
+        for (cAstNode::iterator it = FirstChild();
+            it != LastChild(); it++)
         {
             base = (*it)->ComputeOffsets(base);
         }
@@ -72,14 +69,13 @@ class cParams : public cAstNode
     // generate code in reverse list order (right to left)
     virtual void GenerateCode()
     {
-        list<cExpr *>::iterator it = mList->end(); 
+        cAstNode::iterator it = LastChild(); 
         do
         {
             it--;
             (*it)->GenerateCode();
-        } while (it != mList->begin());
+        } while (it != FirstChild());
     }
 
-  protected:
-    list<cExpr *> *mList;       // list of delcarations
+    cExpr* GetParam(int index) { return (cExpr*)GetChild(index); }
 };

@@ -14,11 +14,11 @@
 
 class cDecl;
 
-class cSymbol
+class cSymbol : public cAstNode
 {
     public:
         // create a Symbol for the given name n
-        cSymbol(std::string n) 
+        cSymbol(std::string n) : cAstNode()
         {
             name = n; 
             sequence = ++totalSymbols;
@@ -54,7 +54,7 @@ class cSymbol
     protected:
         std::string name;           // name of the symbol
         int sequence;               // unique ID for symbol
-        cDecl *mDecl;
+        cDecl *mDecl;               // The decl that defines this symbol
         static int totalSymbols;    // STATIC: keeps track of total number of
                                     // symbols that have been created. Used
                                     // to assign sequence: unique ID

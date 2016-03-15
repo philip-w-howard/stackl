@@ -19,7 +19,7 @@ class cArrayType : public cTypeDecl
 
     virtual cTypeDecl *ParentType() 
     {
-        std::string name = GetSymbol()->Name();
+        std::string name = GetName()->Name();
 
         // remove the last "[]"
         while (name.size() > 0 && name.back() != '[')
@@ -40,7 +40,7 @@ class cArrayType : public cTypeDecl
 
     virtual std::string toString()
     {
-        return "type: " + mName->toString();
+        return "type: " + GetName()->toString();
     }
 
     virtual void GenerateCode()
@@ -54,14 +54,14 @@ class cArrayType : public cTypeDecl
         {
             ArrayType(base->ParentType(), size);
 
-            std::string basename = base->GetSymbol()->Name();
+            std::string basename = base->GetName()->Name();
             name = basename.insert(basename.find("["), 
                     "[" + std::to_string(size) + "]");
             size = base->cTypeDecl::Size();
         }
         else
         {
-            name = base->GetSymbol()->Name() + 
+            name = base->GetName()->Name() + 
                 "[" + std::to_string(size) + "]";
         }
 

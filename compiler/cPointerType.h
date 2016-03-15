@@ -17,7 +17,7 @@ class cPointerType : public cTypeDecl
 
     virtual cTypeDecl *ParentType() 
     {
-        std::string name = GetSymbol()->Name();
+        std::string name = GetName()->Name();
 
         // remove the last "*"
         name.pop_back();
@@ -32,7 +32,7 @@ class cPointerType : public cTypeDecl
 
     virtual std::string toString()
     {
-        return "type: " + mName->toString();
+        return "type: " + GetName()->toString();
     }
 
     virtual void GenerateCode()
@@ -40,7 +40,7 @@ class cPointerType : public cTypeDecl
 
     static cPointerType *PointerType(cTypeDecl *base)
     {
-        std::string name = base->GetSymbol()->Name() + "*";
+        std::string name = base->GetName()->Name() + "*";
         cSymbol *sym = symbolTableRoot->Lookup(name);
         if (sym == NULL) 
         {

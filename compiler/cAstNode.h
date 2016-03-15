@@ -1,62 +1,120 @@
 #pragma once
-//*******************************************************
-// Purpose: Base class for all AST nodes
+//**************************************
+// cAstNode.h
 //
-// Author: Philip Howard
-// Email:  phil.howard@oit.edu
+// pure virtual base class for all AST nodes
 //
-// Date: 2/20/2015
+// Author: Phil Howard 
+// phil.howard@oit.edu
 //
-//*******************************************************
+// Date: Mar. 14, 2016
+//
 
-#include <iostream>
 #include <string>
+#include <vector>
 #include <cassert>
+using std::string;
+using std::vector;
+
+//#include "cVisitor.h"
 
 extern int yylineno;
 
-// declare semantic_error here so all AST classes can call it 
-// without including parser.h
-int semantic_error(std::string msg);
+// called to throw a semantic error
+extern int semantic_error(std::string error);
 
 void fatal_error(std::string msg);
-
 class cAstNode
 {
-  public:
-    cAstNode() 
-    {
-        mSemanticError = false;
-        mLineNumber = yylineno;
-    }
+    public:
+        typedef vector<cAstNode*>::iterator iterator;
 
-    // return the source line number from when the node was created
-    int LineNumber() { return mLineNumber; }
+        cAstNode() 
+        {
+            mSemanticError = false;
+            mLineNumber = yylineno;
+        }
 
-    // return a string representation of the class
-    virtual std::string toString() = 0;
+        // return the source line number from when the node was created
+        int LineNumber() { return mLineNumber; }
 
-    void ThrowSemanticError(std::string msg)
-    {
-        semantic_error(msg);
-        mSemanticError = true;
-    }
+        void AddChild(cAstNode *child)
+        {
+            m_children.push_back(child);
+        }
 
-    // return true if a semantic error was detected in this node
-    virtual bool HasSemanticError() { return mSemanticError; }
+        void SetChild(int index, cAstNode *child)
+        {
+            m_children[index] = child;
+        }
 
-    // Compute the size and offsets for any declarations
-    // The default behavior does nothing. Subclasses with decls
-    // need to override this function.
-    virtual int ComputeOffsets(int base)
-    { return base; }
+        iterator FirstChild()
+        {
+            return m_children.begin();
+        }
 
-    // Generate code for this node.
-    // Subclasses that are responsible for actually generating code
-    // need to override this function.
-    virtual void GenerateCode() {}
-  protected:
-    bool mSemanticError;        // true indicates this node has a semantic error
-    int mLineNumber;            // line number of source when node was created
+        iterator LastChild()
+        {
+            return m_children.end();
+        }
+
+        bool HasChildren()      { return !m_children.empty(); }
+
+        int NumChildren()       { return (int)m_children.size(); }
+        cAstNode* GetChild(int child)
+        {
+            if (child >= (int)m_children.size()) return nullptr;
+            return m_children[child];
+        }
+
+        // return a string representation of the node
+        virtual string toString() = 0;
+
+        string ToString() 
+        {
+            string result("");
+
+            result += "<" + NodeType();
+            result += AttributesToString();
+
+            if (HasChildren())
+            {
+                result += ">";
+                iterator it;
+                for (it=FirstChild(); it != LastChild(); it++)
+                {
+                    if ( (*it) != nullptr) result += (*it)->ToString();
+                }
+            }
+
+            if (HasChildren()) 
+                result += "</" + NodeType() + ">\n";
+            else
+                result += "/>";
+
+            return result;
+        }
+
+        virtual string AttributesToString()   { return string(""); }
+        virtual string NodeType()       { return "AST"; }
+        //virtual void Visit(cVisitor *visitor) = 0;
+
+        // return true if a semantic error was detected in this node
+        virtual bool HasSemanticError() { return mSemanticError; }
+
+         virtual int ComputeOffsets(int base) { return base; }
+         virtual void GenerateCode() {}
+    protected:
+        vector<cAstNode *> m_children;  // list of statements
+        bool mSemanticError;            // This node contains a semantic error
+        int mLineNumber;                // line number of source when 
+                                        // node was created
+
+        void ThrowSemanticError(std::string msg)
+        {
+            semantic_error(msg);
+            mSemanticError = true;
+        }
+
+
 };
-
