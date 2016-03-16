@@ -27,6 +27,8 @@ clean:
 	rm -f makebin
 	rm -f copy2disk
 	rm -f out
+	rm -f test/*.sl
+	rm -f test/*.slb
 
 compiler:
 	$(MAKE) -C compiler

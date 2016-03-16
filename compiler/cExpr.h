@@ -25,7 +25,7 @@ class cExpr : public cStmt
 
     //virtual bool HasEffect()    = 0;
 
-    virtual int Size()          { return GetType()->Size(); }
+    virtual int Size()          { return GetType()->ElementSize(); }
 
     virtual cTypeDecl *GetType() = 0;
     //virtual int  GetOffset() = 0;

@@ -34,7 +34,7 @@ class cPointerDeref : public cVarRef
     virtual void GenerateCode()
     {
         mBase->GenerateCode();
-        if (mBaseType->Size() == 1)
+        if (mBaseType->ElementSize() == 1)
         {
             EmitInt(PUSHCVARIND_OP);
         } else {

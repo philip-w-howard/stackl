@@ -12,7 +12,8 @@ class cStructType : public cTypeDecl
     cStructType(cSymbol *name, cScope *scope, cDeclsList *decls) 
         : cTypeDecl(name, decls->Size())
     {
-        mDecls = decls;
+        // FIX THIS: semantic checks?
+        AddChild(decls);
         mScope = scope;
         mSize = 0;
         name->SetDecl(this);
@@ -35,7 +36,7 @@ class cStructType : public cTypeDecl
     {
         std::string result;
         result = "struct: " + GetName()->toString() + "\n";
-        result += mDecls->toString();
+        result += GetDecls()->toString();
         result += "\n";
 
         return result;
@@ -46,7 +47,7 @@ class cStructType : public cTypeDecl
     virtual int ComputeOffsets(int base)
     {
         // structs are offset from zero
-        mSize = mDecls->ComputeOffsets(0);
+        mSize = GetDecls()->ComputeOffsets(0);
 
         return base;
     }
@@ -55,8 +56,8 @@ class cStructType : public cTypeDecl
     {
     }
 
+    cDeclsList* GetDecls()  { return (cDeclsList*)GetChild(1); }
   protected:
-    cDeclsList  *mDecls;
     cScope      *mScope;
 };
 

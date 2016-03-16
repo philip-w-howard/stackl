@@ -36,7 +36,9 @@ class cAssignExpr : public cExpr
         // Need to dup the result in case the assign is treated as an expr
         EmitInt(DUP_OP);
         mVar->GenerateAddress();
-        if (mVar->GetType()->Size() == 1)
+        if (mVar->IsArrayRef() && mVar->GetType()->ElementSize() == 1)
+            EmitInt(POPCVARIND_OP);
+        else if (mVar->GetType()->Size() == 1)
             EmitInt(POPCVARIND_OP);
         else
             EmitInt(POPVARIND_OP);

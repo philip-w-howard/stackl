@@ -10,7 +10,7 @@ int main()
     char *** c;
     c = &b;
     char ** d;
-    d = *c;
+    d = *c;         // FIX THIS: pushes a char instead of a char**
     char * e;
     e = *b;
 

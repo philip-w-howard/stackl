@@ -45,12 +45,12 @@ class cArrayRef : public cVarRef
             var->GenerateAddress();
 
         GetIndex()->GenerateCode();
-        if (GetType()->Size() == 1)
+        if (GetType()->ElementSize() == 1)
         {
             EmitInt(PLUS_OP);
         } else {
             EmitInt(PUSH_OP);
-            EmitInt(GetType()->Size());
+            EmitInt(GetType()->ElementSize());
             EmitInt(TIMES_OP);
             EmitInt(PLUS_OP);
         }
@@ -59,7 +59,7 @@ class cArrayRef : public cVarRef
     virtual void GenerateCode()
     {
         GenerateAddress();
-        if (GetType()->Size() == 1)
+        if (GetType()->ElementSize() == 1)
             EmitInt(PUSHCVARIND_OP);
         else
             EmitInt(PUSHVARIND_OP);
@@ -69,5 +69,7 @@ class cArrayRef : public cVarRef
     cExpr* GetBase()                { return (cExpr*)GetChild(0); }
     virtual cTypeDecl *GetType()    { return GetBase()->GetType(); }
     cExpr* GetIndex()               { return (cExpr*)GetChild(1); }
+    virtual bool IsArrayRef()       { return true; }
+    virtual bool IsStruct()         { return GetType()->ParentType()->IsStruct(); }
 };
 

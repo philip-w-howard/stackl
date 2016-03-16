@@ -39,12 +39,12 @@ static vars at global and local level
 // Get prepared for visitor pattern:
 cAddressExpr.h      done
 cArrayRef.h         done
-cArrayType.h
+cArrayType.h        done?
 cAsmNode.h
 cAssignExpr.h
 cAstList.h          done: no longer used
 cAstNode.h          done
-cBaseDeclNode.h
+cBaseDeclNode.h     done
 cBinaryExpr.h
 cDecl.h             done
 cDeclsList.h
@@ -71,12 +71,12 @@ cStmtsList.h
 cStringLit.h
 cStructDeref.h
 cStructRef.h
-cStructType.h
+cStructType.h       done
 cSymbol.h           done
 cSymbolTable.h
 cTypeDecl.h         done
 cUnaryExpr.h
-cVarDecl.h          in progress
+cVarDecl.h          done
 cVarRef.h
 cVisitor.h
 cWhileStmt.h

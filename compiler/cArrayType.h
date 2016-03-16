@@ -12,6 +12,7 @@ class cArrayType : public cTypeDecl
   public:
     cArrayType(cSymbol *name, int size) : cTypeDecl(name, WORD_SIZE)
     {
+        // FIX THIS: semantic checks
         name = symbolTableRoot->InsertRoot(name);
         name->SetDecl(this);
         mSize = size;
@@ -66,7 +67,7 @@ class cArrayType : public cTypeDecl
         }
 
         cSymbol *sym = symbolTableRoot->Lookup(name);
-        if (sym == NULL) 
+        if (sym == nullptr) 
         {
             sym = new cSymbol(name);
             return new cArrayType(sym, size);
@@ -74,8 +75,7 @@ class cArrayType : public cTypeDecl
             return dynamic_cast<cArrayType *>(sym->GetDecl());
         }
 
-        return NULL;
+        return nullptr;
     }
-  protected:
 };
 

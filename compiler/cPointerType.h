@@ -13,6 +13,8 @@ class cPointerType : public cTypeDecl
     {
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
+
+        mElementSize = ParentType()->Size(); 
     }
 
     virtual cTypeDecl *ParentType() 
@@ -29,6 +31,9 @@ class cPointerType : public cTypeDecl
     }
 
     virtual bool IsPointer() { return true; }
+
+    // FIX THIS: need this overload?
+    virtual int  ElementSize() { return mElementSize; }
 
     virtual std::string toString()
     {
@@ -53,5 +58,6 @@ class cPointerType : public cTypeDecl
         return NULL;
     }
   protected:
+    int mElementSize = 0;
 };
 

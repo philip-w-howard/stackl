@@ -18,7 +18,8 @@ class cVarDecl : public cDecl
 
         AddChild(type);
         AddChild(name);
-        AddChild(nullptr);  // mExpr
+        AddChild(nullptr);  // array size
+        AddChild(nullptr);  // init Expr
         mOffset     = 0;
         mIsGlobal   = false;
     }
@@ -35,6 +36,7 @@ class cVarDecl : public cDecl
         AddChild(cArrayType::ArrayType(base->GetType(), size));
         AddChild(base->GetName());
         AddChild(arraySize);
+        AddChild(nullptr);      // init expr
         
         base->GetName()->SetDecl(this);
 
@@ -49,7 +51,7 @@ class cVarDecl : public cDecl
             ThrowSemanticError("Cannot initialize arrays or structs");
             return;
         }
-        SetChild(2, init); 
+        SetChild(3, init); 
     }
     void SetGlobal()        { mIsGlobal = true; }
 
@@ -95,9 +97,10 @@ class cVarDecl : public cDecl
     virtual void GenerateCode()
     {}
 
-    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(1); }
-    virtual cTypeDecl* GetType(){ return (cTypeDecl*)GetChild(0); }
-    virtual cExpr*   GetInit()  { return (cExpr*)GetChild(2); }
+    virtual cTypeDecl* GetType()    { return (cTypeDecl*)GetChild(0); }
+    virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }
+    virtual cExpr*   GetArraySize() { return (cExpr*)GetChild(2); }
+    virtual cExpr*   GetInit()      { return (cExpr*)GetChild(3); }
   protected:
     int       mOffset;
     bool      mIsGlobal;

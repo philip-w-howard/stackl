@@ -31,11 +31,12 @@ class cVarRef : public cExpr
         }
     }
 
-    virtual bool IsLval()   { return true; }
-    virtual bool IsStruct() { return GetType()->IsStruct(); }
-    virtual bool IsArray()  { return GetType()->IsArray(); }
-    virtual bool IsPointer(){ return GetType()->IsPointer(); }
-    virtual bool IsFunc()   { return GetType()->IsFunc(); }
+    virtual bool IsLval()       { return true; }
+    virtual bool IsStruct()     { return GetType()->IsStruct(); }
+    virtual bool IsArray()      { return GetType()->IsArray(); }
+    virtual bool IsPointer()    { return GetType()->IsPointer(); }
+    virtual bool IsFunc()       { return GetType()->IsFunc(); }
+    virtual bool IsArrayRef()   { return false; }
 
     virtual cTypeDecl *GetType() 
     { 
@@ -74,7 +75,7 @@ class cVarRef : public cExpr
                 if (var->IsGlobal())
                 {
                     GenerateAddress();
-                    if (var->GetType()->Size() == 1)
+                    if (var->GetType()->ElementSize() == 1)
                         EmitInt(PUSHCVARIND_OP);
                     else
                         EmitInt(PUSHVARIND_OP);
