@@ -13,28 +13,27 @@ class cExprStmt : public cStmt
   public:
     cExprStmt(cExpr *expr)  : cStmt()
     {
-        mExpr = expr;
+        AddChild(expr);
     }
 
     virtual std::string toString()
     {
-        return mExpr->toString();
+        return GetExpr()->toString();
     }
 
     virtual int ComputeOffsets(int base)
     {
-        return mExpr->ComputeOffsets(base);
+        return GetExpr()->ComputeOffsets(base);
     }
 
     virtual void GenerateCode()
     {
-        mExpr->GenerateCode();
+        GetExpr()->GenerateCode();
 
         // remove the result from the stack
         EmitInt(POP_OP);
     }
 
-  protected:
-    cExpr *mExpr;
+    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
 };
 

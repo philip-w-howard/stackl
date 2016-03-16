@@ -12,8 +12,8 @@ class cBinaryExpr : public cExpr
   public:
     cBinaryExpr(cExpr *left, int op, cExpr *right) : cExpr() 
     {
-        mLeft = left;
-        mRight = right;
+        AddChild(left);
+        AddChild(right);
         mOp = op;
         if (GetType() == NULL)
         {
@@ -21,26 +21,26 @@ class cBinaryExpr : public cExpr
         }
     }
 
-    virtual bool IsConst() { return mLeft->IsConst() && mRight->IsConst(); }
+    virtual bool IsConst() { return GetLeft()->IsConst() && GetRight()->IsConst(); }
     virtual int  ConstValue();
 
     virtual cTypeDecl *GetType();
 
     virtual std::string toString()
     {
-       return "(" + mLeft->toString() + OpToString() + mRight->toString() + ")";
+       return "(" + GetLeft()->toString() + OpToString() + GetRight()->toString() + ")";
     }
 
     virtual void GenerateCode()
     {
-        mLeft->GenerateCode();
-        mRight->GenerateCode();
+        GetLeft()->GenerateCode();
+        GetRight()->GenerateCode();
         EmitInt(OpAsInt());
     }
 
+    cExpr* GetLeft()    { return (cExpr*)GetChild(0); }
+    cExpr* GetRight()   { return (cExpr*)GetChild(1); }
   protected:
-    cExpr *mLeft;
-    cExpr *mRight;
     int   mOp;
 
     std::string OpToString();

@@ -20,29 +20,29 @@ class cForStmt : public cStmt
   public:
     cForStmt(cExpr *init, cExpr *expr, cExpr *update, cStmt *stmt) : cStmt()
     {
-        mInit = init;
-        mExpr = expr;
-        mUpdate = update;
-        mStmt = stmt;
+        AddChild(init);
+        AddChild(expr);
+        AddChild(update);
+        AddChild(stmt);
     }
 
     virtual std::string toString()
     {
         std::string result("(FOR: (");
-        result += mInit->toString() + "; ";
-        result += mExpr->toString() + "; ";
-        result += mUpdate->toString() + ")\n";
-        result += "\n" + mStmt->toString();
+        result += GetInit()->toString() + "; ";
+        result += GetExpr()->toString() + "; ";
+        result += GetUpdate()->toString() + ")\n";
+        result += "\n" + GetStmt()->toString();
         result += "\n)";
         return result;
     }
 
     virtual int ComputeOffsets(int base)
     {
-        if (mInit != NULL) mInit->ComputeOffsets(base);
-        if (mExpr != NULL) mExpr->ComputeOffsets(base);
-        if (mUpdate != NULL) mUpdate->ComputeOffsets(base);
-        if (mStmt != NULL) mStmt->ComputeOffsets(base);
+        if (GetInit() != NULL) GetInit()->ComputeOffsets(base);
+        if (GetExpr() != NULL) GetExpr()->ComputeOffsets(base);
+        if (GetUpdate() != NULL) GetUpdate()->ComputeOffsets(base);
+        if (GetStmt() != NULL) GetStmt()->ComputeOffsets(base);
         return base;
     }
 
@@ -51,24 +51,23 @@ class cForStmt : public cStmt
         std::string start_loop = GenerateLabel();
         std::string end_loop = GenerateLabel();
 
-        mInit->GenerateCode();
+        GetInit()->GenerateCode();
         EmitInt(POP_OP);            // need to handle VOID
         SetLabelValue(start_loop);
-        mExpr->GenerateCode();
+        GetExpr()->GenerateCode();
         EmitInt(JUMPE_OP);
         SetLabelRef(end_loop);
-        mStmt->GenerateCode();
-        mUpdate->GenerateCode();
+        GetStmt()->GenerateCode();
+        GetUpdate()->GenerateCode();
         EmitInt(POP_OP);            // need to handle VOID
         EmitInt(JUMP_OP);
         SetLabelRef(start_loop);
         SetLabelValue(end_loop);
     }
 
-  protected:
-    cExpr *mInit;       // initialize the loop variable
-    cExpr *mExpr;       // conditional expression
-    cExpr *mUpdate;     // update prior to }
-    cStmt *mStmt;       // statement to execute while true
+    cExpr* GetInit()    { return (cExpr*)GetChild(0); }
+    cExpr* GetExpr()    { return (cExpr*)GetChild(1); }
+    cExpr* GetUpdate()  { return (cExpr*)GetChild(2); }
+    cStmt* GetStmt()    { return (cStmt*)GetChild(3); }
 };
 

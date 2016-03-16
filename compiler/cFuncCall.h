@@ -20,8 +20,9 @@ class cFuncCall : public cVarRef
         }
 
         mFunc = dynamic_cast<cFuncDecl*>(baseType);
-        mBase = base;
-        mParams = params;
+        
+        AddChild(base);
+        AddChild(params);
     }
 
     virtual bool IsFunc()        { return true; }
@@ -30,8 +31,8 @@ class cFuncCall : public cVarRef
     virtual std::string toString()
     {
         std::string result;
-        result =  mBase->toString() + "( ";
-        if (mParams != NULL) result += mParams->toString();
+        result =  GetBase()->toString() + "( ";
+        if (GetParams() != NULL) result += GetParams()->toString();
         result += " )";
 
         return result;
@@ -39,15 +40,15 @@ class cFuncCall : public cVarRef
 
     virtual void GenerateCode()
     {
-        if (mParams != NULL) mParams->GenerateCode();
+        if (GetParams() != NULL) GetParams()->GenerateCode();
 
         EmitInt(CALL_OP);
         SetLabelRef(mFunc->GetName()->Name());
 
         // Need to pop the args off the stack without affecting the return val
-        if (mParams != NULL)
+        if (GetParams() != NULL)
         {
-            for (int ii=0; ii<mParams->Size()/WORD_SIZE; ii++)
+            for (int ii=0; ii<GetParams()->Size()/WORD_SIZE; ii++)
             {
                 EmitInt(SWAP_OP);
                 EmitInt(POP_OP);
@@ -55,9 +56,10 @@ class cFuncCall : public cVarRef
         }
     }
 
+    cExpr* GetBase()    { return (cExpr*)GetChild(0); }
+    cParams* GetParams(){ return (cParams*)GetChild(1); }
+
   protected:
-    cExpr       *mBase;
     cFuncDecl   *mFunc;
-    cParams     *mParams;
 };
 

@@ -40,31 +40,31 @@ static vars at global and local level
 cAddressExpr.h      done
 cArrayRef.h         done
 cArrayType.h        done?
-cAsmNode.h
-cAssignExpr.h
+cAsmNode.h          done
+cAssignExpr.h       done
 cAstList.h          done: no longer used
 cAstNode.h          done
 cBaseDeclNode.h     done
-cBinaryExpr.h
+cBinaryExpr.h       done
 cDecl.h             done
-cDeclsList.h
-cExpr.h
-cExprStmt.h
-cFixupTable.h
-cForStmt.h
-cFuncCall.h
-cFuncDecl.h
-cIfStmt.h
-cIntExpr.h
-cNopStmt.h
-cParams.h
+cDeclsList.h        done
+cExpr.h             done
+cExprStmt.h         done
+cFixupTable.h       done
+cForStmt.h          done
+cFuncCall.h         done
+cFuncDecl.h         done
+cIfStmt.h           done
+cIntExpr.h          done
+cNopStmt.h          done
+cParams.h           done
 cPointerDeref.h
 cPointerType.h
 cPostfixExpr.h
 cPrefixExpr.h
 cReturnStmt.h
 cScope.h
-cShortCircuitExpr.h
+cShortCircuitExpr.h done
 cSizeofExpr.h
 cStmt.h
 cStmtsList.h

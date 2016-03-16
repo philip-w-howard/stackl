@@ -16,36 +16,36 @@ class cAssignExpr : public cExpr
         {
             ThrowSemanticError("lval must be a variable");
         } else {
-            mVar  = dynamic_cast<cVarRef*>(var);
-            assert(mVar != NULL);
+            cVarRef* varref  = dynamic_cast<cVarRef*>(var);
+            assert(varref != NULL);
         }
-        mExpr = expr;
+        AddChild(var);
+        AddChild(expr);
     }
 
-    virtual cTypeDecl *GetType()    { return mVar->GetType(); }
+    virtual cTypeDecl *GetType()    { return GetVar()->GetType(); }
 
     virtual std::string toString()
     {
-        return "assign " + mVar->toString() + " = " + mExpr->toString();
+        return "assign " + GetVar()->toString() + " = " + GetExpr()->toString();
     }
 
     virtual void GenerateCode()
     {
-        mExpr->GenerateCode();
+        GetExpr()->GenerateCode();
 
         // Need to dup the result in case the assign is treated as an expr
         EmitInt(DUP_OP);
-        mVar->GenerateAddress();
-        if (mVar->IsArrayRef() && mVar->GetType()->ElementSize() == 1)
+        GetVar()->GenerateAddress();
+        if (GetVar()->IsArrayRef() && GetVar()->GetType()->ElementSize() == 1)
             EmitInt(POPCVARIND_OP);
-        else if (mVar->GetType()->Size() == 1)
+        else if (GetVar()->GetType()->Size() == 1)
             EmitInt(POPCVARIND_OP);
         else
             EmitInt(POPVARIND_OP);
     }
 
-  protected:
-    cVarRef *mVar;
-    cExpr *mExpr;
+    cVarRef* GetVar()   { return (cVarRef*)GetChild(0); }
+    cExpr*   GetExpr()  { return (cExpr*)GetChild(1); }
 };
 

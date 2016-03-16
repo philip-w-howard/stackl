@@ -24,7 +24,7 @@ class cAsmNode : public cExpr
     {
         mCode = code;
         mCode2 = 0;
-        mParams = params;
+        AddChild(params);
         mTwoWord = false;
     }
 
@@ -32,7 +32,7 @@ class cAsmNode : public cExpr
     {
         mCode = code;
         mCode2 = code2;
-        mParams = params;
+        AddChild(params);
         mTwoWord = true;
     }
 
@@ -47,21 +47,21 @@ class cAsmNode : public cExpr
         std::string result("ASM ");
         result += std::to_string(mCode);
         if (mTwoWord) result += " " + std::to_string(mCode2);
-        if (mParams != NULL) result += " " + mParams->toString();
+        if (GetParams() != NULL) result += " " + GetParams()->toString();
         return result;
     }
 
     virtual void GenerateCode()
     {
-        if (mParams != NULL) mParams->GenerateCode();
+        if (GetParams() != NULL) GetParams()->GenerateCode();
         EmitInt(mCode);
         if (mTwoWord) EmitInt(mCode2);
     }
+
+    cParams* GetParams()    { return (cParams*)GetChild(0); }
   protected:
     int mCode;              // the opcode to be emitted
     int mCode2;             // 2nd opcode for 2 word instructions
     bool mTwoWord;          // true of 2 word instruction
-    cParams *mParams;       // items to push onto the stack prior to emitting
-                            // the opcode
 };
 

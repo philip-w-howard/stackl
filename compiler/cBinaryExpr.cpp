@@ -10,8 +10,8 @@ int cBinaryExpr::ConstValue()
 
     if (!IsConst()) return 0;
 
-    left = mLeft->ConstValue();
-    right = mRight->ConstValue();
+    left = GetLeft()->ConstValue();
+    right = GetRight()->ConstValue();
 
     switch (mOp)
     {
@@ -138,8 +138,8 @@ int cBinaryExpr::OpAsInt()
 
 cTypeDecl *cBinaryExpr::GetType()
 {
-    cTypeDecl *left = mLeft->GetType();;
-    cTypeDecl *right = mRight->GetType();;
+    cTypeDecl *left = GetLeft()->GetType();;
+    cTypeDecl *right = GetRight()->GetType();;
     cTypeDecl *integer = dynamic_cast<cTypeDecl *>
             (symbolTableRoot->Lookup("int")->GetDecl());
 

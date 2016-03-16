@@ -41,5 +41,7 @@ class cDeclsList : public cStmtsList
 
         return result;
     }
+
+    cDecl* GetDecl(int index)   { return (cDecl*)GetChild(index); }
 };
 

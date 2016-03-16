@@ -21,44 +21,44 @@ class cIfStmt : public cStmt
     cIfStmt(cExpr *expr, cStmt *ifPart, cStmt *elsePart) 
         : cStmt()
     {
-        mExpr = expr;
-        mStmt = ifPart;
-        mElse = elsePart;
+        AddChild(expr);
+        AddChild(ifPart);
+        AddChild(elsePart);
     }
 
     virtual std::string toString()
     {
         std::string result("(IF: ");
-        result += mExpr->toString();
-        if (mStmt != NULL) result += "\n" + mStmt->toString();
-        if (mElse != NULL) result += "\nELSE:\n" + mElse->toString();
+        result += GetCond()->toString();
+        if (GetIfStmt() != NULL) result += "\n" + GetIfStmt()->toString();
+        if (GetElseStmt() != NULL) result += "\nELSE:\n" + GetElseStmt()->toString();
         result += "\n)";
         return result;
     }
 
     virtual int ComputeOffsets(int base)
     {
-        mExpr->ComputeOffsets(base);
-        if (mStmt != NULL) mStmt->ComputeOffsets(base);
-        if (mElse != NULL) mElse->ComputeOffsets(base);
+        GetCond()->ComputeOffsets(base);
+        if (GetIfStmt() != NULL) GetIfStmt()->ComputeOffsets(base);
+        if (GetElseStmt() != NULL) GetElseStmt()->ComputeOffsets(base);
         return base;
     }
 
     virtual void GenerateCode()
     {
         std::string if_label = GenerateLabel();
-        mExpr->GenerateCode();
+        GetCond()->GenerateCode();
         EmitInt(JUMPE_OP);
         SetLabelRef(if_label);
-        if (mStmt != NULL) mStmt->GenerateCode();
+        if (GetIfStmt() != NULL) GetIfStmt()->GenerateCode();
 
-        if (mElse != NULL)
+        if (GetElseStmt() != NULL)
         {
             std::string else_label = GenerateLabel();
             EmitInt(JUMP_OP);
             SetLabelRef(else_label);
             SetLabelValue(if_label);
-            mElse->GenerateCode();
+            GetElseStmt()->GenerateCode();
             SetLabelValue(else_label);
         }
         else
@@ -67,9 +67,8 @@ class cIfStmt : public cStmt
         }
     }
 
-  protected:
-    cExpr *mExpr;       // conditional expression
-    cStmt *mStmt;       // statements for if cond is true
-    cStmt *mElse;       // optional statements for if cond is false
+    cExpr* GetCond()    { return (cExpr*)GetChild(0); }
+    cStmt* GetIfStmt()  { return (cStmt*)GetChild(1); }
+    cStmt* GetElseStmt(){ return (cStmt*)GetChild(2); }
 };
 

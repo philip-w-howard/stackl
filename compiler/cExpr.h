@@ -30,7 +30,6 @@ class cExpr : public cStmt
     virtual cTypeDecl *GetType() = 0;
     //virtual int  GetOffset() = 0;
     virtual void GenerateCode() = 0;
-  protected:
 
 };
 

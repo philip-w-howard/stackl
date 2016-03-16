@@ -7,6 +7,7 @@
 #include "cReturnStmt.h"
 #include "cIntExpr.h"
 #include "cSymbol.h"
+#include "cDeclsList.h"
 #include "codegen.h"
 
 class cFuncDecl : public cTypeDecl
@@ -14,28 +15,28 @@ class cFuncDecl : public cTypeDecl
   public:
     cFuncDecl(cTypeDecl *type, cSymbol *name) : cTypeDecl(name, WORD_SIZE)
     {
+        // FIX THIS: Semantic checks
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
 
-        mReturnType     = type;
+        AddChild(type);
+        AddChild(nullptr); // params
+        AddChild(nullptr); // stmts
         mHasStatements  = false;
-        mStatements     = NULL;
-        mParams         = NULL;
         mDeclsSize      = 0;
     }
 
     void AddParams(cAstNode *params)
     {
-        mParams = params;
+        SetChild(2, params);
     }
 
     void AddStatements(cStmtsList *stmts)
     {
-        mStatements = stmts;
+        SetChild(3, stmts);
         mHasStatements = true;
     }
 
-    cTypeDecl *ReturnType() { return mReturnType; }
     virtual bool IsFunc() { return true; }
     virtual bool IsType() { return false; }
 
@@ -43,8 +44,8 @@ class cFuncDecl : public cTypeDecl
     {
         std::string result;
         result = "function: " + GetName()->toString();
-        if (mParams != NULL)
-            result += "( " + mParams->toString() + " )";
+        if (GetParams() != NULL)
+            result += "( " + GetParams()->toString() + " )";
         else
             result += "( )";
 
@@ -52,8 +53,8 @@ class cFuncDecl : public cTypeDecl
 
         if (mHasStatements)
         {
-            if (mStatements != NULL)
-                result += mStatements->toString();
+            if (GetStmts() != NULL)
+                result += GetStmts()->toString();
             else
                 result += "{}";
         }
@@ -68,8 +69,8 @@ class cFuncDecl : public cTypeDecl
     virtual int ComputeOffsets(int base)
     {
         int locals = 0;
-        if(mParams != NULL)  mParams->ComputeOffsets(-STACK_FRAME_SIZE);
-        if (mStatements != NULL) locals = mStatements->ComputeOffsets(locals);
+        if(GetParams() != NULL)  GetParams()->ComputeOffsets(-STACK_FRAME_SIZE);
+        if (GetStmts() != NULL) locals = GetStmts()->ComputeOffsets(locals);
         mDeclsSize = locals;
 
         return base;
@@ -88,18 +89,18 @@ class cFuncDecl : public cTypeDecl
             EmitInt(adj_size);
         }
 
-        mStatements->GenerateCode();
+        GetStmts()->GenerateCode();
 
         // Force return statement
         cReturnStmt *ret = new cReturnStmt(new cIntExpr(0));
         ret->GenerateCode();
     }
 
+    cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }
+    cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
+    cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }
   protected:
     bool mHasStatements;
-    cTypeDecl *mReturnType;
-    cStmtsList *mStatements;
-    cAstNode *mParams;
     int mDeclsSize;
 };
 

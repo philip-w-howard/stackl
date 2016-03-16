@@ -19,7 +19,5 @@ class cNopStmt : public cStmt
 
     virtual void GenerateCode()
     {}
-
-  protected:
 };
 

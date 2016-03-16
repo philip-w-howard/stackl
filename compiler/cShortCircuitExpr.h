@@ -33,14 +33,14 @@ class cShortCircuitExpr : public cBinaryExpr
             std::string checkExpression = GenerateLabel();
 
             // at a minimum, we want to output the left expression
-            mLeft->GenerateCode();
+            GetLeft()->GenerateCode();
             EmitInt(DUP_OP);
             EmitInt(JUMPE_OP);
             SetLabelRef(checkExpression);
             EmitInt(JUMP_OP);
             SetLabelRef(skipExpression);
             SetLabelValue(checkExpression);
-            mRight->GenerateCode();
+            GetRight()->GenerateCode();
             EmitInt(OpAsInt());
             SetLabelValue(skipExpression);
         }
@@ -50,7 +50,7 @@ class cShortCircuitExpr : public cBinaryExpr
             std::string jmp = GenerateLabel();
 
             // at a minimum, we want to output the left expression
-            mLeft->GenerateCode();
+            GetLeft()->GenerateCode();
 
             // if the result of the left expression left a 0
             // on the stack, skip the right expression
@@ -59,7 +59,7 @@ class cShortCircuitExpr : public cBinaryExpr
             SetLabelRef(jmp);
 
             // generate the code for the right expression
-            mRight->GenerateCode();
+            GetRight()->GenerateCode();
 
             // generate the code for the operator
             EmitInt(OpAsInt());
