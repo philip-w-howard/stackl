@@ -32,7 +32,7 @@ class cPointerDeref : public cVarRef
     virtual void GenerateCode()
     {
         GetBase()->GenerateCode();
-        if (GetType()->ElementSize() == 1)
+        if (GetType()->Size() == 1)     // EmementSize?
         {
             EmitInt(PUSHCVARIND_OP);
         } else {

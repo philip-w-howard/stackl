@@ -68,7 +68,7 @@ class cPlainVarRef : public cVarRef
                 if (var->IsGlobal())
                 {
                     GenerateAddress();
-                    if (var->GetType()->ElementSize() == 1)
+                    if (var->GetType()->Size() == 1)    // ElementSize?
                         EmitInt(PUSHCVARIND_OP);
                     else
                         EmitInt(PUSHVARIND_OP);

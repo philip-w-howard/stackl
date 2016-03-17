@@ -12,7 +12,7 @@ class cPointerType : public cTypeDecl
     cPointerType(cSymbol *name) : cTypeDecl(name, WORD_SIZE)
     {
         name->SetDecl(this);
-        symbolTableRoot->Insert(name);
+        symbolTableRoot->InsertRoot(name);
     }
 
     virtual cTypeDecl *ParentType() 

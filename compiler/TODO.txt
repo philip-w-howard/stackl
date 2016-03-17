@@ -1,3 +1,5 @@
+~/stackl/test.c error. See comments in out2
+
 const optimizations
 multi-D arrays
    mBaseType for multi-D arrays is not correct
