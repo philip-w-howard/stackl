@@ -19,6 +19,7 @@ class cExpr : public cStmt
     virtual bool IsStruct()     { return false; }
     virtual bool IsArray()      { return false; }
     virtual bool IsPointer()    { return false; }
+    virtual bool IsArrayRef()   { return false; }
 
     virtual bool IsConst()      { return false; }
     virtual int  ConstValue()   { return 0; }

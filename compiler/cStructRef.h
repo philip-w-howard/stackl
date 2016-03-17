@@ -10,15 +10,22 @@ class cStructRef : public cVarRef
   public:
     cStructRef(cExpr *base, cSymbol *field) : cVarRef() 
     {
+        cTypeDecl *baseType;
+
         if (!base->IsStruct()) 
         {
             ThrowSemanticError("Left side of '.' is not a struct");
             return;
         }
 
-        cTypeDecl *baseType = base->GetType();
+        // FIX THIS for test30.c
+        if (base->IsArrayRef())
+            baseType = base->GetType()->ParentType();
+        else
+            baseType = base->GetType();
+
         cStructType *s_decl = dynamic_cast<cStructType *>(baseType);
-        if (!s_decl->Contains(field))
+        if (s_decl==nullptr || !s_decl->Contains(field))
         {
             ThrowSemanticError(field->Name() + " is not a field");
             return;

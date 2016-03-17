@@ -12,7 +12,8 @@ class cArrayRef : public cVarRef
     {
         cTypeDecl *baseType = base->GetType();
 
-        if (!baseType->IsPointer() && !base->IsArray())
+        //if (!baseType->IsPointer() && !base->IsArray())
+        if (!baseType->IsPointer() && !baseType->IsArray())
         {
             ThrowSemanticError("Attempted to index a non-array");
             return;
