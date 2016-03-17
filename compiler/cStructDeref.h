@@ -10,6 +10,7 @@ class cStructDeref : public cVarRef
   public:
     cStructDeref(cExpr *base, cSymbol *field) : cVarRef() 
     {
+        AddChild(base);
         cTypeDecl *baseType = base->GetType();
 
         if (!baseType->IsPointer())
@@ -32,26 +33,25 @@ class cStructDeref : public cVarRef
             return;
         }
 
-        mBase = base;
-        mBaseType = baseBaseType;
-        mField = s_decl->GetField(field);
+        field = s_decl->GetField(field);
+        AddChild(field);
     }
 
     virtual cTypeDecl *GetType() 
     { 
-        return dynamic_cast<cTypeDecl *>(mField->GetDecl()->GetType()); 
+        return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
     virtual std::string toString()
     {
-        return mBase->toString() + " -> " + mField->toString();
+        return GetBase()->toString() + " -> " + GetField()->toString();
     }
 
     virtual void GenerateAddress()
     {
-        mBase->GenerateCode();
+        GetBase()->GenerateCode();
 
-        cVarDecl *field = dynamic_cast<cVarDecl*>(mField->GetDecl());
+        cVarDecl *field = dynamic_cast<cVarDecl*>(GetField()->GetDecl());
         if (field == NULL)
             fatal_error("cStructDeref without underlying field.cVarDecl");
         EmitInt(PUSH_OP);
@@ -63,22 +63,20 @@ class cStructDeref : public cVarRef
     {
         GenerateAddress();
 
-        if (mField->GetDecl()->GetType()->IsArray())
+        if (GetField()->GetDecl()->GetType()->IsArray())
         {
             // do nothing: we want the addr
         }
         else
         {
-            if (mField->GetDecl()->GetType()->Size() == 1)
+            if (GetField()->GetDecl()->GetType()->Size() == 1)
                 EmitInt(PUSHCVARIND_OP);
             else
                 EmitInt(PUSHVARIND_OP);
         }
     }
 
-  protected:
-    cExpr       *mBase;
-    cTypeDecl   *mBaseType;
-    cSymbol     *mField;
+    cExpr* GetBase()    { return (cExpr*)GetChild(0); }
+    cSymbol* GetField() { return (cSymbol*)GetChild(1); }
 };
 

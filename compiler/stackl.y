@@ -395,7 +395,7 @@ params:     params',' expr
 primary_expression
 	: IDENTIFIER
             { 
-                $$ = new cVarRef($1); 
+                $$ = new cPlainVarRef($1); 
                 if ($$->HasSemanticError()) YYERROR;
             }
 	| INT_VAL

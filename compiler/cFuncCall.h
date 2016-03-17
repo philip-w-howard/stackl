@@ -38,6 +38,11 @@ class cFuncCall : public cVarRef
         return result;
     }
 
+    virtual void GenerateAddress()
+    {
+        fatal_error("Attempted to get the address of a funciton");
+    }
+
     virtual void GenerateCode()
     {
         if (GetParams() != NULL) GetParams()->GenerateCode();

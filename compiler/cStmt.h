@@ -8,13 +8,12 @@
 class cStmt : public cAstNode
 {
   public:
-    cStmt() 
+    cStmt() : cAstNode()
     {
     }
 
     // useful for cDecl and cExpr, both of which are subclasses.
     // Other subclasses may not have a use for this.
     virtual int Size() { return 0; }
-  protected:
 };
 

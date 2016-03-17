@@ -20,23 +20,23 @@ class cWhileStmt : public cStmt
   public:
     cWhileStmt(cExpr *expr, cStmt *stmt) : cStmt()
     {
-        mExpr = expr;
-        mStmt = stmt;
+        AddChild(expr);
+        AddChild(stmt);
     }
 
     virtual std::string toString()
     {
         std::string result("(WHILE: ");
-        result += mExpr->toString();
-        result += "\n" + mStmt->toString();
+        result += GetCond()->toString();
+        result += "\n" + GetStmt()->toString();
         result += "\n)";
         return result;
     }
 
     virtual int ComputeOffsets(int base)
     {
-        base = mExpr->ComputeOffsets(base);
-        if (mStmt != NULL) base = mStmt->ComputeOffsets(base);
+        base = GetCond()->ComputeOffsets(base);
+        if (GetStmt() != NULL) base = GetStmt()->ComputeOffsets(base);
         return base;
     }
 
@@ -46,17 +46,16 @@ class cWhileStmt : public cStmt
         std::string end_loop = GenerateLabel();
 
         SetLabelValue(start_loop);
-        mExpr->GenerateCode();
+        GetCond()->GenerateCode();
         EmitInt(JUMPE_OP);
         SetLabelRef(end_loop);
-        mStmt->GenerateCode();
+        GetStmt()->GenerateCode();
         EmitInt(JUMP_OP);
         SetLabelRef(start_loop);
         SetLabelValue(end_loop);
     }
 
-  protected:
-    cExpr *mExpr;       // conditional expression
-    cStmt *mStmt;       // statement to execute while true
+    cExpr* GetCond()    { return (cExpr*)GetChild(0); }
+    cStmt* GetStmt()    { return (cStmt*)GetChild(1); }
 };
 

@@ -8,97 +8,16 @@
 class cVarRef : public cExpr
 {
   public:
-    cVarRef() : cExpr()
-    {
-        mSymbol = NULL;
-        mDecl   = NULL;
-    }
-
-    cVarRef(cSymbol *id) : cExpr() 
-    {
-        mSymbol = id;
-        if (symbolTableRoot->Lookup(id->Name()) == NULL)
-        {
-            ThrowSemanticError(id->Name() + " is not defined");
-            return;
-        }
-
-        mDecl = dynamic_cast<cDecl *>( mSymbol->GetDecl());
-        if (mDecl == NULL)
-        {
-            ThrowSemanticError(id->Name() + " is not declared");
-            return;
-        }
-    }
+    cVarRef() : cExpr() {}
 
     virtual bool IsLval()       { return true; }
-    virtual bool IsStruct()     { return GetType()->IsStruct(); }
-    virtual bool IsArray()      { return GetType()->IsArray(); }
-    virtual bool IsPointer()    { return GetType()->IsPointer(); }
-    virtual bool IsFunc()       { return GetType()->IsFunc(); }
+    virtual bool IsStruct()     { return false; }
+    virtual bool IsArray()      { return false; }
+    virtual bool IsPointer()    { return false; }
+    virtual bool IsFunc()       { return false; }
     virtual bool IsArrayRef()   { return false; }
 
-    virtual cTypeDecl *GetType() 
-    { 
-        return mDecl->GetType(); 
-    }
-
-    virtual void GenerateAddress()
-    {
-        cVarDecl *var = dynamic_cast<cVarDecl*>(mDecl);
-        if (var == NULL)
-            fatal_error("Attempted to generate code for a cVarRef without a decl");
-        if (var->IsGlobal())
-        {
-            EmitInt(PUSH_OP);
-            EmitGlobalRef(var->GetName()->Name());
-            EmitInt(PUSH_OP);
-            EmitInt(var->GetOffset());
-            EmitInt(PLUS_OP);
-        } else {
-            EmitInt(PUSH_OP);
-            EmitInt(var->GetOffset());
-            EmitInt(PUSHFP_OP);
-            EmitInt(PLUS_OP);
-        }
-    }
-
-    virtual void GenerateCode()
-    {
-        cVarDecl *var = dynamic_cast<cVarDecl*>(mDecl);
-        if (var != NULL)
-        {
-            if (var->GetType()->IsArray())
-            {
-                GenerateAddress();
-            } else {
-                if (var->IsGlobal())
-                {
-                    GenerateAddress();
-                    if (var->GetType()->ElementSize() == 1)
-                        EmitInt(PUSHCVARIND_OP);
-                    else
-                        EmitInt(PUSHVARIND_OP);
-                } else {
-                    if (var->GetType()->Size() == 1)
-                        EmitInt(PUSHCVAR_OP);
-                    else
-                        EmitInt(PUSHVAR_OP);
-
-                    EmitInt(var->GetOffset());
-                }
-            }
-        } else {
-            fatal_error("Attempted to generate code for a cVarRef without a decl");
-        }
-    }
-
-    virtual std::string toString()
-    {
-        return "var " + mSymbol->toString();
-    }
-  protected:
-    cSymbol *mSymbol;
-    cDecl   *mDecl;
+    virtual cTypeDecl *GetType() = 0;
+    virtual void GenerateAddress() = 0;
 };
 

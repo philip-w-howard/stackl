@@ -10,6 +10,8 @@ class cPointerDeref : public cVarRef
   public:
     cPointerDeref(cExpr *base) : cVarRef() 
     {
+        AddChild(base);
+
         cTypeDecl *baseType = base->GetType();
 
         if (!baseType->IsPointer())
@@ -17,24 +19,20 @@ class cPointerDeref : public cVarRef
             ThrowSemanticError("Attempted to dereference a non-pointer");
             return;
         }
-
-        cTypeDecl *baseBaseType = baseType->ParentType();
-
-        mBase = base;
-        mBaseType = baseBaseType;
     }
 
-    virtual cTypeDecl *GetType() { return mBaseType; }
+    cExpr* GetBase()             { return (cExpr*)GetChild(0); }
+    virtual cTypeDecl* GetType() { return GetBase()->GetType()->ParentType(); }
 
     virtual void GenerateAddress()
     {
-        mBase->GenerateCode();
+        GetBase()->GenerateCode();
     }
 
     virtual void GenerateCode()
     {
-        mBase->GenerateCode();
-        if (mBaseType->ElementSize() == 1)
+        GetBase()->GenerateCode();
+        if (GetType()->ElementSize() == 1)
         {
             EmitInt(PUSHCVARIND_OP);
         } else {
@@ -44,10 +42,7 @@ class cPointerDeref : public cVarRef
 
     virtual std::string toString()
     {
-        return "( * " + mBase->toString() + " )";
+        return "( * " + GetBase()->toString() + " )";
     }
-  protected:
-    cExpr       *mBase;
-    cTypeDecl   *mBaseType;
 };
 

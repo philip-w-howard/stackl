@@ -24,25 +24,25 @@ class cStructRef : public cVarRef
             return;
         }
 
-        mBase = base;
-        mBaseType = baseType;
-        mField = s_decl->GetField(field);
+        field = s_decl->GetField(field);
+        AddChild(base);
+        AddChild(field);
     }
 
     virtual cTypeDecl *GetType() 
     { 
-        return dynamic_cast<cTypeDecl *>(mField->GetDecl()->GetType()); 
+        return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
     virtual void GenerateAddress()
     {
-        cVarRef *var = dynamic_cast<cVarRef*>(mBase);
+        cVarRef *var = dynamic_cast<cVarRef*>(GetBase());
         if (var == NULL)
             fatal_error("cStructRef without underlying cVarRef");
 
         var->GenerateAddress();
 
-        cVarDecl *field = dynamic_cast<cVarDecl*>(mField->GetDecl());
+        cVarDecl *field = dynamic_cast<cVarDecl*>(GetField()->GetDecl());
         if (field == NULL)
             fatal_error("cStructRef without underlying field.cVarDecl");
         EmitInt(PUSH_OP);
@@ -54,13 +54,13 @@ class cStructRef : public cVarRef
     {
         GenerateAddress();
 
-        if (mField->GetDecl()->GetType()->IsArray())
+        if (GetField()->GetDecl()->GetType()->IsArray())
         {
             // do nothing: we want the addr
         }
         else
         {
-            if (mField->GetDecl()->GetType()->Size() == 1)
+            if (GetField()->GetDecl()->GetType()->Size() == 1)
                 EmitInt(PUSHCVARIND_OP);
             else
                 EmitInt(PUSHVARIND_OP);
@@ -69,11 +69,10 @@ class cStructRef : public cVarRef
 
     virtual std::string toString()
     {
-        return mBase->toString() + " . " + mField->toString();
+        return GetBase()->toString() + " . " + GetField()->toString();
     }
-  protected:
-    cExpr *mBase;
-    cTypeDecl *mBaseType;
-    cSymbol *mField;
+
+    cExpr* GetBase()        { return (cExpr*)GetChild(0); }
+    cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
 };
 

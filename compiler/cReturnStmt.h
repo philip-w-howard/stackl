@@ -13,29 +13,28 @@ class cReturnStmt : public cStmt
   public:
     cReturnStmt(cExpr *expr)  : cStmt()
     {
-        mExpr = expr;
+        AddChild(expr);
     }
 
     virtual std::string toString()
     {
-        if (mExpr != NULL)
-            return "return " + mExpr->toString();
+        if (GetExpr() != NULL)
+            return "return " + GetExpr()->toString();
         else
             return "return";
     }
 
     virtual void GenerateCode()
     {
-        if (mExpr != NULL) 
+        if (GetExpr() != NULL) 
         {
-            mExpr->GenerateCode();
+            GetExpr()->GenerateCode();
             EmitInt(RETURNV_OP);
         } else {
             EmitInt(RETURN_OP);
         }
     }
 
-  protected:
-    cExpr *mExpr;
+    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
 };
 

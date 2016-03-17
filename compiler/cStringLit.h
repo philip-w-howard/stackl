@@ -8,7 +8,7 @@
 class cStringLit : public cExpr
 {
   public:
-    cStringLit(char *str) : mStr(str)
+    cStringLit(char *str) :  cExpr(), mStr(str)
     {}
 
     std::string toString() { return mStr; }

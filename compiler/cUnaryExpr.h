@@ -10,21 +10,21 @@ class cUnaryExpr : public cExpr
   public:
     cUnaryExpr(int op, cExpr *expr) : cExpr() 
     {
-        mExpr = expr;
+        AddChild(expr);
         mOp = op;
     }
 
-    virtual bool IsConst() { return mExpr->IsConst(); }
+    virtual bool IsConst() { return GetExpr()->IsConst(); }
     virtual int  ConstValue()
     {
         switch (mOp)
         {
             case '-':
-                return -mExpr->ConstValue();
+                return -GetExpr()->ConstValue();
             case '~':
-                return ~mExpr->ConstValue();
+                return ~GetExpr()->ConstValue();
             case '!':
-                return !mExpr->ConstValue();
+                return !GetExpr()->ConstValue();
             default:
                 fatal_error("Unrecognized unary operator");
                 break;
@@ -33,7 +33,7 @@ class cUnaryExpr : public cExpr
         return 0;
     }
 
-    virtual cTypeDecl *GetType() { return mExpr->GetType(); }
+    virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
 
     std::string OpToString()
     {
@@ -55,11 +55,11 @@ class cUnaryExpr : public cExpr
 
     virtual std::string toString()
     {
-       return "(" + OpToString() + mExpr->toString() + ")";
+       return "(" + OpToString() + GetExpr()->toString() + ")";
     }
     virtual void GenerateCode() 
     {
-        mExpr->GenerateCode();
+        GetExpr()->GenerateCode();
 
         switch (mOp)
         {
@@ -79,8 +79,8 @@ class cUnaryExpr : public cExpr
 
     }
 
+    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
   protected:
-    cExpr *mExpr;
     int   mOp;
 };
 

@@ -22,11 +22,12 @@ class cPostfixExpr : public cExpr
             ThrowSemanticError("attempted to alter a non-Lval");
             return;
         }
-        mExpr = expr;
+
+        AddChild(expr);
         mOp = op;
     }
 
-    virtual cTypeDecl *GetType() { return mExpr->GetType(); }
+    virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
 
     std::string OpToString()
     {
@@ -46,24 +47,24 @@ class cPostfixExpr : public cExpr
 
     virtual std::string toString()
     {
-       return "(" + mExpr->toString() + OpToString() + ")";
+       return "(" + GetExpr()->toString() + OpToString() + ")";
     }
 
     virtual int ComputeOffsets(int base)
     {
-        return mExpr->ComputeOffsets(base);
+        return GetExpr()->ComputeOffsets(base);
     }
 
     virtual void GenerateCode() 
     {
-        cVarRef *var = dynamic_cast<cVarRef*>(mExpr);
+        cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());
         if (var == NULL)
         {
             fatal_error("Generating code for cPrefixExpr without underlying cVarRef");
             return;
         }
 
-        cBinaryExpr *performOp = new cBinaryExpr(mExpr, mOp, new cIntExpr(1));
+        cBinaryExpr *performOp = new cBinaryExpr(GetExpr(), mOp, new cIntExpr(1));
         performOp->GenerateCode();
         EmitInt(DUP_OP);
         var->GenerateAddress();
@@ -73,8 +74,8 @@ class cPostfixExpr : public cExpr
             EmitInt(POPVARIND_OP);
     }
 
+    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
   protected:
-    cExpr *mExpr;
     int   mOp;
 };
 

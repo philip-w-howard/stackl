@@ -38,6 +38,7 @@
 #include "cUnaryExpr.h"
 #include "cAsmNode.h"
 #include "cVarRef.h"
+#include "cPlainVarRef.h"
 #include "cStructRef.h"
 #include "cArrayRef.h"
 #include "cStructDeref.h"
