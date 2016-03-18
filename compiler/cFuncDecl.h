@@ -39,8 +39,10 @@ class cFuncDecl : public cTypeDecl
         mHasStatements = true;
     }
 
-    virtual bool IsFunc() { return true; }
-    virtual bool IsType() { return false; }
+    virtual bool IsFunc()           { return true; }
+    virtual bool IsType()           { return false; }
+    virtual void SetSize(int size)  { mDeclsSize = size; }
+    virtual int  GetSize()          { return mDeclsSize; }
 
     virtual int ComputeOffsets(int base)
     {
@@ -77,7 +79,6 @@ class cFuncDecl : public cTypeDecl
     cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
     cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }
 
-    virtual string NodeType()             { return "FuncDecl"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

@@ -17,6 +17,7 @@
 
 #include "lex.h"
 #include "cAstXml.h"
+#include "cSizeOffset.h"
 #include "codegen.h"
 #include "../version.h"
 
@@ -161,7 +162,10 @@ int main(int argc, char **argv)
             exit(-2);
         }
 
-        program->ComputeOffsets(0);
+        cSizeOffset sizer;
+        sizer.VisitAllNodes(program);
+
+        //program->ComputeOffsets(0);
 
         if (Do_Ast)
         {

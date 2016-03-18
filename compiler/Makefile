@@ -8,6 +8,7 @@ OBJS= scanner.o \
 	 stacklc.o \
 	 cVisitor.o \
 	 cAstXml.o \
+	 cSizeOffset.o \
 
 all: stacklc
 

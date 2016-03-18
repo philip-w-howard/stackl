@@ -62,7 +62,8 @@ class cVarDecl : public cDecl
 
     virtual bool IsVar()    { return true; }
 
-    virtual int GetOffset() { return mOffset; }
+    virtual void SetOffset(int offset)  { mOffset = offset; }
+    virtual int  GetOffset()            { return mOffset; }
 
     virtual int ComputeOffsets(int base)
     {

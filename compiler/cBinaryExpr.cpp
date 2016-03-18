@@ -44,24 +44,24 @@ std::string cBinaryExpr::OpToString()
 {
     switch (mOp)
     {
-        case '+': return " + ";
-        case '-': return " - ";
-        case '*': return " * ";
-        case '/': return " / ";
-        case '%': return " % ";
-        case '>': return " > ";
-        case '<': return " < ";
-        case '&': return " & ";
-        case '|': return " | ";
-        case AND: return " && ";
-        case OR : return " || ";
-        case '^': return " ^ ";
-        case EQ : return " == ";
-        case NE : return " != ";
-        case LE : return " <= ";
-        case GE : return " >= ";
-        case LEFT : return " << ";
-        case RIGHT : return " >> ";
+        case '+': return "+";
+        case '-': return "-";
+        case '*': return "*";
+        case '/': return "/";
+        case '%': return "%";
+        case '>': return "gt";
+        case '<': return "lt";
+        case '&': return "bitand";
+        case '|': return "|";
+        case AND: return "and";
+        case OR : return "||";
+        case '^': return "^";
+        case EQ : return "==";
+        case NE : return "!=";
+        case LE : return "le";
+        case GE : return "ge";
+        case LEFT : return "shift_l";
+        case RIGHT : return "shift_r";
         default: 
             fatal_error("Internal compiler: unrecognized binary operator");
             break;

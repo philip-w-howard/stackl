@@ -99,7 +99,8 @@ void cAstXml::Visit(cFuncCall *node)
 }
 void cAstXml::Visit(cFuncDecl *node)
 {
-    DefaultVisit(node, "FuncDecl");
+    string attr = " localsize=\"" + std::to_string(node->GetSize()) + "\" ";
+    DefaultVisit(node, "FuncDecl", attr);
 }
 void cAstXml::Visit(cIfStmt *node)
 {

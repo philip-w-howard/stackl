@@ -71,6 +71,5 @@ class cParams : public cAstNode
 
     cExpr* GetParam(int index) { return (cExpr*)GetChild(index); }
 
-    virtual string NodeType()             { return "Params"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

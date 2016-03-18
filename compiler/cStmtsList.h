@@ -75,8 +75,6 @@ class cStmtsList : public cStmt
 
     cStmt *GetStmt(int index) { return (cStmt*)GetChild(index); }
 
-    virtual string NodeType()             { return "StmtsList"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

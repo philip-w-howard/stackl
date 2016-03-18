@@ -49,8 +49,6 @@ class cWhileStmt : public cStmt
     cExpr* GetCond()    { return (cExpr*)GetChild(0); }
     cStmt* GetStmt()    { return (cStmt*)GetChild(1); }
 
-    virtual string NodeType()             { return "WhileStmt"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

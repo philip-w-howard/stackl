@@ -61,7 +61,6 @@ class cIfStmt : public cStmt
     cStmt* GetIfStmt()  { return (cStmt*)GetChild(1); }
     cStmt* GetElseStmt(){ return (cStmt*)GetChild(2); }
 
-    virtual string NodeType()             { return "IfStmt"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
 };

@@ -31,9 +31,10 @@ class cStructType : public cTypeDecl
         return mScope->Lookup(sym->Name());
     }
 
-    virtual bool IsStruct() { return true; }
-    virtual int Size() { return mSize; }
-    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
+    virtual bool IsStruct()         { return true; }
+    virtual void SetSize(int size)  { mSize = size; }
+    virtual int Size()              { return mSize; }
+    virtual cSymbol* GetName()      { return (cSymbol*)GetChild(0); }
 
     virtual int ComputeOffsets(int base)
     {
@@ -49,7 +50,6 @@ class cStructType : public cTypeDecl
 
     cDeclsList* GetDecls()  { return (cDeclsList*)GetChild(1); }
 
-    virtual string NodeType()             { return "StructType"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

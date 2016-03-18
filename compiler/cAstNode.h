@@ -67,14 +67,13 @@ class cAstNode
             return m_children[child];
         }
 
-        virtual string AttributesToString()   { return string(""); }
         virtual void Visit(cVisitor *visitor) = 0;
 
         // return true if a semantic error was detected in this node
         virtual bool HasSemanticError() { return mSemanticError; }
 
-         virtual int ComputeOffsets(int base) { return base; }
-         virtual void GenerateCode() {}
+        virtual int ComputeOffsets(int base) { return base; }
+        virtual void GenerateCode() {}
     protected:
         vector<cAstNode *> m_children;  // list of statements
         bool mSemanticError;            // This node contains a semantic error

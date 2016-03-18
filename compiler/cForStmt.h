@@ -59,7 +59,6 @@ class cForStmt : public cStmt
     cExpr* GetUpdate()  { return (cExpr*)GetChild(2); }
     cStmt* GetStmt()    { return (cStmt*)GetChild(3); }
 
-    virtual string NodeType()             { return "ForStmt"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
 };
