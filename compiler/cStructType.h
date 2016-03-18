@@ -10,17 +10,16 @@ class cStructType : public cTypeDecl
 {
   public:
     cStructType(cSymbol *name, cScope *scope, cDeclsList *decls) 
-        : cTypeDecl(name, decls->Size())
+        : cTypeDecl()
     {
         // FIX THIS: semantic checks?
+        AddChild(name);
         AddChild(decls);
         mScope = scope;
         mSize = 0;
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
     }
-
-    virtual bool IsStruct() { return true; }
 
     bool Contains(cSymbol *sym)
     {
@@ -32,7 +31,9 @@ class cStructType : public cTypeDecl
         return mScope->Lookup(sym->Name());
     }
 
+    virtual bool IsStruct() { return true; }
     virtual int Size() { return mSize; }
+    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
 
     virtual int ComputeOffsets(int base)
     {

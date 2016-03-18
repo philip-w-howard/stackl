@@ -8,13 +8,9 @@
 class cTypeDecl : public cDecl
 {
   public:
-    cTypeDecl(cSymbol *name, int size) : cDecl()
-    {
-        AddChild(name);
-        mSize = size;
-    }
+    cTypeDecl() : cDecl() {}
 
-    virtual cSymbol* GetName() { return (cSymbol*)GetChild(0); }
+    virtual cSymbol* GetName() = 0;
 
     virtual bool IsType()   { return true; }
 
@@ -27,7 +23,6 @@ class cTypeDecl : public cDecl
     virtual void GenerateCode()
     {}
 
-    virtual string NodeType()             { return "TypeDecl"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

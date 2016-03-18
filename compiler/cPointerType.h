@@ -9,10 +9,12 @@
 class cPointerType : public cTypeDecl
 {
   public:
-    cPointerType(cSymbol *name) : cTypeDecl(name, WORD_SIZE)
+    cPointerType(cSymbol *name) : cTypeDecl()
     {
         name->SetDecl(this);
         symbolTableRoot->InsertRoot(name);
+        AddChild(name);
+        mSize = WORD_SIZE;
     }
 
     virtual cTypeDecl *ParentType() 
@@ -29,9 +31,8 @@ class cPointerType : public cTypeDecl
     }
 
     virtual bool IsPointer() { return true; }
-
-    // FIX THIS: need this overload?
     virtual int  ElementSize() { return ParentType()->Size(); }
+    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
 
     virtual void GenerateCode()
     {}
@@ -51,8 +52,6 @@ class cPointerType : public cTypeDecl
         return NULL;
     }
 
-    virtual string NodeType()             { return "PointerType"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

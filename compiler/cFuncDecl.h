@@ -13,17 +13,19 @@
 class cFuncDecl : public cTypeDecl
 {
   public:
-    cFuncDecl(cTypeDecl *type, cSymbol *name) : cTypeDecl(name, WORD_SIZE)
+    cFuncDecl(cTypeDecl *type, cSymbol *name) : cTypeDecl()
     {
         // FIX THIS: Semantic checks
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
 
+        AddChild(name);
         AddChild(type);
         AddChild(nullptr); // params
         AddChild(nullptr); // stmts
         mHasStatements  = false;
         mDeclsSize      = 0;
+        mSize = WORD_SIZE;
     }
 
     void AddParams(cAstNode *params)
@@ -70,6 +72,7 @@ class cFuncDecl : public cTypeDecl
         ret->GenerateCode();
     }
 
+    cSymbol* GetName()          { return (cSymbol*)GetChild(0); }
     cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }
     cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
     cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }

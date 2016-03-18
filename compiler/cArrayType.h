@@ -10,9 +10,10 @@
 class cArrayType : public cTypeDecl
 {
   public:
-    cArrayType(cSymbol *name, int size) : cTypeDecl(name, WORD_SIZE)
+    cArrayType(cSymbol *name, int size) : cTypeDecl()
     {
         // FIX THIS: semantic checks
+        AddChild(name);
         name = symbolTableRoot->InsertRoot(name);
         name->SetDecl(this);
         mSize = size;
@@ -35,6 +36,7 @@ class cArrayType : public cTypeDecl
         return dynamic_cast<cTypeDecl*>(sym->GetDecl());
     }
 
+    virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
     virtual bool IsArray()      { return true; }
     virtual int  Size()         { return ParentType()->Size() * mSize; }
     virtual int  ElementSize()  { return ParentType()->Size(); }
@@ -73,9 +75,7 @@ class cArrayType : public cTypeDecl
         return nullptr;
     }
 
-    virtual string NodeType()             { return "arrayType"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 
 

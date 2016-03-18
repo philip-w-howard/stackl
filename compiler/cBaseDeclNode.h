@@ -17,8 +17,10 @@
 class cBaseDeclNode : public cTypeDecl
 {
   public:
-    cBaseDeclNode(cSymbol *name, int size) : cTypeDecl(name, size)
+    cBaseDeclNode(cSymbol *name, int size) : cTypeDecl()
     {
+        AddChild(name);
+        mSize = size;
     }
 
     virtual bool IsType() { return true; }
