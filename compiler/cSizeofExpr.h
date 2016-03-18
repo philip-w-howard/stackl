@@ -32,16 +32,13 @@ class cSizeofExpr : public cExpr
         return symbolTableRoot->Lookup("int")->GetDecl()->GetType();
     }
 
-    virtual std::string toString()
-    {
-       return "SIZEOF(" + std::to_string(mItemSize) + ")";
-    }
-
     virtual void GenerateCode()
     {
         EmitInt(PUSH_OP);
         EmitInt(mItemSize);
     }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
     int   mItemSize;

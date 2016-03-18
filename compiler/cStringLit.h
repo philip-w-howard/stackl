@@ -11,8 +11,6 @@ class cStringLit : public cExpr
     cStringLit(char *str) :  cExpr(), mStr(str)
     {}
 
-    std::string toString() { return mStr; }
-
     virtual bool IsConst() { return true; }
     virtual int  ConstValue()
     {
@@ -31,6 +29,10 @@ class cStringLit : public cExpr
         EmitInt(PUSH_OP);
         EmitString(mStr);
     }
+
+    virtual std::string GetString() { return mStr; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
   protected:
     std::string mStr;
 };

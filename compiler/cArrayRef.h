@@ -4,6 +4,7 @@
 
 #include "cVarRef.h"
 #include "cSymbol.h"
+#include "codegen.h"
 
 class cArrayRef : public cVarRef
 {
@@ -23,11 +24,6 @@ class cArrayRef : public cVarRef
 
         AddChild(base);
         AddChild(index);
-    }
-
-    virtual std::string toString()
-    {
-        return GetBase()->toString() + " [ " + GetIndex()->toString() + " ] ";
     }
 
     virtual void GenerateAddress()
@@ -67,10 +63,15 @@ class cArrayRef : public cVarRef
     }
 
 
-    cExpr* GetBase()                { return (cExpr*)GetChild(0); }
-    virtual cTypeDecl *GetType()    { return GetBase()->GetType(); }
-    cExpr* GetIndex()               { return (cExpr*)GetChild(1); }
-    virtual bool IsArrayRef()       { return true; }
-    virtual bool IsStruct()         { return GetType()->ParentType()->IsStruct(); }
+    cExpr* GetBase()              { return (cExpr*)GetChild(0); }
+    virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }
+    cExpr* GetIndex()             { return (cExpr*)GetChild(1); }
+    virtual bool IsArrayRef()     { return true; }
+    virtual bool IsStruct()       { return GetType()->ParentType()->IsStruct();}
+
+    virtual string NodeType()             { return "ArrayRef"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
+
 

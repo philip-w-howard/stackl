@@ -1,3 +1,5 @@
+delete NodeType functions
+
 const optimizations
 multi-D arrays
    mBaseType for multi-D arrays is not correct

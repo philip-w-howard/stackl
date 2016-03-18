@@ -16,11 +16,6 @@ class cExprStmt : public cStmt
         AddChild(expr);
     }
 
-    virtual std::string toString()
-    {
-        return GetExpr()->toString();
-    }
-
     virtual int ComputeOffsets(int base)
     {
         return GetExpr()->ComputeOffsets(base);
@@ -35,5 +30,9 @@ class cExprStmt : public cStmt
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+
+    virtual string NodeType()             { return "ExprStmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

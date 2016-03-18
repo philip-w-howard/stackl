@@ -25,11 +25,6 @@ class cAssignExpr : public cExpr
 
     virtual cTypeDecl *GetType()    { return GetVar()->GetType(); }
 
-    virtual std::string toString()
-    {
-        return "assign " + GetVar()->toString() + " = " + GetExpr()->toString();
-    }
-
     virtual void GenerateCode()
     {
         GetExpr()->GenerateCode();
@@ -47,5 +42,7 @@ class cAssignExpr : public cExpr
 
     cVarRef* GetVar()   { return (cVarRef*)GetChild(0); }
     cExpr*   GetExpr()  { return (cExpr*)GetChild(1); }
-};
 
+    virtual string NodeType()             { return "assign"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+};

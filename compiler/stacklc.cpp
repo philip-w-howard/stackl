@@ -16,6 +16,7 @@
 #include <limits.h>     // for include path
 
 #include "lex.h"
+#include "cAstXml.h"
 #include "codegen.h"
 #include "../version.h"
 
@@ -168,16 +169,8 @@ int main(int argc, char **argv)
             char *ptr = strrchr(outfile_name, '.');
             if (ptr != NULL) *ptr = 0;
             strcat(outfile_name, ".ast");
-            std::ofstream output(outfile_name);
-            if (!output.is_open())
-            {
-                std::cerr << "ERROR: Unable to open file " << 
-                    outfile_name << std::endl;
-                exit(-1);
-            }
-
-            output << program->toString() << std::endl;
-            output.close();
+            cAstXml astPrinter(outfile_name);
+            astPrinter.VisitAllNodes(program);
         }
 
         strcpy(outfile_name, Input_File);

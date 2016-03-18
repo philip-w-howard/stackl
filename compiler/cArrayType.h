@@ -5,7 +5,7 @@
 #include "cTypeDecl.h"
 #include "cSymbol.h"
 #include "cSymbolTable.h"
-#include "../interp/machine_def.h"
+#include "codegen.h"
 
 class cArrayType : public cTypeDecl
 {
@@ -38,11 +38,6 @@ class cArrayType : public cTypeDecl
     virtual bool IsArray()      { return true; }
     virtual int  Size()         { return ParentType()->Size() * mSize; }
     virtual int  ElementSize()  { return ParentType()->Size(); }
-
-    virtual std::string toString()
-    {
-        return "type: " + GetName()->toString();
-    }
 
     virtual void GenerateCode()
     {}
@@ -77,5 +72,10 @@ class cArrayType : public cTypeDecl
 
         return nullptr;
     }
+
+    virtual string NodeType()             { return "arrayType"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
+
 

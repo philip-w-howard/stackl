@@ -6,6 +6,8 @@ OBJS= scanner.o \
 	 cBinaryExpr.o \
 	 codegen.o \
 	 stacklc.o \
+	 cVisitor.o \
+	 cAstXml.o \
 
 all: stacklc
 

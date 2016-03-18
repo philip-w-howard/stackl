@@ -16,14 +16,6 @@ class cReturnStmt : public cStmt
         AddChild(expr);
     }
 
-    virtual std::string toString()
-    {
-        if (GetExpr() != NULL)
-            return "return " + GetExpr()->toString();
-        else
-            return "return";
-    }
-
     virtual void GenerateCode()
     {
         if (GetExpr() != NULL) 
@@ -36,5 +28,9 @@ class cReturnStmt : public cStmt
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+
+    virtual string NodeType()             { return "ReturnStmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

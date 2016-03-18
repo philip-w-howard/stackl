@@ -1,51 +1,25 @@
 #pragma once
+//************************************************
+// cAstXml
+//
+// Author: Philip Howard
+// Email:  phil.howard@oit.edu
+//
+// Visitor to print the AST in XML form
+//
+#include <iostream>
+#include <fstream>
 
-class cAddressExpr;
-class cArrayRef;
-class cArrayType;
-class cAsmNode;
-class cAssignExpr;
-class cAstNode;
-class cBaseDeclNode;
-class cBinaryExpr;
-class cDecl;
-class cDeclsList;
-class cExpr;
-class cExprStmt;
-class cForStmt;
-class cFuncCall;
-class cFuncDecl;
-class cIfStmt;
-class cIntExpr;
-class cNopStmt;
-class cParams;
-class cPlainVarRef;
-class cPointerDeref;
-class cPointerType;
-class cPostfixExpr;
-class cPrefixExpr;
-class cReturnStmt;
-class cShortCircuitExpr;
-class cSizeofExpr;
-class cStmt;
-class cStmtsList;
-class cStringLit;
-class cStructDeref;
-class cStructRef;
-class cStructType;
-class cSymbol;
-class cTypeDecl;
-class cUnaryExpr;
-class cVarDecl;
-class cVarRef;
-class cWhileStmt;
+#include "cVisitor.h"
+#include "cAstNode.h"
 
-class cVisitor
+class cAstXml : public cVisitor
 {
     public:
-        cVisitor() {}
+        cAstXml(std::string filename);
+        ~cAstXml();
 
-        virtual void VisitAllNodes(cAstNode *node) = 0;
+        virtual void VisitAllNodes(cAstNode *node);
 
         virtual void Visit(cAddressExpr *node);
         virtual void Visit(cArrayRef *node);
@@ -87,7 +61,9 @@ class cVisitor
         virtual void Visit(cVarRef *node);
         virtual void Visit(cWhileStmt *node);
     protected:
-        void PreVisitAllNodes(cAstNode *node);
-        void PostVisitAllNodes(cAstNode *node);
-        void VisitAllChildren(cAstNode *node);
+        std::ofstream output;
+
+        void DefaultVisit(cAstNode *node, 
+                std::string name, 
+                std::string attr = std::string(""));
 };

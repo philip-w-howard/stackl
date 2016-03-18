@@ -46,19 +46,6 @@ class cScope
         return mParent;
     }
 
-    std::string toString()
-    {
-        std::string result;
-
-        for (unordered_map<std::string, cSymbol*>::iterator it =mSymTab.begin();
-                it != mSymTab.end(); it++)
-        {
-            result += (*it).first + ": " + (*it).second->toString() + "\n";
-        }
-
-        return result;
-    }
-
   protected:
     // pointer to a hash table used to store info
     unordered_map<std::string, cSymbol*> mSymTab;

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "cDecl.h"
+#include "cVarDecl.h"
 #include "cExpr.h"
 #include "cSymbol.h"
 #include "cVarRef.h"
@@ -86,9 +88,8 @@ class cPlainVarRef : public cVarRef
         }
     }
 
-    virtual std::string toString()
-    {
-        return "var " + GetName()->toString();
-    }
+    virtual string NodeType()             { return "PlainVarRef"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

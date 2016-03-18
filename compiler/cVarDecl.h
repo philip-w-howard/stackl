@@ -6,6 +6,7 @@
 #include "cArrayType.h"
 #include "cExpr.h"
 #include "cSymbol.h"
+#include "codegen.h"
 
 class cVarDecl : public cDecl
 {
@@ -63,16 +64,6 @@ class cVarDecl : public cDecl
 
     virtual int GetOffset() { return mOffset; }
 
-    virtual std::string toString()
-    {
-        std::string result;
-        result = "vardecl: NOT IMPLEMENTED" ; 
-            //+ mType->GetSymbol()->toString() + " : " 
-            // + GetName()->toString() + " @ " + std::to_string(mOffset);
-
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         int size = GetType()->Size();
@@ -101,6 +92,8 @@ class cVarDecl : public cDecl
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }
     virtual cExpr*   GetArraySize() { return (cExpr*)GetChild(2); }
     virtual cExpr*   GetInit()      { return (cExpr*)GetChild(3); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:
     int       mOffset;
     bool      mIsGlobal;

@@ -24,16 +24,13 @@ class cIntExpr : public cExpr
         return dynamic_cast<cTypeDecl *>(type);
     }
 
-    virtual std::string toString()
-    {
-        return " " + std::to_string(mValue) + " ";
-    }
-
     virtual void GenerateCode()
     {
         EmitInt(PUSH_OP);
         EmitInt(mValue);
     }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
     int mValue;

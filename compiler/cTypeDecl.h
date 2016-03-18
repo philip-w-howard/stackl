@@ -24,13 +24,11 @@ class cTypeDecl : public cDecl
     virtual cTypeDecl *GetType()    { return this; }
     virtual cTypeDecl *ParentType() { return this; }
 
-    virtual std::string toString()
-    {
-        return "type: " + GetName()->toString();
-    }
-
     virtual void GenerateCode()
     {}
+
+    virtual string NodeType()             { return "TypeDecl"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
     int mSize;

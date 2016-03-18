@@ -26,16 +26,6 @@ class cIfStmt : public cStmt
         AddChild(elsePart);
     }
 
-    virtual std::string toString()
-    {
-        std::string result("(IF: ");
-        result += GetCond()->toString();
-        if (GetIfStmt() != NULL) result += "\n" + GetIfStmt()->toString();
-        if (GetElseStmt() != NULL) result += "\nELSE:\n" + GetElseStmt()->toString();
-        result += "\n)";
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         GetCond()->ComputeOffsets(base);
@@ -70,5 +60,9 @@ class cIfStmt : public cStmt
     cExpr* GetCond()    { return (cExpr*)GetChild(0); }
     cStmt* GetIfStmt()  { return (cStmt*)GetChild(1); }
     cStmt* GetElseStmt(){ return (cStmt*)GetChild(2); }
+
+    virtual string NodeType()             { return "IfStmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

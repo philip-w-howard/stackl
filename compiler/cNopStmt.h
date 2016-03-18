@@ -12,12 +12,10 @@ class cNopStmt : public cStmt
     {
     }
 
-    virtual std::string toString()
-    {
-        return "{}";
-    }
-
     virtual void GenerateCode()
     {}
+
+    virtual string NodeType()             { return "NOP"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

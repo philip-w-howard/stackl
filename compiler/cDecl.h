@@ -24,9 +24,6 @@ class cDecl : public cStmt
     virtual cVarDecl  *GetVar();
     virtual cFuncDecl *GetFunc();
 
-    virtual std::string toString()
-    {
-        return "Decl " + GetName()->toString();
-    }
+    virtual string NodeType()             { return "Decl"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
-

@@ -47,14 +47,6 @@ class cParams : public cAstNode
         return size;
     }
 
-    virtual std::string toString()
-    {
-        std::string result;
-        result = "NOT IMPLEMENTED"; // ListToString<cExpr *>(mList, false);
-
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         for (cAstNode::iterator it = FirstChild();
@@ -78,4 +70,7 @@ class cParams : public cAstNode
     }
 
     cExpr* GetParam(int index) { return (cExpr*)GetChild(index); }
+
+    virtual string NodeType()             { return "Params"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

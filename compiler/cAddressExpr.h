@@ -3,6 +3,7 @@
 #include <string>
 
 #include "cExpr.h"
+#include "cVarRef.h"
 #include "cSymbol.h"
 
 class cAddressExpr : public cExpr
@@ -18,10 +19,6 @@ class cAddressExpr : public cExpr
 
     virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
 
-    virtual std::string toString()
-    {
-       return "( & " + GetExpr()->toString() + ")";
-    }
     virtual void GenerateCode() 
     {
         cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());
@@ -32,5 +29,9 @@ class cAddressExpr : public cExpr
     }
 
     cExpr* GetExpr() { return (cExpr*)GetChild(0); }
+
+    virtual string NodeType()             { return "AddressExpr"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

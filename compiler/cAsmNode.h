@@ -42,15 +42,6 @@ class cAsmNode : public cExpr
         return NULL;
     }
 
-    virtual std::string toString()
-    {
-        std::string result("ASM ");
-        result += std::to_string(mCode);
-        if (mTwoWord) result += " " + std::to_string(mCode2);
-        if (GetParams() != NULL) result += " " + GetParams()->toString();
-        return result;
-    }
-
     virtual void GenerateCode()
     {
         if (GetParams() != NULL) GetParams()->GenerateCode();
@@ -59,6 +50,13 @@ class cAsmNode : public cExpr
     }
 
     cParams* GetParams()    { return (cParams*)GetChild(0); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
+    int GetOp1()        { return mCode; }
+    int GetOp2()        { return mCode2; }
+    bool UsesTwoArgs()  { return mTwoWord; }
+
   protected:
     int mCode;              // the opcode to be emitted
     int mCode2;             // 2nd opcode for 2 word instructions

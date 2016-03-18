@@ -46,11 +46,6 @@ class cSymbolTable
     // create a default table with symbols for base types
     void InitDefaultTable();
 
-    std::string toString()
-    {
-        return "symtable: " + mScope->toString();
-    }
-
   protected:
     // pointer to a hash table used to store info
     cScope *mScope;

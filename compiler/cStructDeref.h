@@ -2,6 +2,9 @@
 
 #include <string>
 
+#include "cVarDecl.h"
+#include "cStructType.h"
+#include "cTypeDecl.h"
 #include "cVarRef.h"
 #include "cSymbol.h"
 
@@ -42,11 +45,6 @@ class cStructDeref : public cVarRef
         return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
-    virtual std::string toString()
-    {
-        return GetBase()->toString() + " -> " + GetField()->toString();
-    }
-
     virtual void GenerateAddress()
     {
         GetBase()->GenerateCode();
@@ -78,5 +76,8 @@ class cStructDeref : public cVarRef
 
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cSymbol* GetField() { return (cSymbol*)GetChild(1); }
+
+    virtual string NodeType()             { return "StructDeref"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

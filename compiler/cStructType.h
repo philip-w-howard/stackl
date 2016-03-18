@@ -32,16 +32,6 @@ class cStructType : public cTypeDecl
         return mScope->Lookup(sym->Name());
     }
 
-    virtual std::string toString()
-    {
-        std::string result;
-        result = "struct: " + GetName()->toString() + "\n";
-        result += GetDecls()->toString();
-        result += "\n";
-
-        return result;
-    }
-
     virtual int Size() { return mSize; }
 
     virtual int ComputeOffsets(int base)
@@ -57,6 +47,10 @@ class cStructType : public cTypeDecl
     }
 
     cDeclsList* GetDecls()  { return (cDeclsList*)GetChild(1); }
+
+    virtual string NodeType()             { return "StructType"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
   protected:
     cScope      *mScope;
 };

@@ -2,6 +2,10 @@
 
 #include <string>
 
+#include "cSymbol.h"
+#include "cExpr.h"
+#include "cTypeDecl.h"
+#include "cStructType.h"
 #include "cVarRef.h"
 #include "cSymbol.h"
 
@@ -74,12 +78,11 @@ class cStructRef : public cVarRef
         }
     }
 
-    virtual std::string toString()
-    {
-        return GetBase()->toString() + " . " + GetField()->toString();
-    }
-
     cExpr* GetBase()        { return (cExpr*)GetChild(0); }
     cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
+
+    virtual string NodeType()             { return "StructRef"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

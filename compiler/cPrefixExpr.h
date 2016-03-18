@@ -45,11 +45,6 @@ class cPrefixExpr : public cExpr
         return "unrecognized postfix op ";
     }
 
-    virtual std::string toString()
-    {
-       return "(" + OpToString() + GetExpr()->toString() + ")";
-    }
-
     virtual int ComputeOffsets(int base)
     {
         return GetExpr()->ComputeOffsets(base);
@@ -75,6 +70,9 @@ class cPrefixExpr : public cExpr
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
   protected:
     int   mOp;
 };

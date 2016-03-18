@@ -53,15 +53,6 @@ class cStmtsList : public cStmt
         return size;
     }
 
-    virtual std::string toString()
-    {
-        std::string result("STMTS:\n{NOT IMPLEMENTED\n");
-        //result += ListToString<cStmt *>(mList, true);
-        result += "}\n";
-
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         for (cAstNode::iterator it = FirstChild();
@@ -83,5 +74,9 @@ class cStmtsList : public cStmt
     }
 
     cStmt *GetStmt(int index) { return (cStmt*)GetChild(index); }
+
+    virtual string NodeType()             { return "StmtsList"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

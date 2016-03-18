@@ -26,17 +26,6 @@ class cForStmt : public cStmt
         AddChild(stmt);
     }
 
-    virtual std::string toString()
-    {
-        std::string result("(FOR: (");
-        result += GetInit()->toString() + "; ";
-        result += GetExpr()->toString() + "; ";
-        result += GetUpdate()->toString() + ")\n";
-        result += "\n" + GetStmt()->toString();
-        result += "\n)";
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         if (GetInit() != NULL) GetInit()->ComputeOffsets(base);
@@ -69,5 +58,9 @@ class cForStmt : public cStmt
     cExpr* GetExpr()    { return (cExpr*)GetChild(1); }
     cExpr* GetUpdate()  { return (cExpr*)GetChild(2); }
     cStmt* GetStmt()    { return (cStmt*)GetChild(3); }
+
+    virtual string NodeType()             { return "ForStmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

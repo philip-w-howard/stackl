@@ -24,15 +24,6 @@ class cWhileStmt : public cStmt
         AddChild(stmt);
     }
 
-    virtual std::string toString()
-    {
-        std::string result("(WHILE: ");
-        result += GetCond()->toString();
-        result += "\n" + GetStmt()->toString();
-        result += "\n)";
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         base = GetCond()->ComputeOffsets(base);
@@ -57,5 +48,9 @@ class cWhileStmt : public cStmt
 
     cExpr* GetCond()    { return (cExpr*)GetChild(0); }
     cStmt* GetStmt()    { return (cStmt*)GetChild(1); }
+
+    virtual string NodeType()             { return "WhileStmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

@@ -26,11 +26,6 @@ class cBinaryExpr : public cExpr
 
     virtual cTypeDecl *GetType();
 
-    virtual std::string toString()
-    {
-       return "(" + GetLeft()->toString() + OpToString() + GetRight()->toString() + ")";
-    }
-
     virtual void GenerateCode()
     {
         GetLeft()->GenerateCode();
@@ -40,10 +35,13 @@ class cBinaryExpr : public cExpr
 
     cExpr* GetLeft()    { return (cExpr*)GetChild(0); }
     cExpr* GetRight()   { return (cExpr*)GetChild(1); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
+    std::string OpToString();
   protected:
     int   mOp;
 
-    std::string OpToString();
     int OpAsInt();
 };
 

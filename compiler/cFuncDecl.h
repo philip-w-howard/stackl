@@ -40,32 +40,6 @@ class cFuncDecl : public cTypeDecl
     virtual bool IsFunc() { return true; }
     virtual bool IsType() { return false; }
 
-    virtual std::string toString()
-    {
-        std::string result;
-        result = "function: " + GetName()->toString();
-        if (GetParams() != NULL)
-            result += "( " + GetParams()->toString() + " )";
-        else
-            result += "( )";
-
-        result += "\n";
-
-        if (mHasStatements)
-        {
-            if (GetStmts() != NULL)
-                result += GetStmts()->toString();
-            else
-                result += "{}";
-        }
-        else
-        {
-            result += ";";
-        }
-
-        return result;
-    }
-
     virtual int ComputeOffsets(int base)
     {
         int locals = 0;
@@ -99,6 +73,10 @@ class cFuncDecl : public cTypeDecl
     cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }
     cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
     cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }
+
+    virtual string NodeType()             { return "FuncDecl"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
   protected:
     bool mHasStatements;
     int mDeclsSize;

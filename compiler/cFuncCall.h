@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "cTypeDecl.h"
+#include "cFuncDecl.h"
 #include "cVarRef.h"
 #include "cParams.h"
 #include "cSymbol.h"
@@ -28,16 +30,6 @@ class cFuncCall : public cVarRef
     virtual bool IsFunc()        { return true; }
     virtual cTypeDecl *GetType() { return mFunc->ReturnType(); }
 
-    virtual std::string toString()
-    {
-        std::string result;
-        result =  GetBase()->toString() + "( ";
-        if (GetParams() != NULL) result += GetParams()->toString();
-        result += " )";
-
-        return result;
-    }
-
     virtual void GenerateAddress()
     {
         fatal_error("Attempted to get the address of a funciton");
@@ -63,6 +55,9 @@ class cFuncCall : public cVarRef
 
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cParams* GetParams(){ return (cParams*)GetChild(1); }
+
+    virtual string NodeType()             { return "FuncCall"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
     cFuncDecl   *mFunc;

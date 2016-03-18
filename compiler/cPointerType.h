@@ -33,11 +33,6 @@ class cPointerType : public cTypeDecl
     // FIX THIS: need this overload?
     virtual int  ElementSize() { return ParentType()->Size(); }
 
-    virtual std::string toString()
-    {
-        return "type: " + GetName()->toString();
-    }
-
     virtual void GenerateCode()
     {}
 
@@ -55,5 +50,9 @@ class cPointerType : public cTypeDecl
 
         return NULL;
     }
+
+    virtual string NodeType()             { return "PointerType"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

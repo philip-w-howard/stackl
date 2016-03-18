@@ -40,9 +40,8 @@ class cPointerDeref : public cVarRef
         }
     }
 
-    virtual std::string toString()
-    {
-        return "( * " + GetBase()->toString() + " )";
-    }
+    virtual string NodeType()             { return "PointerDeref"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 

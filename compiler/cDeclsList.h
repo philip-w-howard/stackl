@@ -33,15 +33,8 @@ class cDeclsList : public cStmtsList
         AddChild(decl);
     }
 
-    virtual std::string toString()
-    {
-        std::string result("DECLS:\n{\n");
-        result += "NOT IMPLEMENTED"; // ListToString<cStmt *>(mList, true);
-        result += "}\n";
-
-        return result;
-    }
-
     cDecl* GetDecl(int index)   { return (cDecl*)GetChild(index); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

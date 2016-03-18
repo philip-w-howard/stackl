@@ -68,6 +68,9 @@ class cShortCircuitExpr : public cBinaryExpr
             SetLabelValue(jmp);
         }
     }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
   protected:
     bool mShortOnTrue;      // short circuit if left op is true
                             // NOTE: also uses members from cBinaryExpr

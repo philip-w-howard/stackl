@@ -53,10 +53,6 @@ class cUnaryExpr : public cExpr
         return "unrecognized unary op ";
     }
 
-    virtual std::string toString()
-    {
-       return "(" + OpToString() + GetExpr()->toString() + ")";
-    }
     virtual void GenerateCode() 
     {
         GetExpr()->GenerateCode();
@@ -80,6 +76,8 @@ class cUnaryExpr : public cExpr
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:
     int   mOp;
 };

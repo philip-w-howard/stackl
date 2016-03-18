@@ -16,7 +16,7 @@
 using std::string;
 using std::vector;
 
-//#include "cVisitor.h"
+#include "cVisitor.h"
 
 extern int yylineno;
 
@@ -67,37 +67,8 @@ class cAstNode
             return m_children[child];
         }
 
-        // return a string representation of the node
-        virtual string toString() = 0;
-
-        string ToString() 
-        {
-            string result("");
-
-            result += "<" + NodeType();
-            result += AttributesToString();
-
-            if (HasChildren())
-            {
-                result += ">";
-                iterator it;
-                for (it=FirstChild(); it != LastChild(); it++)
-                {
-                    if ( (*it) != nullptr) result += (*it)->ToString();
-                }
-            }
-
-            if (HasChildren()) 
-                result += "</" + NodeType() + ">\n";
-            else
-                result += "/>";
-
-            return result;
-        }
-
         virtual string AttributesToString()   { return string(""); }
-        virtual string NodeType()       { return "AST"; }
-        //virtual void Visit(cVisitor *visitor) = 0;
+        virtual void Visit(cVisitor *visitor) = 0;
 
         // return true if a semantic error was detected in this node
         virtual bool HasSemanticError() { return mSemanticError; }

@@ -23,10 +23,7 @@ class cBaseDeclNode : public cTypeDecl
 
     virtual bool IsType() { return true; }
 
-    virtual std::string toString()
-    {
-        return "Base Type " + GetName()->toString() + 
-            " size: " + std::to_string(mSize);
-    }
+    virtual string NodeType()             { return "BaseDecl"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

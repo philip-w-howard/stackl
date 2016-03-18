@@ -15,5 +15,9 @@ class cStmt : public cAstNode
     // useful for cDecl and cExpr, both of which are subclasses.
     // Other subclasses may not have a use for this.
     virtual int Size() { return 0; }
+
+    virtual string NodeType()             { return "Stmt"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };
 
