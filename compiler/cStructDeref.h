@@ -77,7 +77,6 @@ class cStructDeref : public cVarRef
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cSymbol* GetField() { return (cSymbol*)GetChild(1); }
 
-    virtual string NodeType()             { return "StructDeref"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

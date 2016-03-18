@@ -36,14 +36,6 @@ class cStructType : public cTypeDecl
     virtual int Size()              { return mSize; }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(0); }
 
-    virtual int ComputeOffsets(int base)
-    {
-        // structs are offset from zero
-        mSize = GetDecls()->ComputeOffsets(0);
-
-        return base;
-    }
-
     virtual void GenerateCode()
     {
     }

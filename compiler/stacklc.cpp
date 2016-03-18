@@ -165,8 +165,6 @@ int main(int argc, char **argv)
         cSizeOffset sizer;
         sizer.VisitAllNodes(program);
 
-        //program->ComputeOffsets(0);
-
         if (Do_Ast)
         {
             strcpy(outfile_name, Input_File);

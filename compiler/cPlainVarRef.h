@@ -84,12 +84,10 @@ class cPlainVarRef : public cVarRef
                 }
             }
         } else {
-            fatal_error("Attempted to generate code for a cVarRef without a decl");
+            fatal_error("Attempt to generate code for a cVarRef with no decl");
         }
     }
 
-    virtual string NodeType()             { return "PlainVarRef"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

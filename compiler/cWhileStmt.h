@@ -24,13 +24,6 @@ class cWhileStmt : public cStmt
         AddChild(stmt);
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        base = GetCond()->ComputeOffsets(base);
-        if (GetStmt() != NULL) base = GetStmt()->ComputeOffsets(base);
-        return base;
-    }
-
     virtual void GenerateCode()
     {
         std::string start_loop = GenerateLabel();

@@ -16,11 +16,6 @@ class cExprStmt : public cStmt
         AddChild(expr);
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        return GetExpr()->ComputeOffsets(base);
-    }
-
     virtual void GenerateCode()
     {
         GetExpr()->GenerateCode();
@@ -32,6 +27,5 @@ class cExprStmt : public cStmt
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

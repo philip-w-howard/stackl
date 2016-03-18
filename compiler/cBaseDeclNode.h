@@ -24,9 +24,8 @@ class cBaseDeclNode : public cTypeDecl
     }
 
     virtual bool IsType() { return true; }
-
-    virtual string NodeType()             { return "BaseDecl"; }
-    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
     virtual cSymbol* GetName()            { return (cSymbol*)GetChild(0); }
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

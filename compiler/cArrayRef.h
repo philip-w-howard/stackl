@@ -69,9 +69,7 @@ class cArrayRef : public cVarRef
     virtual bool IsArrayRef()     { return true; }
     virtual bool IsStruct()       { return GetType()->ParentType()->IsStruct();}
 
-    virtual string NodeType()             { return "ArrayRef"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 
 

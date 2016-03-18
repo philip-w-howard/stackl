@@ -29,8 +29,6 @@ class cReturnStmt : public cStmt
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
 
-    virtual string NodeType()             { return "ReturnStmt"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

@@ -72,7 +72,6 @@ class cAstNode
         // return true if a semantic error was detected in this node
         virtual bool HasSemanticError() { return mSemanticError; }
 
-        virtual int ComputeOffsets(int base) { return base; }
         virtual void GenerateCode() {}
     protected:
         vector<cAstNode *> m_children;  // list of statements

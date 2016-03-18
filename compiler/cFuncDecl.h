@@ -44,16 +44,6 @@ class cFuncDecl : public cTypeDecl
     virtual void SetSize(int size)  { mDeclsSize = size; }
     virtual int  GetSize()          { return mDeclsSize; }
 
-    virtual int ComputeOffsets(int base)
-    {
-        int locals = 0;
-        if(GetParams() != NULL)  GetParams()->ComputeOffsets(-STACK_FRAME_SIZE);
-        if (GetStmts() != NULL) locals = GetStmts()->ComputeOffsets(locals);
-        mDeclsSize = locals;
-
-        return base;
-    }
-
     virtual void GenerateCode()
     {
         if (!mHasStatements) return;

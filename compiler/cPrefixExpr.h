@@ -45,11 +45,6 @@ class cPrefixExpr : public cExpr
         return "unrecognized postfix op ";
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        return GetExpr()->ComputeOffsets(base);
-    }
-
     virtual void GenerateCode() 
     {
         cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());

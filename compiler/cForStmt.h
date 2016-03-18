@@ -26,15 +26,6 @@ class cForStmt : public cStmt
         AddChild(stmt);
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        if (GetInit() != NULL) GetInit()->ComputeOffsets(base);
-        if (GetExpr() != NULL) GetExpr()->ComputeOffsets(base);
-        if (GetUpdate() != NULL) GetUpdate()->ComputeOffsets(base);
-        if (GetStmt() != NULL) GetStmt()->ComputeOffsets(base);
-        return base;
-    }
-
     virtual void GenerateCode()
     {
         std::string start_loop = GenerateLabel();
@@ -60,6 +51,5 @@ class cForStmt : public cStmt
     cStmt* GetStmt()    { return (cStmt*)GetChild(3); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

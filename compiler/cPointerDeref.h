@@ -40,8 +40,6 @@ class cPointerDeref : public cVarRef
         }
     }
 
-    virtual string NodeType()             { return "PointerDeref"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

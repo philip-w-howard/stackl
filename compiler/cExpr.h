@@ -32,7 +32,6 @@ class cExpr : public cStmt
     //virtual int  GetOffset() = 0;
     virtual void GenerateCode() = 0;
 
-    virtual string NodeType()             { return "Expr"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

@@ -53,17 +53,6 @@ class cStmtsList : public cStmt
         return size;
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        for (cAstNode::iterator it = FirstChild();
-            it != LastChild(); it++)
-        {
-            base = (*it)->ComputeOffsets(base);
-        }
-
-        return base;
-    }
-
     virtual void GenerateCode()
     {
         for (cAstNode::iterator it = FirstChild();

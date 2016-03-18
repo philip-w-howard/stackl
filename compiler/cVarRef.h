@@ -20,8 +20,6 @@ class cVarRef : public cExpr
     virtual cTypeDecl *GetType() = 0;
     virtual void GenerateAddress() = 0;
 
-    virtual string NodeType()             { return "VarRef"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

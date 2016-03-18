@@ -47,17 +47,6 @@ class cParams : public cAstNode
         return size;
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        for (cAstNode::iterator it = FirstChild();
-            it != LastChild(); it++)
-        {
-            base = (*it)->ComputeOffsets(base);
-        }
-
-        return base;
-    }
-
     // generate code in reverse list order (right to left)
     virtual void GenerateCode()
     {

@@ -26,14 +26,6 @@ class cIfStmt : public cStmt
         AddChild(elsePart);
     }
 
-    virtual int ComputeOffsets(int base)
-    {
-        GetCond()->ComputeOffsets(base);
-        if (GetIfStmt() != NULL) GetIfStmt()->ComputeOffsets(base);
-        if (GetElseStmt() != NULL) GetElseStmt()->ComputeOffsets(base);
-        return base;
-    }
-
     virtual void GenerateCode()
     {
         std::string if_label = GenerateLabel();

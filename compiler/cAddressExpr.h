@@ -30,8 +30,6 @@ class cAddressExpr : public cExpr
 
     cExpr* GetExpr() { return (cExpr*)GetChild(0); }
 
-    virtual string NodeType()             { return "AddressExpr"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
 };
 

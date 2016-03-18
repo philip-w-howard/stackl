@@ -56,7 +56,6 @@ class cFuncCall : public cVarRef
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cParams* GetParams(){ return (cParams*)GetChild(1); }
 
-    virtual string NodeType()             { return "FuncCall"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

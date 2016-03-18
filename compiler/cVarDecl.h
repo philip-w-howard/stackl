@@ -65,27 +65,6 @@ class cVarDecl : public cDecl
     virtual void SetOffset(int offset)  { mOffset = offset; }
     virtual int  GetOffset()            { return mOffset; }
 
-    virtual int ComputeOffsets(int base)
-    {
-        int size = GetType()->Size();
-
-        if (size == 1) 
-            mOffset = base;
-        else if (base % WORD_SIZE != 0)
-            mOffset = base/WORD_SIZE*WORD_SIZE + WORD_SIZE;
-        else
-            mOffset = base;
-
-        if (base < 0)
-        {
-            mOffset -= size;
-            base = mOffset;
-        }
-        else
-            base = mOffset + size;
-
-        return base;
-    }
     virtual void GenerateCode()
     {}
 

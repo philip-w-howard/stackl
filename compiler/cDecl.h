@@ -24,6 +24,5 @@ class cDecl : public cStmt
     virtual cVarDecl  *GetVar();
     virtual cFuncDecl *GetFunc();
 
-    virtual string NodeType()             { return "Decl"; }
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
