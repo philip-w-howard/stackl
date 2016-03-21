@@ -13,7 +13,6 @@
 
 #include "cStmt.h"
 #include "cExpr.h"
-#include "codegen.h"
 
 class cForStmt : public cStmt
 {
@@ -24,25 +23,6 @@ class cForStmt : public cStmt
         AddChild(expr);
         AddChild(update);
         AddChild(stmt);
-    }
-
-    virtual void GenerateCode()
-    {
-        std::string start_loop = GenerateLabel();
-        std::string end_loop = GenerateLabel();
-
-        GetInit()->GenerateCode();
-        EmitInt(POP_OP);            // need to handle VOID
-        SetLabelValue(start_loop);
-        GetExpr()->GenerateCode();
-        EmitInt(JUMPE_OP);
-        SetLabelRef(end_loop);
-        GetStmt()->GenerateCode();
-        GetUpdate()->GenerateCode();
-        EmitInt(POP_OP);            // need to handle VOID
-        EmitInt(JUMP_OP);
-        SetLabelRef(start_loop);
-        SetLabelValue(end_loop);
     }
 
     cExpr* GetInit()    { return (cExpr*)GetChild(0); }

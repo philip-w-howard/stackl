@@ -25,29 +25,6 @@ class cFuncCall : public cVarRef
         AddChild(params);
     }
 
-    virtual void GenerateAddress()
-    {
-        fatal_error("Attempted to get the address of a funciton");
-    }
-
-    virtual void GenerateCode()
-    {
-        if (GetParams() != NULL) GetParams()->GenerateCode();
-
-        EmitInt(CALL_OP);
-        SetLabelRef(GetFuncName());
-
-        // Need to pop the args off the stack without affecting the return val
-        if (GetParams() != NULL)
-        {
-            for (int ii=0; ii<GetParams()->Size()/WORD_SIZE; ii++)
-            {
-                EmitInt(SWAP_OP);
-                EmitInt(POP_OP);
-            }
-        }
-    }
-
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cParams* GetParams(){ return (cParams*)GetChild(1); }
     virtual bool IsFunc()        { return true; }

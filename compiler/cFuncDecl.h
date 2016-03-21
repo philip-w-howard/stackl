@@ -8,7 +8,7 @@
 #include "cIntExpr.h"
 #include "cSymbol.h"
 #include "cDeclsList.h"
-#include "codegen.h"
+#include "cCodeGen.h"
 
 class cFuncDecl : public cTypeDecl
 {
@@ -25,7 +25,7 @@ class cFuncDecl : public cTypeDecl
         AddChild(nullptr); // stmts
         mHasStatements  = false;
         mDeclsSize      = 0;
-        mSize = WORD_SIZE;
+        mSize = cCodeGen::STACKL_WORD_SIZE;
     }
 
     void AddParams(cAstNode *params)
@@ -43,26 +43,6 @@ class cFuncDecl : public cTypeDecl
     virtual bool IsType()           { return false; }
     virtual void SetSize(int size)  { mDeclsSize = size; }
     virtual int  GetSize()          { return mDeclsSize; }
-
-    virtual void GenerateCode()
-    {
-        if (!mHasStatements) return;
-
-        EmitComment(GetName()->Name() + "\n");
-        SetLabelValue(GetName()->Name());
-        int adj_size = (mDeclsSize / WORD_SIZE * WORD_SIZE) + WORD_SIZE;
-        if (mDeclsSize != 0)
-        {
-            EmitInt(ADJSP_OP);
-            EmitInt(adj_size);
-        }
-
-        GetStmts()->GenerateCode();
-
-        // Force return statement
-        cReturnStmt *ret = new cReturnStmt(new cIntExpr(0));
-        ret->GenerateCode();
-    }
 
     cSymbol* GetName()          { return (cSymbol*)GetChild(0); }
     cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }

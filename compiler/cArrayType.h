@@ -5,7 +5,6 @@
 #include "cTypeDecl.h"
 #include "cSymbol.h"
 #include "cSymbolTable.h"
-#include "codegen.h"
 
 class cArrayType : public cTypeDecl
 {
@@ -40,9 +39,6 @@ class cArrayType : public cTypeDecl
     virtual bool IsArray()      { return true; }
     virtual int  Size()         { return ParentType()->Size() * mSize; }
     virtual int  ElementSize()  { return ParentType()->Size(); }
-
-    virtual void GenerateCode()
-    {}
 
     static cArrayType *ArrayType(cTypeDecl *base, int size)
     {

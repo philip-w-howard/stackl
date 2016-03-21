@@ -12,9 +12,6 @@ class cNopStmt : public cStmt
     {
     }
 
-    virtual void GenerateCode()
-    {}
-
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

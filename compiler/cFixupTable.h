@@ -26,43 +26,6 @@ class cFixupTable
         mDest[label] = loc;
     }
 
-    void FixupOutput(std::ofstream &output)
-    {
-        std::string name;
-
-        std::list<string_item>::iterator str_it;
-        for (str_it=mStringList.begin(); str_it!=mStringList.end(); str_it++)
-        {
-            SetLabelValue((*str_it).mLabel);
-            EmitActualString( (*str_it).mString );
-        }
-
-        SetLabelValue(GlobalLabel);
-        std::list<string_item>::iterator glb_it;
-        for (glb_it=mGlobalList.begin(); glb_it!=mGlobalList.end(); glb_it++)
-        {
-            EmitActualGlobal( (*glb_it).mLabel, (*glb_it).mSize );
-        }
-
-        std::unordered_multimap<std::string, int>::iterator it;
-        std::unordered_map<std::string, int>::const_iterator found;
-        for (it=mSource.begin(); it!=mSource.end(); it++)
-        {
-            name = (*it).first;
-
-            found = mDest.find(name);
-            if (found != mDest.end())
-            {
-                output << "C " << (*it).first << " " 
-                    << (*found).first << "\n";
-                output << "F " << (*it).second << " " 
-                    << (*found).second << "\n";
-            } else {
-                fatal_error("no destination for " + name + " in fixup table");
-            }
-        }
-    }
-
     void FixupOutput(cCodeGen *coder)
     {
         std::string name;

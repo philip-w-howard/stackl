@@ -3,7 +3,6 @@
 #include <string>
 #include "cExpr.h"
 #include "cSymbolTable.h"
-#include "codegen.h"
 
 class cStringLit : public cExpr
 {
@@ -24,13 +23,8 @@ class cStringLit : public cExpr
             (symbolTableRoot->Lookup("char*")->GetDecl());
     }
 
-    void GenerateCode()
-    {
-        EmitInt(PUSH_OP);
-        EmitString(mStr);
-    }
-
     virtual std::string GetString() { return mStr; }
+
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

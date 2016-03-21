@@ -1,5 +1,6 @@
 #include "lex.h"
 #include "cSizeOffset.h"
+#include "cCodeGen.h"
 
 cSizeOffset::cSizeOffset() : cVisitor()
 {
@@ -37,11 +38,16 @@ void cSizeOffset::Visit(cStructType *node)
 void cSizeOffset::Visit(cVarDecl *node)
 {
     int size = node->GetType()->Size();
+    int offset;
 
     if (size == 1)
         node->SetOffset(m_offset);
-    else if (m_offset % WORD_SIZE != 0)
-        node->SetOffset(m_offset/WORD_SIZE*WORD_SIZE + WORD_SIZE);
+    else if (m_offset % cCodeGen::STACKL_WORD_SIZE != 0)
+    {
+        offset = m_offset/cCodeGen::STACKL_WORD_SIZE*cCodeGen::STACKL_WORD_SIZE 
+            + cCodeGen::STACKL_WORD_SIZE;
+        node->SetOffset(offset);
+    }
     else
         node->SetOffset(m_offset);
 

@@ -3,11 +3,12 @@
 #include <string>
 
 
-#include "codegen.h"
 #include "cFixupTable.h"
-#include "../interp/syscodes.h"
 #include "lex.h"
 #include "cGenAddr.h"
+
+// NOTE This include has to come after the others
+#include "../interp/machine_def.h"
 
 using std::string;
 

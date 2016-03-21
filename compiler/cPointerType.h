@@ -4,7 +4,7 @@
 
 #include "cTypeDecl.h"
 #include "cSymbol.h"
-#include "../interp/machine_def.h"
+#include "cCodeGen.h"
 
 class cPointerType : public cTypeDecl
 {
@@ -14,7 +14,7 @@ class cPointerType : public cTypeDecl
         name->SetDecl(this);
         symbolTableRoot->InsertRoot(name);
         AddChild(name);
-        mSize = WORD_SIZE;
+        mSize = cCodeGen::STACKL_WORD_SIZE;
     }
 
     virtual cTypeDecl *ParentType() 
@@ -33,9 +33,6 @@ class cPointerType : public cTypeDecl
     virtual bool IsPointer() { return true; }
     virtual int  ElementSize() { return ParentType()->Size(); }
     virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
-
-    virtual void GenerateCode()
-    {}
 
     static cPointerType *PointerType(cTypeDecl *base)
     {

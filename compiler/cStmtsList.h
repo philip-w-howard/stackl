@@ -53,15 +53,6 @@ class cStmtsList : public cStmt
         return size;
     }
 
-    virtual void GenerateCode()
-    {
-        for (cAstNode::iterator it = FirstChild();
-            it != LastChild(); it++)
-        {
-            (*it)->GenerateCode();
-        }
-    }
-
     cStmt *GetStmt(int index) { return (cStmt*)GetChild(index); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }

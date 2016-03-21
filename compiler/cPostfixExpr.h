@@ -46,25 +46,6 @@ class cPostfixExpr : public cExpr
         return "unrecognized postfix op ";
     }
 
-    virtual void GenerateCode() 
-    {
-        cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());
-        if (var == NULL)
-        {
-            fatal_error("Generating code for cPrefixExpr without underlying cVarRef");
-            return;
-        }
-
-        cBinaryExpr *performOp = new cBinaryExpr(GetExpr(), mOp, new cIntExpr(1));
-        performOp->GenerateCode();
-        EmitInt(DUP_OP);
-        var->GenerateAddress();
-        if (var->GetType()->Size() == 1)
-            EmitInt(POPCVARIND_OP);
-        else
-            EmitInt(POPVARIND_OP);
-    }
-
     cVarRef* GetExpr()  { return (cVarRef*)GetChild(0); }
     int GetOp()         { return mOp; }
 

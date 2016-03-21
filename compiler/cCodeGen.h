@@ -7,6 +7,8 @@
 class cGenAddr;
 class cFixupTable;
 
+static const int STACK_FRAME_SIZE = 8;
+
 class cCodeGen : public cVisitor
 {
     public:
@@ -68,6 +70,7 @@ class cCodeGen : public cVisitor
         void SetLabelValue(std::string label);
         std::string GenerateLabel();
 
+        static const int STACKL_WORD_SIZE;
     protected:
         std::ofstream m_Output;
         std::string m_Filename;

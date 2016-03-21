@@ -13,7 +13,6 @@
 
 #include "cStmt.h"
 #include "cExpr.h"
-#include "codegen.h"
 
 class cWhileStmt : public cStmt
 {
@@ -22,21 +21,6 @@ class cWhileStmt : public cStmt
     {
         AddChild(expr);
         AddChild(stmt);
-    }
-
-    virtual void GenerateCode()
-    {
-        std::string start_loop = GenerateLabel();
-        std::string end_loop = GenerateLabel();
-
-        SetLabelValue(start_loop);
-        GetCond()->GenerateCode();
-        EmitInt(JUMPE_OP);
-        SetLabelRef(end_loop);
-        GetStmt()->GenerateCode();
-        EmitInt(JUMP_OP);
-        SetLabelRef(start_loop);
-        SetLabelValue(end_loop);
     }
 
     cExpr* GetCond()    { return (cExpr*)GetChild(0); }

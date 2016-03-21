@@ -72,7 +72,6 @@ class cAstNode
         // return true if a semantic error was detected in this node
         virtual bool HasSemanticError() { return mSemanticError; }
 
-        virtual void GenerateCode() {}
     protected:
         vector<cAstNode *> m_children;  // list of statements
         bool mSemanticError;            // This node contains a semantic error

@@ -24,22 +24,6 @@ class cPointerDeref : public cVarRef
     cExpr* GetBase()             { return (cExpr*)GetChild(0); }
     virtual cTypeDecl* GetType() { return GetBase()->GetType()->ParentType(); }
 
-    virtual void GenerateAddress()
-    {
-        GetBase()->GenerateCode();
-    }
-
-    virtual void GenerateCode()
-    {
-        GetBase()->GenerateCode();
-        if (GetType()->Size() == 1)     // EmementSize?
-        {
-            EmitInt(PUSHCVARIND_OP);
-        } else {
-            EmitInt(PUSHVARIND_OP);
-        }
-    }
-
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
 

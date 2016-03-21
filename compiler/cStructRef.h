@@ -53,40 +53,6 @@ class cStructRef : public cVarRef
         return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
-    virtual void GenerateAddress()
-    {
-        cVarRef *var = dynamic_cast<cVarRef*>(GetBase());
-        if (var == NULL)
-            fatal_error("cStructRef without underlying cVarRef");
-
-        var->GenerateAddress();
-
-        cVarDecl *field = dynamic_cast<cVarDecl*>(GetField()->GetDecl());
-        if (field == NULL)
-            fatal_error("cStructRef without underlying field.cVarDecl");
-        EmitInt(PUSH_OP);
-        EmitInt(field->GetOffset());
-        EmitInt(PLUS_OP);
-    }
-
-    virtual void GenerateCode()
-    {
-        GenerateAddress();
-
-        if (GetField()->GetDecl()->GetType()->IsArray())
-        {
-            // do nothing: we want the addr
-        }
-        else
-        {
-            if (GetField()->GetDecl()->GetType()->Size() == 1)
-                EmitInt(PUSHCVARIND_OP);
-            else
-                EmitInt(PUSHVARIND_OP);
-        }
-    }
-
-    // FIX THIS: was cExpr
     cVarRef* GetBase()      { return (cVarRef*)GetChild(0); }
     cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
     cVarDecl* GetFieldDecl()     { return (cVarDecl*)(GetField()->GetDecl()); }

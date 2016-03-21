@@ -6,7 +6,6 @@
 #include "cArrayType.h"
 #include "cExpr.h"
 #include "cSymbol.h"
-#include "codegen.h"
 
 class cVarDecl : public cDecl
 {
@@ -66,9 +65,6 @@ class cVarDecl : public cDecl
 
     virtual void SetOffset(int offset)  { mOffset = offset; }
     virtual int  GetOffset()            { return mOffset; }
-
-    virtual void GenerateCode()
-    {}
 
     virtual cTypeDecl* GetType()    { return (cTypeDecl*)GetChild(0); }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }

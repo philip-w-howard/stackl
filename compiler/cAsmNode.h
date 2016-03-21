@@ -15,7 +15,6 @@
 #include "cStmt.h"
 #include "cStmtsList.h"
 #include "cParams.h"
-#include "codegen.h"
 
 class cAsmNode : public cExpr
 {
@@ -42,20 +41,12 @@ class cAsmNode : public cExpr
         return NULL;
     }
 
-    virtual void GenerateCode()
-    {
-        if (GetParams() != NULL) GetParams()->GenerateCode();
-        EmitInt(mCode);
-        if (mTwoWord) EmitInt(mCode2);
-    }
-
-    cParams* GetParams()    { return (cParams*)GetChild(0); }
-
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
-    int GetOp1()        { return mCode; }
-    int GetOp2()        { return mCode2; }
-    bool UsesTwoArgs()  { return mTwoWord; }
+    int GetOp1()            { return mCode; }
+    int GetOp2()            { return mCode2; }
+    bool UsesTwoArgs()      { return mTwoWord; }
+    cParams* GetParams()    { return (cParams*)GetChild(0); }
 
   protected:
     int mCode;              // the opcode to be emitted

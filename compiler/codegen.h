@@ -13,6 +13,8 @@
 #include <string>
 #include "../interp/machine_def.h"
 
+#error "codegen functionality moved to cCodeGen"
+
 static const int STACK_FRAME_SIZE = 8;
 
 bool InitOutput(const char *filename);

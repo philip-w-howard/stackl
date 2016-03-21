@@ -3,9 +3,9 @@
 #include <string>
 
 
-#include "codegen.h"
+#include "../interp/machine_def.h"
+
 #include "cFixupTable.h"
-#include "../interp/syscodes.h"
 #include "lex.h"
 #include "cCodeGen.h"
 #include "cGenAddr.h"
@@ -13,6 +13,7 @@
 using std::string;
 
 const string cFixupTable::GlobalLabel = "$global$";
+const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
 cCodeGen::cCodeGen(string filename) : cVisitor()
 {

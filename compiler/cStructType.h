@@ -36,10 +36,6 @@ class cStructType : public cTypeDecl
     virtual int Size()              { return mSize; }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(0); }
 
-    virtual void GenerateCode()
-    {
-    }
-
     cDeclsList* GetDecls()  { return (cDeclsList*)GetChild(1); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }

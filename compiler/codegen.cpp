@@ -16,6 +16,8 @@
 #include "cFixupTable.h"
 #include "../interp/syscodes.h"
 
+#error "codegen functionality moved to cCodeGen"
+
 // Output files
 static std::ofstream Output;
 static int  Next_Label = 1;

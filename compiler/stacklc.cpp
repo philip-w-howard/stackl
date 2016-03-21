@@ -18,7 +18,6 @@
 #include "lex.h"
 #include "cAstXml.h"
 #include "cSizeOffset.h"
-#include "cCodeGen.h"
 
 //#include "codegen.h"
 #include "../version.h"
@@ -173,6 +172,7 @@ int main(int argc, char **argv)
             char *ptr = strrchr(outfile_name, '.');
             if (ptr != NULL) *ptr = 0;
             strcat(outfile_name, ".ast");
+
             cAstXml astPrinter(outfile_name);
             astPrinter.VisitAllNodes(program);
         }
@@ -186,11 +186,6 @@ int main(int argc, char **argv)
         cCodeGen coder(outfile_name);
         coder.VisitAllNodes(program);
 
-        /*
-        InitOutput(outfile_name);
-        program->GenerateCode();
-        FinalizeOutput();
-        */
     } else {
         std::cerr << total_errors << " Errors in compile" << std::endl;
     }

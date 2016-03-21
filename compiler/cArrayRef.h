@@ -4,7 +4,6 @@
 
 #include "cVarRef.h"
 #include "cSymbol.h"
-#include "codegen.h"
 
 class cArrayRef : public cVarRef
 {
@@ -33,43 +32,6 @@ class cArrayRef : public cVarRef
         AddChild(base);
         AddChild(index);
     }
-
-    virtual void GenerateAddress()
-    {
-        cVarRef *var = dynamic_cast<cVarRef*>(GetBase());
-        if (var == NULL) 
-        {
-            fatal_error("Generating address for cArrayRef "
-                        "without an underlying cVarRef");
-            return;
-        }
-
-        if (GetType()->IsPointer())
-            var->GenerateCode();
-        else
-            var->GenerateAddress();
-
-        GetIndex()->GenerateCode();
-        if (GetType()->ElementSize() == 1)
-        {
-            EmitInt(PLUS_OP);
-        } else {
-            EmitInt(PUSH_OP);
-            EmitInt(GetType()->ElementSize());
-            EmitInt(TIMES_OP);
-            EmitInt(PLUS_OP);
-        }
-
-    }
-    virtual void GenerateCode()
-    {
-        GenerateAddress();
-        if (GetType()->ElementSize() == 1)
-            EmitInt(PUSHCVARIND_OP);
-        else
-            EmitInt(PUSHVARIND_OP);
-    }
-
 
     cVarRef* GetBase()            { return (cVarRef*)GetChild(0); }
     virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }

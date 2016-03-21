@@ -32,12 +32,6 @@ class cSizeofExpr : public cExpr
         return symbolTableRoot->Lookup("int")->GetDecl()->GetType();
     }
 
-    virtual void GenerateCode()
-    {
-        EmitInt(PUSH_OP);
-        EmitInt(mItemSize);
-    }
-
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

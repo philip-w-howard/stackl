@@ -24,13 +24,9 @@ class cExpr : public cStmt
     virtual bool IsConst()      { return false; }
     virtual int  ConstValue()   { return 0; }
 
-    //virtual bool HasEffect()    = 0;
-
     virtual int Size()          { return GetType()->ElementSize(); }
 
     virtual cTypeDecl *GetType() = 0;
-    //virtual int  GetOffset() = 0;
-    virtual void GenerateCode() = 0;
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

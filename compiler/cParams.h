@@ -15,6 +15,7 @@ using std::list;
 
 #include "cAstNode.h"
 #include "cExpr.h"
+#include "cCodeGen.h"
 
 using std::list;
 
@@ -39,23 +40,12 @@ class cParams : public cAstNode
         for (int ii=0; ii<NumChildren(); ii++)
         {
             if ( GetParam(ii)->GetType()->IsArray())
-                size += WORD_SIZE;
+                size += cCodeGen::STACKL_WORD_SIZE;
             else
                 size += GetParam(ii)->Size();
         }
 
         return size;
-    }
-
-    // generate code in reverse list order (right to left)
-    virtual void GenerateCode()
-    {
-        cAstNode::iterator it = LastChild(); 
-        do
-        {
-            it--;
-            (*it)->GenerateCode();
-        } while (it != FirstChild());
     }
 
     cExpr* GetParam(int index) { return (cExpr*)GetChild(index); }

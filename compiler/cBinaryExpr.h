@@ -5,8 +5,6 @@
 #include "cExpr.h"
 #include "cSymbol.h"
 
-#include "codegen.h"
-
 class cBinaryExpr : public cExpr
 {
   public:
@@ -26,20 +24,13 @@ class cBinaryExpr : public cExpr
 
     virtual cTypeDecl *GetType();
 
-    virtual void GenerateCode()
-    {
-        GetLeft()->GenerateCode();
-        GetRight()->GenerateCode();
-        EmitInt(OpAsInt());
-    }
-
     cExpr* GetLeft()    { return (cExpr*)GetChild(0); }
     cExpr* GetRight()   { return (cExpr*)GetChild(1); }
 
-    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
-
     std::string OpToString();
     int OpAsInt();
+
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:
     int   mOp;
 

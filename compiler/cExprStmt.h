@@ -6,22 +6,12 @@
 #include "cExpr.h"
 #include "cSymbol.h"
 
-#include "codegen.h"
-
 class cExprStmt : public cStmt
 {
   public:
     cExprStmt(cExpr *expr)  : cStmt()
     {
         AddChild(expr);
-    }
-
-    virtual void GenerateCode()
-    {
-        GetExpr()->GenerateCode();
-
-        // remove the result from the stack
-        EmitInt(POP_OP);
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }

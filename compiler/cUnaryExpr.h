@@ -53,28 +53,6 @@ class cUnaryExpr : public cExpr
         return "unrecognized unary op ";
     }
 
-    virtual void GenerateCode() 
-    {
-        GetExpr()->GenerateCode();
-
-        switch (mOp)
-        {
-            case '-':
-                EmitInt(NEG_OP);
-                break;
-            case '~':
-                EmitInt(COMP_OP);
-                break;
-            case '!':
-                EmitInt(NOT_OP);
-                break;
-            default:
-                fatal_error("Unrecognized unary operator");
-                break;
-        }
-
-    }
-
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
     int    GetOp()      { return mOp; }
 

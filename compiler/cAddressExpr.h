@@ -19,15 +19,6 @@ class cAddressExpr : public cExpr
 
     virtual cTypeDecl *GetType() { return GetVar()->GetType(); }
 
-    virtual void GenerateCode() 
-    {
-        cVarRef *var = dynamic_cast<cVarRef*>(GetVar());
-        if (var == NULL)
-            fatal_error("address of without underlying cVarRef");
-
-        var->GenerateAddress();
-    }
-
     cVarRef* GetVar() { return (cVarRef*)GetChild(0); }
 
 

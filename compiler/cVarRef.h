@@ -18,7 +18,6 @@ class cVarRef : public cExpr
     //virtual bool IsArrayRef()   { return false; }
 
     virtual cTypeDecl *GetType() = 0;
-    virtual void GenerateAddress() = 0;
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

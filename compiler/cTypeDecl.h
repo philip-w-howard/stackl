@@ -20,9 +20,6 @@ class cTypeDecl : public cDecl
     virtual cTypeDecl *GetType()    { return this; }
     virtual cTypeDecl *ParentType() { return this; }
 
-    virtual void GenerateCode()
-    {}
-
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
