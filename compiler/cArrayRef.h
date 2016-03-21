@@ -11,6 +11,14 @@ class cArrayRef : public cVarRef
   public:
     cArrayRef(cExpr *base, cExpr *index) : cVarRef() 
     {
+        cVarRef *var = dynamic_cast<cVarRef*>(base);
+        if (var == NULL) 
+        {
+            ThrowSemanticError("Generating address for cArrayRef "
+                        "without an underlying cVarRef");
+            return;
+        }
+
         cTypeDecl *baseType = base->GetType();
 
         //if (!baseType->IsPointer() && !base->IsArray())
@@ -63,7 +71,7 @@ class cArrayRef : public cVarRef
     }
 
 
-    cExpr* GetBase()              { return (cExpr*)GetChild(0); }
+    cVarRef* GetBase()            { return (cVarRef*)GetChild(0); }
     virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }
     cExpr* GetIndex()             { return (cExpr*)GetChild(1); }
     virtual bool IsArrayRef()     { return true; }

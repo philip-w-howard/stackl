@@ -64,7 +64,8 @@ class cPrefixExpr : public cExpr
             EmitInt(POPVARIND_OP);
     }
 
-    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+    cVarRef* GetExpr()  { return (cVarRef*)GetChild(0); }
+    int GetOp()         { return mOp; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 

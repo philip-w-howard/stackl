@@ -20,6 +20,7 @@ class cDecl : public cStmt
     virtual bool IsPointer(){ return false; }
     virtual bool IsArray()  { return false; }
     virtual cSymbol *GetName()      = 0;
+    //virtual int GetOffset() = 0;
     virtual cTypeDecl *GetType();
     virtual cVarDecl  *GetVar();
     virtual cFuncDecl *GetFunc();

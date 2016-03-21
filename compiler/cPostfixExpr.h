@@ -4,6 +4,7 @@
 
 #include "cExpr.h"
 #include "cAssignExpr.h"
+#include "cVarRef.h"
 #include "cSymbol.h"
 
 class cPostfixExpr : public cExpr
@@ -64,7 +65,8 @@ class cPostfixExpr : public cExpr
             EmitInt(POPVARIND_OP);
     }
 
-    cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+    cVarRef* GetExpr()  { return (cVarRef*)GetChild(0); }
+    int GetOp()         { return mOp; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 

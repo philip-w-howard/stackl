@@ -23,6 +23,7 @@ class cVarDecl : public cDecl
         AddChild(nullptr);  // init Expr
         mOffset     = 0;
         mIsGlobal   = false;
+        mHasInit    = false;
     }
 
     cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl()
@@ -53,6 +54,7 @@ class cVarDecl : public cDecl
             return;
         }
         SetChild(3, init); 
+        mHasInit = true;
     }
     void SetGlobal()        { mIsGlobal = true; }
 
@@ -72,10 +74,12 @@ class cVarDecl : public cDecl
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }
     virtual cExpr*   GetArraySize() { return (cExpr*)GetChild(2); }
     virtual cExpr*   GetInit()      { return (cExpr*)GetChild(3); }
+    bool             HasInit()      { return mHasInit; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:
     int       mOffset;
     bool      mIsGlobal;
+    bool      mHasInit;
 };
 

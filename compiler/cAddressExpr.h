@@ -17,18 +17,19 @@ class cAddressExpr : public cExpr
         AddChild(expr);
     }
 
-    virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
+    virtual cTypeDecl *GetType() { return GetVar()->GetType(); }
 
     virtual void GenerateCode() 
     {
-        cVarRef *var = dynamic_cast<cVarRef*>(GetExpr());
+        cVarRef *var = dynamic_cast<cVarRef*>(GetVar());
         if (var == NULL)
             fatal_error("address of without underlying cVarRef");
 
         var->GenerateAddress();
     }
 
-    cExpr* GetExpr() { return (cExpr*)GetChild(0); }
+    cVarRef* GetVar() { return (cVarRef*)GetChild(0); }
+
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

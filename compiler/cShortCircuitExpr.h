@@ -69,6 +69,8 @@ class cShortCircuitExpr : public cBinaryExpr
         }
     }
 
+    bool ShortOnTrue()  { return mShortOnTrue; }
+
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:

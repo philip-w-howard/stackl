@@ -1,9 +1,12 @@
+#pragma once
+
 #include <fstream>
 #include <unordered_map>
 #include <list>
 #include <string>
 
 #include "cAstNode.h"
+#include "cCodeGen.h"
 
 class cFixupTable
 {
@@ -54,6 +57,41 @@ class cFixupTable
                     << (*found).first << "\n";
                 output << "F " << (*it).second << " " 
                     << (*found).second << "\n";
+            } else {
+                fatal_error("no destination for " + name + " in fixup table");
+            }
+        }
+    }
+
+    void FixupOutput(cCodeGen *coder)
+    {
+        std::string name;
+
+        std::list<string_item>::iterator str_it;
+        for (str_it=mStringList.begin(); str_it!=mStringList.end(); str_it++)
+        {
+            coder->SetLabelValue((*str_it).mLabel);
+            coder->EmitActualString( (*str_it).mString );
+        }
+
+        coder->SetLabelValue(GlobalLabel);
+        std::list<string_item>::iterator glb_it;
+        for (glb_it=mGlobalList.begin(); glb_it!=mGlobalList.end(); glb_it++)
+        {
+            coder->EmitActualGlobal( (*glb_it).mLabel, (*glb_it).mSize );
+        }
+
+        std::unordered_multimap<std::string, int>::iterator it;
+        std::unordered_map<std::string, int>::const_iterator found;
+        for (it=mSource.begin(); it!=mSource.end(); it++)
+        {
+            name = (*it).first;
+
+            found = mDest.find(name);
+            if (found != mDest.end())
+            {
+                coder->EmitComment( (*it).first + " " +  (*found).first);
+                coder->EmitFixup( (*it).second, (*found).second);
             } else {
                 fatal_error("no destination for " + name + " in fixup table");
             }

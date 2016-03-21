@@ -76,6 +76,7 @@ class cUnaryExpr : public cExpr
     }
 
     cExpr* GetExpr()    { return (cExpr*)GetChild(0); }
+    int    GetOp()      { return mOp; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:

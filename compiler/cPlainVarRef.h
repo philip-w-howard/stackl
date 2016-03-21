@@ -19,6 +19,7 @@ class cPlainVarRef : public cVarRef
             return;
         }
 
+        // Was cast to cDecl
         if (dynamic_cast<cDecl *>( id->GetDecl()) == nullptr)
         {
             ThrowSemanticError(id->Name() + " is not declared");
@@ -28,8 +29,8 @@ class cPlainVarRef : public cVarRef
         AddChild(id);
     }
 
-    cSymbol* GetName()          { return (cSymbol*)GetChild(0); }
-    cDecl*   GetDecl()          { return GetName()->GetDecl(); }
+    cSymbol*  GetName()          { return (cSymbol*)GetChild(0); }
+    cVarDecl* GetDecl()          { return (cVarDecl*)(GetName()->GetDecl()); }
     virtual cTypeDecl *GetType(){ return GetDecl()->GetType(); }
     virtual bool IsStruct()     { return GetType()->IsStruct(); }
     virtual bool IsArray()      { return GetType()->IsArray(); }

@@ -1,14 +1,16 @@
-COPTS=-Wall -g -c  -O0 -std=c++0x
+COPTS=-Wall -g -c  -O0 -std=c++11
 OBJS= scanner.o \
 	 parser.o \
 	 cSymbolTable.o \
 	 cDecl.o \
 	 cBinaryExpr.o \
-	 codegen.o \
 	 stacklc.o \
 	 cVisitor.o \
 	 cAstXml.o \
 	 cSizeOffset.o \
+	 cGenAddr.o \
+	 cCodeGen.o \
+	 codegen.o \
 
 all: stacklc
 

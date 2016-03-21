@@ -39,9 +39,9 @@ class cBinaryExpr : public cExpr
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
     std::string OpToString();
+    int OpAsInt();
   protected:
     int   mOp;
 
-    int OpAsInt();
 };
 

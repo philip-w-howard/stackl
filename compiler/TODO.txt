@@ -1,4 +1,6 @@
-for SizeOffset visitor, need to implement subclasses of the base classes that have stuff.
+Continue moving GenerateCode code to cCodeGen
+figure out git version as version
+figure out gcc generating dependencies
 
 delete NodeType functions
 

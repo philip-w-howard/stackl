@@ -23,7 +23,8 @@ static int  Next_Label = 1;
 static cFixupTable FixupTable;
 static int Location = 0;
 
-const std::string cFixupTable::GlobalLabel = "$global$";
+// moved to cCodeGen.cpp
+//const std::string cFixupTable::GlobalLabel = "$global$";
 
 static char Filename[255];
 //*****************************************

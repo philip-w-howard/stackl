@@ -20,15 +20,10 @@ class cFuncCall : public cVarRef
             ThrowSemanticError("Attempted to call a non-function");
             return;
         }
-
-        mFunc = dynamic_cast<cFuncDecl*>(baseType);
         
         AddChild(base);
         AddChild(params);
     }
-
-    virtual bool IsFunc()        { return true; }
-    virtual cTypeDecl *GetType() { return mFunc->ReturnType(); }
 
     virtual void GenerateAddress()
     {
@@ -40,7 +35,7 @@ class cFuncCall : public cVarRef
         if (GetParams() != NULL) GetParams()->GenerateCode();
 
         EmitInt(CALL_OP);
-        SetLabelRef(mFunc->GetName()->Name());
+        SetLabelRef(GetFuncName());
 
         // Need to pop the args off the stack without affecting the return val
         if (GetParams() != NULL)
@@ -55,10 +50,13 @@ class cFuncCall : public cVarRef
 
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }
     cParams* GetParams(){ return (cParams*)GetChild(1); }
+    virtual bool IsFunc()        { return true; }
+    cFuncDecl* GetFuncDecl()     { return (cFuncDecl*)(GetBase()->GetType()); }
+    virtual cTypeDecl *GetType() { return GetFuncDecl()->ReturnType(); }
+    std::string GetFuncName()    { return GetFuncDecl()->GetName()->Name(); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
   protected:
-    cFuncDecl   *mFunc;
 };
 

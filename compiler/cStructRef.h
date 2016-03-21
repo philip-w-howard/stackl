@@ -14,6 +14,11 @@ class cStructRef : public cVarRef
   public:
     cStructRef(cExpr *base, cSymbol *field) : cVarRef() 
     {
+        if (dynamic_cast<cVarRef*>(base) == nullptr)
+        {
+            ThrowSemanticError("cStructRef without underlying cVarRef");
+            return;
+        }
         cTypeDecl *baseType;
 
         if (!base->IsStruct()) 
@@ -22,7 +27,6 @@ class cStructRef : public cVarRef
             return;
         }
 
-        // FIX THIS for test30.c
         if (base->IsArrayRef())
             baseType = base->GetType()->ParentType();
         else
@@ -38,6 +42,10 @@ class cStructRef : public cVarRef
         field = s_decl->GetField(field);
         AddChild(base);
         AddChild(field);
+
+        cVarDecl *test_field = dynamic_cast<cVarDecl*>(GetField()->GetDecl());
+        if (test_field == NULL)
+            fatal_error("cStructRef without underlying field.cVarDecl");
     }
 
     virtual cTypeDecl *GetType() 
@@ -78,8 +86,10 @@ class cStructRef : public cVarRef
         }
     }
 
-    cExpr* GetBase()        { return (cExpr*)GetChild(0); }
+    // FIX THIS: was cExpr
+    cVarRef* GetBase()      { return (cVarRef*)GetChild(0); }
     cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
+    cVarDecl* GetFieldDecl()     { return (cVarDecl*)(GetField()->GetDecl()); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

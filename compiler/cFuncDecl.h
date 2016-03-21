@@ -68,6 +68,8 @@ class cFuncDecl : public cTypeDecl
     cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }
     cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
     cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }
+    bool IsDefinition()         { return mHasStatements; }
+    int DeclsSize()             { return mDeclsSize; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
