@@ -8,9 +8,11 @@ INCLUDES = startup.h \
 	   dma_term.h \
 	   disk.h \
 
+GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
+
 .PHONY: compiler interp utils
 
-all: compiler interp utils execs
+all: version compiler interp utils execs
 
 release: all
 	cp copy2disk $(RELEASE)
@@ -30,13 +32,17 @@ clean:
 	rm -f test/*.sl
 	rm -f test/*.slb
 
-compiler:
+version: .git/refs/heads
+	echo "#pragma once" > version.h
+	echo "#define VERSION \"$(GIT_VERSION)\"" >> version.h
+
+compiler: version
 	$(MAKE) -C compiler
 
-interp: 
+interp:  version
 	$(MAKE) -C interp
 
-utils: 
+utils:  version
 	$(MAKE) -C utils
 
 execs: compiler interp 

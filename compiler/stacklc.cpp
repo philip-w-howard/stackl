@@ -19,7 +19,6 @@
 #include "cAstXml.h"
 #include "cSizeOffset.h"
 
-//#include "codegen.h"
 #include "../version.h"
 
 extern int yydebug;

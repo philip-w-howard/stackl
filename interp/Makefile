@@ -1,4 +1,4 @@
-COPTS=-Wall -g -c -O0 -pthread
+COPTS=-Wall -g -c  -O0 -pthread
 COPTS2=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
