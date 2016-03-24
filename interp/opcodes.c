@@ -5,6 +5,7 @@
 
 #include "syscall.h"
 #include "machine_def.h"
+#include "opcode_defs.h"
 #include "opcodes.h"
 #include "machine.h"
 #include "vmem.h"

@@ -1,7 +1,5 @@
-Fix the broken tests
-Make assembler
 Make assembler code gen
-figure out git version as version
+Fix the broken tests
 figure out gcc generating dependencies
 
 const optimizations

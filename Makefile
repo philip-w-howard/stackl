@@ -4,6 +4,7 @@ INCLUDES = startup.h \
 	   string.h \
 	   syscodes.h \
 	   machine_def.h \
+	   opcode_defs.h \
 	   pio_term.h \
 	   dma_term.h \
 	   disk.h \
@@ -36,7 +37,7 @@ version: .git/refs/heads
 	echo "#pragma once" > version.h
 	echo "#define VERSION \"$(GIT_VERSION)\"" >> version.h
 
-compiler: version
+compiler: version interp
 	$(MAKE) -C compiler
 
 interp:  version
@@ -49,6 +50,7 @@ execs: compiler interp
 	cp compiler/stacklc .
 	cp interp/stackl .
 	cp interp/syscodes.h .
+	cp interp/opcode_defs.h .
 	cp interp/machine_def.h .
 	cp interp/pio_term.h .
 	cp interp/dma_term.h .

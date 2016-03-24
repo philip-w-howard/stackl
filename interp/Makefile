@@ -21,10 +21,9 @@ clean:
 	rm -f slasm.o
 
 opcodes.o: opcodes.c opcode_defs.h
-	gcc $(COPTS) $< -o $@
 
 .c.o: 
-	gcc $(COPTS) $? -o $@
+	gcc $(COPTS) $< -o $@
 
 opcode_defs.h: slasm
 	slasm -defs

@@ -25,10 +25,10 @@ int main()
             prints(" to ");
             printi(index);
             prints("\n");
-            asm(NOP);
-            asm(NOP);
-            asm(NOP);
-            asm(NOP);
+            asm(NOP_OP);
+            asm(NOP_OP);
+            asm(NOP_OP);
+            asm(NOP_OP);
             data[ii][jj] = index;
             index++;
         }

@@ -8,6 +8,7 @@
 #include "cGenAddr.h"
 
 // NOTE This include has to come after the others
+#include "../interp/opcode_defs.h"
 #include "../interp/machine_def.h"
 
 using std::string;

@@ -1,4 +1,4 @@
-#include <machine_def.h>
+#include <opcode_defs.h>
 
 int main();
 

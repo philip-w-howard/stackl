@@ -3,7 +3,7 @@
 #include "cBinaryExpr.h"
 #include "lex.h"
 #include "parser.h"
-#include "../interp/machine_def.h"
+#include "../interp/opcode_defs.h"
 
 int cBinaryExpr::ConstValue()
 {
