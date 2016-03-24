@@ -8,6 +8,7 @@
 #include "vmem.h"
 #include "loader.h"
 #include "disk.h"
+#include "formatstr.h"
 
 static int Do_Debug = 0;
 
@@ -47,53 +48,6 @@ void MemCpy(int addr, char *sptr)
     Set_Byte(&cpu, addr, *sptr);
 }
 
-char *format_string(char *str)
-{
-    char *sptr;
-
-    sptr = strrchr(str, '"');
-    if (sptr == NULL)
-    {
-        fprintf(stderr, "File format error: invalid string\n");
-        return str;
-    }
-
-    // eliminate trailing "
-    *sptr = 0;
-
-    sptr = strchr(str, '"');
-    if (sptr == NULL)
-    {
-        fprintf(stderr, "File format error: invalid string\n");
-        return str;
-    }
-
-    // eliminate leading "
-    sptr++;
-
-    // Handle escape sequences
-    str = sptr;
-    sptr = strchr(str, '\\');
-    while (sptr != NULL)
-    {
-        if (sptr[1] == 'n')
-        {
-            *sptr = '\n';
-            sptr++;
-            *sptr = 0;
-            sptr++;
-            // can't user strcat because dest overlaps with src
-            //strcat(str, sptr);
-            memmove(str+strlen(str), sptr, strlen(sptr)+1);
-        } else {
-            fprintf(stderr, "Unrecognized escape sequence in string\n");
-            sptr += 2;
-        }
-        sptr = strchr(sptr, '\\');
-    }
-
-    return str;
-}
 //***************************************
 //int Load(Machine_State *cpu, const char *filename, int base, int top)
 int Load_Text(const char *filename)

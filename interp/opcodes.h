@@ -1,6 +1,5 @@
 #pragma once
 #include "machine.h"
-#include "opcodes.h"
 
 void Execute(Machine_State *machine);
 void Opcodes_Debug();

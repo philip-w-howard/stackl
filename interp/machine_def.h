@@ -1,3 +1,8 @@
+#pragma once
+
+#include "opcode_defs.h"
+
+/*
 #define NOP         0
 #define PLUS_OP     1
 #define MINUS_OP    2
@@ -56,7 +61,7 @@
 #define TRACE_OFF_OP 126
 
 #define ILLEGAL_OP  127
-
+*/
 
 // Register definitions for SAVEREG and RESTREG
 #define BP_REG      0

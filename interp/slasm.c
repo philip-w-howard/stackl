@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
+#include "formatstr.h"
 #include "../version.h"
 
 static char g_Input_File[256] = "";
@@ -14,6 +16,11 @@ static int g_Memory_Index;
 static int g_Data_Memory_Index;
 static int g_Use_Data = 0;
 
+#define NUM_OPCODES (sizeof(op_list)/sizeof(opcode_t))
+static const char *DELIMS = " \t\n";
+static const char *HELP_STR =
+ "slasm [-M<mem size>] [-version] <source file>\n";
+
 typedef struct
 {
     char *op_name;
@@ -24,6 +31,7 @@ static opcode_t op_list[] =
 {
     {"nop", 0},
     {"plus", 0},
+    {"minus", 0},
     {"times", 0},
     {"divide", 0},
     {"mod", 0},
@@ -44,7 +52,6 @@ static opcode_t op_list[] =
     {"returnv", 0},
     {"neg", 0},
     {"pushcvarind", 0},
-    {"popcvarind", 0},
     {"outs", 0},
     {"inp", 0},
     {"pushfp", 0},
@@ -62,7 +69,7 @@ static opcode_t op_list[] =
     {"shiftl", 0},
     {"shiftr", 0},
     {"pushvarind", 0},
-    {"popvarind", 0},
+    {"popcvarind", 0},
     {"popvarind", 0},
     {"comp", 0},
     {"push", 1},
@@ -74,11 +81,14 @@ static opcode_t op_list[] =
     {"call", 1},
     {"pushcvar", 1},
     {"popcvar", 1},
-    {"traceon", 0},
-    {"traceoff", 0},
+    {"trace_on", 0},
+    {"trace_off", 0},
     {"illegal", 0}
 };
 
+//**************************************
+// label processing
+//**************************************
 typedef struct
 {
     char label[50];
@@ -93,7 +103,7 @@ static int g_Num_Label_Refs = 0;
 static int g_Label_Defs_Extent = 0;
 static int g_Label_Refs_Extent = 0;
 
-void add_label_def(char *label)
+static void add_label_def(char *label)
 {
     if (g_Num_Label_Defs >= g_Label_Defs_Extent)
     {
@@ -118,9 +128,11 @@ void add_label_def(char *label)
         g_Label_Defs[g_Num_Label_Defs].is_data = 0;
         g_Label_Defs[g_Num_Label_Defs].offset = g_Memory_Index;
     }
+
+    g_Num_Label_Defs++;
 }
 
-void add_label_ref(char *label)
+static void add_label_ref(char *label)
 {
     if (g_Num_Label_Refs >= g_Label_Refs_Extent)
     {
@@ -147,22 +159,97 @@ void add_label_ref(char *label)
         g_Label_Refs[g_Num_Label_Refs].offset = g_Memory_Index;
         g_Memory_Index++;
     }
+
+    g_Num_Label_Refs++;
 }
 
-static const int NUM_OPCODES = sizeof(op_list)/sizeof(opcode_t);
+static label_def_t *get_label_def(char *label)
+{
+    int ii;
 
-static const char *DELIMS = " \t\n";
+    for (ii=0; ii<g_Num_Label_Defs; ii++)
+    {
+       if (strcmp(label, g_Label_Defs[ii].label) == 0) return &g_Label_Defs[ii];
+    }
 
-static const char *HELP_STR =
- "slasm [-M<mem size>] [-version] <source file>\n";
+    fprintf(stderr, "Undefined label: %s\n", label);
+    exit(1);
 
-void report_error(const char *msg)
+    return NULL;
+}
+
+static void update_labels()
+{
+    int ii;
+    int mem_address;
+    int label_address;
+
+    label_def_t *label_def;
+
+    for (ii=0; ii<g_Num_Label_Refs; ii++)
+    {
+        label_def = get_label_def(g_Label_Refs[ii].label);
+        if (label_def == NULL) 
+        {
+            fprintf(stderr, "Undefined label: %s\n", g_Label_Refs[ii].label);
+            exit(1);
+        }
+
+        mem_address = g_Label_Refs[ii].offset;
+        if (g_Label_Refs[ii].is_data) mem_address += g_Memory_Index;
+
+        label_address = label_def->offset;
+        if (label_def->is_data) label_address += g_Memory_Index;
+        label_address *= sizeof(int);
+
+        g_Memory[mem_address] = label_address;
+    }
+}
+
+//**************************************
+// end label processing
+//**************************************
+
+static void report_error(const char *msg)
 {
     fprintf(stderr, "Error %s in line %d\n", msg, g_Line_Num);
     g_Num_Errors++;
 }
 
-void Process_Args(int argc, char **argv)
+static void strupr(char *str)
+{
+    while (*str)
+    {
+        *str = toupper(*str);
+        str++;
+    }
+}
+
+static void make_def_file()
+{
+    FILE *def_file;
+    int  ii;
+    char opcode[50];
+
+    def_file = fopen("opcode_defs.h", "w");
+    if (def_file == NULL)
+    {
+        fprintf(stderr, "Unable to open opcode_defs.h\n");
+        exit(1);
+    }
+
+    for (ii=0; ii<NUM_OPCODES; ii++)
+    {
+        strcpy(opcode, op_list[ii].op_name);
+        strcat(opcode, "_OP");
+        strupr(opcode);
+        fprintf(def_file, "#define %s %d\n", opcode, ii);
+    }
+
+    fclose(def_file);
+}
+
+static void Process_Args(int argc, char **argv)
 {
     int ii;
     for (ii=1; ii<argc; ii++)
@@ -170,7 +257,12 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "help") == 0)
+            if (strcmp(arg, "defs") == 0)
+            {
+                make_def_file();
+                exit(0);
+            }
+            else if (strcmp(arg, "help") == 0)
             {
                 printf(HELP_STR);
                 exit(0);
@@ -197,7 +289,7 @@ void Process_Args(int argc, char **argv)
     }
 }
 
-int get_op_index(char *op_name)
+static int get_op_index(char *op_name)
 {
     int ii;
     for (ii=0; ii<NUM_OPCODES; ii++)
@@ -208,7 +300,7 @@ int get_op_index(char *op_name)
     return -1;
 }
 
-void store(int value)
+static void store(int value)
 {
     if (g_Use_Data)
         g_Data_Memory[g_Data_Memory_Index++] = value;
@@ -216,21 +308,51 @@ void store(int value)
         g_Memory[g_Memory_Index++] = value;
 }
 
-void output_label_ref(char *label)
+static void process_string(char *str)
 {
+    int *int_ptr;
+    char aligned_str[1000];
+    int ii;
+
+    str = format_string(str);
+    if (str == NULL)
+    {
+        report_error("Invalid string format");
+        return;
+    }
+
+    strcpy(aligned_str, str);
+    int_ptr = (int *)aligned_str;
+
+    // strlen (including NULL) rounded up to a word size.
+    int str_len = (strlen(aligned_str)+sizeof(int))/sizeof(int);
+    for (ii=0; ii<str_len; ii++)
+    {
+        store(int_ptr[ii]);
+    }
 }
 
-void process_dot_cmd(char *line)
+static void process_dot_cmd(char *line)
 {
-    if (strcasecmp(line, ".dataseg") == 0)
+    char *token;
+    char *str;
+
+    token = strtok(line, DELIMS);
+
+    if (strcasecmp(token, ".dataseg") == 0)
         g_Use_Data = 1;
-    else if (strcasecmp(line, ".codeseg") == 0)
+    else if (strcasecmp(token, ".codeseg") == 0)
         g_Use_Data = 0;
+    else if (strcasecmp(token, ".string") == 0)
+    {
+        str = strtok(NULL, "\n");
+        process_string(str);
+    }
     else
         report_error("Unrecognized dot command");
 }
 
-void process_label(char *line)
+static void process_label(char *line)
 {
     char *label = strtok(line, ":");
 
@@ -245,7 +367,7 @@ void process_label(char *line)
     add_label_def(label);
 }
 
-void process_asm(char *line)
+static void process_asm(char *line)
 {
     char *op_name;
     char *op_param;
@@ -275,10 +397,45 @@ void process_asm(char *line)
         }
 
         if (op_param[0] == '$')
-            output_label_ref(&op_param[1]);
+            add_label_ref(&op_param[1]);
         else
             store(atoi(op_param));
     }
+}
+
+static void write_output(char *in_filename)
+{
+    char out_filename[256];
+    FILE *bin_file;
+    int status;
+
+    strcpy(out_filename, in_filename);
+    
+    char *extension = strstr(out_filename, ".sl");
+    if (extension != NULL)
+        strcpy(extension, ".slb");
+    else
+        strcat(out_filename, ".slb");
+
+    bin_file = fopen(out_filename, "wb");
+
+    if (bin_file == NULL)
+    {
+        fprintf(stderr, "Unable to open output file\n");
+        exit(1);
+    }
+
+    status = fwrite(g_Memory, 
+            (g_Memory_Index + g_Data_Memory_Index) * sizeof(int), 
+            1, bin_file);
+    if (status != 1)
+    {
+        fprintf(stderr, "Unable to create output file\n");
+        fclose(bin_file);
+        exit(1);
+    }
+
+    fclose(bin_file);
 }
 
 int main(int argc, char** argv)
@@ -286,8 +443,6 @@ int main(int argc, char** argv)
     FILE *input;
     char  line[1000];
     char *comment;
-
-    printf("Num opcodes: %d\n", NUM_OPCODES);
 
     Process_Args(argc, argv);
 
@@ -330,12 +485,22 @@ int main(int argc, char** argv)
 
     fclose(input);
 
+    // append the data memory to the actual memory
+    memcpy(&g_Memory[g_Memory_Index], 
+            g_Data_Memory, 
+            g_Data_Memory_Index*sizeof(int));
+
+    // fix-up the label references
+    update_labels();
+
     if (g_Num_Errors > 0)
     {
         fprintf(stderr, "%d errors while processing %s\n", 
                 g_Num_Errors, g_Input_File);
         exit(1);
     }
+
+    write_output(g_Input_File);
 
     return 0;
 }

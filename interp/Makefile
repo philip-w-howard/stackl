@@ -9,6 +9,7 @@ OBJS=stackl.o \
 	 dma_term.o \
 	 pio_term.o \
 	 disk.o \
+	 formatstr.o \
 
 all: stackl slasm
 
@@ -19,12 +20,18 @@ clean:
 	rm -f slasm
 	rm -f slasm.o
 
-.c.o:
+opcodes.o: opcodes.c opcode_defs.h
+	gcc $(COPTS) $< -o $@
+
+.c.o: 
 	gcc $(COPTS) $? -o $@
+
+opcode_defs.h: slasm
+	slasm -defs
 
 stackl: $(OBJS)
 	gcc $(OBJS) -o stackl -lpthread
 
-slasm: slasm.o
-	gcc slasm.o -o slasm
+slasm: slasm.c formatstr.o
+	gcc slasm.c -o slasm formatstr.o
 

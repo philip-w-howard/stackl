@@ -152,7 +152,7 @@ void Execute(Machine_State *cpu)
     
     switch (val)
     {
-        case NOP:
+        case NOP_OP:
             DEBUG("NOP");
             INC(IP, 1);
             break;
