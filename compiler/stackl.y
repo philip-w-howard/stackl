@@ -26,6 +26,7 @@
     cStmtsList*         stmtslist;
     cExpr*              expr;
     cVarRef*            var_ref;
+    cStringLit*         str;
     }
 
 %{
@@ -85,6 +86,7 @@
 %type <stmt>            stmt
 %type <stmtslist>       block
 
+%type <str>             string_lit
 %type <expr>            primary_expression
 %type <expr>            postfix_expression
 %type <expr>            unary_expression
@@ -379,6 +381,26 @@ asm_stmt : ASM '(' constant_expression ')'
                 $$ = new cAsmNode($3->ConstValue(), $5->ConstValue(), $7); 
                 if ($$->HasSemanticError()) YYERROR;
             }
+        | ASM '(' string_lit ')' 
+            { 
+                $$ = new cAsmNode($3, NULL); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
+        | ASM '(' string_lit ',' params ')'
+            { 
+                $$ = new cAsmNode($3, $5); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
+        | ASM2 '(' string_lit ',' constant_expression ')' 
+            { 
+                $$ = new cAsmNode($3, $5->ConstValue(), NULL); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
+        | ASM2 '(' string_lit  ',' constant_expression ',' params ')'
+            { 
+                $$ = new cAsmNode($3, $5->ConstValue(), $7); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
 lval:     unary_expression
             { $$ = $1; }
 params:     params',' expr
@@ -389,6 +411,12 @@ params:     params',' expr
         |   expr
             { 
                 $$ = new cParams($1); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
+
+string_lit: STRING_LIT
+            { 
+                $$ = new cStringLit($1); 
                 if ($$->HasSemanticError()) YYERROR;
             }
 
@@ -403,11 +431,8 @@ primary_expression
                 $$ = new cIntExpr($1); 
                 if ($$->HasSemanticError()) YYERROR;
             }
-	| STRING_LIT
-            { 
-                $$ = new cStringLit($1); 
-                if ($$->HasSemanticError()) YYERROR;
-            }
+	| string_lit
+            { $$ = $1; }
 	| '(' expr ')'
             { $$ = $2; }
 

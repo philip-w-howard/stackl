@@ -18,6 +18,7 @@ all: version compiler interp utils execs
 release: all
 	cp copy2disk $(RELEASE)
 	cp makebin $(RELEASE)
+	cp slasm $(RELEASE)
 	cp stackl $(RELEASE)
 	cp stacklc $(RELEASE)
 	cp $(INCLUDES) $(RELEASE)
@@ -25,6 +26,7 @@ clean:
 	$(MAKE) -C compiler clean
 	$(MAKE) -C interp clean
 	$(MAKE) -C utils clean
+	rm -f slasm
 	rm -f stackl
 	rm -f stacklc
 	rm -f makebin
@@ -48,6 +50,7 @@ utils:  version
 
 execs: compiler interp 
 	cp compiler/stacklc .
+	cp interp/slasm .
 	cp interp/stackl .
 	cp interp/syscodes.h .
 	cp interp/opcode_defs.h .

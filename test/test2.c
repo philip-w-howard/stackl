@@ -4,14 +4,14 @@
 int main()
 {
     if (1)
-        asm(OUTS_OP, "if works\n");
+        asm("OUTS", "if works\n");
     else
-        asm(OUTS_OP, "if 1 broken\n");
+        asm("OUTS", "if 1 broken\n");
 
     if (0)
-        asm(OUTS_OP, "if 2 broken\n");
+        asm("OUTS", "if 2 broken\n");
     else
-        asm(OUTS_OP, "if-else works\n");
+        asm("OUTS", "if-else works\n");
 
     return 0;
 }

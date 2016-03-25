@@ -2,6 +2,6 @@
 
 int main()
 {
-    asm(OUTS_OP, "Hello world\n");
+    asm("OUTS", "Hello world\n");
     return 0;
 }

@@ -71,6 +71,72 @@ std::string cBinaryExpr::OpToString()
     return 0;
 }
 
+std::string cBinaryExpr::OpAsString()
+{
+    switch (mOp)
+    {
+        case '+': 
+            return ("PLUS");
+            break;
+        case '-': 
+            return ("MINUS");
+            break;
+        case '*': 
+            return ("TIMES");
+            break;
+        case '/': 
+            return ("DIVIDE");
+            break;
+        case '%': 
+            return ("MOD");
+            break;
+        case '>': 
+            return ("GT");
+            break;
+        case '<': 
+            return ("LT");
+            break;
+        case '&': 
+            return ("BAND");
+            break;
+        case '|': 
+            return ("BOR");
+            break;
+        case AND: 
+            return ("AND");
+            break;
+        case OR : 
+            return ("OR");
+            break;
+        case '^': 
+            return ("BXOR");
+            break;
+        case EQ : 
+            return ("EQ");
+            break;
+        case NE : 
+            return ("NE");
+            break;
+        case LE : 
+            return ("LE");
+            break;
+        case GE : 
+            return ("GE");
+            break;
+        case LEFT : 
+            return ("SHIFTL");
+            break;
+        case RIGHT : 
+            return ("SHIFTR");
+            break;
+        default: 
+            fatal_error("Internal compiler: unrecognized binary operator");
+            break;
+    }
+
+    return 0;
+}
+
 int cBinaryExpr::OpAsInt()
 {
     switch (mOp)

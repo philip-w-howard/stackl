@@ -5,7 +5,6 @@
 #include "cVisitor.h"
 
 class cGenAddr;
-class cFixupTable;
 
 static const int STACK_FRAME_SIZE = 8;
 
@@ -58,16 +57,12 @@ class cCodeGen : public cVisitor
         virtual void Visit(cWhileStmt *node);
 
 
-        void EmitInt(int val);
-        void EmitString(std::string str);
-        void EmitActualString(std::string str);
-        void EmitGlobalDef(std::string str, int size);
-        void EmitGlobalRef(std::string str);
-        void EmitActualGlobal(std::string str, int size);
+        void EmitInst(std::string inst, std::string label);
+        void EmitInst(std::string inst, int operand);
+        void EmitInst(std::string inst);
+        void EmitLabel(string label);
         void EmitComment(std::string str);
-        void EmitFixup(int loc, int dest);
-        void SetLabelRef(std::string label);
-        void SetLabelValue(std::string label);
+        void EmitStringLit(std::string str, std::string label);
         std::string GenerateLabel();
 
         static const int STACKL_WORD_SIZE;
@@ -76,7 +71,6 @@ class cCodeGen : public cVisitor
         std::string m_Filename;
         int m_Next_Label = 1;
         int m_Location = 0;
-        cFixupTable *m_FixupTable;
         cGenAddr *m_GenAddr;
 
         static const int STACK_FRAME_SIZE = 8;

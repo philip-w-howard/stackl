@@ -308,6 +308,16 @@ static void store(int value)
         g_Memory[g_Memory_Index++] = value;
 }
 
+static void process_data(char *str)
+{
+    int value;
+
+    if (str[0] == '$')
+        add_label_ref(&str[1]);
+    else
+        store(atoi(str));
+}
+
 static void process_string(char *str)
 {
     int *int_ptr;
@@ -347,6 +357,19 @@ static void process_dot_cmd(char *line)
     {
         str = strtok(NULL, "\n");
         process_string(str);
+    }
+    else if (strcasecmp(token, ".block") == 0)
+    {
+        str = strtok(NULL, "\n");
+        if (g_Use_Data)
+            g_Data_Memory_Index += atoi(str);
+        else
+            g_Memory_Index += atoi(str);
+    }
+    else if (strcasecmp(token, ".data") == 0)
+    {
+        str = strtok(NULL, "\n");
+        process_data(str);
     }
     else
         report_error("Unrecognized dot command");

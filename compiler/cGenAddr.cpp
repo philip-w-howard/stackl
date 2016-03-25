@@ -2,8 +2,6 @@
 #include <fstream>
 #include <string>
 
-
-#include "cFixupTable.h"
 #include "lex.h"
 #include "cGenAddr.h"
 
@@ -34,12 +32,11 @@ void cGenAddr::Visit(cArrayRef *node)
     node->GetIndex()->Visit(m_CodeGen);
     if (node->GetType()->ElementSize() == 1)
     {
-        m_CodeGen->EmitInt(PLUS_OP);
+        m_CodeGen->EmitInst("PLUS");
     } else {
-        m_CodeGen->EmitInt(PUSH_OP);
-        m_CodeGen->EmitInt(node->GetType()->ElementSize());
-        m_CodeGen->EmitInt(TIMES_OP);
-        m_CodeGen->EmitInt(PLUS_OP);
+        m_CodeGen->EmitInst("PUSH", node->GetType()->ElementSize());
+        m_CodeGen->EmitInst("TIMES");
+        m_CodeGen->EmitInst("PLUS");
     }
 }
 
@@ -73,16 +70,11 @@ void cGenAddr::Visit(cPlainVarRef *node)
         fatal_error("Attempted to generate code for a cVarRef without a decl");
     if (var->IsGlobal())
     {
-        m_CodeGen->EmitInt(PUSH_OP);
-        m_CodeGen->EmitGlobalRef(var->GetName()->Name());
-        m_CodeGen->EmitInt(PUSH_OP);
-        m_CodeGen->EmitInt(var->GetOffset());
-        m_CodeGen->EmitInt(PLUS_OP);
+        m_CodeGen->EmitInst("PUSH", var->GetName()->Name());
     } else {
-        m_CodeGen->EmitInt(PUSH_OP);
-        m_CodeGen->EmitInt(var->GetOffset());
-        m_CodeGen->EmitInt(PUSHFP_OP);
-        m_CodeGen->EmitInt(PLUS_OP);
+        m_CodeGen->EmitInst("PUSH", var->GetOffset());
+        m_CodeGen->EmitInst("PUSHFP");
+        m_CodeGen->EmitInst("PLUS");
     }
 }
 
@@ -106,9 +98,8 @@ void cGenAddr::Visit(cStructDeref *node)
     node->GetBase()->Visit(m_CodeGen);
 
     cVarDecl *field = node->GetFieldDecl();
-    m_CodeGen->EmitInt(PUSH_OP);
-    m_CodeGen->EmitInt(field->GetOffset());
-    m_CodeGen->EmitInt(PLUS_OP);
+    m_CodeGen->EmitInst("PUSH", field->GetOffset());
+    m_CodeGen->EmitInst("PLUS");
 }
 
 void cGenAddr::Visit(cStructRef *node)
@@ -118,9 +109,8 @@ void cGenAddr::Visit(cStructRef *node)
     var->Visit(this);
 
     cVarDecl *field = node->GetFieldDecl();
-    m_CodeGen->EmitInt(PUSH_OP);
-    m_CodeGen->EmitInt(field->GetOffset());
-    m_CodeGen->EmitInt(PLUS_OP);
+    m_CodeGen->EmitInst("PUSH", field->GetOffset());
+    m_CodeGen->EmitInst("PLUS");
 }
 //void cGenAddr::Visit(cStructType *node)         { VisitAllChildren(node); }
 //void cGenAddr::Visit(cSymbol *node)             { VisitAllChildren(node); }

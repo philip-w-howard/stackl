@@ -16,7 +16,7 @@ int  Input_Have_Line;
 
 int check_buff()
 {
-    if (Input_Ring[Input_Head] == 'x') asm(HALT_OP);
+    if (Input_Ring[Input_Head] == 'x') asm("HALT");
 }
 
 int Input_Queue_Full()
@@ -60,7 +60,7 @@ int test_pio_term()
 int interrupt()
 {
     test_pio_term();
-    asm(RTI_OP);
+    asm("RTI");
 }
 
 int do_out(char *param)
@@ -84,15 +84,15 @@ int systrap(int size, int op, int parm1, int parm2)
     {
         do_out(parm1);
     } else if (op == EXIT_CALL) {
-        asm(HALT_OP);
+        asm("HALT");
     }
 
-    asm(RTI_OP);
+    asm("RTI");
 }
 
 int syscall(int size, int op, int parm1, int parm2)
 {
-    asm(TRAP_OP);
+    asm("TRAP");
 
     return 0;
 }

@@ -1,6 +1,6 @@
 int prints(char *msg)
 {
-    asm(OUTS_OP, msg);
+    asm("OUTS", msg);
     return 0;
 }
 

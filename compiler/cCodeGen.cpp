@@ -6,14 +6,12 @@
 #include "../interp/opcode_defs.h"
 #include "../interp/machine_def.h"
 
-#include "cFixupTable.h"
 #include "lex.h"
 #include "cCodeGen.h"
 #include "cGenAddr.h"
 
 using std::string;
 
-const string cFixupTable::GlobalLabel = "$global$";
 const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
 cCodeGen::cCodeGen(string filename) : cVisitor()
@@ -26,26 +24,21 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
 
     m_Filename = filename;
     m_GenAddr = new cGenAddr(this);
-    m_FixupTable = new cFixupTable();
 
     // Leave room for ISR address (if any)
-    SetLabelRef("interrupt");
-    SetLabelRef("systrap");
+    EmitInst(".data",  "interrupt");
+    EmitInst(".data",  "systrap");
 
-    EmitInt(JUMP_OP);
-    SetLabelRef("startup__");
-    EmitInt(POP_OP);            // need to throw away the return value
-    EmitInt(HALT_OP);
+    EmitInst("JUMP", "startup__");
+    EmitInst("POP");            // need to throw away the return value
+    EmitInst("HALT");
 }
 
 cCodeGen::~cCodeGen()
 {
-    m_FixupTable->FixupOutput(this);
-
-    m_Output << "X\n";
     m_Output.close();
 
-    string makebin("makebin ");
+    string makebin("slasm ");
     makebin += m_Filename;
 
     int result = system(makebin.c_str());
@@ -68,9 +61,9 @@ void cCodeGen::Visit(cArrayRef *node)
 {
     node->Visit(m_GenAddr);
     if (node->GetType()->ElementSize() == 1)
-        EmitInt(PUSHCVARIND_OP);
+        EmitInst("PUSHCVARIND");
     else
-        EmitInt(PUSHVARIND_OP);
+        EmitInst("PUSHVARIND");
 }
 
 void cCodeGen::Visit(cArrayType *node)
@@ -79,8 +72,10 @@ void cCodeGen::Visit(cArrayType *node)
 void cCodeGen::Visit(cAsmNode *node)
 {
     if (node->GetParams() != NULL) node->GetParams()->Visit(this);
-    EmitInt(node->GetOp1());
-    if (node->UsesTwoArgs()) EmitInt(node->GetOp2());
+    if (node->UsesTwoArgs()) 
+        EmitInst(node->GetOp1String(), node->GetOp2());
+    else
+        EmitInst(node->GetOp1String());
 }
 
 void cCodeGen::Visit(cAssignExpr *node)
@@ -88,17 +83,17 @@ void cCodeGen::Visit(cAssignExpr *node)
     node->GetExpr()->Visit(this);
 
     // Need to dup the result in case the assign is treated as an expr
-    EmitInt(DUP_OP);
+    EmitInst("DUP");
     node->GetVar()->Visit(m_GenAddr);
     if (node->GetVar()->IsArrayRef() && 
         node->GetVar()->GetType()->ElementSize() == 1)
     {
-        EmitInt(POPCVARIND_OP);
+        EmitInst("POPCVARIND");
     }
     else if (node->GetVar()->GetType()->Size() == 1)
-        EmitInt(POPCVARIND_OP);
+        EmitInst("POPCVARIND");
     else
-        EmitInt(POPVARIND_OP);
+        EmitInst("POPVARIND");
 }
 
 //void cCodeGen::Visit(cAstNode *node)            { VisitAllChildren(node); }
@@ -107,7 +102,7 @@ void cCodeGen::Visit(cBinaryExpr *node)
 {
     node->GetLeft()->Visit(this);
     node->GetRight()->Visit(this);
-    EmitInt(node->OpAsInt());
+    EmitInst(node->OpAsString());
 }
 //void cCodeGen::Visit(cDecl *node)               { VisitAllChildren(node); }
 //void cCodeGen::Visit(cDeclsList *node)          { VisitAllChildren(node); }
@@ -118,7 +113,7 @@ void cCodeGen::Visit(cExprStmt *node)
     node->GetExpr()->Visit(this);
 
     // remove the result from the stack
-    EmitInt(POP_OP);
+    EmitInst("POP");
 }
 
 void cCodeGen::Visit(cForStmt *node)
@@ -127,33 +122,30 @@ void cCodeGen::Visit(cForStmt *node)
     std::string end_loop = GenerateLabel();
 
     node->GetInit()->Visit(this);
-    EmitInt(POP_OP);            // need to handle VOID
-    SetLabelValue(start_loop);
+    EmitInst("POP");            // need to handle VOID
+    EmitLabel(start_loop);
     node->GetExpr()->Visit(this);
-    EmitInt(JUMPE_OP);
-    SetLabelRef(end_loop);
+    EmitInst("JUMPE", end_loop);
     node->GetStmt()->Visit(this);
     node->GetUpdate()->Visit(this);
-    EmitInt(POP_OP);            // need to handle VOID
-    EmitInt(JUMP_OP);
-    SetLabelRef(start_loop);
-    SetLabelValue(end_loop);
+    EmitInst("POP");            // need to handle VOID
+    EmitInst("JUMP", start_loop);
+    EmitLabel(end_loop);
 }
 
 void cCodeGen::Visit(cFuncCall *node)
 {
     if (node->GetParams() != NULL) node->GetParams()->Visit(this);
 
-    EmitInt(CALL_OP);
-    SetLabelRef(node->GetFuncName());
+    EmitInst("CALL", node->GetFuncName());
 
     // Need to pop the args off the stack without affecting the return val
     if (node->GetParams() != NULL)
     {
         for (int ii=0; ii<node->GetParams()->Size()/WORD_SIZE; ii++)
         {
-            EmitInt(SWAP_OP);
-            EmitInt(POP_OP);
+            EmitInst("SWAP");
+            EmitInst("POP");
         }
     }
 }
@@ -163,12 +155,11 @@ void cCodeGen::Visit(cFuncDecl *node)
     if (node->IsDefinition())
     {
         EmitComment(node->GetName()->Name() + "\n");
-        SetLabelValue(node->GetName()->Name());
+        EmitLabel(node->GetName()->Name());
         int adj_size = (node->DeclsSize() / WORD_SIZE * WORD_SIZE) + WORD_SIZE;
         if (node->DeclsSize() != 0)
         {
-            EmitInt(ADJSP_OP);
-            EmitInt(adj_size);
+            EmitInst("ADJSP", adj_size);
         }
 
         node->GetStmts()->Visit(this);
@@ -183,29 +174,26 @@ void cCodeGen::Visit(cIfStmt *node)
 {
     std::string if_label = GenerateLabel();
     node->GetCond()->Visit(this);
-    EmitInt(JUMPE_OP);
-    SetLabelRef(if_label);
+    EmitInst("JUMPE", if_label);
     if (node->GetIfStmt() != NULL) node->GetIfStmt()->Visit(this);
 
     if (node->GetElseStmt() != NULL)
     {
         std::string else_label = GenerateLabel();
-        EmitInt(JUMP_OP);
-        SetLabelRef(else_label);
-        SetLabelValue(if_label);
+        EmitInst("JUMP", else_label);
+        EmitLabel(if_label);
         node->GetElseStmt()->Visit(this);
-        SetLabelValue(else_label);
+        EmitLabel(else_label);
     }
     else
     {
-        SetLabelValue(if_label);
+        EmitLabel(if_label);
     }
 }
 
 void cCodeGen::Visit(cIntExpr *node)
 {
-    EmitInt(PUSH_OP);
-    EmitInt(node->ConstValue());
+    EmitInst("PUSH", node->ConstValue());
 }
 
 //void cCodeGen::Visit(cNopStmt *node)
@@ -234,16 +222,14 @@ void cCodeGen::Visit(cPlainVarRef *node)
             node->Visit(m_GenAddr);
             
             if (var->GetType()->Size() == 1)    // ElementSize?
-                EmitInt(PUSHCVARIND_OP);
+                EmitInst("PUSHCVARIND");
             else
-                EmitInt(PUSHVARIND_OP);
+                EmitInst("PUSHVARIND");
         } else {
             if (var->GetType()->Size() == 1)
-                EmitInt(PUSHCVAR_OP);
+                EmitInst("PUSHCVAR", var->GetOffset());
             else
-                EmitInt(PUSHVAR_OP);
-
-            EmitInt(var->GetOffset());
+                EmitInst("PUSHVAR", var->GetOffset());
         }
     }
 }
@@ -253,9 +239,9 @@ void cCodeGen::Visit(cPointerDeref *node)
     node->GetBase()->Visit(this);
     if (node->GetType()->Size() == 1)     // EmementSize?
     {
-        EmitInt(PUSHCVARIND_OP);
+        EmitInst("PUSHCVARIND");
     } else {
-        EmitInt(PUSHVARIND_OP);
+        EmitInst("PUSHVARIND");
     }
 }
 
@@ -269,12 +255,12 @@ void cCodeGen::Visit(cPostfixExpr *node)
         new cBinaryExpr(var, node->GetOp(), new cIntExpr(1));
 
     performOp->Visit(this);
-    EmitInt(DUP_OP);
+    EmitInst("DUP");
     var->Visit(m_GenAddr);
     if (var->GetType()->Size() == 1)
-        EmitInt(POPCVARIND_OP);
+        EmitInst("POPCVARIND");
     else
-        EmitInt(POPVARIND_OP);
+        EmitInst("POPVARIND");
 }
 
 void cCodeGen::Visit(cPrefixExpr *node)
@@ -288,9 +274,9 @@ void cCodeGen::Visit(cPrefixExpr *node)
     performOp->Visit(this);
     var->Visit(m_GenAddr);
     if (var->GetType()->Size() == 1)
-        EmitInt(POPCVARIND_OP);
+        EmitInst("POPCVARIND");
     else
-        EmitInt(POPVARIND_OP);
+        EmitInst("POPVARIND");
 }
 
 void cCodeGen::Visit(cReturnStmt *node)
@@ -298,9 +284,9 @@ void cCodeGen::Visit(cReturnStmt *node)
     if (node->GetExpr() != NULL) 
     {
         node->GetExpr()->Visit(this);
-        EmitInt(RETURNV_OP);
+        EmitInst("RETURNV");
     } else {
-        EmitInt(RETURN_OP);
+        EmitInst("RETURN");
     }
 }
 
@@ -314,15 +300,14 @@ void cCodeGen::Visit(cShortCircuitExpr *node)
 
         // at a minimum, we want to output the left expression
         node->GetLeft()->Visit(this);
-        EmitInt(DUP_OP);
-        EmitInt(JUMPE_OP);
-        SetLabelRef(checkExpression);
-        EmitInt(JUMP_OP);
-        SetLabelRef(skipExpression);
-        SetLabelValue(checkExpression);
+        EmitInst("DUP");
+        EmitInst("JUMPE", checkExpression);
+        EmitInst("JUMP", skipExpression);
+
+        EmitLabel(checkExpression);
         node->GetRight()->Visit(this);
-        EmitInt(node->OpAsInt());
-        SetLabelValue(skipExpression);
+        EmitInst(node->OpAsString());
+        EmitLabel(skipExpression);
     }
     else
     {
@@ -334,25 +319,23 @@ void cCodeGen::Visit(cShortCircuitExpr *node)
 
         // if the result of the left expression left a 0
         // on the stack, skip the right expression
-        EmitInt(DUP_OP);
-        EmitInt(JUMPE_OP);
-        SetLabelRef(jmp);
+        EmitInst("DUP");
+        EmitInst("JUMPE", jmp);
 
         // generate the code for the right expression
         node->GetRight()->Visit(this);
 
         // generate the code for the operator
-        EmitInt(node->OpAsInt());
+        EmitInst(node->OpAsString());
 
         // jump to the end if the left expression was false
-        SetLabelValue(jmp);
+        EmitLabel(jmp);
     }
 }
 
 void cCodeGen::Visit(cSizeofExpr *node)
 {
-    EmitInt(PUSH_OP);
-    EmitInt(node->ConstValue());
+    EmitInst("PUSH", node->ConstValue());
 }
 
 //void cCodeGen::Visit(cStmt *node)               { VisitAllChildren(node); }
@@ -360,8 +343,9 @@ void cCodeGen::Visit(cSizeofExpr *node)
 
 void cCodeGen::Visit(cStringLit *node)
 {
-    EmitInt(PUSH_OP);
-    EmitString(node->GetString());
+    string label = GenerateLabel();
+    EmitInst("PUSH", label);
+    EmitStringLit(node->GetString(), label);
 }
 
 void cCodeGen::Visit(cStructDeref *node)
@@ -375,9 +359,9 @@ void cCodeGen::Visit(cStructDeref *node)
     else
     {
         if (node->GetField()->GetDecl()->GetType()->Size() == 1)
-            EmitInt(PUSHCVARIND_OP);
+            EmitInst("PUSHCVARIND");
         else
-            EmitInt(PUSHVARIND_OP);
+            EmitInst("PUSHVARIND");
     }
 }
 
@@ -392,9 +376,9 @@ void cCodeGen::Visit(cStructRef *node)
     else
     {
         if (node->GetField()->GetDecl()->GetType()->Size() == 1)
-            EmitInt(PUSHCVARIND_OP);
+            EmitInst("PUSHCVARIND");
         else
-            EmitInt(PUSHVARIND_OP);
+            EmitInst("PUSHVARIND");
     }
 }
 
@@ -409,13 +393,13 @@ void cCodeGen::Visit(cUnaryExpr *node)
     switch (node->GetOp())
     {
         case '-':
-            EmitInt(NEG_OP);
+            EmitInst("NEG");
             break;
         case '~':
-            EmitInt(COMP_OP);
+            EmitInst("COMP");
             break;
         case '!':
-            EmitInt(NOT_OP);
+            EmitInst("NOT");
             break;
         default:
             fatal_error("Unrecognized unary operator");
@@ -425,7 +409,24 @@ void cCodeGen::Visit(cUnaryExpr *node)
 
 void cCodeGen::Visit(cVarDecl *node)
 {
-    // don't visit children
+    // NOTE: we explicitly avoit visiting children
+
+    // If global, emit label and allocate space
+    if (node->IsGlobal())
+    {
+        EmitInst(".dataseg");
+        EmitLabel(node->GetName()->Name());
+        if (node->IsConst())
+        {
+            EmitInst(".data", node->GetInit()->ConstValue());
+        }
+        else
+        {
+            EmitInst(".block", 
+                    (node->GetType()->Size() + WORD_SIZE - 1)/WORD_SIZE);
+        }
+        EmitInst(".codeseg");
+    }
 }
 
 //void cCodeGen::Visit(cVarRef *node)             { VisitAllChildren(node); }
@@ -435,23 +436,35 @@ void cCodeGen::Visit(cWhileStmt *node)
     std::string start_loop = GenerateLabel();
     std::string end_loop = GenerateLabel();
 
-    SetLabelValue(start_loop);
+    EmitLabel(start_loop);
     node->GetCond()->Visit(this);
-    EmitInt(JUMPE_OP);
-    SetLabelRef(end_loop);
+    EmitInst("JUMPE", end_loop);
     node->GetStmt()->Visit(this);
-    EmitInt(JUMP_OP);
-    SetLabelRef(start_loop);
-    SetLabelValue(end_loop);
+    EmitInst("JUMP", start_loop);
+    EmitLabel(end_loop);
 }
 
 //*****************************************
-// write an integer constant to the output
-void cCodeGen::EmitInt(int val)
+// Emit an instruction
+void cCodeGen::EmitInst(string inst, string label)
 {
-    m_Output << "D " << m_Location << " " << val << "\n";
-    m_Location += WORD_SIZE;
+    m_Output << inst << " $" << label << "\n";
 }
+
+//*****************************************
+// Emit an instruction
+void cCodeGen::EmitInst(string inst, int param)
+{
+    m_Output << inst << " " << param << "\n";
+}
+
+//*****************************************
+// Emit an instruction
+void cCodeGen::EmitInst(string inst)
+{
+    m_Output << inst << "\n";
+}
+
 //*****************************************
 // Generate a unique label for GOTO statements
 string cCodeGen::GenerateLabel()
@@ -462,59 +475,20 @@ string cCodeGen::GenerateLabel()
     return label;
 }
 //*****************************************
-void cCodeGen::EmitFixup(int loc, int dest)
+void cCodeGen::EmitStringLit(string str, string label)
 {
-    m_Output << "F " << loc << " " << dest << "\n";
-}
-//*****************************************
-void cCodeGen::EmitString(string str)
-{
-    string label = GenerateLabel();
-    SetLabelRef(label);
-    m_FixupTable->FixupAddString(str, label);
-    // m_Output << "S " << str << "\n";
-    // m_Location += WORD_SIZE;
-}
-//*****************************************
-void cCodeGen::EmitActualString(string str)
-{
-    int size;
-    m_Output << "S " << m_Location << " " << str << "\n";
-    size = (str.size() + WORD_SIZE)/WORD_SIZE;
-    size *= WORD_SIZE;
-    m_Location += size;
-}
-//*****************************************
-void cCodeGen::EmitGlobalDef(string str, int size)
-{
-    m_FixupTable->FixupAddGlobal(str, size);
-}
-//*****************************************
-void cCodeGen::EmitGlobalRef(string str)
-{
-    SetLabelRef(cFixupTable::GlobalLabel);
-}
-//*****************************************
-void cCodeGen::EmitActualGlobal(string str, int size)
-{
-    m_Output << "G " << m_Location << " " << str << " " << size << "\n";
-    size = (size + WORD_SIZE - 1)/WORD_SIZE;
-    size *= WORD_SIZE;
-    m_Location += size;
+    m_Output << ".dataseg\n";
+    EmitLabel(label);
+    m_Output << ".string \"" << str << "\"\n";
+    m_Output << ".codeseg\n";
 }
 //*****************************************
 void cCodeGen::EmitComment(string str)
 {
-    m_Output << "C " << m_Location << " " << str << "\n";
+    m_Output << "; " << m_Location << " " << str << "\n";
 }
 //*****************************************
-void cCodeGen::SetLabelRef(string label)
+void cCodeGen::EmitLabel(string label)
 {
-    m_FixupTable->AddLabelRef(label, m_Location);
-    EmitInt(-99);
-}
-//*****************************************
-void cCodeGen::SetLabelValue(string label)
-{
-    m_FixupTable->AddLabelValue(label, m_Location);
+    m_Output << label << ":\n";
 }

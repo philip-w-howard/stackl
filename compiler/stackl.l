@@ -18,6 +18,7 @@ char yycurrentfile[PATH_MAX];
 extern char Include_Path[PATH_MAX];
 
 #define Return(a) return do_return(a);
+static int process_string_lit();
 static int do_return(int val);
 static int proc_identifier(const char *name);
 static void open_input(char *name);
@@ -80,10 +81,7 @@ identifier      {letter}({letter}|{digit}|"_")*
                     }
                   }
 
-{quote}{not_quote}*{quote}  {
-                                yylval.string = yytext;
-                                Return(STRING_LIT);
-                            }
+{quote}{not_quote}*{quote}  { return process_string_lit(); }
 {punctuation}               Return(yytext[0]);
 {operator}                  Return(yytext[0]);
 "&&"                        Return(AND);
@@ -209,4 +207,10 @@ static int do_return(int val)
     if (Do_Debug) fprintf(stderr, "Scanned '%s': %d\n", yytext, val);
     return val;
 }
-
+static int process_string_lit()
+{
+    // need to trim the quotes off
+    yytext[strlen(yytext)-1] = 0;
+    yylval.string = &yytext[1];
+    return STRING_LIT;
+}
