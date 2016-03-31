@@ -403,7 +403,7 @@ static void process_asm(char *line)
 
     if (op_index == -1)
     {
-        report_error("Unrecognized opcoe");
+        report_error("Unrecognized opcode");
         return;
     }
 

@@ -3,7 +3,6 @@
 #include "cBinaryExpr.h"
 #include "lex.h"
 #include "parser.h"
-#include "../interp/opcode_defs.h"
 
 int cBinaryExpr::ConstValue()
 {
@@ -137,6 +136,7 @@ std::string cBinaryExpr::OpAsString()
     return 0;
 }
 
+/*
 int cBinaryExpr::OpAsInt()
 {
     switch (mOp)
@@ -202,6 +202,7 @@ int cBinaryExpr::OpAsInt()
 
     return 0;
 }
+*/
 
 cTypeDecl *cBinaryExpr::GetType()
 {

@@ -2,8 +2,6 @@
 #include <fstream>
 #include <string>
 
-
-#include "../interp/opcode_defs.h"
 #include "../interp/machine_def.h"
 
 #include "lex.h"

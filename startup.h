@@ -1,4 +1,4 @@
-//#include <opcode_defs.h>
+// Default startup code for stacklc compiler
 
 int main();
 
@@ -7,13 +7,11 @@ int systrap()   {}
 int startup__()
 {
     main();
-    //asm(HALT_OP);
     asm("HALT");
 }
 
 int sys_prints(char *msg)
 {
-    //asm(OUTS_OP, msg);
     asm("OUTS", msg);
     return 0;
 }

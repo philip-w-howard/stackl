@@ -28,7 +28,7 @@ class cBinaryExpr : public cExpr
     cExpr* GetRight()   { return (cExpr*)GetChild(1); }
 
     std::string OpToString();
-    int OpAsInt();
+    //int OpAsInt();
     std::string OpAsString();
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
