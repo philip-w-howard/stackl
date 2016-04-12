@@ -1,5 +1,5 @@
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 char *a;
 char **b;

@@ -1,5 +1,5 @@
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 const int ONE = 1;
 #define TWO 2

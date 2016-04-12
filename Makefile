@@ -1,13 +1,16 @@
 RELEASE  = ~/bin
-INCLUDES = startup.h \
+EXTRA_INCLUDES = \
 	   system.h \
-	   string.h \
 	   syscodes.h \
 	   machine_def.h \
 	   opcode_defs.h \
 	   pio_term.h \
 	   dma_term.h \
 	   disk.h \
+
+INCLUDES = startup.h \
+	   string.h \
+	   io.h \
 
 GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
 
@@ -60,3 +63,12 @@ execs: compiler interp
 	cp interp/disk.h .
 	cp utils/makebin .
 	cp utils/copy2disk .
+
+extra_includes: compiler interp 
+	cp interp/syscodes.h .
+	cp interp/opcode_defs.h .
+	cp interp/machine_def.h .
+	cp interp/pio_term.h .
+	cp interp/dma_term.h .
+	cp interp/disk.h .
+

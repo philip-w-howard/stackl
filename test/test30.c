@@ -1,7 +1,7 @@
 // Test arrays of structs
 //
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 typedef struct
 {

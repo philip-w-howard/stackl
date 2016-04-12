@@ -1,5 +1,5 @@
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 // additional string library tests
 int main()

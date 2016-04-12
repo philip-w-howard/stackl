@@ -2,7 +2,7 @@
 // NOTE: This test is incomplete
 //
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 int main()
 {

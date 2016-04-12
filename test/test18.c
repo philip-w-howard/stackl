@@ -1,7 +1,7 @@
 // Test return value of integer functions
 //
 #include <string.h>
-#include <io.h>
+#include "test/io.h"
 
 int empty()
 { }
