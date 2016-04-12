@@ -189,7 +189,8 @@ static void open_input(char *name)
 
     if ( ! yyin )
     {
-        printf("Error opening %s\n", yytext);
+        printf("Error opening %s\n", path);
+        exit(1);
     } else {
         File_Def fileDef;
         strcpy(fileDef.mName, yycurrentfile);
