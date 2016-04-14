@@ -698,7 +698,8 @@ assignment_expression
                 if ($$->HasSemanticError()) YYERROR;
             }
         | lval '=' asm_stmt
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { $$ = new cAssignExpr($1, $3); }
+            //{ semantic_error("Not implemented " + std::to_string(__LINE__)); }
         | lval PLUS_EQ expr
             { 
                 $$ = new cAssignExpr($1, new cBinaryExpr($1, '+', $3)); 

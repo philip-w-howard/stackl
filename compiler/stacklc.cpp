@@ -176,7 +176,7 @@ int main(int argc, char **argv)
             astPrinter.VisitAllNodes(program);
         }
 
-        // Create output filenmae
+        // Create output filename
         strcpy(outfile_name, Input_File);
         char *ptr = strrchr(outfile_name, '.');
         if (ptr != NULL) *ptr = 0;

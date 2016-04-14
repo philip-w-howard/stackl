@@ -1,4 +1,5 @@
-RELEASE  = ~/bin
+# RELEASE  = ~/bin
+RELEASE  = release
 EXTRA_INCLUDES = \
 	   system.h \
 	   syscodes.h \
