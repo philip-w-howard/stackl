@@ -5,6 +5,7 @@
 #include "cExpr.h"
 #include "cVarRef.h"
 #include "cSymbol.h"
+#include "cCodeGen.h"
 
 class cAddressExpr : public cExpr
 {
@@ -21,6 +22,7 @@ class cAddressExpr : public cExpr
 
     cVarRef* GetVar() { return (cVarRef*)GetChild(0); }
 
+    virtual int Size() { return cCodeGen::STACKL_WORD_SIZE; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
