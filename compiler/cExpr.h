@@ -24,7 +24,8 @@ class cExpr : public cStmt
     virtual bool IsConst()      { return false; }
     virtual int  ConstValue()   { return 0; }
 
-    virtual int Size()          { return GetType()->ElementSize(); }
+    //virtual int Size()          { return GetType()->ElementSize(); }
+    virtual int Size()          { return GetType()->Size(); }
 
     virtual cTypeDecl *GetType() = 0;
 

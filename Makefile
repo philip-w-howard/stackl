@@ -1,5 +1,6 @@
-# RELEASE  = ~/bin
-RELEASE  = release
+RELEASE  = ~/stackl_rel
+#RELEASE  = ~/bin
+# RELEASE  = release
 EXTRA_INCLUDES = \
 	   system.h \
 	   syscodes.h \

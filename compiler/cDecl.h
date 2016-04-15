@@ -11,7 +11,7 @@ class cFuncDecl;
 class cDecl : public cStmt
 {
   public:
-    cDecl() {}
+    cDecl() : cStmt() {}
 
     virtual bool IsType()   { return false; }
     virtual bool IsVar()    { return false; }
