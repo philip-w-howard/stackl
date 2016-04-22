@@ -9,7 +9,9 @@
 #include "disk.h"
 #include "../version.h"
 
-static char Input_File[200] = "";
+// Use PATH_MAX from limits.h?
+//
+static char Input_File[256] = "";
 static int Memory_Size = 0;
 static int Use_Disk = 0;        // 1
 static int Boot_Disk = 0;       // 1
@@ -53,6 +55,11 @@ void Process_Args(int argc, char **argv)
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "opcodes") == 0)
                 Opcodes_Debug();
+            else if (strcmp(arg, "pio_term") == 0)
+            {
+                Use_PIO_Term = 1;
+                Use_DMA_Term = 0;
+            }
             else if (argv[ii][1] == 'T')
                 Set_Timer_Interval(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)

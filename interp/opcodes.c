@@ -51,8 +51,8 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
     va_start(args, fmt);
 
     char format[200];
-    sprintf(format, "%0x %d %d %d %d %s\n", 
-            cpu->FLAG, cpu->BP, cpu->IP, cpu->SP, cpu->FP, fmt);
+    sprintf(format, "%0x %d %d %d %d %d %s\n", 
+            cpu->FLAG, cpu->BP, cpu->LP, cpu->IP, cpu->SP, cpu->FP, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
 }
@@ -343,11 +343,10 @@ void Execute(Machine_State *cpu)
             INC(IP, 1);
             break;
         case INP_OP:
-            temp = GET_INTVAL(SP, -1);
+            temp = pop(cpu);
             DEBUG("INP %d %d", Get_Word(cpu, temp), Get_Word(cpu, temp+4));
             check_priv(cpu, "INP");
             Schedule_IO(cpu, temp);
-            INC(SP, 1);
             INC(IP, 1);
             break;
         /*
