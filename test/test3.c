@@ -275,7 +275,7 @@ int main()
     // post INC
     z = 35;
     x = z++;
-    if (x == 36 && z == 36)
+    if (x == 35 && z == 36)
         asm("OUTS", "post INC works\n");
     else
         asm("OUTS", "post INC broken\n");
@@ -283,7 +283,7 @@ int main()
     // post DEC
     z = 37;
     x = z--;
-    if (x == 36 && z == 36)
+    if (x == 37 && z == 36)
         asm("OUTS", "post DEC works\n");
     else
         asm("OUTS", "post DEC broken\n");
@@ -291,7 +291,7 @@ int main()
     // pre INC
     z = 36;
     x = ++z;
-    if (x == 36 && z == 37)
+    if (x == 37 && z == 37)
         asm("OUTS", "pre INC works\n");
     else
         asm("OUTS", "pre INC broken\n");
@@ -299,7 +299,7 @@ int main()
     // pre DEC
     z = 36;
     x = --z;
-    if (x == 36 && z == 35)
+    if (x == 35 && z == 35)
         asm("OUTS", "pre DEC works\n");
     else
         asm("OUTS", "pre DEC broken\n");

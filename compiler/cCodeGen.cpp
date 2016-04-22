@@ -270,6 +270,7 @@ void cCodeGen::Visit(cPrefixExpr *node)
         cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     performOp->Visit(this);
+    EmitInst("DUP");
     var->Visit(m_GenAddr);
     if (var->GetType()->Size() == 1)
         EmitInst("POPCVARIND");

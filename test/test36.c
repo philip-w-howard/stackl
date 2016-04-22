@@ -4,6 +4,9 @@
 #include <string.h>
 #include "test/io.h"
 
+//#include <stdio.h>
+//#define prints printf
+
 int main()
 {
     char *buff;
@@ -14,9 +17,11 @@ int main()
 
     while (*buff)
     {
-        if (*ptr++ != *buff) prints("precedence is wrong\n");
+        if (*ptr++ != *buff) prints("preinc precedence is wrong\n");
         buff++;
     }
+
+    if (*--ptr != '4') prints("predec precedence is wrong\n");
 
     prints("Test complete\n");
 
