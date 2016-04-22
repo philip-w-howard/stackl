@@ -252,8 +252,8 @@ void cCodeGen::Visit(cPostfixExpr *node)
     cBinaryExpr *performOp = 
         new cBinaryExpr(var, node->GetOp(), new cIntExpr(1));
 
+    var->Visit(this);
     performOp->Visit(this);
-    EmitInst("DUP");
     var->Visit(m_GenAddr);
     if (var->GetType()->Size() == 1)
         EmitInst("POPCVARIND");
