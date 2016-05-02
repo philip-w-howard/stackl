@@ -12,7 +12,19 @@ class cStructType : public cTypeDecl
     cStructType(cSymbol *name, cScope *scope, cDeclsList *decls) 
         : cTypeDecl()
     {
-        // FIX THIS: semantic checks?
+        if (symbolTableRoot->LocalLookup(name->Name()) != nullptr)
+        {
+            ThrowSemanticError(name->Name() +" already defined in local scope");
+            return;
+        }
+
+        // if the symbol exists in an outer scope, we need to create a new one
+        // instead of re-using the outer scoped symbol
+        if (symbolTableRoot->Lookup(name->Name()) != nullptr)
+        {
+            name = new cSymbol(name->Name());
+        }
+
         AddChild(name);
         AddChild(decls);
         mScope = scope;

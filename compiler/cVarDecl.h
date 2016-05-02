@@ -18,6 +18,13 @@ class cVarDecl : public cDecl
             return;
         }
 
+        // if the symbol exists in an outer scope, we need to create a new one
+        // instead of re-using the outer scoped symbol
+        if (symbolTableRoot->Lookup(name->Name()) != nullptr)
+        {
+            name = new cSymbol(name->Name());
+        }
+
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
 
