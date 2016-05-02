@@ -23,6 +23,42 @@ class cFuncCall : public cVarRef
         
         AddChild(base);
         AddChild(params);
+
+        cFuncDecl *func = base->GetType()->GetFunc();
+        assert(func != nullptr);
+        cDeclsList *args = func->GetParams();
+
+        if ( (args == nullptr && params != nullptr) ||
+             (args != nullptr && params == nullptr))
+        {
+            ThrowSemanticError("Wrong number of arguments");
+            return;
+        }
+
+        if (args != nullptr && params != nullptr)
+        {
+            if (args->NumChildren() != params->NumChildren())
+            {
+                ThrowSemanticError("Wrong number of arguments");
+                return;
+            }
+
+            // FIX THIS: need to check types is some meaningful way
+            // Allow ptr <--> int and char <--> int, but disallow 
+            // every other difference
+            /*
+            for (int ii=0; ii<args->NumChildren(); ii++)
+            {
+                if (args->GetDecl(ii)->GetType() !=
+                            params->GetParam(ii)->GetType()))
+                {
+                    ThrowSemanticError("Argument " + std::to_string(ii+1) +
+                            " is of incompatible type");
+                    return;
+                }
+            }
+            */
+        }
     }
 
     cExpr* GetBase()    { return (cExpr*)GetChild(0); }

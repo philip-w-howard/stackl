@@ -25,7 +25,7 @@ class cFuncDecl : public cTypeDecl
         mDeclsSize      = 0;
         mSize = cCodeGen::STACKL_WORD_SIZE;
 
-        // FIX THIS: Semantic checks
+        // Do semantic checks
         cSymbol *func = symbolTableRoot->Lookup(name->Name());
         if (func != nullptr)
         {
