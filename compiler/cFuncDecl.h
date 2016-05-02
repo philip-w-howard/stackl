@@ -15,10 +15,8 @@ class cFuncDecl : public cTypeDecl
   public:
     cFuncDecl(cTypeDecl *type, cSymbol *name) : cTypeDecl()
     {
-        // FIX THIS: Semantic checks
-        name->SetDecl(this);
-        symbolTableRoot->Insert(name);
-
+        mHasStatements = false;
+        mHasParams = false;
         AddChild(name);
         AddChild(type);
         AddChild(nullptr); // params
@@ -26,15 +24,88 @@ class cFuncDecl : public cTypeDecl
         mHasStatements  = false;
         mDeclsSize      = 0;
         mSize = cCodeGen::STACKL_WORD_SIZE;
+
+        // FIX THIS: Semantic checks
+        cSymbol *func = symbolTableRoot->Lookup(name->Name());
+        if (func != nullptr)
+        {
+            // we have another definition. Let's make sure that is compatible
+            // with this def.
+            cDecl *decl = func->GetDecl();
+            if (!decl->IsFunc())
+            {
+                ThrowSemanticError(name->Name() +
+                        " previously defined as other than a function");
+                return;
+            }
+            else
+            {
+                cFuncDecl *funcDecl = decl->GetFunc();
+                assert(funcDecl != nullptr);
+                if (funcDecl->ReturnType() != type)
+                {
+                    ThrowSemanticError(name->Name() +
+                        " previously defined with a different return type");
+                    return;
+                }
+                else
+                {
+                    m_children = funcDecl->m_children;
+                    mHasStatements = funcDecl->mHasStatements;
+                    mHasParams = funcDecl->mHasParams;
+                    name->SetDecl(this);
+                }
+            }
+
+        }
+        else
+        {
+            name->SetDecl(this);
+            symbolTableRoot->Insert(name);
+        }
     }
 
-    void AddParams(cAstNode *params)
+    void AddParams(cDeclsList *params)
     {
+        cDeclsList *old_params = GetParams();
+        // if params have been set and either the old or new are not NULL
+        if (mHasParams && (params != nullptr || old_params != nullptr))
+        {
+            if ( (params != nullptr && old_params == nullptr) ||
+                 (params == nullptr && old_params != nullptr) ||
+                 (params->NumChildren() != old_params->NumChildren()) )
+            {
+                ThrowSemanticError(GetName()->Name() +
+                        " redeclared with a different number of parameters");
+                return;
+            }
+
+            for (int ii=0; ii<params->NumChildren(); ii++)
+            {
+                cDecl *decl1 = params->GetDecl(ii);
+                cDecl *decl2 = old_params->GetDecl(ii);
+
+                assert(decl1 != nullptr && decl2 != nullptr);
+                if (decl1->GetType() != decl2->GetType())
+                {
+                    ThrowSemanticError(GetName()->Name() +
+                        " redeclared with a different parameters");
+                    return;
+                }
+            }
+        }
+
         SetChild(2, params);
+        mHasParams = true;
     }
 
     void AddStatements(cStmtsList *stmts)
     {
+        if (mHasStatements)
+        {
+            ThrowSemanticError(GetName()->Name() + " already defined");
+            return;
+        }
         SetChild(3, stmts);
         mHasStatements = true;
     }
@@ -55,6 +126,7 @@ class cFuncDecl : public cTypeDecl
 
   protected:
     bool mHasStatements;
+    bool mHasParams;
     int mDeclsSize;
 };
 

@@ -3,7 +3,7 @@
 #include "cVarDecl.h"
 #include "cFuncDecl.h"
 
-// FIX THIS:: this is ugly. Does it actually get used?
+// FIX THIS:: this is ugly, but it gets used
 //
 cTypeDecl *cDecl::GetType()
 { 

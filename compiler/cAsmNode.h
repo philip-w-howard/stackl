@@ -17,7 +17,6 @@
 #include "cParams.h"
 #include "cStringLit.h"
 
-// FIX THIS: semantic check int code vs string code
 class cAsmNode : public cExpr
 {
   public:

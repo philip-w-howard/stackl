@@ -12,7 +12,12 @@ class cVarDecl : public cDecl
   public:
     cVarDecl(cTypeDecl *type, cSymbol *name) : cDecl()
     {
-        // FIX THIS semantic check for "already defined"
+        if (symbolTableRoot->LocalLookup(name->Name()) != nullptr)
+        {
+            ThrowSemanticError(name->Name() +" already defined in local scope");
+            return;
+        }
+
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
 

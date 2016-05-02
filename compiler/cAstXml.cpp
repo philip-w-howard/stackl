@@ -47,7 +47,7 @@ void cAstXml::Visit(cAsmNode *node)
 {
     string attr("");
 
-    attr = " Op=\"" + std::to_string(node->GetOp1()) + "\" ";
+    attr = " Op=\"" + node->GetOp1String() + "\" ";
 
     if (node->UsesTwoArgs())
     {
