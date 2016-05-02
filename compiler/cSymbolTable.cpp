@@ -69,6 +69,17 @@ cSymbol *cSymbolTable::InsertRoot(cSymbol *symbol)
     return symbol;
 }
 //*******************************************
+cSymbol *cSymbolTable::InsertRoot(std::string name, cSymbol *symbol)
+{
+    cScope *scope = mScope;
+    while(scope->Parent() != NULL)
+        scope = scope->Parent();
+
+    scope->Insert(name, symbol);
+
+    return symbol;
+}
+//*******************************************
 // Look for a symbol. Return NULL if not found
 cSymbol *cSymbolTable::Lookup(std::string name)
 {

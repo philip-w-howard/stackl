@@ -148,10 +148,16 @@ int main(int argc, char **argv)
     char startup[PATH_MAX];
     strcpy(startup, Include_Path);
     strcat(startup, "startup.h");
-    if (!Do_Boot_Code)
+    if (Do_Boot_Code)
     {
-        result = process_file(startup, &program, &total_errors);
+        symbolTableRoot->InsertRoot("$$interrupt", new cSymbol("interrupt"));
+        symbolTableRoot->InsertRoot("$$systrap", new cSymbol("systrap"));
     }
+    else
+    {
+        //result = process_file(startup, &program, &total_errors);
+    }
+
     if (result == 0) process_file(Input_File, &program, &total_errors);
 
     if (result == 0 && total_errors == 0)

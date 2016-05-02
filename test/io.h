@@ -1,3 +1,6 @@
+#pragma once
+#include <string.h>
+
 int prints(char *msg)
 {
     asm("OUTS", msg);

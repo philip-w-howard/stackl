@@ -1,5 +1,6 @@
+#include "test/io.h"
 int main()
 {
-    sys_prints("Unused test\n");
+    prints("Unused test\n");
     return 0;
 }

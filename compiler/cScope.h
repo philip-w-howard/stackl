@@ -23,8 +23,7 @@ class cScope
         mParent = p;
     }
 
-    // Insert a symbol into the table. If symbol already exists, returns
-    // the preexisting symbol. Otherwise, return new symbol
+    // Insert a symbol into the table. 
     void Insert(std::string name, cSymbol *symbol)
     {
         mSymTab[name] = symbol;

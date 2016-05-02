@@ -340,6 +340,7 @@ void Execute(Machine_State *cpu)
             check_priv(cpu, "OUTS");
             temp = pop(cpu);
             printf("%s", (char *)Get_Addr(cpu, temp));
+            fflush(stdout);
             INC(IP, 1);
             break;
         case INP_OP:

@@ -233,8 +233,10 @@ global_decl: func_decl
                                 YYABORT; 
                             }
                         }
-        |   PRAGMA INTERRUPT IDENTIFIER {}
-        |   PRAGMA SYSTRAP IDENTIFIER {}
+        |   PRAGMA INTERRUPT IDENTIFIER 
+                        { symbolTableRoot->InsertRoot("$$interrupt", $3); }
+        |   PRAGMA SYSTRAP IDENTIFIER 
+                        { symbolTableRoot->InsertRoot("$$systrap", $3); }
         | error ';'
             { $$ = NULL; }
 func_decl:  func_header ';'

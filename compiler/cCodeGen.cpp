@@ -24,11 +24,23 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
     m_GenAddr = new cGenAddr(this);
 
     // Leave room for ISR address (if any)
-    EmitInst(".data",  "interrupt");
-    EmitInst(".data",  "systrap");
+    cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
+    if (interrupt != nullptr)
+        EmitInst(".data",  interrupt->Name());
+    else
+        EmitInst(".data", -1);
 
-    EmitInst("JUMP", "startup__");
-    EmitInst("POP");            // need to throw away the return value
+    cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
+    if (systrap != nullptr)
+        EmitInst(".data",  systrap->Name());
+    else
+        EmitInst(".data", -1);
+
+    EmitInst("JUMP", "__startup");
+
+    EmitLabel("__startup");
+    EmitInst("CALL", "main");
+    EmitInst("POP");
     EmitInst("HALT");
 }
 

@@ -1,5 +1,4 @@
-//#include <string.h>
-//#include <system.h>
+#include "test/io.h"
 
 int main()
 {
@@ -12,15 +11,15 @@ int main()
     carr[1] = 'x';
     cptr[2] = '\n';
     carr[3] = 0;
-    sys_prints(carr);
-    sys_prints(cptr);
-    sys_prints("The end\n");
+    prints(carr);
+    prints(cptr);
+    prints("The end\n");
 
     cptr = "this is a cptr\n";
-    sys_prints(cptr);
+    prints(cptr);
 
     cptr += 5;
-    sys_prints(cptr);
+    prints(cptr);
 
     cptr = carr1;
     carr1[0] = 'h';
@@ -31,5 +30,5 @@ int main()
     carr1[5] = '\n';
     carr1[6] = 0;
 
-    sys_prints(cptr);
+    prints(cptr);
 }

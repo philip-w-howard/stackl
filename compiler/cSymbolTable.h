@@ -28,6 +28,10 @@ class cSymbolTable
     // Insert in the root symbol table
     cSymbol *InsertRoot(cSymbol *symbol);
 
+    // Insert a symbol into the root table, where the key can be different
+    // from the symbol->Name(). This is used to specify interrupt vectors
+    cSymbol *InsertRoot(std::string name, cSymbol *symbol);
+
     // Look for a symbol. Returns NULL if symbol is not found.
     cSymbol *Lookup(std::string name);
 

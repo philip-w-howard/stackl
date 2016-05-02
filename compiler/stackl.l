@@ -74,9 +74,8 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "#pragma"            BEGIN(DO_PRAGMA); Return(PRAGMA);
 <DO_PRAGMA>"once"       Return(ONCE);
-<DO_PRAGMA>"interrupt"  Return(INTERRUPT);
-<DO_PRAGMA>"systrap"    Return(SYSTRAP);
-<DO_PRAGMA>{identifier} Return(proc_identifier(yytext));
+<DO_PRAGMA>"interrupt"  BEGIN(INITIAL); Return(INTERRUPT);
+<DO_PRAGMA>"systrap"    BEGIN(INITIAL); Return(SYSTRAP);
 <DO_PRAGMA>[ \t]+       {}
 <DO_PRAGMA>"\n"         BEGIN(INITIAL);
 <DO_PRAGMA>.            Return(JUNK_TOKEN);   // discard anything not recognized

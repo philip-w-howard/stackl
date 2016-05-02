@@ -1,3 +1,5 @@
+#pragma once
+
 int strlen(char *str)
 {
     int count;
