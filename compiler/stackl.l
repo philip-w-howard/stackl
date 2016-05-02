@@ -4,6 +4,7 @@
 
 #include <limits.h>     // for include path
 #include <list>
+#include <set>
 #include "lex.h"
 
 class File_Def
@@ -14,10 +15,13 @@ class File_Def
 };
 
 static std::list<File_Def> FileList ;
+static std::set<std::string> OnceList ;
 char yycurrentfile[PATH_MAX];
 extern char Include_Path[PATH_MAX];
 
 #define Return(a) return do_return(a);
+int process_once();
+static int process_eof();
 static int process_string_lit();
 static int do_return(int val);
 static int proc_identifier(const char *name);
@@ -37,6 +41,7 @@ extern int Do_Debug;
    */
 %x INCLUDE
 %x C_COMMENT
+%x DO_PRAGMA
 
 apost           [']
 quote           [\"]
@@ -67,19 +72,16 @@ identifier      {letter}({letter}|{digit}|"_")*
                     BEGIN(INITIAL);
                   }
 
-<<EOF>>           {
-                    File_Def file_item;
-                    if (FileList.empty())
-                        yyterminate();
-                    else
-                    {
-                        file_item = FileList.back();
-                        FileList.pop_back();
-                        yylineno = file_item.mPrevLine;
-                        strcpy(yycurrentfile, file_item.mName);
-                        yypop_buffer_state();
-                    }
-                  }
+"#pragma"            BEGIN(DO_PRAGMA); Return(PRAGMA);
+<DO_PRAGMA>"once"       Return(ONCE);
+<DO_PRAGMA>"interrupt"  Return(INTERRUPT);
+<DO_PRAGMA>"systrap"    Return(SYSTRAP);
+<DO_PRAGMA>{identifier} Return(proc_identifier(yytext));
+<DO_PRAGMA>[ \t]+       {}
+<DO_PRAGMA>"\n"         BEGIN(INITIAL);
+<DO_PRAGMA>.            Return(JUNK_TOKEN);   // discard anything not recognized
+
+<<EOF>>           { if (process_eof()) yyterminate(); }
 
 {quote}{not_quote}*{quote}  { return process_string_lit(); }
 {punctuation}               Return(yytext[0]);
@@ -215,4 +217,36 @@ static int process_string_lit()
     yytext[strlen(yytext)-1] = 0;
     yylval.string = &yytext[1];
     return STRING_LIT;
+}
+int process_once()
+{
+    std::string file(yycurrentfile);
+    if (OnceList.find(file) != OnceList.end())
+    {
+        return process_eof();
+    }
+    else
+    {
+        OnceList.insert(file);
+    }
+    return 0;
+}
+
+static int process_eof()
+{
+    File_Def file_item;
+    if (FileList.empty()) 
+    {
+        return 1;
+    }
+    else
+    {
+        file_item = FileList.back();
+        FileList.pop_back();
+        yylineno = file_item.mPrevLine;
+        strcpy(yycurrentfile, file_item.mName);
+        yypop_buffer_state();
+    }
+
+    return 0;
 }

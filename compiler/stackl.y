@@ -60,6 +60,7 @@
 %token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
+%token  PRAGMA ONCE INTERRUPT SYSTRAP
 
 %type <decl_list>       program
 
@@ -225,6 +226,15 @@ global_decl: func_decl
                 $1->SetGlobal();
                 $$ = $1; 
             }
+        |   PRAGMA ONCE { 
+                            if (process_once()) 
+                            {
+                                yyerror("'#pragma once' in main source file");
+                                YYABORT; 
+                            }
+                        }
+        |   PRAGMA INTERRUPT IDENTIFIER {}
+        |   PRAGMA SYSTRAP IDENTIFIER {}
         | error ';'
             { $$ = NULL; }
 func_decl:  func_header ';'
@@ -360,6 +370,7 @@ stmt:       decl
             { semantic_error("Not implemented " + std::to_string(__LINE__)); }
         |   asm_stmt ';'
             { $$ = $1; }
+
 asm_stmt : ASM '(' string_lit ')' 
             { 
                 $$ = new cAsmNode($3, NULL); 

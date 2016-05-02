@@ -54,6 +54,7 @@
 #include "parse.h"
 
 int yylex();
+int process_once();
 
 extern char *yytext;
 extern int yylineno;
