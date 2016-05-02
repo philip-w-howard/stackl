@@ -21,22 +21,6 @@
 class cAsmNode : public cExpr
 {
   public:
-    cAsmNode(int code, cParams *params) : cExpr()
-    {
-        mCode = code;
-        mCode2 = 0;
-        AddChild(params);
-        mTwoWord = false;
-    }
-
-    cAsmNode(int code, int code2, cParams *params) : cExpr()
-    {
-        mCode = code;
-        mCode2 = code2;
-        AddChild(params);
-        mTwoWord = true;
-    }
-
     cAsmNode(cStringLit *code, cParams *params) : cExpr()
     {
         mOp = code->GetString();
@@ -61,7 +45,6 @@ class cAsmNode : public cExpr
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
-    int GetOp1()            { return mCode; }
     int GetOp2()            { return mCode2; }
     bool UsesTwoArgs()      { return mTwoWord; }
     cParams* GetParams()    { return (cParams*)GetChild(0); }
@@ -69,7 +52,6 @@ class cAsmNode : public cExpr
 
   protected:
     string mOp;             // the opcode as a string
-    int mCode;              // the opcode to be emitted
     int mCode2;             // 2nd opcode for 2 word instructions
     bool mTwoWord;          // true of 2 word instruction
 };

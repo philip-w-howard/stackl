@@ -360,28 +360,7 @@ stmt:       decl
             { semantic_error("Not implemented " + std::to_string(__LINE__)); }
         |   asm_stmt ';'
             { $$ = $1; }
-
-asm_stmt : ASM '(' constant_expression ')' 
-            { 
-                $$ = new cAsmNode($3->ConstValue(), NULL); 
-                if ($$->HasSemanticError()) YYERROR;
-            }
-        | ASM '(' constant_expression ',' params ')'
-            { 
-                $$ = new cAsmNode($3->ConstValue(), $5); 
-                if ($$->HasSemanticError()) YYERROR;
-            }
-        | ASM2 '(' constant_expression ',' constant_expression ')' 
-            { 
-                $$ = new cAsmNode($3->ConstValue(), $5->ConstValue(), NULL); 
-                if ($$->HasSemanticError()) YYERROR;
-            }
-        | ASM2 '(' constant_expression  ',' constant_expression ',' params ')'
-            { 
-                $$ = new cAsmNode($3->ConstValue(), $5->ConstValue(), $7); 
-                if ($$->HasSemanticError()) YYERROR;
-            }
-        | ASM '(' string_lit ')' 
+asm_stmt : ASM '(' string_lit ')' 
             { 
                 $$ = new cAsmNode($3, NULL); 
                 if ($$->HasSemanticError()) YYERROR;

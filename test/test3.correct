@@ -34,3 +34,4 @@ post INC works
 post DEC works
 pre INC works
 pre DEC works
+equals in expr works

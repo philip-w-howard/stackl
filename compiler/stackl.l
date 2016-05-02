@@ -150,11 +150,12 @@ identifier      {letter}({letter}|{digit}|"_")*
 static int proc_identifier(const char *name)
 {
     yylval.symbol = symbolTableRoot->Lookup(name);
-    if (yylval.symbol == NULL) 
+    if (yylval.symbol == nullptr) 
     {
         yylval.symbol = new cSymbol(name);
     } else {
         cDecl *decl = yylval.symbol->GetDecl();
+        if (decl == nullptr) return IDENTIFIER;
         if (decl->IsType()) return TYPE_ID;
         if (decl->IsVar() && decl->GetVar()->IsConst()) 
         {

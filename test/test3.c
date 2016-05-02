@@ -304,5 +304,12 @@ int main()
     else
         asm("OUTS", "pre DEC broken\n");
     
+    // equals in expr
+    z = 36;
+    z = (x = 5);
+    if (z==5 && x==5)
+        asm("OUTS", "equals in expr works\n");
+    else
+        asm("OUTS", "equals in expr broken\n");
     return 0;
 }

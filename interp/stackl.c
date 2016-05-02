@@ -89,7 +89,6 @@ int main(int argc, char **argv)
 
     Process_Args(argc, argv);
 
-
     Init_Machine(Memory_Size);
     Init_IO(Use_Inp_Instr);
     if (Use_PIO_Term) PIO_T_Init();

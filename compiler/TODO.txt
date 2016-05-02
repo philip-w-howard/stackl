@@ -1,34 +1,27 @@
-Couldn't open <io.h   Need to fix error message.
+Add semantic checks
+    function param number and type
 
-Fix the broken tests
+implement "#pragma once" behavior
+
+Use pragmas for interrupt and systrap specification
+
+Always supply __startup behavior: main(); exit();
+
+Implement machine check interrupt vector. User mode machine checks trap, OS mode machine checks halt.
+
+Allow int <--> ptr conversions, but prohibit others
+    Implement cast syntax? or just default conversion?
+
 figure out gcc generating dependencies
 
 const optimizations
+
 multi-D arrays
    mBaseType for multi-D arrays is not correct
    mBaseType for cArrayRef[3][2] on second index
 
 redo test suite
 
-Add semantic checks
-
-cSymbol has Decl
-    types: cTypeDecl
-    func:  cFuncDecl
-        return type
-    var:   cVarDecl
-        base type
-
-cExpr
-    GetType
-        Binary: result type
-        Int:    sym("int")->GetDecl
-        Var:    mType->GetDecl
-
-expr should include assign as operators
-    Test assign operator expr in other expr
-
-throw semantic_error on ',' in expr list
 
 allow structs separate from typedef?
 
