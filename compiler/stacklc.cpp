@@ -48,8 +48,6 @@ extern cDeclsList *yyast_root;
 char Input_File[200] = "";
 int  Do_Debug = 0;
 int  Do_Ast = 0;
-int  Do_Boot_Code = 0;
-
 void Process_Args(int argc, char **argv)
 {
     for (int ii=1; ii<argc; ii++)
@@ -61,8 +59,6 @@ void Process_Args(int argc, char **argv)
                 Do_Debug = 1;
             else if (strcmp(arg, "ast") == 0)
                 Do_Ast = 1;
-            else if (strcmp(arg, "boot") == 0)
-                Do_Boot_Code = 1;
             else if (strcmp(arg, "version") == 0)
             {
                 std::cout << "stacklc " << VERSION << " " <<__DATE__ << " " 
@@ -71,7 +67,7 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                std::cout << "stacklc -help -version -boot -yydebug -debug -ast <file>\n";
+                std::cout << "stacklc -help -version -yydebug -debug -ast <file>\n";
                 exit(0);
             }
             else if (strcmp(arg, "yydebug") == 0)
@@ -144,19 +140,6 @@ int main(int argc, char **argv)
     symbolTableRoot->InitDefaultTable();
     cDeclsList *program = NULL;
     int total_errors = 0;
-
-    char startup[PATH_MAX];
-    strcpy(startup, Include_Path);
-    strcat(startup, "startup.h");
-    if (Do_Boot_Code)
-    {
-        symbolTableRoot->InsertRoot("$$interrupt", new cSymbol("interrupt"));
-        symbolTableRoot->InsertRoot("$$systrap", new cSymbol("systrap"));
-    }
-    else
-    {
-        //result = process_file(startup, &program, &total_errors);
-    }
 
     if (result == 0) process_file(Input_File, &program, &total_errors);
 

@@ -36,12 +36,18 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
     else
         EmitInst(".data", -1);
 
-    EmitInst("JUMP", "__startup");
+    cSymbol *startup = symbolTableRoot->Lookup("$$startup");
+    if (startup != nullptr)
+        EmitInst("JUMP",  startup->Name());
+    else
+    {
+        EmitInst("JUMP", "__startup");
 
-    EmitLabel("__startup");
-    EmitInst("CALL", "main");
-    EmitInst("POP");
-    EmitInst("HALT");
+        EmitLabel("__startup");
+        EmitInst("CALL", "main");
+        EmitInst("POP");
+        EmitInst("HALT");
+    }
 }
 
 cCodeGen::~cCodeGen()

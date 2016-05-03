@@ -32,6 +32,7 @@
 #include "cPointerDeref.h"
 #include "cPointerType.h"
 #include "cPostfixExpr.h"
+#include "cPragma.h"
 #include "cPrefixExpr.h"
 #include "cReturnStmt.h"
 #include "cShortCircuitExpr.h"

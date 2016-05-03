@@ -60,7 +60,7 @@
 %token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
-%token  PRAGMA ONCE INTERRUPT SYSTRAP
+%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP
 
 %type <decl_list>       program
 
@@ -226,17 +226,28 @@ global_decl: func_decl
                 $1->SetGlobal();
                 $$ = $1; 
             }
-        |   PRAGMA ONCE { 
-                            if (process_once()) 
-                            {
-                                yyerror("'#pragma once' in main source file");
-                                YYABORT; 
-                            }
+        |   PRAGMA ONCE { $$ = new cPragma("once", "");
+                          if (process_once()) 
+                          {
+                              yyerror("'#pragma once' in main source file");
+                              YYABORT; 
+                          }
                         }
         |   PRAGMA INTERRUPT IDENTIFIER 
-                        { symbolTableRoot->InsertRoot("$$interrupt", $3); }
+                        { 
+                            $$ = new cPragma("interrupt", $3->Name());
+                            symbolTableRoot->InsertRoot("$$interrupt", $3); 
+                        }
         |   PRAGMA SYSTRAP IDENTIFIER 
-                        { symbolTableRoot->InsertRoot("$$systrap", $3); }
+                        { 
+                            $$ = new cPragma("systrap", $3->Name());
+                            symbolTableRoot->InsertRoot("$$systrap", $3); 
+                        }
+        |   PRAGMA STARTUP IDENTIFIER 
+                        {
+                            $$ = new cPragma("startup", $3->Name());
+                            symbolTableRoot->InsertRoot("$$startup", $3); 
+                        }
         | error ';'
             { $$ = NULL; }
 func_decl:  func_header ';'

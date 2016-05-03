@@ -136,6 +136,17 @@ void cAstXml::Visit(cPostfixExpr *node)
     string attr = " op=\"" + node->OpToString() + "\" ";
     DefaultVisit(node, "PostfixExpr", attr);
 }
+void cAstXml::Visit(cPragma *node)
+{
+    string attr = " name=\"" + node->GetOp() + "\" ";
+    
+    if (node->GetArg().length() > 0)
+    {
+        attr += " arg=\"" + node->GetArg() + "\" ";
+    }
+    DefaultVisit(node, "Pragma", attr);             
+}
+
 void cAstXml::Visit(cPrefixExpr *node)
 {
     string attr = " op=\"" + node->OpToString() + "\" ";

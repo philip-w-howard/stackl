@@ -1,11 +1,9 @@
+The following two lines cause a stacklc segfault. May need to invent a pramga node to fix this
+#define IO_COMPLETE 0x800F0000
+#pragma startup startup__
+
 Add semantic checks
     function param number and type
-
-implement "#pragma once" behavior
-
-Use pragmas for interrupt and systrap specification
-
-Always supply __startup behavior: main(); exit();
 
 Implement machine check interrupt vector. User mode machine checks trap, OS mode machine checks halt.
 

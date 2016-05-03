@@ -2,6 +2,7 @@
 #include "machine.h"
 
 void Init_Memory(int mem_size);
+void VM_Enable_Log(int enabled);
 int Mem_Size();
 
 int Get_Word(Machine_State *regs, int address);

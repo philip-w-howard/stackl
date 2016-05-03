@@ -9,7 +9,22 @@
 
 static char *Memory;
 static int  Memory_Size = DEFAULT_MEMORY_SIZE;
-
+static FILE *Mem_Log = NULL;
+static int Log_Enabled = 0;
+//***************************************
+static void write_log(int address, int value, char *label)
+{
+    if (Log_Enabled)
+    {
+        if (Mem_Log == NULL) Mem_Log = fopen("mem.log", "w");
+        fprintf(Mem_Log, "%5d %8d %08X %s\n", address, value, value, label);
+    }
+}
+//***************************************
+void VM_Enable_Log(int enabled)
+{
+    Log_Enabled = enabled;
+}
 //***************************************
 int Mem_Size()
 {
@@ -53,14 +68,14 @@ int Get_Word(Machine_State *cpu, int address)
     else
         value = IO_Get_Word(address);
 
-    //fprintf(Mem_Log, "%5d %8d %08X Get_Word\n", address, value, value);
+    write_log(address, value, "Get_Word");
     return value;
 }
 //***************************************
 void Set_Word(Machine_State *cpu, int address, int value)
 {
     address = validate_address(cpu, address, 0);
-    //fprintf(Mem_Log, "%5d %8d %08X Set_Word\n", address, value, value);
+    write_log(address, value, "Set_Word");
     if (address < Memory_Size)
         *(int *)&Memory[address] = value;
     else
@@ -77,14 +92,14 @@ int Get_Byte(Machine_State *cpu, int address)
     else
         value = IO_Get_Byte(address);
 
-    //fprintf(Mem_Log, "%5d %8d %08X Get_Byte\n", address, value, value);
+    write_log(address, value, "Get_Byte");
     return value;
 }
 //***************************************
 void Set_Byte(Machine_State *cpu, int address, int value)
 {
     address = validate_address(cpu, address, 1);
-    //fprintf(Mem_Log, "%5d %8d %08X Set_Byte\n", address, value, value);
+    write_log(address, value, "Set_Byte");
     if (address < Memory_Size)
         Memory[address] = value;
     else
@@ -95,7 +110,7 @@ void *Get_Addr(Machine_State *cpu, int address)
 {
     //int value = Get_Word(address);
     address = validate_address(cpu, address, 1);
-    //fprintf(Mem_Log, "%5d %8d %08X Get_Addr\n", address, value, value);
+    write_log(address, 0, "Get_Addr");
     return &Memory[address];
 }
 //***************************************
