@@ -176,7 +176,7 @@ void cAstXml::Visit(cStmtsList *node)
 }
 void cAstXml::Visit(cStringLit *node)
 {
-    string attr = " value=" + node->GetString() + " ";
+    string attr = " value=\"" + node->GetString() + "\" ";
     DefaultVisit(node, "StringLit", attr);
 }
 void cAstXml::Visit(cStructDeref *node)

@@ -3,21 +3,20 @@ RELEASE  = ~/bin
 # RELEASE  = release
 EXTRA_INCLUDES = \
 	   system.h \
-	   syscodes.h \
 	   opcode_defs.h \
-	   pio_term.h \
 	   dma_term.h \
 	   disk.h \
 
-INCLUDES = startup.h \
-	   string.h \
+INCLUDES = string.h \
 	   machine_def.h \
+	   syscodes.h \
+	   pio_term.h \
 
 GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
 
 .PHONY: compiler interp utils
 
-all: version compiler interp utils execs
+all: version compiler interp utils includes execs
 
 release: all
 	cp copy2disk $(RELEASE)
@@ -56,9 +55,13 @@ execs: compiler interp
 	cp compiler/stacklc .
 	cp interp/slasm .
 	cp interp/stackl .
-	cp interp/machine_def.h .
 	cp utils/makebin .
 	cp utils/copy2disk .
+
+includes:
+	cp interp/syscodes.h .
+	cp interp/machine_def.h .
+	cp interp/pio_term.h .
 
 extra_includes: compiler interp 
 	cp interp/syscodes.h .

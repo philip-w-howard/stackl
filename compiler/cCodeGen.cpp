@@ -7,11 +7,31 @@
 #include "lex.h"
 #include "cCodeGen.h"
 #include "cGenAddr.h"
+#include "../version.h"
 
 using std::string;
 
 const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
+void cCodeGen::Write_Header()
+{
+    int feature_index = 0;
+    string feature_name;
+    cSymbol *feature;
+
+    m_Output << "#stackl " << VERSION << std::endl;
+
+    feature_name = "$$feature" + std::to_string(feature_index++);
+    while ((feature = symbolTableRoot->Lookup(feature_name)) != nullptr)
+    {
+        m_Output << "#" << feature->Name() << std::endl;
+        feature_name = "$$feature" + std::to_string(feature_index++);
+    }
+
+    m_Output << "#begindata" << std::endl;
+}
+
+//***********************************
 cCodeGen::cCodeGen(string filename) : cVisitor()
 {
     m_Output.open(filename);
@@ -22,6 +42,8 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
 
     m_Filename = filename;
     m_GenAddr = new cGenAddr(this);
+
+    Write_Header();
 
     // Leave room for ISR address (if any)
     cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
@@ -426,14 +448,14 @@ void cCodeGen::Visit(cUnaryExpr *node)
 
 void cCodeGen::Visit(cVarDecl *node)
 {
-    // NOTE: we explicitly avoit visiting children
+    // NOTE: we explicitly avoid visiting children
 
     // If global, emit label and allocate space
     if (node->IsGlobal())
     {
         EmitInst(".dataseg");
         EmitLabel(node->GetName()->Name());
-        if (node->IsConst())
+        if (node->IsConst() || node->HasInit())
         {
             EmitInst(".data", node->GetInit()->ConstValue());
         }

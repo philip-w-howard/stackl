@@ -74,4 +74,6 @@ class cCodeGen : public cVisitor
         cGenAddr *m_GenAddr;
 
         static const int STACK_FRAME_SIZE = 8;
+
+        void Write_Header();
 };

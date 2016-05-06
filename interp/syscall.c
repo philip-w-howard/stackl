@@ -8,6 +8,8 @@
 #include "sched.h"
 #include "io_handler.h"
 
+#error "No longer used"
+
 static int Syscall_Do_Debug = 0;
 
 void Syscall_Debug()

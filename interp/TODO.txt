@@ -1,1 +1,7 @@
+File format:
+header
+  stackl version
+  options
+  #startdata
+data
 Use <stdint.> to force size of things.

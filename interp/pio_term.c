@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#include "pio_term.h"
+#include "pio_term_int.h"
 #include "machine.h"
 #include "io_handler.h"
 
@@ -21,6 +21,8 @@ static volatile int XDR_Reg;
 static volatile int IER_Reg;
 static volatile int IIR_Reg;
 static volatile int XDR_Written;
+
+static void PIO_T_Finish();
 
 //************************************************
 // Enable/Disable nonblocking mode
@@ -82,6 +84,7 @@ static void *terminal_output(void *arg)
             usleep(10);       // ~100000 baud
             fputc(XDR_Reg, stdout);
             fflush(stdout);
+            //fprintf(stderr, "pio out: %c\n", XDR_Reg);
 
             pthread_mutex_lock(&IO_Q_Lock);
 
@@ -134,7 +137,7 @@ static int get_byte(int id, int addr)
 
     pthread_mutex_unlock(&IO_Q_Lock);
 
-    //printf("pio_term get_byte: %X %X\n", addr, value);
+    //fprintf(stderr, "pio_term get_byte: %X %X\n", addr, value);
 
     return value;
 }
@@ -149,7 +152,7 @@ static void set_byte(int id, int addr, int value)
 {
     pthread_mutex_lock(&IO_Q_Lock);
 
-    //printf("pio_term set byte: %X %X\n", addr, value);
+    //fprintf(stderr, "pio_term set byte: %X %X\n", addr, value);
 
     if (addr == 0) 
     {
@@ -188,16 +191,16 @@ int PIO_T_Init()
     IO_Register_Handler(0, PIO_T_RDR, 8,
             get_word, get_byte, set_word, set_byte);
 
+    atexit(PIO_T_Finish);
+
     return 0;
 }
 //*************************************
-int PIO_T_Finish()
+static void PIO_T_Finish()
 {
     IO_Q_Halt_Thread = 1;
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread_1, NULL);
     pthread_join(IO_Q_Thread_2, NULL);
     set_nonblock(0);
-
-    return 0;
 }

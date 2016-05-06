@@ -38,11 +38,11 @@ class cPrefixExpr : public cExpr
             case '-':
                 return "--";
             default:
-                fatal_error("Unrecognized postfix operator");
+                fatal_error("Unrecognized prefix operator");
                 break;
         }
 
-        return "unrecognized postfix op ";
+        return "unrecognized prefix op ";
     }
 
     cVarRef* GetExpr()  { return (cVarRef*)GetChild(0); }

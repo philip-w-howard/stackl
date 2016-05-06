@@ -188,6 +188,15 @@ static void set_byte(int id, int addr, int value)
     Machine_Check("Disk: illegal byte register access");
 }
 //*************************************
+static void Disk_Finish()
+{
+    IO_Q_Halt_Thread = 1;
+    pthread_cond_signal(&IO_Q_Cond);
+    pthread_join(IO_Q_Thread, NULL);
+
+    close_disk();
+}
+//*************************************
 int Disk_Init()
 {
     IO_Q_Halt_Thread = 0;
@@ -199,16 +208,7 @@ int Disk_Init()
     IO_Register_Handler(0, DISK_STATUS, 16,
             get_word, get_byte, set_word, set_byte);
 
-    return 0;
-}
-//*************************************
-int Disk_Finish()
-{
-    IO_Q_Halt_Thread = 1;
-    pthread_cond_signal(&IO_Q_Cond);
-    pthread_join(IO_Q_Thread, NULL);
-
-    close_disk();
+    atexit(Disk_Finish);
 
     return 0;
 }

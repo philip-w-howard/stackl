@@ -7,6 +7,9 @@
 #include "machine.h"
 #include "vmem.h"
 #include "loader.h"
+#include "io_handler.h"
+#include "dma_term.h"
+#include "pio_term_int.h"
 #include "disk.h"
 #include "formatstr.h"
 
@@ -165,7 +168,9 @@ int Load_Text(const char *filename)
     return max_byte;
 }
 
-int Load(const char *filename)
+//*************************************************
+// Load a binary file (.slb)
+int Load(const char *filename, int boot)
 {
     int top;
     int value;
@@ -173,6 +178,8 @@ int Load(const char *filename)
     int max_addr = 0;
     FILE *input = fopen(filename, "r");
     char string[256];
+    char *token;
+    const char *delims = " \n";
 
     Machine_State cpu;
     Get_Machine_State(&cpu);
@@ -185,6 +192,38 @@ int Load(const char *filename)
         strcat(string, ".slb");
         input = fopen(string, "r");
         if (input == NULL) return 0;
+    }
+
+    fgets(string, sizeof(string), input);
+    token = strtok(string, delims);
+    if (strcmp(token, "stackl") != 0)
+    {
+        fclose(input);
+        return 0;
+    }
+    while (fgets(string, sizeof(string), input))
+    {
+        token = strtok(string, delims);
+        if (strcmp(token, "begindata") == 0) 
+        {
+            break;
+        }
+        else if (boot && strcmp(token, "pio_term") == 0)
+        {
+            PIO_T_Init();
+        }
+        else if (boot && strcmp(token, "dma_term") == 0)
+        {
+            DMA_T_Init();
+        }
+        else if (boot && strcmp(token, "disk") == 0)
+        {
+            Disk_Init();
+        }
+        else if (boot && strcmp(token, "inp") == 0)
+        {
+            IO_Enable_Inp();
+        }
     }
 
     while (fread(&value, 4, 1, input) == 1)
@@ -213,7 +252,7 @@ int Boot(const char *filename)
     cpu.FP = cpu.SP;
     Set_Machine_State(&cpu);
 
-    top = Load(filename);
+    top = Load(filename, 1);
     if (top == 0) return 1;
 
     cpu.SP = top + WORD_SIZE;

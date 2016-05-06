@@ -35,6 +35,7 @@ class cVarDecl : public cDecl
         mOffset     = 0;
         mIsGlobal   = false;
         mHasInit    = false;
+        mIsConst    = false;
     }
 
     cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl()
@@ -68,10 +69,12 @@ class cVarDecl : public cDecl
         mHasInit = true;
     }
     void SetGlobal()        { mIsGlobal = true; }
+    void SetConst()         { mIsConst = true; }
 
     virtual bool IsGlobal() { return mIsGlobal; }
     virtual bool IsConst()  
-        { return GetInit()!=nullptr && GetInit()->IsConst(); }
+        { return mIsConst; }
+        //{ return GetInit()!=nullptr && GetInit()->IsConst(); }
 
     virtual bool IsVar()    { return true; }
 
@@ -89,5 +92,6 @@ class cVarDecl : public cDecl
     int       mOffset;
     bool      mIsGlobal;
     bool      mHasInit;
+    bool      mIsConst;
 };
 

@@ -1,6 +1,4 @@
-The following two lines cause a stacklc segfault. May need to invent a pramga node to fix this
-#define IO_COMPLETE 0x800F0000
-#pragma startup startup__
+Add pragmas for IO config?
 
 Add semantic checks
     function param number and type
@@ -17,6 +15,7 @@ const optimizations
 multi-D arrays
    mBaseType for multi-D arrays is not correct
    mBaseType for cArrayRef[3][2] on second index
+      taking sizeof cell to be same as sizeof row
 
 redo test suite
 

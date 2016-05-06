@@ -5,7 +5,7 @@
 #include "loader.h"
 #include "io_handler.h"
 #include "dma_term.h"
-#include "pio_term.h"
+#include "pio_term_int.h"
 #include "disk.h"
 #include "../version.h"
 
@@ -20,7 +20,8 @@ static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
 
 static const char *HELP_STR =
- "stackl [-opcodes] [-help] [-version] [-loader]\n"
+ "stackl [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
+ "       [-opcodes] [-help] [-version] [-loader]\n"
  "       [-M<mem size>] [-N<num instr>] [-T<timer interval>]\n";
 
 void Process_Args(int argc, char **argv)
@@ -91,10 +92,21 @@ int main(int argc, char **argv)
 
     Init_Machine(Memory_Size);
     Init_IO(Use_Inp_Instr);
-    if (Use_PIO_Term) PIO_T_Init();
-    if (Use_DMA_Term) DMA_T_Init();
-    if (Use_Disk) Disk_Init();
 
+    if (Use_PIO_Term) 
+    {
+        PIO_T_Init();
+    }
+
+    if (Use_DMA_Term) 
+    {
+        DMA_T_Init();
+    }
+
+    if (Use_Disk) 
+    {
+        Disk_Init();
+    }
 
     if (Boot_Disk && Use_Disk)
     {
@@ -116,11 +128,6 @@ int main(int argc, char **argv)
     }
 
     Machine_Execute();
-
-    if (Use_Disk) Disk_Finish();
-    if (Use_DMA_Term) DMA_T_Finish();
-    if (Use_PIO_Term) PIO_T_Finish();
-    Finish_IO();
 
     return 0;
 }

@@ -16,4 +16,3 @@
 #define DMA_T_CMD_START_WRITE   0x00000004
 
 int DMA_T_Init();
-int DMA_T_Finish();

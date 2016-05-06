@@ -19,5 +19,4 @@
 #define DISK_BLOCK_SIZE        1024
 
 int Disk_Init();
-int Disk_Finish();
 int Disk_Load_Boot_Block();

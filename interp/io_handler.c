@@ -99,9 +99,14 @@ static void *IO_Processor(void *arg)
                         Machine_Check("Invalid IO code: %d", io_op);
                     break;
                 case EXEC_CALL:
-                    status = Load( (char *)addr );
-                    if (status == 0) io_op |= IO_ERROR;
-                    Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
+                    if (Allow_INP_Instr)
+                    {
+                        status = Load( (char *)addr, 0);
+                        if (status == 0) io_op |= IO_ERROR;
+                        Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
+                    }
+                    else
+                        Machine_Check("Invalid IO code: %d", io_op);
                     break;
                 default:
                     Machine_Check("Invalid IO code: %d", io_op);
@@ -120,6 +125,18 @@ static void *IO_Processor(void *arg)
     return NULL;
 }
 //*************************************
+static void Finish_IO()
+{
+    IO_Q_Halt_Thread = 1;
+    pthread_cond_signal(&IO_Q_Cond);
+    pthread_join(IO_Q_Thread, NULL);
+}
+//*************************************
+void IO_Enable_Inp()
+{
+    Allow_INP_Instr = 1;
+}
+//*************************************
 void Init_IO(int allow_INP)
 {
     Allow_INP_Instr = allow_INP;
@@ -133,13 +150,8 @@ void Init_IO(int allow_INP)
     Handler_List = (handler_t *)malloc(sizeof(handler_t));
     assert(Handler_List != NULL);
     Handler_List->next = NULL;
-}
-//*************************************
-void Finish_IO()
-{
-    IO_Q_Halt_Thread = 1;
-    pthread_cond_signal(&IO_Q_Cond);
-    pthread_join(IO_Q_Thread, NULL);
+
+    atexit(Finish_IO);
 }
 //*************************************
 void Schedule_IO(Machine_State *cpu, int io_blk_addr)
@@ -184,7 +196,8 @@ int IO_Get_Word(int address)
     if (handler != NULL)
         return handler->get_word(handler->id, address - handler->addr);
     else
-        return 0xFFFFFFFF;
+        Machine_Check("Get from invalid IO word address: 0X%08X\n", address);
+    return 0xFFFFFFFF;
 }
 //*************************************
 void IO_Set_Word(int address, int value)
@@ -194,6 +207,10 @@ void IO_Set_Word(int address, int value)
     {
         handler->set_word(handler->id, address - handler->addr, value);
     }
+    else
+    {
+        Machine_Check("Set to invalid IO word address: 0X%08X\n", address);
+    }
 }
 //*************************************
 int IO_Get_Byte(int address)
@@ -202,7 +219,8 @@ int IO_Get_Byte(int address)
     if (handler != NULL)
         return handler->get_byte(handler->id, address - handler->addr);
     else
-        return 0xFF;
+        Machine_Check("Get from invalid IO byte address: 0X%08X\n", address);
+    return 0xFF;
 }
 //*************************************
 void IO_Set_Byte(int address, int value)
@@ -211,6 +229,10 @@ void IO_Set_Byte(int address, int value)
     if (handler != NULL) 
     {
         handler->set_byte(handler->id, address - handler->addr, value);
+    }
+    else
+    {
+        Machine_Check("Set to invalid IO byte address: 0X%08X\n", address);
     }
 }
 //*************************************

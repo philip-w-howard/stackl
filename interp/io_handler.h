@@ -16,8 +16,9 @@ typedef struct
 } io_blk;
 
 void Init_IO(int allow_INP);
-void Finish_IO();
 void Schedule_IO(Machine_State *cpu, int io_blk_addr);
+void IO_Enable_Inp();
+
 int IO_Get_Word(int address);
 void IO_Set_Word(int address, int value);
 int IO_Get_Byte(int address);

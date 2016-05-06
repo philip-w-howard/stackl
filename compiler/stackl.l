@@ -77,6 +77,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 <DO_PRAGMA>"interrupt"  BEGIN(INITIAL); Return(INTERRUPT);
 <DO_PRAGMA>"systrap"    BEGIN(INITIAL); Return(SYSTRAP);
 <DO_PRAGMA>"startup"    BEGIN(INITIAL); Return(STARTUP);
+<DO_PRAGMA>"feature"    BEGIN(INITIAL); Return(FEATURE);
 <DO_PRAGMA>[ \t]+       {}
 <DO_PRAGMA>"\n"         BEGIN(INITIAL);
 <DO_PRAGMA>.            Return(JUNK_TOKEN);   // discard anything not recognized

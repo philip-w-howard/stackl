@@ -12,6 +12,7 @@ static int g_Num_Errors = 0;
 static int g_Line_Num = 0;
 static int* g_Memory;
 static int* g_Data_Memory;
+static char g_Header[2048] = "";
 static int g_Memory_Index;
 static int g_Data_Memory_Index;
 static int g_Use_Data = 0;
@@ -448,6 +449,14 @@ static void write_output(char *in_filename)
         exit(1);
     }
 
+    status = fprintf(bin_file, g_Header);
+    if (status < 0)
+    {
+        fprintf(stderr, "Unable to create output file\n");
+        fclose(bin_file);
+        exit(1);
+    }
+
     status = fwrite(g_Memory, 
             (g_Memory_Index + g_Data_Memory_Index) * sizeof(int), 
             1, bin_file);
@@ -500,6 +509,8 @@ int main(int argc, char** argv)
 
         if (line[0] == '.') 
             process_dot_cmd(line);
+        else if (line[0] == '#')
+            strcat(g_Header, &line[1]);
         else if (strchr(line, ':') != NULL)
             process_label(line);
         else

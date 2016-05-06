@@ -34,6 +34,7 @@
     int semantic_error(std::string msg);
 
     cDeclsList *yyast_root = NULL;
+    int g_Feature = 0;
 %}
 
 %start  program
@@ -60,7 +61,7 @@
 %token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
-%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP
+%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP FEATURE
 
 %type <decl_list>       program
 
@@ -208,6 +209,7 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl(type, $2);
                 var->SetInit(new cIntExpr($3));
                 var->SetGlobal();
+                var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
             }
@@ -218,6 +220,7 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl(type, $2);
                 var->SetInit(new cIntExpr(-$4));
                 var->SetGlobal();
+                var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
             }
@@ -247,6 +250,13 @@ global_decl: func_decl
                         {
                             $$ = new cPragma("startup", $3->Name());
                             symbolTableRoot->InsertRoot("$$startup", $3); 
+                        }
+        |   PRAGMA FEATURE IDENTIFIER 
+                        {
+                            $$ = new cPragma("feature", $3->Name());
+                            string feature = "$$feature" + 
+                                std::to_string(g_Feature++);
+                            symbolTableRoot->InsertRoot(feature, $3); 
                         }
         | error ';'
             { $$ = NULL; }

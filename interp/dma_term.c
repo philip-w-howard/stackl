@@ -119,6 +119,13 @@ static void set_byte(int id, int addr, int value)
 {
 }
 //*************************************
+static void DMA_T_Finish()
+{
+    IO_Q_Halt_Thread = 1;
+    pthread_cond_signal(&IO_Q_Cond);
+    pthread_join(IO_Q_Thread, NULL);
+}
+//*************************************
 int DMA_T_Init()
 {
     IO_Q_Halt_Thread = 0;
@@ -128,14 +135,6 @@ int DMA_T_Init()
     IO_Register_Handler(0, DMA_T_STATUS, 16,
             get_word, get_byte, set_word, set_byte);
 
-    return 0;
-}
-//*************************************
-int DMA_T_Finish()
-{
-    IO_Q_Halt_Thread = 1;
-    pthread_cond_signal(&IO_Q_Cond);
-    pthread_join(IO_Q_Thread, NULL);
-
+    atexit(DMA_T_Finish);
     return 0;
 }

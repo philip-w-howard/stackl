@@ -18,13 +18,13 @@ int main()
     {
         for (jj=0; jj<2; jj++)
         {
-            prints("Setting ");
-            printi(ii);
-            prints(" ");
-            printi(jj);
-            prints(" to ");
-            printi(index);
-            prints("\n");
+            //prints("Setting ");
+            //printi(ii);
+            //prints(" ");
+            //printi(jj);
+            //prints(" to ");
+            //printi(index);
+            //prints("\n");
             asm("NOP");
             asm("NOP");
             asm("NOP");
@@ -34,9 +34,9 @@ int main()
         }
     }
 
-    prints("Index reached ");
-    printi(index);
-    prints("\n");
+    //prints("Index reached ");
+    //printi(index);
+    //prints("\n");
 
     index--;
     while (index > 0)
@@ -45,15 +45,15 @@ int main()
         if (datap[index] != index+1) 
         {
             prints("Error at offset ");
-            printi(index);
-            prints(" ");
-            printi(datap[index]);
+            //printi(index);
+            //prints(" ");
+            //printi(datap[index]);
             prints("\n");
         }
         else
         {
             prints("Data at index ");
-            printi(index);
+            //printi(index);
             prints(" is OK\n");
         }
     }
