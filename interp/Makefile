@@ -9,6 +9,7 @@ OBJS=stackl.o \
 	 dma_term.o \
 	 pio_term.o \
 	 disk.o \
+	 timer.o \
 	 formatstr.o \
 
 all: stackl slasm

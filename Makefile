@@ -11,6 +11,7 @@ INCLUDES = string.h \
 	   machine_def.h \
 	   syscodes.h \
 	   pio_term.h \
+	   timer.h \
 
 GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
 
@@ -62,6 +63,7 @@ includes:
 	cp interp/syscodes.h .
 	cp interp/machine_def.h .
 	cp interp/pio_term.h .
+	cp interp/timer.h .
 
 extra_includes: compiler interp 
 	cp interp/syscodes.h .

@@ -84,6 +84,8 @@ static opcode_t op_list[] =
     {"popcvar", 1},
     {"trace_on", 0},
     {"trace_off", 0},
+    {"clid", 0},
+    {"seid", 0},
     {"illegal", 0}
 };
 

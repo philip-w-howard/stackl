@@ -10,6 +10,7 @@
 #include "machine.h"
 #include "vmem.h"
 #include "io_handler.h"
+#include "timer.h"
 
 #define WORD_SIZE 4
 #define GET_INTVAL(reg, off) (Get_Word(cpu, cpu-> reg + OFFSET(off)))
@@ -19,7 +20,6 @@
 
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
-int Timer_Interval = 0;
 
 static int debug_break()
 {
@@ -29,11 +29,6 @@ static int debug_break()
 void Opcodes_Debug()
 {
     Do_Debug = 1;
-}
-
-void Set_Timer_Interval(int instr)
-{
-    Timer_Interval = instr;
 }
 
 void Set_Max_Instr(int max)
@@ -138,12 +133,11 @@ void Execute(Machine_State *cpu)
         return;
     }
 
-    if (Timer_Interval > 0 && (num_instructions % Timer_Interval) == 0)
-    {
-        cpu->FLAG |= FL_INT_PENDING;
-    }
+    Timer_Heartbeat();
 
-    if ((cpu->FLAG & FL_INT_PENDING) && !(cpu->FLAG & FL_INT_MODE))
+    if ( (cpu->FLAG & FL_INT_PENDING) && 
+        !(cpu->FLAG & FL_INT_MODE)    &&
+        !(cpu->FLAG & FL_INT_DIS))
     {
         interrupt(cpu, INTERRUPT_VECTOR);
         return;
@@ -332,6 +326,22 @@ void Execute(Machine_State *cpu)
         case PUSHFP_OP:
             DEBUG("PUSHFP %d", cpu->FP);
             SET_INTVAL(SP, 0, cpu->FP);
+            INC(SP, 1);
+            INC(IP, 1);
+            break;
+        case CLID_OP:
+            DEBUG("CLID");
+            check_priv(cpu, "CLID");
+            SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
+            cpu->FLAG &= ~FL_INT_DIS;
+            INC(SP, 1);
+            INC(IP, 1);
+            break;
+        case SEID_OP:
+            DEBUG("SEID");
+            check_priv(cpu, "SEID");
+            SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
+            cpu->FLAG |= FL_INT_DIS;
             INC(SP, 1);
             INC(IP, 1);
             break;

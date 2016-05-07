@@ -1,5 +1,5 @@
 #!/bin/bash
-for test in `seq 1 36`; do
+for test in `seq 1 37`; do
     test/runc test$test
 done
 

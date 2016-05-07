@@ -51,4 +51,6 @@
 #define POPCVAR_OP 50
 #define TRACE_ON_OP 51
 #define TRACE_OFF_OP 52
-#define ILLEGAL_OP 53
+#define CLID_OP 53
+#define SEID_OP 54
+#define ILLEGAL_OP 55

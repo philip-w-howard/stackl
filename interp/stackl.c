@@ -7,6 +7,7 @@
 #include "dma_term.h"
 #include "pio_term_int.h"
 #include "disk.h"
+#include "timer.h"
 #include "../version.h"
 
 // Use PATH_MAX from limits.h?
@@ -22,7 +23,7 @@ static int Use_Inp_Instr = 0;
 static const char *HELP_STR =
  "stackl [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
  "       [-opcodes] [-help] [-version] [-loader]\n"
- "       [-M<mem size>] [-N<num instr>] [-T<timer interval>]\n";
+ "       [-M<mem size>] [-N<num instr>]\n";
 
 void Process_Args(int argc, char **argv)
 {
@@ -61,8 +62,6 @@ void Process_Args(int argc, char **argv)
                 Use_PIO_Term = 1;
                 Use_DMA_Term = 0;
             }
-            else if (argv[ii][1] == 'T')
-                Set_Timer_Interval(atoi(&argv[ii][2]));
             else if (strcmp(arg, "version") == 0)
             {
                 printf("stackl %s %s %s\n", VERSION, __DATE__, __TIME__);
@@ -92,6 +91,7 @@ int main(int argc, char **argv)
 
     Init_Machine(Memory_Size);
     Init_IO(Use_Inp_Instr);
+    Timer_Init();
 
     if (Use_PIO_Term) 
     {

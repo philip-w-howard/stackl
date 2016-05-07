@@ -24,7 +24,7 @@ void IO_Set_Word(int address, int value);
 int IO_Get_Byte(int address);
 void IO_Set_Byte(int address, int value);
 
-int IO_Register_Handler(int start_addr, int size, int id, 
+int IO_Register_Handler(int id, int addr, int size, 
         int (*get_word)(int id, int addr),
         int (*get_byte)(int id, int addr),
         void (*set_word)(int id, int addr, int value),

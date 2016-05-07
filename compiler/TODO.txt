@@ -1,3 +1,12 @@
+test:
+   interrupt: prints
+   seid
+      check return val
+   interrupt
+   cli
+   (interrupt prints)
+    check return val
+
 Add pragmas for IO config?
 
 Add semantic checks
