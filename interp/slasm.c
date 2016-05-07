@@ -17,10 +17,12 @@ static int g_Memory_Index;
 static int g_Data_Memory_Index;
 static int g_Use_Data = 0;
 
+static int g_Make_Listing = 0;
+
 #define NUM_OPCODES (sizeof(op_list)/sizeof(opcode_t))
 static const char *DELIMS = " \t\n";
 static const char *HELP_STR =
- "slasm [-M<mem size>] [-version] <source file>\n";
+ "slasm [-defs] [-M<mem size>] [-version] [-list] <source file>\n";
 
 typedef struct
 {
@@ -270,6 +272,8 @@ static void Process_Args(int argc, char **argv)
                 printf(HELP_STR);
                 exit(0);
             }
+            else if (strcmp(arg, "list") == 0)
+                g_Make_Listing = 1;
             else if (argv[ii][1] == 'M')
                 g_Memory_Size = atoi(&argv[ii][2]);
             else if (strcmp(arg, "version") == 0)
@@ -429,21 +433,29 @@ static void process_asm(char *line)
     }
 }
 
-static void write_output(char *in_filename)
+static char *make_filename(char *in_filename, char *extension)
 {
-    char out_filename[256];
+    static char out_filename[256];
     FILE *bin_file;
     int status;
 
     strcpy(out_filename, in_filename);
     
-    char *extension = strstr(out_filename, ".sl");
-    if (extension != NULL)
-        strcpy(extension, ".slb");
+    char *end_of_root = strstr(out_filename, ".sl");
+    if (end_of_root != NULL)
+        strcpy(end_of_root, extension);
     else
-        strcat(out_filename, ".slb");
+        strcat(out_filename, extension);
 
-    bin_file = fopen(out_filename, "wb");
+    return out_filename;
+}
+
+static void write_output(char *in_filename)
+{
+    FILE *bin_file;
+    int status;
+
+    bin_file = fopen(make_filename(in_filename, ".slb"), "w");
 
     if (bin_file == NULL)
     {
@@ -472,9 +484,34 @@ static void write_output(char *in_filename)
     fclose(bin_file);
 }
 
+static void write_listing(FILE *listing, char *line)
+{
+    int word_size = sizeof(g_Memory[0]);
+    fprintf(listing, "%6d  %6d     %s", 
+            g_Memory_Index*word_size, g_Data_Memory_Index*word_size, line);
+}
+
+static void write_symbol_table(FILE *listing)
+{
+    int word_size = sizeof(g_Memory[0]);
+    int label_address;
+    int ii;
+
+    fprintf(listing, "\n********************************\nSymbol Table\n");
+
+    for (ii=0; ii<g_Num_Label_Defs; ii++)
+    {
+        label_address = g_Label_Defs[ii].offset;
+        if (g_Label_Defs[ii].is_data) label_address += g_Memory_Index;
+        fprintf(listing, "%6d   %s\n", 
+                label_address*word_size, g_Label_Defs[ii].label);
+    }
+}
+
 int main(int argc, char** argv)
 {
     FILE *input;
+    FILE *listing = NULL;
     char  line[1000];
     char *comment;
 
@@ -493,6 +530,16 @@ int main(int argc, char** argv)
         exit(2);
     }
 
+    if (g_Make_Listing)
+    {
+        listing = fopen(make_filename(g_Input_File, ".lst"), "w");
+        if (listing == NULL)
+        {
+            fprintf(stderr, "Unable to open listing file\n");
+            exit(2);
+        }
+    }
+
     g_Memory = (int *)malloc(g_Memory_Size/sizeof(int));
     g_Data_Memory = (int *)malloc(g_Memory_Size/sizeof(int));
     if (g_Memory == NULL || g_Data_Memory == NULL)
@@ -504,6 +551,8 @@ int main(int argc, char** argv)
     while (fgets(line, sizeof(line), input) != NULL)
     {
         g_Line_Num++;
+
+        if (g_Make_Listing) write_listing(listing, line);
 
         // trim comments
         comment = strchr(line, ';');
@@ -538,5 +587,10 @@ int main(int argc, char** argv)
 
     write_output(g_Input_File);
 
+    if (g_Make_Listing) 
+    {
+        write_symbol_table(listing);
+        fclose(listing);
+    }
     return 0;
 }
