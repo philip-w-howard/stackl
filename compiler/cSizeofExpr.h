@@ -11,6 +11,8 @@ class cSizeofExpr : public cExpr
     cSizeofExpr(cExpr *expr) : cExpr() 
     {
         mItemSize = expr->GetType()->Size();
+        AddChild(expr);
+        AddChild(nullptr);
     }
 
     cSizeofExpr(cSymbol *sym) : cExpr()
@@ -21,11 +23,28 @@ class cSizeofExpr : public cExpr
             return;
         }
 
+        AddChild(nullptr);
+        AddChild(sym);
         mItemSize = sym->GetDecl()->GetType()->Size();
     }
 
     virtual bool IsConst() { return true; }
-    virtual int  ConstValue() { return mItemSize; }
+    virtual int  ConstValue() 
+    { 
+        if (GetChild(0) != nullptr)
+        {
+            cExpr *expr = (cExpr*)GetChild(0);
+            mItemSize = expr->GetType()->Size();
+        }
+        else
+        {
+            cSymbol *sym = (cSymbol*)GetChild(1);
+            mItemSize = sym->GetDecl()->GetType()->Size();
+        }
+
+
+        return mItemSize; 
+    }
 
     virtual cTypeDecl *GetType() 
     { 

@@ -107,6 +107,8 @@ static void interrupt(Machine_State *cpu, int vector)
     push(cpu, cpu->IP);
     push(cpu, cpu->FP);
 
+    cpu->FP = cpu->SP;
+
     // go to system mode and interrupt mode
     cpu->FLAG &= ~FL_USER_MODE;
     cpu->FLAG |= FL_INT_MODE;

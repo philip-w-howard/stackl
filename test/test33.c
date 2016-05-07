@@ -1,7 +1,7 @@
 // Test multidimensional arrays
 //
-#include <string.h>
-#include "test/io.h"
+//#include <string.h>
+//#include "test/io.h"
 
 int main()
 {
@@ -44,21 +44,21 @@ int main()
         index--;
         if (datap[index] != index+1) 
         {
-            prints("Error at offset ");
+            //prints("Error at offset ");
             //printi(index);
             //prints(" ");
             //printi(datap[index]);
-            prints("\n");
+            //prints("\n");
         }
         else
         {
-            prints("Data at index ");
+            //prints("Data at index ");
             //printi(index);
-            prints(" is OK\n");
+            //prints(" is OK\n");
         }
     }
 
-    prints("Test complete\n");
+    //prints("Test complete\n");
 
     return 0;
 }
