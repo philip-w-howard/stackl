@@ -86,6 +86,12 @@ cCodeGen::~cCodeGen()
 
 void cCodeGen::VisitAllNodes(cAstNode *node) { node->Visit(this); }
 
+void cCodeGen::EmitLineNumber(cAstNode *node)
+{
+    EmitComment("Source: " + node->SourceFile() + " Line: " +
+            std::to_string(node->LineNumber()) );
+}
+
 void cCodeGen::Visit(cAddressExpr *node)
 {
     cVarRef *var = node->GetVar();
@@ -97,6 +103,7 @@ void cCodeGen::Visit(cAddressExpr *node)
 
 void cCodeGen::Visit(cArrayRef *node)
 {
+    EmitLineNumber(node);
     node->Visit(m_GenAddr);
     if (node->GetType()->ElementSize() == 1)
         EmitInst("PUSHCVARIND");
@@ -109,6 +116,7 @@ void cCodeGen::Visit(cArrayType *node)
 
 void cCodeGen::Visit(cAsmNode *node)
 {
+    EmitLineNumber(node);
     if (node->GetParams() != NULL) node->GetParams()->Visit(this);
     if (node->UsesTwoArgs()) 
         EmitInst(node->GetOp1String(), node->GetOp2());
@@ -118,6 +126,7 @@ void cCodeGen::Visit(cAsmNode *node)
 
 void cCodeGen::Visit(cAssignExpr *node)
 {
+    EmitLineNumber(node);
     node->GetExpr()->Visit(this);
 
     // Need to dup the result in case the assign is treated as an expr
@@ -156,6 +165,7 @@ void cCodeGen::Visit(cExprStmt *node)
 
 void cCodeGen::Visit(cForStmt *node)
 {
+    EmitLineNumber(node);
     std::string start_loop = GenerateLabel();
     std::string end_loop = GenerateLabel();
 
@@ -173,6 +183,7 @@ void cCodeGen::Visit(cForStmt *node)
 
 void cCodeGen::Visit(cFuncCall *node)
 {
+    EmitLineNumber(node);
     if (node->GetParams() != NULL) node->GetParams()->Visit(this);
 
     EmitInst("CALL", node->GetFuncName());
@@ -190,6 +201,7 @@ void cCodeGen::Visit(cFuncCall *node)
 
 void cCodeGen::Visit(cFuncDecl *node)
 {
+    EmitLineNumber(node);
     if (node->IsDefinition())
     {
         EmitComment(node->GetName()->Name() + "\n");
@@ -210,6 +222,7 @@ void cCodeGen::Visit(cFuncDecl *node)
 
 void cCodeGen::Visit(cIfStmt *node)
 {
+    EmitLineNumber(node);
     std::string if_label = GenerateLabel();
     node->GetCond()->Visit(this);
     EmitInst("JUMPE", if_label);
@@ -287,6 +300,7 @@ void cCodeGen::Visit(cPointerDeref *node)
 
 void cCodeGen::Visit(cPostfixExpr *node)
 {
+    EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
     cBinaryExpr *performOp = 
@@ -303,6 +317,7 @@ void cCodeGen::Visit(cPostfixExpr *node)
 
 void cCodeGen::Visit(cPrefixExpr *node)
 {
+    EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
     node->GetExpr()->Visit(this);
@@ -320,6 +335,7 @@ void cCodeGen::Visit(cPrefixExpr *node)
 
 void cCodeGen::Visit(cReturnStmt *node)
 {
+    EmitLineNumber(node);
     if (node->GetExpr() != NULL) 
     {
         node->GetExpr()->Visit(this);
@@ -451,6 +467,7 @@ void cCodeGen::Visit(cVarDecl *node)
     // NOTE: we explicitly avoid visiting children
 
     // If global, emit label and allocate space
+    EmitLineNumber(node);
     if (node->IsGlobal())
     {
         EmitInst(".dataseg");
@@ -472,6 +489,7 @@ void cCodeGen::Visit(cVarDecl *node)
 
 void cCodeGen::Visit(cWhileStmt *node)
 {
+    EmitLineNumber(node);
     std::string start_loop = GenerateLabel();
     std::string end_loop = GenerateLabel();
 
@@ -524,7 +542,7 @@ void cCodeGen::EmitStringLit(string str, string label)
 //*****************************************
 void cCodeGen::EmitComment(string str)
 {
-    m_Output << "; " << m_Location << " " << str << "\n";
+    m_Output << "; " << " " << str << "\n";
 }
 //*****************************************
 void cCodeGen::EmitLabel(string label)

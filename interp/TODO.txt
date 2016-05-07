@@ -1,5 +1,3 @@
 Use <stdint.> to force size of things.
 
 assembler listing file showing addresses and labels
-
-Timer as IO mapped device

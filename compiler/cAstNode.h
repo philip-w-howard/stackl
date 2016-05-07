@@ -19,6 +19,7 @@ using std::vector;
 #include "cVisitor.h"
 
 extern int yylineno;
+extern char yycurrentfile[];
 
 // called to throw a semantic error
 extern int semantic_error(std::string error);
@@ -33,10 +34,12 @@ class cAstNode
         {
             mSemanticError = false;
             mLineNumber = yylineno;
+            mSourceFile = string(yycurrentfile);
         }
 
         // return the source line number from when the node was created
         int LineNumber() { return mLineNumber; }
+        string SourceFile() { return mSourceFile; }
 
         void AddChild(cAstNode *child)
         {
@@ -77,7 +80,7 @@ class cAstNode
         bool mSemanticError;            // This node contains a semantic error
         int mLineNumber;                // line number of source when 
                                         // node was created
-
+        string mSourceFile;             // source file the node was created from
         void ThrowSemanticError(std::string msg)
         {
             semantic_error(msg);
