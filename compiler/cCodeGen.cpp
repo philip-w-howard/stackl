@@ -67,7 +67,6 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
 
         EmitLabel("__startup");
         EmitInst("CALL", "main");
-        EmitInst("POP");
         EmitInst("HALT");
     }
 }

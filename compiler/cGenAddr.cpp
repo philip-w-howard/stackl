@@ -30,7 +30,7 @@ void cGenAddr::Visit(cArrayRef *node)
     {
         m_CodeGen->EmitInst("PLUS");
     } else {
-        m_CodeGen->EmitInst("PUSH", node->GetType()->ElementSize());
+        m_CodeGen->EmitInst("PUSH", node->GetType()->Size());
         m_CodeGen->EmitInst("TIMES");
         m_CodeGen->EmitInst("PLUS");
     }

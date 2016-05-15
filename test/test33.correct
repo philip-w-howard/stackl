@@ -1,10 +1,46 @@
-Setting 0 0 to 1
-Setting 0 1 to 2
-Setting 1 0 to 3
-Setting 1 1 to 4
-Setting 2 0 to 5
-Setting 2 1 to 6
-Index reached 7
+Setting 0 0 0 to 1
+Setting 0 0 1 to 2
+Setting 0 1 0 to 3
+Setting 0 1 1 to 4
+Setting 0 2 0 to 5
+Setting 0 2 1 to 6
+Setting 1 0 0 to 7
+Setting 1 0 1 to 8
+Setting 1 1 0 to 9
+Setting 1 1 1 to 10
+Setting 1 2 0 to 11
+Setting 1 2 1 to 12
+Setting 2 0 0 to 13
+Setting 2 0 1 to 14
+Setting 2 1 0 to 15
+Setting 2 1 1 to 16
+Setting 2 2 0 to 17
+Setting 2 2 1 to 18
+Setting 3 0 0 to 19
+Setting 3 0 1 to 20
+Setting 3 1 0 to 21
+Setting 3 1 1 to 22
+Setting 3 2 0 to 23
+Setting 3 2 1 to 24
+Index reached 25
+Data at index 23 is OK
+Data at index 22 is OK
+Data at index 21 is OK
+Data at index 20 is OK
+Data at index 19 is OK
+Data at index 18 is OK
+Data at index 17 is OK
+Data at index 16 is OK
+Data at index 15 is OK
+Data at index 14 is OK
+Data at index 13 is OK
+Data at index 12 is OK
+Data at index 11 is OK
+Data at index 10 is OK
+Data at index 9 is OK
+Data at index 8 is OK
+Data at index 7 is OK
+Data at index 6 is OK
 Data at index 5 is OK
 Data at index 4 is OK
 Data at index 3 is OK

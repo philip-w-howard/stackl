@@ -27,14 +27,18 @@ class cArrayRef : public cVarRef
             return;
         }
 
-        baseType = baseType->ParentType();
+        if (baseType->IsArray()) baseType = baseType->ParentType();
 
         AddChild(base);
         AddChild(index);
+        AddChild(baseType);
+
+        //baseType = baseType->ParentType();
     }
 
     cVarRef* GetBase()            { return (cVarRef*)GetChild(0); }
-    virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }
+    //virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }
+    virtual cTypeDecl *GetType()  { return (cTypeDecl*)GetChild(2); }
     cExpr* GetIndex()             { return (cExpr*)GetChild(1); }
     virtual bool IsArrayRef()     { return true; }
     virtual bool IsStruct()       { return GetType()->ParentType()->IsStruct();}

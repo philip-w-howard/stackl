@@ -9,67 +9,46 @@
 class cArrayType : public cTypeDecl
 {
   public:
-    cArrayType(cSymbol *name, int size) : cTypeDecl()
+    cArrayType(cTypeDecl *base, int size)
     {
+        std::string name;
+        cSymbol *sym;
+
+        name = base->GetName()->Name() + "[" + std::to_string(size) + "]";
+
+        sym = symbolTableRoot->Lookup(name);
+        if (sym == nullptr) 
+        {
+            sym = new cSymbol(name);
+        }
+
         // FIX THIS: semantic checks
-        AddChild(name);
-        name = symbolTableRoot->InsertRoot(name);
-        name->SetDecl(this);
-        mSize = size;
+        AddChild(sym);
+        sym = symbolTableRoot->Insert(sym);
+        sym->SetDecl(this);
+
+        if (base->IsArray())
+        {
+            cArrayType *baseArray = (cArrayType*)base;
+            AddChild(new cArrayType(baseArray->ParentType(), size));
+            mSize = baseArray->mSize;
+        }
+        else
+        {
+            AddChild(base);
+            mSize = size;
+        }
     }
 
     virtual cTypeDecl *ParentType() 
     {
-        std::string name = GetName()->Name();
-
-        // remove the last "[]"
-        while (name.size() > 0 && name.back() != '[')
-        {
-            name.pop_back();
-        }
-        if (name.back() == '[') name.pop_back();
-
-        cSymbol *sym = symbolTableRoot->Lookup(name);
-        if (sym == NULL) fatal_error("Array type with no base type.");
-
-        return dynamic_cast<cTypeDecl*>(sym->GetDecl());
+        return dynamic_cast<cTypeDecl*>(GetChild(1));
     }
 
     virtual cSymbol* GetName()  { return (cSymbol*)GetChild(0); }
     virtual bool IsArray()      { return true; }
     virtual int  Size()         { return ParentType()->Size() * mSize; }
     virtual int  ElementSize()  { return ParentType()->Size(); }
-
-    static cArrayType *ArrayType(cTypeDecl *base, int size)
-    {
-        std::string name;
-
-        if (base->IsArray())
-        {
-            ArrayType(base->ParentType(), size);
-
-            std::string basename = base->GetName()->Name();
-            name = basename.insert(basename.find("["), 
-                    "[" + std::to_string(size) + "]");
-            size = base->cTypeDecl::Size();
-        }
-        else
-        {
-            name = base->GetName()->Name() + 
-                "[" + std::to_string(size) + "]";
-        }
-
-        cSymbol *sym = symbolTableRoot->Lookup(name);
-        if (sym == nullptr) 
-        {
-            sym = new cSymbol(name);
-            return new cArrayType(sym, size);
-        } else {
-            return dynamic_cast<cArrayType *>(sym->GetDecl());
-        }
-
-        return nullptr;
-    }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

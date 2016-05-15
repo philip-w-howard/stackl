@@ -41,7 +41,12 @@ void cAstXml::Visit(cArrayRef *node)
 }
 void cAstXml::Visit(cArrayType *node)
 {
-    DefaultVisit(node, "ArrayType");
+    string attr("");
+    int size = node->Size() / node->ElementSize();
+
+    attr = " Size=\"" + std::to_string(size) + "\" ";
+
+    DefaultVisit(node, "ArrayType", attr);
 }
 void cAstXml::Visit(cAsmNode *node)
 {

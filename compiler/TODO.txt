@@ -1,3 +1,6 @@
+2D arrays:
+    decl: store element for each dimension
+    ref: pluck off element for each deref
 Add semantic checks
     function param number and type
 

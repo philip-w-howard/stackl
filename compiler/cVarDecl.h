@@ -42,12 +42,12 @@ class cVarDecl : public cDecl
     {
         if (!arraySize->IsConst())
         {
-            ThrowSemanticError("Array dimention must be a const");
+            ThrowSemanticError("Array dimension must be a const");
             return;
         }
 
         int size = arraySize->ConstValue();
-        AddChild(cArrayType::ArrayType(base->GetType(), size));
+        AddChild(new cArrayType(base->GetType(), size));
         AddChild(base->GetName());
         AddChild(arraySize);
         AddChild(nullptr);      // init expr
