@@ -8,6 +8,8 @@
 #include "sched.h"
 #include "io_handler.h"
 
+#error "Obsolete code"
+
 #define NUM_PROCESSES 2
 
 #define EMPTY           0

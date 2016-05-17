@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdint.h>
 
 #include "disk.h"
 #include "machine.h"
@@ -18,10 +19,10 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 static volatile int IO_Q_Halt_Thread = 0;
 static pthread_t IO_Q_Thread;
 
-static int Status;
-static int Command;
-static int Address;
-static int Block;
+static int32_t Status;
+static int32_t Command;
+static int32_t Address;
+static int32_t Block;
 
 static int Disk_fd = -1;
 static const char *Disk_Filename = "stackl.disk";
@@ -135,9 +136,9 @@ static void *disk_device(void *arg)
     return NULL;
 }
 //***********************************
-static int get_word(int id, int addr)
+static int32_t get_word(int32_t id, int32_t addr)
 {
-    int value;
+    int32_t value;
 
     pthread_mutex_lock(&IO_Q_Lock);
 
@@ -158,13 +159,13 @@ static int get_word(int id, int addr)
     return value;
 }
 //***********************************
-static int get_byte(int id, int addr)
+static int32_t get_byte(int32_t id, int32_t addr)
 {
     Machine_Check("Disk: illegal byte register access");
     return 0xFFFFFFFF;
 }
 //***********************************
-static void set_word(int id, int addr, int value)
+static void set_word(int32_t id, int32_t addr, int32_t value)
 {
     pthread_mutex_lock(&IO_Q_Lock);
 
@@ -183,7 +184,7 @@ static void set_word(int id, int addr, int value)
     pthread_mutex_unlock(&IO_Q_Lock);
 }
 //***********************************
-static void set_byte(int id, int addr, int value)
+static void set_byte(int32_t id, int32_t addr, int32_t value)
 {
     Machine_Check("Disk: illegal byte register access");
 }

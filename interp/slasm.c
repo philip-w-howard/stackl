@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdint.h>
 
 #include "formatstr.h"
 #include "../version.h"
@@ -10,8 +11,8 @@ static char g_Input_File[256] = "";
 static int g_Memory_Size = 65536;
 static int g_Num_Errors = 0;
 static int g_Line_Num = 0;
-static int* g_Memory;
-static int* g_Data_Memory;
+static int32_t* g_Memory;
+static int32_t* g_Data_Memory;
 static char g_Header[2048] = "";
 static int g_Memory_Index;
 static int g_Data_Memory_Index;
@@ -98,7 +99,7 @@ typedef struct
 {
     char label[50];
     int  is_data;
-    int  offset;
+    int32_t  offset;
 } label_def_t;
 
 static label_def_t *g_Label_Defs = NULL;
@@ -186,8 +187,8 @@ static label_def_t *get_label_def(char *label)
 static void update_labels()
 {
     int ii;
-    int mem_address;
-    int label_address;
+    int32_t mem_address;
+    int32_t label_address;
 
     label_def_t *label_def;
 
@@ -205,7 +206,7 @@ static void update_labels()
 
         label_address = label_def->offset;
         if (label_def->is_data) label_address += g_Memory_Index;
-        label_address *= sizeof(int);
+        label_address *= sizeof(int32_t);
 
         g_Memory[mem_address] = label_address;
     }
@@ -296,9 +297,9 @@ static void Process_Args(int argc, char **argv)
     }
 }
 
-static int get_op_index(char *op_name)
+static int32_t get_op_index(char *op_name)
 {
-    int ii;
+    int32_t ii;
     for (ii=0; ii<NUM_OPCODES; ii++)
     {
         if (strcasecmp(op_name, op_list[ii].op_name) == 0) return ii;
@@ -307,7 +308,7 @@ static int get_op_index(char *op_name)
     return -1;
 }
 
-static void store(int value)
+static void store(int32_t value)
 {
     if (g_Use_Data)
         g_Data_Memory[g_Data_Memory_Index++] = value;
@@ -317,7 +318,7 @@ static void store(int value)
 
 static void process_data(char *str)
 {
-    int value;
+    int32_t value;
 
     if (str[0] == '$')
         add_label_ref(&str[1]);
@@ -327,9 +328,9 @@ static void process_data(char *str)
 
 static void process_string(char *str)
 {
-    int *int_ptr;
+    int32_t *int_ptr;
     char aligned_str[1000];
-    int ii;
+    int32_t ii;
 
     str = format_string(str);
     if (str == NULL)
@@ -339,10 +340,10 @@ static void process_string(char *str)
     }
 
     strcpy(aligned_str, str);
-    int_ptr = (int *)aligned_str;
+    int_ptr = (int32_t *)aligned_str;
 
     // strlen (including NULL) rounded up to a word size.
-    int str_len = (strlen(aligned_str)+sizeof(int))/sizeof(int);
+    int str_len = (strlen(aligned_str)+sizeof(int32_t))/sizeof(int32_t);
     for (ii=0; ii<str_len; ii++)
     {
         store(int_ptr[ii]);
@@ -401,7 +402,7 @@ static void process_asm(char *line)
 {
     char *op_name;
     char *op_param;
-    int  op_index;
+    int32_t  op_index;
 
     op_name = strtok(line, DELIMS);
     if (op_name == NULL) return;
@@ -472,7 +473,7 @@ static void write_output(char *in_filename)
     }
 
     status = fwrite(g_Memory, 
-            (g_Memory_Index + g_Data_Memory_Index) * sizeof(int), 
+            (g_Memory_Index + g_Data_Memory_Index) * sizeof(int32_t), 
             1, bin_file);
     if (status != 1)
     {
@@ -486,16 +487,16 @@ static void write_output(char *in_filename)
 
 static void write_listing(FILE *listing, char *line)
 {
-    int word_size = sizeof(g_Memory[0]);
+    int32_t word_size = sizeof(g_Memory[0]);
     fprintf(listing, "%6d  %6d     %s", 
             g_Memory_Index*word_size, g_Data_Memory_Index*word_size, line);
 }
 
 static void write_symbol_table(FILE *listing)
 {
-    int word_size = sizeof(g_Memory[0]);
-    int label_address;
-    int ii;
+    int32_t word_size = sizeof(g_Memory[0]);
+    int32_t label_address;
+    int32_t ii;
 
     fprintf(listing, "\n********************************\nSymbol Table\n");
 
@@ -540,8 +541,8 @@ int main(int argc, char** argv)
         }
     }
 
-    g_Memory = (int *)malloc(g_Memory_Size/sizeof(int));
-    g_Data_Memory = (int *)malloc(g_Memory_Size/sizeof(int));
+    g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
+    g_Data_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
     if (g_Memory == NULL || g_Data_Memory == NULL)
     {
         fprintf(stderr, "Out of memory\n");
@@ -573,7 +574,7 @@ int main(int argc, char** argv)
     // append the data memory to the actual memory
     memcpy(&g_Memory[g_Memory_Index], 
             g_Data_Memory, 
-            g_Data_Memory_Index*sizeof(int));
+            g_Data_Memory_Index*sizeof(int32_t));
 
     // fix-up the label references
     update_labels();

@@ -1,16 +1,17 @@
 #pragma once
+#include <stdint.h>
 
 #define INTERRUPT_VECTOR    0
 #define TRAP_VECTOR         1
 
 typedef struct
 {
-    int BP;         // Base Pointer: base addr for mem
-    int LP;         // Limit Pointer: high water mark for mem
-    int IP;         // Instructino Pionter
-    int SP;         // Stack Pointer
-    int FP;         // Frame Pointer
-    int FLAG;       // FLAG register (bits defined above)
+    int32_t BP;         // Base Pointer: base addr for mem
+    int32_t LP;         // Limit Pointer: high water mark for mem
+    int32_t IP;         // Instructino Pionter
+    int32_t SP;         // Stack Pointer
+    int32_t FP;         // Frame Pointer
+    int32_t FLAG;       // FLAG register (bits defined above)
 } Machine_State;
 
 int Is_User_Mode();

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <stdint.h>
 
-#include "syscall.h"
 #include "machine_def.h"
 #include "opcode_defs.h"
 #include "opcodes.h"
@@ -53,13 +53,13 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
 }
 
 //***************************************
-static void push(Machine_State *cpu, int value)
+static void push(Machine_State *cpu, int32_t value)
 {
     Set_Word(cpu, cpu->SP, value);
     cpu->SP += WORD_SIZE;
 }
 //***************************************
-static int pop(Machine_State *cpu)
+static int32_t pop(Machine_State *cpu)
 {
     cpu->SP -= WORD_SIZE;
     return Get_Word(cpu, cpu->SP);
@@ -75,7 +75,7 @@ void check_priv(Machine_State *cpu, char *inst_name)
 //***************************************
 static void do_rti(Machine_State *cpu)
 {
-    int flag;
+    int32_t flag;
     flag = cpu->FLAG;
 
     check_priv(cpu, "RTI");
@@ -92,9 +92,9 @@ static void do_rti(Machine_State *cpu)
         cpu->SP -= cpu->BP;
 }
 //***********************************************
-static void interrupt(Machine_State *cpu, int vector)
+static void interrupt(Machine_State *cpu, int32_t vector)
 {
-    int was_user;
+    int32_t was_user;
 
     was_user = cpu->FLAG & FL_USER_MODE;
 
@@ -126,7 +126,7 @@ static void interrupt(Machine_State *cpu, int vector)
 //***************************************
 void Execute(Machine_State *cpu)
 {
-    int temp;
+    int32_t temp;
     static int num_instructions = 0;
 
     if (++num_instructions >= Max_Instructions) 
@@ -145,7 +145,7 @@ void Execute(Machine_State *cpu)
         return;
     }
 
-    int val = GET_INTVAL(IP, 0);
+    int32_t val = GET_INTVAL(IP, 0);
     
     switch (val)
     {
@@ -366,8 +366,8 @@ void Execute(Machine_State *cpu)
         case TRAPTOC_OP:
             DEBUG("TRAPTOC_OP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             {
-                int args[20];
-                int ii;
+                int32_t args[20];
+                int32_t ii;
                 args[0] = GET_INTVAL(FP, -3);
                 for (ii=1; ii<args[0]; ii++)
                 {

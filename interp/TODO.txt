@@ -1,2 +1,1 @@
-Use <stdint.> to force size of things.
 

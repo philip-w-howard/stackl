@@ -17,7 +17,7 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 
 typedef struct
 {
-    int io_blk_addr;
+    int32_t io_blk_addr;
 } io_op_t;
 
 static io_op_t IO_Q[IO_Q_SIZE];
@@ -28,13 +28,13 @@ static pthread_t IO_Q_Thread;
 
 typedef struct handler_s
 {
-    int id;
-    int addr;
-    int top;
-    int (*get_word)(int id, int addr);
-    int (*get_byte)(int id, int addr);
-    void (*set_word)(int id, int addr, int value);
-    void (*set_byte)(int id, int addr, int value);
+    int32_t id;
+    int32_t addr;
+    int32_t top;
+    int32_t (*get_word)(int32_t id, int32_t addr);
+    int32_t (*get_byte)(int32_t id, int32_t addr);
+    void (*set_word)(int32_t id, int32_t addr, int32_t value);
+    void (*set_byte)(int32_t id, int32_t addr, int32_t value);
     struct handler_s *next;
 } handler_t;
 
@@ -45,9 +45,9 @@ static int Allow_INP_Instr = 0;
 //*************************************
 static void *IO_Processor(void *arg)
 {
-    int io_blk_addr;
-    int io_op;
-    int status;
+    int32_t io_blk_addr;
+    int32_t io_op;
+    int32_t status;
     void *addr;
 
     while (IO_Q_Halt_Thread == 0)
@@ -94,7 +94,7 @@ static void *IO_Processor(void *arg)
                     break;
                 case GETI_CALL:
                     if (Allow_INP_Instr)
-                        scanf("%d", (int *)addr);
+                        scanf("%d", (int32_t *)addr);
                     else
                         Machine_Check("Invalid IO code: %d", io_op);
                     break;
@@ -154,9 +154,9 @@ void Init_IO(int allow_INP)
     atexit(Finish_IO);
 }
 //*************************************
-void Schedule_IO(Machine_State *cpu, int io_blk_addr)
+void Schedule_IO(Machine_State *cpu, int32_t io_blk_addr)
 {
-    int op;
+    int32_t op;
 
     // NOTE: Ignoring queue overflow
     pthread_mutex_lock(&IO_Q_Lock);
@@ -176,7 +176,7 @@ void Schedule_IO(Machine_State *cpu, int io_blk_addr)
 }
 
 //*************************************
-static handler_t *get_handler(int addr)
+static handler_t *get_handler(int32_t addr)
 {
     handler_t *handler;
 
@@ -190,7 +190,7 @@ static handler_t *get_handler(int addr)
     return handler;
 }
 //*************************************
-int IO_Get_Word(int address)
+int32_t IO_Get_Word(int32_t address)
 {
     handler_t *handler = get_handler(address);
     if (handler != NULL)
@@ -200,7 +200,7 @@ int IO_Get_Word(int address)
     return 0xFFFFFFFF;
 }
 //*************************************
-void IO_Set_Word(int address, int value)
+void IO_Set_Word(int32_t address, int32_t value)
 {
     handler_t *handler = get_handler(address);
     if (handler != NULL) 
@@ -213,7 +213,7 @@ void IO_Set_Word(int address, int value)
     }
 }
 //*************************************
-int IO_Get_Byte(int address)
+int32_t IO_Get_Byte(int32_t address)
 {
     handler_t *handler = get_handler(address);
     if (handler != NULL)
@@ -223,7 +223,7 @@ int IO_Get_Byte(int address)
     return 0xFF;
 }
 //*************************************
-void IO_Set_Byte(int address, int value)
+void IO_Set_Byte(int32_t address, int32_t value)
 {
     handler_t *handler = get_handler(address);
     if (handler != NULL) 
@@ -236,11 +236,11 @@ void IO_Set_Byte(int address, int value)
     }
 }
 //*************************************
-int IO_Register_Handler(int id, int addr, int size, 
-        int (*get_word)(int id, int addr),
-        int (*get_byte)(int id, int addr),
-        void (*set_word)(int id, int addr, int value),
-        void (*set_byte)(int id, int addr, int value)
+int32_t IO_Register_Handler(int32_t id, int32_t addr, int32_t size, 
+        int32_t (*get_word)(int32_t id, int32_t addr),
+        int32_t (*get_byte)(int32_t id, int32_t addr),
+        void (*set_word)(int32_t id, int32_t addr, int32_t value),
+        void (*set_byte)(int32_t id, int32_t addr, int32_t value)
         )
 {
     handler_t *handler = (handler_t *)malloc(sizeof(handler_t));

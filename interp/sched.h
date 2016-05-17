@@ -1,6 +1,8 @@
 #pragma once
 #include "machine.h"
 
+#error "Obsolete code"
+
 typedef struct
 {
     int process_id;

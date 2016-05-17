@@ -7,12 +7,12 @@
 
 #define DEFAULT_MEMORY_SIZE  20000
 
-static char *Memory;
+static int8_t *Memory;
 static int  Memory_Size = DEFAULT_MEMORY_SIZE;
 static FILE *Mem_Log = NULL;
 static int Log_Enabled = 0;
 //***************************************
-static void write_log(int address, int value, char *label)
+static void write_log(int32_t address, int32_t value, char *label)
 {
     if (Log_Enabled)
     {
@@ -31,7 +31,7 @@ int Mem_Size()
     return Memory_Size;
 }
 //***************************************
-static int validate_address(Machine_State *regs, int address, int is_char)
+static int validate_address(Machine_State *regs, int32_t address, int is_char)
 {
     if (address < 0)
     {
@@ -58,13 +58,13 @@ static int validate_address(Machine_State *regs, int address, int is_char)
     return address;
 }
 //***************************************
-int Get_Word(Machine_State *cpu, int address)
+int32_t Get_Word(Machine_State *cpu, int32_t address)
 {
-    int value;
+    int32_t value;
 
     address = validate_address(cpu, address, 0);
     if (address < Memory_Size)
-        value = *(int *)&Memory[address];
+        value = *(int32_t *)&Memory[address];
     else
         value = IO_Get_Word(address);
 
@@ -72,19 +72,19 @@ int Get_Word(Machine_State *cpu, int address)
     return value;
 }
 //***************************************
-void Set_Word(Machine_State *cpu, int address, int value)
+void Set_Word(Machine_State *cpu, int32_t address, int32_t value)
 {
     address = validate_address(cpu, address, 0);
     write_log(address, value, "Set_Word");
     if (address < Memory_Size)
-        *(int *)&Memory[address] = value;
+        *(int32_t *)&Memory[address] = value;
     else
         IO_Set_Word(address, value);
 }
 //***************************************
-int Get_Byte(Machine_State *cpu, int address)
+int32_t Get_Byte(Machine_State *cpu, int32_t address)
 {
-    int value;
+    int32_t value;
 
     address = validate_address(cpu, address, 1);
     if (address < Memory_Size)
@@ -96,7 +96,7 @@ int Get_Byte(Machine_State *cpu, int address)
     return value;
 }
 //***************************************
-void Set_Byte(Machine_State *cpu, int address, int value)
+void Set_Byte(Machine_State *cpu, int32_t address, int32_t value)
 {
     address = validate_address(cpu, address, 1);
     write_log(address, value, "Set_Byte");
@@ -106,7 +106,7 @@ void Set_Byte(Machine_State *cpu, int address, int value)
         IO_Set_Byte(address, value);
 }
 //***************************************
-void *Get_Addr(Machine_State *cpu, int address)
+void *Get_Addr(Machine_State *cpu, int32_t address)
 {
     //int value = Get_Word(address);
     address = validate_address(cpu, address, 1);
@@ -118,31 +118,31 @@ void Init_Memory(int mem_size)
 {
     if (mem_size <= 0) mem_size = DEFAULT_MEMORY_SIZE;
     Memory_Size = mem_size;
-    Memory = (char *)malloc(Memory_Size);
+    Memory = (int8_t *)malloc(Memory_Size);
     memset(Memory, 0x79, Memory_Size);
 }
 //***************************************
-int Abs_Get_Word(int address)
+int32_t Abs_Get_Word(int32_t address)
 {
     return Get_Word(NULL, address);
 }
 //***************************************
-void Abs_Set_Word(int address, int value)
+void Abs_Set_Word(int32_t address, int32_t value)
 {
     return Set_Word(NULL, address, value);
 }
 //***************************************
-int Abs_Get_Byte(int address)
+int32_t Abs_Get_Byte(int32_t address)
 {
     return Get_Byte(NULL, address);
 }
 //***************************************
-void Abs_Set_Byte(int address, int value)
+void Abs_Set_Byte(int32_t address, int32_t value)
 {
     return Set_Byte(NULL, address, value);
 }
 //***************************************
-void *Abs_Get_Addr(int address)
+void *Abs_Get_Addr(int32_t address)
 {
     return Get_Addr(NULL, address);
 }

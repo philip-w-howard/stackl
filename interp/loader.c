@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
 #include "machine_def.h"
 #include "opcodes.h"
 #include "machine.h"
@@ -22,7 +24,7 @@ void Loader_Debug()
 
 // set DEBUG to "//" to turn off DEBUG
 #define DEBUG(...) debug_print(__VA_ARGS__);
-static void debug_print(int location, const char *fmt, ...)
+static void debug_print(int32_t location, const char *fmt, ...)
 {
     if (!Do_Debug) return;
 
@@ -35,7 +37,7 @@ static void debug_print(int location, const char *fmt, ...)
     va_end(args);
 }
 
-void MemCpy(int addr, char *sptr)
+void MemCpy(int32_t addr, char *sptr)
 {
     Machine_State cpu;
     Get_Machine_State(&cpu);
@@ -55,22 +57,22 @@ void MemCpy(int addr, char *sptr)
 //int Load(Machine_State *cpu, const char *filename, int base, int top)
 int Load_Text(const char *filename)
 {
-    int base;
-    int top;
-    int loc;
-    int value;
+    int32_t base;
+    int32_t top;
+    int32_t loc;
+    int32_t value;
     char record_type[20];
     char string[256];
     char *sptr;
-    int  slen;
+    int32_t  slen;
 
     Machine_State cpu;
     Get_Machine_State(&cpu);
     base = cpu.BP;
     top  = cpu.LP;
 
-    int byte = base;
-    int max_byte = byte;
+    int32_t byte = base;
+    int32_t max_byte = byte;
     FILE *input = fopen(filename, "r");
 
     if (input == NULL) 
@@ -172,10 +174,10 @@ int Load_Text(const char *filename)
 // Load a binary file (.slb)
 int Load(const char *filename, int boot)
 {
-    int top;
-    int value;
-    int addr;
-    int max_addr = 0;
+    int32_t top;
+    int32_t value;
+    int32_t addr;
+    int32_t max_addr = 0;
     FILE *input = fopen(filename, "r");
     char string[256];
     char *token;
@@ -244,7 +246,7 @@ int Load(const char *filename, int boot)
 
 int Boot(const char *filename)
 {
-    int top;
+    int32_t top;
     Machine_State cpu;
 
     Get_Machine_State(&cpu);

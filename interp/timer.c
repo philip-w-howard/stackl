@@ -8,15 +8,15 @@ static volatile uint32_t Timer_Count_Reg = 0;
 static volatile uint32_t Timer_Limit_Reg = 0xFFFFFFFF;
 
 //***********************************
-static int get_byte(int id, int addr)
+static int32_t get_byte(int32_t id, int32_t addr)
 {
     Machine_Check("timer registers are word wide");
     return 0;
 }
 //***********************************
-static int get_word(int id, int addr)
+static int32_t get_word(int32_t id, int32_t addr)
 {
-    int value;
+    int32_t value;
 
     if (addr == 0) 
     {
@@ -33,12 +33,12 @@ static int get_word(int id, int addr)
     return value;
 }
 //***********************************
-static void set_byte(int id, int addr, int value)
+static void set_byte(int32_t id, int32_t addr, int32_t value)
 {
     Machine_Check("timer registers are word wide");
 }
 //***********************************
-static void set_word(int id, int addr, int value)
+static void set_word(int32_t id, int32_t addr, int32_t value)
 {
     if (addr == 0) 
     {

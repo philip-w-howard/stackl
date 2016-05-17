@@ -1,6 +1,3 @@
-2D arrays:
-    decl: store element for each dimension
-    ref: pluck off element for each deref
 Add semantic checks
     function param number and type
 
@@ -13,13 +10,7 @@ figure out gcc generating dependencies
 
 const optimizations
 
-multi-D arrays
-   mBaseType for multi-D arrays is not correct
-   mBaseType for cArrayRef[3][2] on second index
-      taking sizeof cell to be same as sizeof row
-
 redo test suite
-
 
 allow structs separate from typedef?
 
