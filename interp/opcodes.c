@@ -92,14 +92,14 @@ static void do_rti(Machine_State *cpu)
         cpu->SP -= cpu->BP;
 }
 //***********************************************
-static void interrupt(Machine_State *cpu, int32_t vector)
+static void interrupt(Machine_State *cpu, int32_t vector, int is_trap)
 {
     int32_t was_user;
 
     was_user = cpu->FLAG & FL_USER_MODE;
 
-    // turn off pending bit
-    cpu->FLAG &= ~FL_INT_PENDING;
+    // turn off pending bit for HW interrupts
+    if (!is_trap) cpu->FLAG &= ~FL_INT_PENDING;
 
     push(cpu, cpu->FLAG);
     push(cpu, cpu->BP);
@@ -107,7 +107,9 @@ static void interrupt(Machine_State *cpu, int32_t vector)
     push(cpu, cpu->IP);
     push(cpu, cpu->FP);
 
-    cpu->FP = cpu->SP;
+    // Don't update the FP for trap instructions, so
+    // trap handler can see args from caller
+    if (!is_trap) cpu->FP = cpu->SP;
 
     // go to system mode and interrupt mode
     cpu->FLAG &= ~FL_USER_MODE;
@@ -141,7 +143,7 @@ void Execute(Machine_State *cpu)
         !(cpu->FLAG & FL_INT_MODE)    &&
         !(cpu->FLAG & FL_INT_DIS))
     {
-        interrupt(cpu, INTERRUPT_VECTOR);
+        interrupt(cpu, INTERRUPT_VECTOR, 0);
         return;
     }
 
@@ -384,7 +386,7 @@ void Execute(Machine_State *cpu)
         case TRAP_OP:
             DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             INC(IP, 1);
-            interrupt(cpu, TRAP_VECTOR);
+            interrupt(cpu, TRAP_VECTOR, 1);
             break;
         case RTI_OP:
             DEBUG("RTI");
