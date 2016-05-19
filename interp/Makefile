@@ -27,7 +27,7 @@ opcodes.o: opcodes.c opcode_defs.h
 	gcc $(COPTS) $< -o $@
 
 opcode_defs.h: slasm
-	slasm -defs
+	./slasm -defs
 
 stackl: $(OBJS)
 	gcc $(OBJS) -o stackl -lpthread
