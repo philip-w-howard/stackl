@@ -85,7 +85,6 @@ static void *terminal_output(void *arg)
             usleep(10);       // ~100000 baud
             fputc(XDR_Reg, stdout);
             fflush(stdout);
-            //fprintf(stderr, "pio out: %c\n", XDR_Reg);
 
             pthread_mutex_lock(&IO_Q_Lock);
 
@@ -138,8 +137,6 @@ static int32_t get_byte(int32_t id, int32_t addr)
 
     pthread_mutex_unlock(&IO_Q_Lock);
 
-    //fprintf(stderr, "pio_term get_byte: %X %X\n", addr, value);
-
     return value;
 }
 //***********************************
@@ -152,8 +149,6 @@ static int32_t get_word(int32_t id, int32_t addr)
 static void set_byte(int32_t id, int32_t addr, int32_t value)
 {
     pthread_mutex_lock(&IO_Q_Lock);
-
-    //fprintf(stderr, "pio_term set byte: %X %X\n", addr, value);
 
     if (addr == 0) 
     {

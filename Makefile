@@ -1,5 +1,5 @@
-RELEASE  = ~/stackl_rel
-#RELEASE  = ~/bin
+#RELEASE  = ~/stackl_rel
+RELEASE  = ~/bin
 # RELEASE  = release
 EXTRA_INCLUDES = \
 	   system.h \
@@ -21,11 +21,15 @@ all: version compiler interp utils includes execs
 
 release: all
 	cp copy2disk $(RELEASE)
-	cp makebin $(RELEASE)
 	cp slasm $(RELEASE)
 	cp stackl $(RELEASE)
 	cp stacklc $(RELEASE)
 	cp $(INCLUDES) $(RELEASE)
+	chmod 755 $(RELEASE)/copy2disk
+	chmod 755 $(RELEASE)/slasm
+	chmod 755 $(RELEASE)/stackl
+	chmod 755 $(RELEASE)/stacklc
+	chmod 644 $(RELEASE)/*.h
 clean:
 	$(MAKE) -C compiler clean
 	$(MAKE) -C interp clean
@@ -33,7 +37,6 @@ clean:
 	rm -f slasm
 	rm -f stackl
 	rm -f stacklc
-	rm -f makebin
 	rm -f copy2disk
 	rm -f out
 	rm -f test/*.sl
@@ -56,7 +59,6 @@ execs: compiler interp
 	cp compiler/stacklc .
 	cp interp/slasm .
 	cp interp/stackl .
-	cp utils/makebin .
 	cp utils/copy2disk .
 
 includes:
