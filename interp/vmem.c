@@ -5,7 +5,7 @@
 #include "io_handler.h"
 #include "vmem.h"
 
-#define DEFAULT_MEMORY_SIZE  20000
+#define DEFAULT_MEMORY_SIZE  40000
 
 static int8_t *Memory;
 static int  Memory_Size = DEFAULT_MEMORY_SIZE;

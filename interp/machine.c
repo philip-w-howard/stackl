@@ -8,7 +8,7 @@
 #include "io_handler.h"
 #include "vmem.h"
 
-#define DEFAULT_MEMORY_SIZE  20000
+#define DEFAULT_MEMORY_SIZE  40000
 
 static Machine_State Regs;
 static pthread_mutex_t Machine_Lock = PTHREAD_MUTEX_INITIALIZER;
