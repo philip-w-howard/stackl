@@ -1,6 +1,7 @@
 separate compilation:
 slasm
-    Process_Args
-       build file list
-    main
-       loop through file list
+    figure out how to genereate only 1 vector set
+    figure out how to gather all the pragmas
+
+    add/process #pragas to .sl
+    Auto-gen __startup in assembler if not appropriate pragma

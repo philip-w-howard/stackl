@@ -1,3 +1,6 @@
+put #pragmas in .sl
+Don't autogen vectors or __startup. slasm will do that.
+
 Add semantic checks
     function param number and type
 

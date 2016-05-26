@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,7 +8,6 @@
 #include "formatstr.h"
 #include "../version.h"
 
-static char g_Input_File[256] = "";
 static int g_Memory_Size = 65536;
 static int g_Num_Errors = 0;
 static int g_Line_Num = 0;
@@ -19,6 +19,7 @@ static int g_Data_Memory_Index;
 static int g_Use_Data = 0;
 
 static int g_Make_Listing = 0;
+static FILE *g_Listing = NULL;
 
 #define NUM_OPCODES (sizeof(op_list)/sizeof(opcode_t))
 static const char *DELIMS = " \t\n";
@@ -61,7 +62,6 @@ static opcode_t op_list[] =
     {"pushfp", 0},
     {"setmode", 1},
     {"jmpuser", 1},
-    //{"traptoc", 0},
     {"trap", 0},
     {"rti", 0},
     {"calli", 0},
@@ -184,6 +184,29 @@ static label_def_t *get_label_def(char *label)
     return NULL;
 }
 
+static void fixup_offsets()
+{
+    int ii;
+
+    for (ii=0; ii<g_Num_Label_Refs; ii++)
+    {
+        if (g_Label_Refs[ii].is_data)
+        {
+            g_Label_Refs[ii].offset += g_Memory_Index;
+            g_Label_Refs[ii].is_data = 0;
+        }
+    }
+
+    for (ii=0; ii<g_Num_Label_Defs; ii++)
+    {
+        if (g_Label_Defs[ii].is_data)
+        {
+            g_Label_Defs[ii].offset += g_Memory_Index;
+            g_Label_Defs[ii].is_data = 0;
+        }
+    }
+}
+
 static void clean_locals()
 {
     int ii;
@@ -224,6 +247,12 @@ static void update_single_label(int label_index)
     label_address *= sizeof(int32_t);
 
     g_Memory[mem_address] = label_address;
+    if (g_Make_Listing)
+    {
+        fprintf(g_Listing, "Fixup %s at %d to %d\n", 
+                g_Label_Refs[label_index].label, 
+                mem_address*sizeof(int32_t), label_address);
+    }
 }
 
 static void update_labels(int do_locals)
@@ -232,6 +261,7 @@ static void update_labels(int do_locals)
     int32_t mem_address;
     int32_t label_address;
 
+    fixup_offsets();
 
     for (ii=0; ii<g_Num_Label_Refs; ii++)
     {
@@ -254,6 +284,31 @@ static void update_labels(int do_locals)
 // end label processing
 //**************************************
 
+//**************************************
+// File name processing
+//**************************************
+
+static char **g_File_List = NULL;
+static int g_Num_Files = 0;
+static int g_Files_Extent = 0;
+
+static void Add_File(char *filename)
+{
+    if (g_Num_Files >= g_Files_Extent)
+    {
+        g_Files_Extent += 20;
+        g_File_List = realloc(g_File_List, sizeof(char **)*g_Files_Extent);
+        assert(g_File_List != NULL);
+    }
+
+    g_File_List[g_Num_Files] = malloc(strlen(filename)+1);
+    strcpy(g_File_List[g_Num_Files], filename);
+    g_Num_Files++;
+}
+
+//**************************************
+// End file name processing
+//**************************************
 static void report_error(const char *msg)
 {
     fprintf(stderr, "Error %s in line %d\n", msg, g_Line_Num);
@@ -330,7 +385,7 @@ static void Process_Args(int argc, char **argv)
         else
         {
             // assume input file name
-            strcpy(g_Input_File, argv[ii]);
+            Add_File(argv[ii]);
         }
     }
 }
@@ -547,46 +602,20 @@ static void write_symbol_table(FILE *listing)
     }
 }
 
-int main(int argc, char** argv)
+static int process_file(char *filename, FILE *listing)
 {
     FILE *input;
-    FILE *listing = NULL;
     char  line[1000];
     char *comment;
 
-    Process_Args(argc, argv);
-
-    if (strlen(g_Input_File) == 0)
-    {
-        printf(HELP_STR);
-        exit(1);
-    }
-
-    input = fopen(g_Input_File, "r");
+    input = fopen(filename, "r");
     if (input == NULL)
     {
-        fprintf(stderr, "Unable to open input: %s\n", g_Input_File);
+        fprintf(stderr, "Unable to open input: %s\n", filename);
         exit(2);
     }
 
-    if (g_Make_Listing)
-    {
-        listing = fopen(make_filename(g_Input_File, ".lst"), "w");
-        if (listing == NULL)
-        {
-            fprintf(stderr, "Unable to open listing file\n");
-            exit(2);
-        }
-    }
-
-    g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
-    g_Data_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
-    if (g_Memory == NULL || g_Data_Memory == NULL)
-    {
-        fprintf(stderr, "Out of memory\n");
-        exit(1);
-    }
-
+    g_Line_Num = 0;
     while (fgets(line, sizeof(line), input) != NULL)
     {
         g_Line_Num++;
@@ -616,21 +645,69 @@ int main(int argc, char** argv)
 
     // fix-up the label references
     update_labels(1);
-    update_labels(0);
+
+    // this needs to be here for now until I figure out how to handle non-locals
+    // after updating g_Memory_Index
+    //update_labels(0);
+
+    g_Memory_Index += g_Data_Memory_Index;
+    g_Data_Memory_Index = 0;
 
     if (g_Num_Errors > 0)
     {
         fprintf(stderr, "%d errors while processing %s\n", 
-                g_Num_Errors, g_Input_File);
+                g_Num_Errors, filename);
         exit(1);
     }
 
-    write_output(g_Input_File);
+    return 0;
+}
+int main(int argc, char** argv)
+{
+    FILE *input;
+    char  line[1000];
+    char *comment;
+
+    Process_Args(argc, argv);
+
+    if (g_Num_Files == 0)
+    {
+        printf(HELP_STR);
+        exit(1);
+    }
+
+    if (g_Make_Listing)
+    {
+        g_Listing = fopen(make_filename(g_File_List[0], ".lst"), "w");
+        if (g_Listing == NULL)
+        {
+            fprintf(stderr, "Unable to open listing file\n");
+            exit(2);
+        }
+    }
+
+    g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
+    g_Data_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
+    if (g_Memory == NULL || g_Data_Memory == NULL)
+    {
+        fprintf(stderr, "Out of memory\n");
+        exit(1);
+    }
+
+    int ii;
+    for (ii=0; ii<g_Num_Files; ii++)
+    {
+        process_file(g_File_List[ii], g_Listing);
+    }
+
+    update_labels(0);
+
+    write_output(g_File_List[0]);
 
     if (g_Make_Listing) 
     {
-        write_symbol_table(listing);
-        fclose(listing);
+        write_symbol_table(g_Listing);
+        fclose(g_Listing);
     }
     return 0;
 }
