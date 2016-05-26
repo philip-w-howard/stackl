@@ -17,6 +17,9 @@ static char g_Header[2048] = "";
 static int g_Memory_Index;
 static int g_Data_Memory_Index;
 static int g_Use_Data = 0;
+static char g_Interrupt[256] = "";
+static char g_Systrap[256] = "";
+static char g_Startup[256] = "";
 
 static int g_Make_Listing = 0;
 static FILE *g_Listing = NULL;
@@ -443,6 +446,64 @@ static void process_string(char *str)
     }
 }
 
+static void process_pound_cmd(char *line)
+{
+    char *name;
+
+    if (strncmp(line, "#interrupt", strlen("#interrupt")) == 0)
+    {
+        if (strlen(g_Interrupt) != 0) 
+        {
+            report_error("Multiple interrupt definitions");
+            return;
+        }
+        name = strtok(line, " \n");
+        name = strtok(NULL, " \n");
+        if (name == NULL || strlen(name)==0)
+        {
+            report_error("Invalid interrupt definition");
+            return;
+        }
+        strcpy(g_Interrupt, name);
+    }
+    else if (strncmp(line, "#systrap", strlen("#systrap")) == 0)
+    {
+        if (strlen(g_Systrap) != 0) 
+        {
+            report_error("Multiple systrap definitions");
+            return;
+        }
+        name = strtok(line, " \n");
+        name = strtok(NULL, " \n");
+        if (name == NULL || strlen(name)==0)
+        {
+            report_error("Invalid systrap definition");
+            return;
+        }
+        strcpy(g_Systrap, name);
+    }
+    else if (strncmp(line, "#startup", strlen("#startup")) == 0)
+    {
+        if (strlen(g_Startup) != 0) 
+        {
+            report_error("Multiple startup definitions");
+            return;
+        }
+        name = strtok(line, " \n");
+        name = strtok(NULL, " \n");
+        if (name == NULL || strlen(name)==0)
+        {
+            report_error("Invalid startup definition");
+            return;
+        }
+        strcpy(g_Startup, name);
+    }
+    else
+    {
+        strcat(g_Header, &line[1]);
+    }
+}
+
 static void process_dot_cmd(char *line)
 {
     char *token;
@@ -629,7 +690,7 @@ static int process_file(char *filename, FILE *listing)
         if (line[0] == '.') 
             process_dot_cmd(line);
         else if (line[0] == '#')
-            strcat(g_Header, &line[1]);
+            process_pound_cmd(line);
         else if (strchr(line, ':') != NULL)
             process_label(line);
         else
@@ -662,6 +723,58 @@ static int process_file(char *filename, FILE *listing)
 
     return 0;
 }
+
+static void update_single_vector(int offset, char *name)
+{
+    int32_t label_address;
+    label_def_t *label_def;
+
+    label_def = get_label_def(name);
+
+    if (label_def == NULL) 
+    {
+        fprintf(stderr, "Undefined label: %s\n", name);
+        exit(1);
+    }
+
+    label_address = label_def->offset;
+    label_address *= sizeof(int32_t);
+
+    g_Memory[offset] = label_address;
+    if (g_Make_Listing)
+    {
+        fprintf(g_Listing, "Fixup %s at %d to %d\n", 
+                name, offset*sizeof(int32_t), label_address);
+    }
+}
+static void update_vectors()
+{
+    label_def_t *label_def;
+
+    if (strlen(g_Interrupt) != 0)
+        update_single_vector(0, g_Interrupt);
+    else
+        g_Memory[0] = -1;
+
+    if (strlen(g_Systrap) != 0)
+        update_single_vector(1, g_Systrap);
+    else
+        g_Memory[1] = -1;
+
+    g_Memory[2] = get_op_index("jump");
+    if (strlen(g_Startup) != 0)
+    {
+        update_single_vector(3, g_Startup);
+    }
+    else
+    {
+        g_Memory[3] = g_Memory_Index*sizeof(int32_t);
+        g_Memory[g_Memory_Index++] = get_op_index("call");
+        update_single_vector(g_Memory_Index++, "main");
+        g_Memory[g_Memory_Index++] = get_op_index("halt");
+    }
+}
+
 int main(int argc, char** argv)
 {
     FILE *input;
@@ -694,6 +807,9 @@ int main(int argc, char** argv)
         exit(1);
     }
 
+    // leave room for vector table and startup jump
+    g_Memory_Index = 4;
+
     int ii;
     for (ii=0; ii<g_Num_Files; ii++)
     {
@@ -701,6 +817,8 @@ int main(int argc, char** argv)
     }
 
     update_labels(0);
+
+    update_vectors();
 
     write_output(g_File_List[0]);
 

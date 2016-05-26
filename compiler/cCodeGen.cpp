@@ -44,30 +44,15 @@ cCodeGen::cCodeGen(const char * filename) : cVisitor()
 
     Write_Header();
 
-    // Leave room for ISR address (if any)
+    // Handle vectors (if defined)
     cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
-    if (interrupt != nullptr)
-        EmitInst(".data",  interrupt->Name());
-    else
-        EmitInst(".data", -1);
+    if (interrupt != nullptr) EmitInst("#interrupt " + interrupt->Name());
 
     cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
-    if (systrap != nullptr)
-        EmitInst(".data",  systrap->Name());
-    else
-        EmitInst(".data", -1);
+    if (systrap != nullptr) EmitInst("#systrap " + systrap->Name());
 
     cSymbol *startup = symbolTableRoot->Lookup("$$startup");
-    if (startup != nullptr)
-        EmitInst("JUMP",  startup->Name());
-    else
-    {
-        EmitInst("JUMP", "$__startup");
-
-        EmitLabel("$__startup");
-        EmitInst("CALL", "main");
-        EmitInst("HALT");
-    }
+    if (startup != nullptr) EmitInst("#startup " + startup->Name());
 }
 
 cCodeGen::~cCodeGen()
