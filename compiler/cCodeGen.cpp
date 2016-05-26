@@ -28,7 +28,7 @@ void cCodeGen::Write_Header()
         feature_name = "$$feature" + std::to_string(feature_index++);
     }
 
-    m_Output << "#begindata" << std::endl;
+    //m_Output << "#begindata" << std::endl;
 }
 
 //***********************************

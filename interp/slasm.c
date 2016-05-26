@@ -626,6 +626,14 @@ static void write_output(char *in_filename)
         exit(1);
     }
 
+    status = fprintf(bin_file, "begindata\n");
+    if (status < 0)
+    {
+        fprintf(stderr, "Unable to create output file\n");
+        fclose(bin_file);
+        exit(1);
+    }
+
     status = fwrite(g_Memory, 
             (g_Memory_Index + g_Data_Memory_Index) * sizeof(int32_t), 
             1, bin_file);
