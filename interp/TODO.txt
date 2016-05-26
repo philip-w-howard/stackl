@@ -1,1 +1,6 @@
-
+separate compilation:
+slasm
+    Process_Args
+       build file list
+    main
+       loop through file list

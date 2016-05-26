@@ -184,32 +184,70 @@ static label_def_t *get_label_def(char *label)
     return NULL;
 }
 
-static void update_labels()
+static void clean_locals()
+{
+    int ii;
+
+    for (ii=0; ii<g_Num_Label_Refs; ii++)
+    {
+        if (g_Label_Refs[ii].label[0] == '$')
+            g_Label_Refs[ii].label[0] = '#';
+    }
+
+    for (ii=0; ii<g_Num_Label_Defs; ii++)
+    {
+        if (g_Label_Defs[ii].label[0] == '$')
+            g_Label_Defs[ii].label[0] = '#';
+    }
+}
+
+static void update_single_label(int label_index)
+{
+    int32_t mem_address;
+    int32_t label_address;
+    label_def_t *label_def;
+
+    label_def = get_label_def(g_Label_Refs[label_index].label);
+
+    if (label_def == NULL) 
+    {
+        fprintf(stderr, "Undefined label: %s\n", 
+                g_Label_Refs[label_index].label);
+        exit(1);
+    }
+
+    mem_address = g_Label_Refs[label_index].offset;
+    if (g_Label_Refs[label_index].is_data) mem_address += g_Memory_Index;
+
+    label_address = label_def->offset;
+    if (label_def->is_data) label_address += g_Memory_Index;
+    label_address *= sizeof(int32_t);
+
+    g_Memory[mem_address] = label_address;
+}
+
+static void update_labels(int do_locals)
 {
     int ii;
     int32_t mem_address;
     int32_t label_address;
 
-    label_def_t *label_def;
 
     for (ii=0; ii<g_Num_Label_Refs; ii++)
     {
-        label_def = get_label_def(g_Label_Refs[ii].label);
-        if (label_def == NULL) 
+        if (do_locals && g_Label_Refs[ii].label[0] == '$')
         {
-            fprintf(stderr, "Undefined label: %s\n", g_Label_Refs[ii].label);
-            exit(1);
+            update_single_label(ii);
         }
-
-        mem_address = g_Label_Refs[ii].offset;
-        if (g_Label_Refs[ii].is_data) mem_address += g_Memory_Index;
-
-        label_address = label_def->offset;
-        if (label_def->is_data) label_address += g_Memory_Index;
-        label_address *= sizeof(int32_t);
-
-        g_Memory[mem_address] = label_address;
+        else if (!do_locals && 
+                (g_Label_Refs[ii].label[0] != '$') &&
+                (g_Label_Refs[ii].label[0] != '#'))
+        {
+            update_single_label(ii);
+        }
     }
+
+    if (do_locals) clean_locals();
 }
 
 //**************************************
@@ -577,7 +615,8 @@ int main(int argc, char** argv)
             g_Data_Memory_Index*sizeof(int32_t));
 
     // fix-up the label references
-    update_labels();
+    update_labels(1);
+    update_labels(0);
 
     if (g_Num_Errors > 0)
     {
