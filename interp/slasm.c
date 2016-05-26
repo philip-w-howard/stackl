@@ -320,7 +320,7 @@ static void process_data(char *str)
 {
     int32_t value;
 
-    if (str[0] == '$')
+    if (str[0] == '@')
         add_label_ref(&str[1]);
     else
         store(atoi(str));
@@ -427,7 +427,7 @@ static void process_asm(char *line)
             return;
         }
 
-        if (op_param[0] == '$')
+        if (op_param[0] == '@')
             add_label_ref(&op_param[1]);
         else
             store(atoi(op_param));

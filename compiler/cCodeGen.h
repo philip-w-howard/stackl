@@ -11,7 +11,7 @@ static const int STACK_FRAME_SIZE = 8;
 class cCodeGen : public cVisitor
 {
     public:
-        cCodeGen(std::string filename);
+        cCodeGen(const char *filename);
         ~cCodeGen();
 
         virtual void VisitAllNodes(cAstNode *node);
@@ -68,7 +68,6 @@ class cCodeGen : public cVisitor
         static const int STACKL_WORD_SIZE;
     protected:
         std::ofstream m_Output;
-        std::string m_Filename;
         int m_Next_Label = 1;
         cGenAddr *m_GenAddr;
 

@@ -32,7 +32,7 @@ void cCodeGen::Write_Header()
 }
 
 //***********************************
-cCodeGen::cCodeGen(string filename) : cVisitor()
+cCodeGen::cCodeGen(const char * filename) : cVisitor()
 {
     m_Output.open(filename);
     if (!m_Output.is_open())
@@ -40,7 +40,6 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
         fatal_error("Unable to open output file");
     }
 
-    m_Filename = filename;
     m_GenAddr = new cGenAddr(this);
 
     Write_Header();
@@ -63,9 +62,9 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
         EmitInst("JUMP",  startup->Name());
     else
     {
-        EmitInst("JUMP", "__startup");
+        EmitInst("JUMP", "$__startup");
 
-        EmitLabel("__startup");
+        EmitLabel("$__startup");
         EmitInst("CALL", "main");
         EmitInst("HALT");
     }
@@ -74,13 +73,6 @@ cCodeGen::cCodeGen(string filename) : cVisitor()
 cCodeGen::~cCodeGen()
 {
     m_Output.close();
-
-    string makebin("slasm ");
-    makebin += m_Filename;
-
-    int result = system(makebin.c_str());
-
-    if (result < 0) fatal_error("Error creating binary output");
 }
 
 void cCodeGen::VisitAllNodes(cAstNode *node) { node->Visit(this); }
@@ -504,7 +496,7 @@ void cCodeGen::Visit(cWhileStmt *node)
 // Emit an instruction
 void cCodeGen::EmitInst(string inst, string label)
 {
-    m_Output << inst << " $" << label << "\n";
+    m_Output << inst << " @" << label << "\n";
 }
 
 //*****************************************
@@ -526,7 +518,7 @@ void cCodeGen::EmitInst(string inst)
 string cCodeGen::GenerateLabel()
 {
     m_Next_Label++;
-    string label("LABEL_");
+    string label("$LABEL_");
     label += std::to_string(m_Next_Label);
     return label;
 }

@@ -33,5 +33,5 @@ stackl: $(OBJS)
 	gcc $(OBJS) -o stackl -lpthread
 
 slasm: slasm.c formatstr.o
-	gcc slasm.c -o slasm formatstr.o
+	gcc -g -O0 slasm.c -o slasm formatstr.o
 

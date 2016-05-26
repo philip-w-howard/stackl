@@ -48,6 +48,7 @@ extern cDeclsList *yyast_root;
 char Input_File[200] = "";
 int  Do_Debug = 0;
 int  Do_Ast = 0;
+int  Do_Assembler = 1;
 void Process_Args(int argc, char **argv)
 {
     for (int ii=1; ii<argc; ii++)
@@ -55,19 +56,21 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "debug") == 0)
-                Do_Debug = 1;
-            else if (strcmp(arg, "ast") == 0)
+            if (strcmp(arg, "ast") == 0)
                 Do_Ast = 1;
+            else if (strcmp(arg, "c") == 0)
+                Do_Assembler = 0;
+            else if (strcmp(arg, "debug") == 0)
+                Do_Debug = 1;
+            else if (strcmp(arg, "help") == 0)
+            {
+                std::cout << "stacklc -help -version -yydebug -debug -ast <file>\n";
+                exit(0);
+            }
             else if (strcmp(arg, "version") == 0)
             {
                 std::cout << "stacklc " << VERSION << " " <<__DATE__ << " " 
                     << __TIME__ << std::endl;
-                exit(0);
-            }
-            else if (strcmp(arg, "help") == 0)
-            {
-                std::cout << "stacklc -help -version -yydebug -debug -ast <file>\n";
                 exit(0);
             }
             else if (strcmp(arg, "yydebug") == 0)
@@ -171,8 +174,22 @@ int main(int argc, char **argv)
         if (ptr != NULL) *ptr = 0;
         strcat(outfile_name, ".sl");
 
-        cCodeGen coder(outfile_name);
-        coder.VisitAllNodes(program);
+        // coder must be in its own scope so it goes out of scope
+        // and gets destructed
+        {
+            cCodeGen coder(outfile_name);
+            coder.VisitAllNodes(program);
+        }
+
+        if (Do_Assembler)
+        {
+            string makebin("slasm ");
+            makebin += outfile_name;
+
+            int result = system(makebin.c_str());
+
+            if (result < 0) fatal_error("Error creating binary output");
+        }
 
     } else {
         std::cerr << total_errors << " Errors in compile" << std::endl;
