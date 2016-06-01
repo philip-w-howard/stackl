@@ -301,7 +301,10 @@ void cCodeGen::Visit(cPrefixExpr *node)
         cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     performOp->Visit(this);
-    EmitInst("DUP");
+
+    // Don't need DUP because we already push the pre-value onto the stack
+    //EmitInst("DUP");
+
     var->Visit(m_GenAddr);
     if (var->GetType()->Size() == 1)
         EmitInst("POPCVARIND");

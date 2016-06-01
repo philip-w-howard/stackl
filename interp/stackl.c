@@ -33,7 +33,12 @@ void Process_Args(int argc, char **argv)
         if (argv[ii][0] == '-')
         {
             char *arg = &argv[ii][1];
-            if (strcmp(arg, "dma_term") == 0)
+            if (strcmp(arg, "boot") == 0)
+            {
+                Use_Disk = 1;
+                Boot_Disk = 1;
+            }
+            else if (strcmp(arg, "dma_term") == 0)
             {
                 Use_PIO_Term = 0;
                 Use_DMA_Term = 1;

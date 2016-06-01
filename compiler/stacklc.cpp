@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     {
         if (program == NULL)
         {
-            semantic_error("Unknown compiler error ");
+            semantic_error("Source produced no output ");
             exit(-2);
         }
 

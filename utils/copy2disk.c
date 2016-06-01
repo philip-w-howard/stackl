@@ -4,9 +4,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char **argv)
 {
+    int size;
+    int start_offset;
     int offset;
     int status;
     FILE *input;
@@ -39,7 +42,6 @@ int main(int argc, char **argv)
         exit(-2);
     }
 
-    int size;
     size = fseek(input, 0, SEEK_END);
     if (size != 0)
     {
@@ -56,7 +58,14 @@ int main(int argc, char **argv)
     }
 
     rewind(input);
-    lseek(disk, offset, SEEK_SET);
+
+    strcpy(buff, "");
+    while ((strcmp(buff, "begindata\n") != 0) && 
+           (fgets(buff, size, input) != NULL))
+    {}
+
+    start_offset = ftell(input);
+    size -= start_offset;
 
     status = fread(buff, size, 1, input);
     if (status != 1)
@@ -65,6 +74,7 @@ int main(int argc, char **argv)
         exit(-5);
     }
 
+    lseek(disk, offset, SEEK_SET);
     status = write(disk, buff, size);
     if (status != size)
     {
@@ -72,6 +82,7 @@ int main(int argc, char **argv)
         exit(-5);
     }
 
+    printf("Write %d bytes starting at offset %d\n", size, offset);
     fclose(input);
     close(disk);
 

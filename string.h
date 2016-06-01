@@ -28,6 +28,25 @@ char * strcpy(char *dest, char *src)
     return dest;
 }
 
+char * strcat(char *dest, char *src)
+{
+    char *dst;
+
+    dst = dest;
+    while (*dst++) {}
+
+    dst--;
+
+    while (*src)
+    {
+        *dst++ = *src++;
+    }
+
+    *dst++ = 0;
+
+    return dest;
+}
+
 char * strncpy(char *dest, char *src, int size)
 {
     char *dst;
