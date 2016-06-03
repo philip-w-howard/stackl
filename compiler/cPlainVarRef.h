@@ -37,6 +37,17 @@ class cPlainVarRef : public cVarRef
     virtual bool IsPointer()    { return GetType()->IsPointer(); }
     virtual bool IsFunc()       { return GetType()->IsFunc(); }
     virtual bool IsArrayRef()   { return false; }
+    virtual bool IsConst()      { return GetDecl()->IsConst(); }
+    virtual int ConstValue()
+    {
+        cVarDecl *var = GetDecl();
+        if (var->IsConst() && var->HasInit())
+        {
+            return var->GetInit()->ConstValue();
+        }
+
+        return 0;
+    }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

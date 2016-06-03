@@ -160,11 +160,16 @@ static int proc_identifier(const char *name)
         cDecl *decl = yylval.symbol->GetDecl();
         if (decl == nullptr) return IDENTIFIER;
         if (decl->IsType()) return TYPE_ID;
+
+        // FIX THIS: var refs should be returned, but
+        // Is_Const for the varref should be detectable
+        /*
         if (decl->IsVar() && decl->GetVar()->IsConst()) 
         {
             yylval.int_val = decl->GetVar()->GetInit()->ConstValue();
             return INT_VAL;
         }
+        */
     }
 
     return IDENTIFIER;

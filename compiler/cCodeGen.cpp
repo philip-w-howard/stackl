@@ -240,23 +240,30 @@ void cCodeGen::Visit(cPlainVarRef *node)
 {
     cVarDecl *var = node->GetDecl();
 
-    if (var->GetType()->IsArray())
+    if (var->IsConst() && var->HasInit())
     {
-        node->Visit(m_GenAddr);
-    } else {
-        if (var->IsGlobal())
+        var->GetInit()->Visit(this);
+    }
+    else
+    {
+        if (var->GetType()->IsArray())
         {
             node->Visit(m_GenAddr);
-            
-            if (var->GetType()->Size() == 1)    // ElementSize?
-                EmitInst("PUSHCVARIND");
-            else
-                EmitInst("PUSHVARIND");
         } else {
-            if (var->GetType()->Size() == 1)
-                EmitInst("PUSHCVAR", var->GetOffset());
-            else
-                EmitInst("PUSHVAR", var->GetOffset());
+            if (var->IsGlobal())
+            {
+                node->Visit(m_GenAddr);
+                
+                if (var->GetType()->Size() == 1)    // ElementSize?
+                    EmitInst("PUSHCVARIND");
+                else
+                    EmitInst("PUSHVARIND");
+            } else {
+                if (var->GetType()->Size() == 1)
+                    EmitInst("PUSHCVAR", var->GetOffset());
+                else
+                    EmitInst("PUSHVAR", var->GetOffset());
+            }
         }
     }
 }

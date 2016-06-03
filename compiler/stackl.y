@@ -199,7 +199,7 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl($2, $3);
                 var->SetInit($5);
                 var->SetGlobal();
-                //var->SetConst();
+                var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
             }

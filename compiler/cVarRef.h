@@ -10,12 +10,7 @@ class cVarRef : public cExpr
   public:
     cVarRef() : cExpr() {}
 
-    virtual bool IsLval()       { return true; }
-    //virtual bool IsStruct()     { return false; }
-    //virtual bool IsArray()      { return false; }
-    //virtual bool IsPointer()    { return false; }
-    //virtual bool IsFunc()       { return false; }
-    //virtual bool IsArrayRef()   { return false; }
+    virtual bool IsLval()       { return !IsConst(); /* true; */ }
 
     virtual cTypeDecl *GetType() = 0;
 
