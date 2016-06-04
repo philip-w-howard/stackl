@@ -1,8 +1,4 @@
 test for stack for pre/post inc/dec
-test for:
-    char buff[20];
-    buff = itostr(val, buff);
-    // need to make arrays const and prevent const as lval
 
 Add semantic checks
     function param number and type
@@ -21,5 +17,3 @@ redo test suite
 allow structs separate from typedef?
 
 static vars at global and local level
-
-separate compilation

@@ -456,7 +456,7 @@ void cCodeGen::Visit(cVarDecl *node)
     {
         EmitInst(".dataseg");
         EmitLabel(node->GetName()->Name());
-        if (node->IsConst() || node->HasInit())
+        if (node->IsConst() && node->HasInit())
         {
             EmitInst(".data", node->GetInit()->ConstValue());
         }

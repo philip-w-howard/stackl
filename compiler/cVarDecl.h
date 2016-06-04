@@ -56,6 +56,8 @@ class cVarDecl : public cDecl
 
         mOffset     = 0;
         mIsGlobal   = false;
+        mHasInit    = false;
+        mIsConst    = true;
     }
 
     void SetInit(cExpr *init) 
