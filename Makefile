@@ -44,6 +44,9 @@ clean:
 	rm -f out
 	rm -f test/*.sl
 	rm -f test/*.slb
+	rm -f test/*.lst
+	rm -f test/*.ast
+	rm -f test/*.xml
 
 version: .git/refs/heads
 	echo "#pragma once" > version.h

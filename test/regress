@@ -1,6 +1,9 @@
 #!/bin/bash
+make -kBC test
+
+#for test in `seq 1 38`; do
 for test in `seq 1 38`; do
-    test/runc test$test
+    test/runb test$test
 done
 
 #test/runspecial test2001 -boot < test/test2001.input

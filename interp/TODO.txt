@@ -1,7 +1,0 @@
-separate compilation:
-slasm
-    figure out how to genereate only 1 vector set
-    figure out how to gather all the pragmas
-
-    add/process #pragas to .sl
-    Auto-gen __startup in assembler if not appropriate pragma
