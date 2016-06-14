@@ -1,4 +1,4 @@
-// Test main
+// Test main and OUTS
 
 int main()
 {

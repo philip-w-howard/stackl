@@ -144,7 +144,7 @@ int main(int argc, char **argv)
     cDeclsList *program = NULL;
     int total_errors = 0;
 
-    if (result == 0) process_file(Input_File, &program, &total_errors);
+    result = process_file(Input_File, &program, &total_errors);
 
     if (result == 0 && total_errors == 0)
     {
@@ -186,13 +186,14 @@ int main(int argc, char **argv)
             string makebin("slasm ");
             makebin += outfile_name;
 
-            int result = system(makebin.c_str());
+            result = system(makebin.c_str());
 
             if (result < 0) fatal_error("Error creating binary output");
         }
 
     } else {
         std::cerr << total_errors << " Errors in compile" << std::endl;
+        if (result == 0) result = total_errors;
     }
 
     return result;

@@ -1,5 +1,3 @@
-//#include <string.h>
-//#include <system.h>
 // test if/else
 int main()
 {

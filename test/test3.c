@@ -3,6 +3,18 @@
 
 // test expressions and all operators
 //
+int DoNotPrintMe()
+{
+    asm("OUTS", "failure\n");
+    return 1;  
+}
+
+int DoPrintMe(int ret)
+{
+    asm("OUTS", "success\n");
+    return ret;  
+}
+
 int main()
 {
     int x;
@@ -311,5 +323,20 @@ int main()
         asm("OUTS", "equals in expr works\n");
     else
         asm("OUTS", "equals in expr broken\n");
-    return 0;
+
+    // Check short circuit nature of || and &&
+    //
+    if(0 && DoNotPrintMe())
+        asm("OUTS", "failure\n");
+    if(1 || DoNotPrintMe())
+        asm("OUTS", "success\n");
+    if(1 && DoPrintMe(0))
+        asm("OUTS", "failure\n");
+    if(0 || DoPrintMe(0))
+        asm("OUTS", "failure\n");
+    if(1 && DoPrintMe(1))
+        asm("OUTS", "success\n");
+    if(0 || DoPrintMe(1))
+        asm("OUTS", "success\n");
 }
+

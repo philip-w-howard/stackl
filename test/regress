@@ -1,10 +1,9 @@
 #!/bin/bash
-make -kBC test
+
+stacklc -c test/io.c
 
 #for test in `seq 1 38`; do
 for test in `seq 1 38`; do
-    test/runb test$test
+    test/runt test$test test/io.sl
 done
 
-#test/runspecial test2001 -boot < test/test2001.input
-#test/runspecial test1000 -boot -T600

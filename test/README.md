@@ -22,24 +22,20 @@ Makefile?
     pointer arithmetic
 7) string library
     string functions including printi
-    Use separate compilation                ###################
-    Add other string function tests         ###################
 8) Function calls
     return values
     functions in expressions
 9) Unused
-10) string library: Combine with Test 7     ###################
-    check that all string functions are tested
-11) More string library. Combite with 7     ###################
-12) More string library. Combite with 7     ###################
+10) Unused
+11) Unused
+12) Unused
 13) Structs
 14) Mixing decls and statements
     #define
     global consts with initializers
 15) Unused
-16) Short ciruit nature of || and && (should come earlier)  ###################
+16) Unused
 17) sizeof
-    Incomplete                              ###################
 18) Test return value of functions
     empty if's and while's
 19) Scopes
@@ -69,63 +65,3 @@ n) use interrupt to test stack behavior for
     all operators as expressions
     all operators in assignment statements
 m) semantic checks
-    1. printi; prints
-    2. variable declaration; variable assignment
-    3. if statements; else statements
-    4. operators
-        x == y
-        x != y
-        x && y
-        x || y
-        x > y
-        x < y
-        x >= y
-        x <= y
-        x + y
-        x = y
-        x * y
-        x / y
-        x & y
-        -x
-        x += y
-        x -= y
-        x *= y
-        x /= y
-        x++
-        ++x
-        x--
-        --x
-        ~x
-        x << y
-        x >> y
-        x <<= y
-        x >>= y
-    5. while loops
-    6. for loops
-    7. function calls; return statements
-    9. arrays; pointers; array[x] assignment; array[x] reference; ptr[x] assignment; ptr[x] reference
-    10. strcpy; strncpy; strchr
-    11. strcmp
-    12. strrev; itostr
-    13. struct field assignment; struct field reference
-    14. mixing declarations and statements; consts; defines
-    15. exec
-    16. short circuiting && and ||
-    17. sizeof operator
-    18. empty blocks; empty statements
-    19. correct block stack manipulaation
-    20. global variables
-    21. scanl; scans; scani; exit
-    22. bitwise operators
-        |
-        &
-        |=
-        &=
-        ^=
-    23. generic type pointers; ptr[x] reference
-    24. generic type pointers; \*ptr reference
-    25. generic type poinetrs; \*ptr reference
-    26. proper pointer field dereferencing
-    27. pointer artihemetic; \*ptr reference
-    28. \*ptr reference
-    30. syscall; systrap; exit; startup; interrupt

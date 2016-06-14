@@ -20,6 +20,6 @@ clean:
 %.sl : %.c
 	stacklc $(COPTS) $<
 
-%.slb : %.sl
-	slasm $<
+%.slb : %.sl io.sl
+	slasm $< io.sl
 
