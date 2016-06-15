@@ -45,25 +45,34 @@ int main()
         char *cptr;
         int  *iptr;
         struct_t *sptr;
+        void *vptr;
         int  ii;
 
         cptr = 0;
         iptr = 0;
         sptr = 0;
+        vptr = 0;
         for (ii=0; ii<10; ii++)
         {
             if (cptr++ != ii) 
                 prints("char pointer arithmetic error\n");
             else
                 prints("char pointer arithmetic OK\n");
+
             if (iptr++ != ii*4) 
                 prints("int pointer arithmetic error\n");
             else
                 prints("int pointer arithmetic OK\n");
+
             if (sptr++ != ii*sizeof(struct_t)) 
                 prints("struct pointer arithmetic error\n");
             else
                 prints("struct pointer arithmetic OK\n");
+
+            if (vptr++ != ii) 
+                prints("void pointer arithmetic error\n");
+            else
+                prints("void pointer arithmetic OK\n");
         }
     }
 
