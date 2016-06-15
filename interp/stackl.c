@@ -21,7 +21,7 @@ static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
 
 static const char *HELP_STR =
- "stackl [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
+ "stackl [-boot] [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
  "       [-opcodes] [-help] [-version] [-loader]\n"
  "       [-M<mem size>] [-N<num instr>]\n";
 

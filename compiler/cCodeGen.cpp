@@ -283,11 +283,22 @@ void cCodeGen::Visit(cPointerDeref *node)
 
 void cCodeGen::Visit(cPostfixExpr *node)
 {
+    cBinaryExpr *performOp;
+
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    cBinaryExpr *performOp = 
-        new cBinaryExpr(var, node->GetOp(), new cIntExpr(1));
+    if (var->IsPointer())
+    {
+        performOp = new 
+            cBinaryExpr(node->GetExpr(), node->GetOp(), 
+                    new cIntExpr(var->GetType()->ElementSize()));
+    }
+    else
+    {
+        performOp = new 
+            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
+    }
 
     var->Visit(this);
     performOp->Visit(this);
@@ -300,11 +311,22 @@ void cCodeGen::Visit(cPostfixExpr *node)
 
 void cCodeGen::Visit(cPrefixExpr *node)
 {
+    cBinaryExpr *performOp;
+
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    cBinaryExpr *performOp = new 
-        cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
+    if (var->IsPointer())
+    {
+        performOp = new 
+            cBinaryExpr(node->GetExpr(), node->GetOp(), 
+                    new cIntExpr(var->GetType()->ElementSize()));
+    }
+    else
+    {
+        performOp = new 
+            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
+    }
 
     performOp->Visit(this);
 

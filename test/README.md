@@ -25,7 +25,7 @@ Makefile?
 8) Function calls
     return values
     functions in expressions
-9) Unused
+9) Pointer arithmetic
 10) Unused
 11) Unused
 12) Unused
