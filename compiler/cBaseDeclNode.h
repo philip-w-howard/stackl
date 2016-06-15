@@ -17,15 +17,19 @@
 class cBaseDeclNode : public cTypeDecl
 {
   public:
-    cBaseDeclNode(cSymbol *name, int size) : cTypeDecl()
+    cBaseDeclNode(cSymbol *name, int size, bool isVoid = false) : cTypeDecl()
     {
         AddChild(name);
         mSize = size;
+        mIsVoid = isVoid;
     }
 
     virtual bool IsType() { return true; }
+    virtual bool IsVoid() { return mIsVoid; }
     virtual cSymbol* GetName()            { return (cSymbol*)GetChild(0); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+  protected:
+    bool mIsVoid;
 };
 

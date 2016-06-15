@@ -13,6 +13,7 @@ class cTypeDecl : public cDecl
     virtual cSymbol* GetName() = 0;
 
     virtual bool IsType()   { return true; }
+    virtual bool IsVoid()   { return false; }
 
     virtual int ElementSize()       { return mSize; }
     virtual int Size()              { return mSize; }

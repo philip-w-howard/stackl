@@ -136,7 +136,7 @@ void cCodeGen::Visit(cExprStmt *node)
     node->GetExpr()->Visit(this);
 
     // remove the result from the stack
-    EmitInst("POP");
+    if (!node->GetExpr()->GetType()->IsVoid()) EmitInst("POP");
 }
 
 void cCodeGen::Visit(cForStmt *node)
@@ -191,8 +191,15 @@ void cCodeGen::Visit(cFuncDecl *node)
         node->GetStmts()->Visit(this);
 
         // Force return statement
-        cReturnStmt *ret = new cReturnStmt(new cIntExpr(0));
-        ret->Visit(this);
+        if (!node->ReturnType()->IsVoid())
+        {
+            cReturnStmt *ret = new cReturnStmt(new cIntExpr(0));
+            ret->Visit(this);
+        }
+        else
+        {
+            EmitInst("RETURN");
+        }
     }
 }
 

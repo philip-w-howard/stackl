@@ -118,7 +118,6 @@ identifier      {letter}({letter}|{digit}|"_")*
 "volatile"                  Return(VOLATILE);
 "break"                     Return(BREAK);
 "case"                      Return(CASE);
-"void"                      Return(VOID);
 "if"                        Return(IF);
 "else"                      Return(ELSE);
 "for"                       Return(FOR);
@@ -130,6 +129,9 @@ identifier      {letter}({letter}|{digit}|"_")*
                               Return(TYPE_ID);
                             }
 "char"                      { yylval.symbol = symbolTableRoot->Lookup("char");
+                              Return(TYPE_ID);
+                            }
+"void"                      { yylval.symbol = symbolTableRoot->Lookup("void");
                               Return(TYPE_ID);
                             }
 "sizeof"                    Return(SIZEOF);

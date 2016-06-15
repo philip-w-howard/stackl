@@ -1,0 +1,3 @@
+Machine Check handler
+    user mode: trap
+    system mode: halt

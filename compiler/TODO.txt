@@ -1,5 +1,12 @@
 Update document
 
+allow void functions
+allow void * pointers
+
+function return types
+    validate the type of thing in return statement
+    Don't force return 0 at end of functions
+
 test for stack for pre/post inc/dec
 
 Add semantic checks

@@ -1,6 +1,13 @@
 #include "test/io.h"
+void voidfunc()
+{
+    asm("OUTS", "in voidfunc\n");
+}
 int main()
 {
-    prints("Unused test\n");
+    voidfunc();
+    voidfunc();
+
+    prints("Test complete\n");
     return 0;
 }

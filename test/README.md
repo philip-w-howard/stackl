@@ -26,7 +26,7 @@ Makefile?
     return values
     functions in expressions
 9) Pointer arithmetic
-10) Unused
+10) void functions
 11) Unused
 12) Unused
 13) Structs

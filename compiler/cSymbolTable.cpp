@@ -138,6 +138,10 @@ void cSymbolTable::InitDefaultTable()
     Insert(sym);
     sym->SetDecl(new cBaseDeclNode(sym, 4));
 
+    sym = new cSymbol("void");
+    Insert(sym);
+    sym->SetDecl(new cBaseDeclNode(sym, 1, true));
+
     // Need a type for character constants
     sym = new cSymbol("char*");
     Insert(sym);
