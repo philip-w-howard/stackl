@@ -300,7 +300,7 @@ void Execute(Machine_State *cpu)
             DEBUG("CALLI %d", GET_INTVAL(SP, -1));
             INC(SP, -1);
             temp = GET_INTVAL(SP, 0);
-            SET_INTVAL(SP, 0, (cpu->IP + OFFSET(2)));
+            SET_INTVAL(SP, 0, (cpu->IP + OFFSET(1)));
             SET_INTVAL(SP, 1, (cpu->FP));
             INC(SP, 2);
             cpu->FP = cpu->SP;

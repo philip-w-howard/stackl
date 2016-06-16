@@ -1,7 +1,9 @@
-Update document
+Function addresses for setting interrupt vectors
 
-allow void functions
-allow void * pointers
+Function pointers?
+    syntax and semantics?
+
+Update document
 
 function return types
     validate the type of thing in return statement

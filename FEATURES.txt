@@ -1,24 +1,12 @@
 BUGS
 
-  *ptr1++ = *ptr2++
-  does not seem to work
-
-  variable initialization does not always work
-  char *ptr = ptr2
-
-
 TODO
 
 Clean up test suite
     Get rid of useless tests
-    Combine like features
     Comment block indicating purpose of test
     Mimimise assumptions
         Assume previous tests pass, but not later ones
-
-Implement proper precedence
-Test precedence
-
 
 Include files for "regular" C code to mimic stackl C code.
 
@@ -29,76 +17,12 @@ Correct struct definition
 optimizations:
    ptr[0] -> *ptr
 
-implement sizeof() operator
-proper implementation of general arrays
-proper implementation of structs
 full semantic checks
    matching function params
    only one function body
 casting an int into a char
 
-separate compilation
-
 command line args to main
 
-assignment to charp vars
-    array cell address
-address-of operator
-
-make opcodes an enum?
-
 WORKS
-
-Global variables
-    treat similar to string constants
-    Add "G addr size" record to .sl
-    generate code:
-        PUSH
-        Fixup location
-        VARIND
-
-allow #define'd constants to show up as INT_VAL, not Expr (or whatever)
-short circuit of && and ||
--help for stackl and stacklc
-Load appends ".sl" if not already there
-GetMem/SetMem relative to base reg
-Have I/O happen in separate thread so that a GET does not block all threads.
-Rudimentary scheduler
-include files from proper directories
-Fork loads at different addr
-Return from main calls exit() not HALT_OP
-library code is included by default (e.g. syscal and halt)
-allow global decls include consts
-validate that a Function Call is a function
-syscalls for print, scan, exit, exec
-address of in params
-string_lit as function arg
--ast command line argument to stacklc
-charp vars as arrays
-include files
-assign cptr to string_lit
-can declare char * vars and char[] 
-can access individual chars in a char array
-pointer arithmetic
-character literals
-expressions
-Unary minus
-++ -- <op>=
-Test of all operators
-if statements (including else)
-while statements
-for loops
-rudimentary function calls
-return statements
-function return values
-functions in expressions
-function parameters
-strings literals
-prints
-
-type taxonomy
-    int
-    char *       isPointer
-    char []      isArray
-    string_lit   isAbsolute
 

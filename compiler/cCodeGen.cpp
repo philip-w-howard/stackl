@@ -251,28 +251,25 @@ void cCodeGen::Visit(cPlainVarRef *node)
     {
         var->GetInit()->Visit(this);
     }
-    else
+    else if (node->IsFunc())
+        EmitInst("PUSH", node->GetName()->Name());
+    else if (var->GetType()->IsArray())
     {
-        if (var->GetType()->IsArray())
-        {
-            node->Visit(m_GenAddr);
-        } else {
-            if (var->IsGlobal())
-            {
-                node->Visit(m_GenAddr);
-                
-                if (var->GetType()->Size() == 1)    // ElementSize?
-                    EmitInst("PUSHCVARIND");
-                else
-                    EmitInst("PUSHVARIND");
-            } else {
-                if (var->GetType()->Size() == 1)
-                    EmitInst("PUSHCVAR", var->GetOffset());
-                else
-                    EmitInst("PUSHVAR", var->GetOffset());
-            }
-        }
-    }
+        node->Visit(m_GenAddr);
+    } 
+    else if (var->IsGlobal())
+    {
+        node->Visit(m_GenAddr);
+        
+        if (var->GetType()->Size() == 1)    // ElementSize?
+            EmitInst("PUSHCVARIND");
+        else
+            EmitInst("PUSHVARIND");
+    } 
+    else if (var->GetType()->Size() == 1)
+        EmitInst("PUSHCVAR", var->GetOffset());
+    else
+        EmitInst("PUSHVAR", var->GetOffset());
 }
 
 void cCodeGen::Visit(cPointerDeref *node)
