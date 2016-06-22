@@ -2,8 +2,7 @@
 
 stacklc -c test/io.c
 
-#for test in `seq 1 38`; do
-for test in `seq 1 38`; do
+for test in `seq 1 40`; do
     test/runt test$test test/io.sl
 done
 

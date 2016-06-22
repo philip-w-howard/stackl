@@ -1,5 +1,6 @@
-#pragma interrupt interrupt
 #include <machine_def.h>
+
+void *Interrupt_Vector[16];
 
 int interrupt()
 {
@@ -11,6 +12,9 @@ int interrupt()
 int main()
 {
     int value;
+
+    asm2("POPREG", IVEC_REG, &Interrupt_Vector);
+    Interrupt_Vector[0] = interrupt;
 
     asm2("POPREG", FLAG_REG, FL_I_FIRST_INT);
 

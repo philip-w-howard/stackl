@@ -1,3 +1,5 @@
+// Make sure pre-inc doesn't mess up the stack.
+// This was a bug in some 0.9.x versions
 #include "test/io.h"
 
 int inc(int *value)

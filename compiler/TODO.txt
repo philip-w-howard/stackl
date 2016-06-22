@@ -1,12 +1,8 @@
-Write test for testing TRAPs
-
-Delete systrap, and interrupt pragmas (use interrupt vector instead)
-    Update doc to reflect loss of pragmas
+Update test40 to user "void *" for interrupt vector
+Add test for sizeof(void *)
 
 Function pointers?
     syntax and semantics?
-
-Update document
 
 function return types
     validate the type of thing in return statement

@@ -1,5 +1,3 @@
-Rethink interrupt vectors and start address for executables.
-
 Implement virtual memory
     Use bit in FLAG reg
     Need Page Table register
