@@ -52,7 +52,10 @@ static void *terminal_device(void *arg)
             Status |= DMA_T_STATUS_READ_DONE | DMA_T_STATUS_ATTN;
             if (buffer == NULL) Status |= DMA_T_STATUS_READ_ERROR;
 
-            if (Command & DMA_T_CMD_INT_ENA) Machine_Signal_Interrupt(1);
+            if (Command & DMA_T_CMD_INT_ENA) 
+            {
+                Machine_Signal_Interrupt(1, DMA_T_VECTOR);
+            }
         }
         pthread_mutex_unlock(&IO_Q_Lock);
     }
@@ -103,7 +106,10 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
             printf("%s", buffer);
             Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);
             Status |= DMA_T_STATUS_WRITE_DONE | DMA_T_STATUS_ATTN;
-            if (Command & DMA_T_CMD_INT_ENA) Machine_Signal_Interrupt(0);
+            if (Command & DMA_T_CMD_INT_ENA) 
+            {
+                Machine_Signal_Interrupt(0, DMA_T_VECTOR);
+            }
         }
 
         pthread_cond_signal(&IO_Q_Cond);

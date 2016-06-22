@@ -9,5 +9,7 @@
 #define TIMER_CSR_IE    0x00000001      // Interrupt enable
 #define TIMER_CSR_INT   0x80000000      // Interrupt occurred
 
+#define TIMER_VECTOR    3
+
 int Timer_Init();                       // called by interpreter
 int Timer_Heartbeat();                  // called by interpreter

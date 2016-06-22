@@ -91,7 +91,10 @@ static void *terminal_output(void *arg)
             XDR_Written = 0;
             IIR_Reg |= PIO_T_IID_XMIT | PIO_T_IID_INT;
             pthread_mutex_unlock(&IO_Q_Lock);
-            if (IER_Reg & PIO_T_IE_XMIT) Machine_Signal_Interrupt(1);
+            if (IER_Reg & PIO_T_IE_XMIT) 
+            {
+                Machine_Signal_Interrupt(1, PIO_T_VECTOR);
+            }
         } else {
             pthread_mutex_unlock(&IO_Q_Lock);
         }
@@ -114,7 +117,7 @@ static void *terminal_input(void *arg)
 
             pthread_mutex_unlock(&IO_Q_Lock);
 
-            if (need_interrupt) Machine_Signal_Interrupt(1);
+            if (need_interrupt) Machine_Signal_Interrupt(1, PIO_T_VECTOR);
         }
     }
     return NULL;

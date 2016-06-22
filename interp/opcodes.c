@@ -86,20 +86,38 @@ static void do_rti(Machine_State *cpu)
     cpu->BP = pop(cpu);
     cpu->FLAG = pop(cpu);
 
-    if (flag & FL_INT_PENDING) cpu->FLAG |= FL_INT_PENDING;
+    // re-enable any interrupts that occurred during this ISR
+    cpu->FLAG |= flag & FL_I_ALL;
 
     if (cpu->FLAG & FL_USER_MODE) 
         cpu->SP -= cpu->BP;
 }
 //***********************************************
-static void interrupt(Machine_State *cpu, int32_t vector, int is_trap)
+// FIX THIS: 
+static void interrupt(Machine_State *cpu, int is_trap)
 {
     int32_t was_user;
+    int32_t vector;
 
     was_user = cpu->FLAG & FL_USER_MODE;
 
-    // turn off pending bit for HW interrupts
-    if (!is_trap) cpu->FLAG &= ~FL_INT_PENDING;
+    if (is_trap) 
+    {
+        vector = TRAP_VECTOR;
+    }
+    else
+    {
+        // Find highest priority pending interrupt
+        for (vector=0; vector<16; vector++)
+        {
+            if (cpu->FLAG & (FL_I_FIRST_INT << vector)) break;
+        }
+
+        if (vector == 16) return;   // no pending interrupts
+
+        // turn off pending bit for HW interrupts
+        cpu->FLAG &= ~(FL_I_FIRST_INT << vector);
+    }
 
     push(cpu, cpu->FLAG);
     push(cpu, cpu->BP);
@@ -123,7 +141,7 @@ static void interrupt(Machine_State *cpu, int32_t vector, int is_trap)
     }
 
     // ISR is at vector
-    cpu->IP = Get_Word(cpu, vector*WORD_SIZE);
+    cpu->IP = Get_Word(cpu, cpu->IVEC + vector*WORD_SIZE);
 }
 //***************************************
 void Execute(Machine_State *cpu)
@@ -139,11 +157,11 @@ void Execute(Machine_State *cpu)
 
     Timer_Heartbeat();
 
-    if ( (cpu->FLAG & FL_INT_PENDING) && 
+    if ( (cpu->FLAG & FL_I_ALL) && 
         !(cpu->FLAG & FL_INT_MODE)    &&
         !(cpu->FLAG & FL_INT_DIS))
     {
-        interrupt(cpu, INTERRUPT_VECTOR, 0);
+        interrupt(cpu, 0);
         return;
     }
 
@@ -386,7 +404,7 @@ void Execute(Machine_State *cpu)
         case TRAP_OP:
             DEBUG("TRAP %d %d", GET_INTVAL(FP,-3), GET_INTVAL(FP,-4));
             INC(IP, 1);
-            interrupt(cpu, TRAP_VECTOR, 1);
+            interrupt(cpu, 1);
             break;
         case RTI_OP:
             DEBUG("RTI");
@@ -461,21 +479,6 @@ void Execute(Machine_State *cpu)
             Set_Byte(cpu, temp, Get_Byte(cpu, cpu->SP));
             INC(IP,2);
             break;
-        case SETMODE_OP:
-            DEBUG("SETMODE %d", GET_INTVAL(IP,1));
-            check_priv(cpu, "SETMODE");
-            cpu->FLAG = GET_INTVAL(IP,1);
-
-            if (cpu->FLAG & FL_USER_MODE)
-            {
-                // need to update regs so we are still executing the same code
-                cpu->IP -= cpu->BP;
-                cpu->SP -= cpu->BP;
-                cpu->FP -= cpu->BP;
-            }
-
-            INC(IP,2);
-            break;
         case JMPUSER_OP:
             DEBUG("JMPUSER_%d", GET_INTVAL(IP,1));
             check_priv(cpu, "JMPUSER");
@@ -489,64 +492,6 @@ void Execute(Machine_State *cpu)
             cpu->IP = temp;
 
             break;
-            /*
-        case SAVEREG_OP:
-            DEBUG("SAVEREG %d %d", GET_INTVAL(SP,-1), GET_INTVAL(SP,-1));
-            check_priv(cpu, "SAVEREG");
-            temp = GET_INTVAL(SP,-1);
-            INC(IP,1);
-            INC(SP,2);
-            switch (temp)
-            {
-                case BP_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->BP);
-                    break;
-                case LP_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->LP);
-                    break;
-                case IP_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->IP);
-                    break;
-                case SP_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->SP);
-                    break;
-                case FP_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->FP);
-                    break;
-                case FLAG_REG:
-                    Set_Word(GET_INTVAL(SP,1), cpu->FLAG);
-                    break;
-            }
-            break;
-        case RESTREG_OP:
-            DEBUG("RESTREG %d %d", GET_INTVAL(SP,-1), GET_INTVAL(SP,-1));
-            check_priv(cpu, "RESTREG");
-            temp = GET_INTVAL(SP,-1);
-            INC(IP,1);
-            INC(SP,2);
-            switch (temp)
-            {
-                case BP_REG:
-                    cpu->BP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-                case LP_REG:
-                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-                case IP_REG:
-                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-                case SP_REG:
-                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-                case FP_REG:
-                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-                case FLAG_REG:
-                    cpu->LP = Get_Word(GET_INTVAL(SP,1));
-                    break;
-            }
-            break;
-            */
         case PUSHREG_OP:
             DEBUG("PUSHREG %d", GET_INTVAL(IP,1));
             //check_priv(cpu, "SAVEREG");
@@ -571,6 +516,9 @@ void Execute(Machine_State *cpu)
                     break;
                 case FLAG_REG:
                     push(cpu, cpu->FLAG);
+                    break;
+                case IVEC_REG:
+                    push(cpu, cpu->IVEC);
                     break;
             }
             break;
@@ -599,6 +547,9 @@ void Execute(Machine_State *cpu)
                     break;
                 case FLAG_REG:
                     cpu->FLAG = pop(cpu);
+                    break;
+                case IVEC_REG:
+                    cpu->IVEC = pop(cpu);
                     break;
             }
             break;

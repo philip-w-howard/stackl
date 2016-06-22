@@ -10,6 +10,7 @@
 
 #include "disk.h"
 #include "machine.h"
+#include "machine_def.h"
 #include "vmem.h"
 #include "io_handler.h"
 
@@ -83,7 +84,10 @@ static int start_disk_read()
         Status &= ~DISK_STATUS_READ_BUSY;
         Status |= DISK_STATUS_READ_DONE | DISK_STATUS_ATTN;
 
-        if (Command & DISK_CMD_INT_ENA) Machine_Signal_Interrupt(1);
+        if (Command & DISK_CMD_INT_ENA) 
+        {
+            Machine_Signal_Interrupt(1, DISK_VECTOR);
+        }
     }
 
     return error;
@@ -120,7 +124,10 @@ static int start_disk_write()
         Status &= ~DISK_STATUS_WRITE_BUSY;
         Status |= DISK_STATUS_WRITE_DONE | DISK_STATUS_ATTN;
 
-        if (Command & DISK_CMD_INT_ENA) Machine_Signal_Interrupt(1);
+        if (Command & DISK_CMD_INT_ENA) 
+        {
+            Machine_Signal_Interrupt(1, DISK_VECTOR);
+        }
     }
 
     return error;

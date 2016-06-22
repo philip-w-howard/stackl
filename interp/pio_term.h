@@ -8,3 +8,5 @@
 #define PIO_T_IID_INT   0x01
 #define PIO_T_IID_RECV  0x02
 #define PIO_T_IID_XMIT  0x04
+
+#define PIO_T_VECTOR    5

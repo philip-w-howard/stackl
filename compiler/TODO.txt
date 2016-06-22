@@ -1,4 +1,7 @@
-Function addresses for setting interrupt vectors
+Write test for testing TRAPs
+
+Delete systrap, and interrupt pragmas (use interrupt vector instead)
+    Update doc to reflect loss of pragmas
 
 Function pointers?
     syntax and semantics?

@@ -63,7 +63,6 @@ static opcode_t op_list[] =
     {"outs", 0},
     {"inp", 0},
     {"pushfp", 0},
-    {"setmode", 1},
     {"jmpuser", 1},
     {"trap", 0},
     {"rti", 0},

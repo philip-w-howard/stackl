@@ -32,23 +32,6 @@ void Machine_Check(const char *fmt, ...)
     exit(-1);
 }
 //***************************************
-int Is_User_Mode()
-{
-    return Regs.FLAG & FL_USER_MODE;
-}
-//***************************************
-int Set_User_Mode(int value)
-{
-    int user_mode = Regs.FLAG & FL_USER_MODE;
-
-    if (value)
-        Regs.FLAG |= FL_USER_MODE;
-    else
-        Regs.FLAG &= ~FL_USER_MODE;
-
-    return user_mode;
-}
-//***************************************
 void Init_Machine(int mem_size)
 {
     //Mem_Log = fopen("mem.log", "w");
@@ -63,6 +46,7 @@ void Init_Machine(int mem_size)
     Regs.FP = 0;
     Regs.SP = 0;
     Regs.FLAG = 0;
+    Regs.IVEC = 0;
 
     pthread_mutex_unlock(&Machine_Lock);
 }
@@ -101,10 +85,10 @@ void Machine_Execute()
     }
 }
 //***************************************
-void Machine_Signal_Interrupt(int from_hw)
+void Machine_Signal_Interrupt(int from_hw, int32_t vector)
 {
     if (from_hw) pthread_mutex_lock(&Machine_Lock);
-    Regs.FLAG |= FL_INT_PENDING;
+    Regs.FLAG |= FL_I_FIRST_INT << vector;
     if (from_hw) pthread_mutex_unlock(&Machine_Lock);
 }
 

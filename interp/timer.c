@@ -74,7 +74,7 @@ int Timer_Heartbeat()
 
         if (Timer_CSR_Reg & TIMER_CSR_IE)
         {
-            Machine_Signal_Interrupt(0);
+            Machine_Signal_Interrupt(0, TIMER_VECTOR);
         }
     }
     return 0;

@@ -12,7 +12,7 @@ int main()
 {
     int value;
 
-    asm2("POPREG", FLAG_REG, 0x0010);
+    asm2("POPREG", FLAG_REG, FL_I_FIRST_INT);
 
     value = asm("seid");
     if (value)
@@ -21,7 +21,7 @@ int main()
         asm("OUTS", "prior to seid was clear\n");
 
     value = asm2("PUSHREG", FLAG_REG);
-    value |= 0x0010;
+    value |= FL_I_FIRST_INT;
     asm2("POPREG", FLAG_REG, value);
 
     asm("OUTS", "interrupt requested\n");
