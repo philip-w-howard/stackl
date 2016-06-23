@@ -1,4 +1,4 @@
-#include "test/io.h"
+//#include "test/io.h"
 // Test character arrays and pointers
 int main()
 {
@@ -11,15 +11,20 @@ int main()
     carr[1] = 'x';
     cptr[2] = '\n';
     carr[3] = 0;
-    prints(carr);
-    prints(cptr);
-    prints("The end\n");
+    asm("OUTS", carr);
+    asm("OUTS", cptr);
+    asm("OUTS", "The end\n");
+    //prints(carr);
+    //prints(cptr);
+    //prints("The end\n");
 
     cptr = "this is a cptr\n";
-    prints(cptr);
+    asm("OUTS", cptr);
+    //prints(cptr);
 
     cptr += 5;
-    prints(cptr);
+    asm("OUTS", cptr);
+    //prints(cptr);
 
     cptr = carr1;
     carr1[0] = 'h';
@@ -30,5 +35,6 @@ int main()
     carr1[5] = '\n';
     carr1[6] = 0;
 
-    prints(cptr);
+    asm("OUTS", cptr);
+    //prints(cptr);
 }

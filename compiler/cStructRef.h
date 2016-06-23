@@ -56,7 +56,12 @@ class cStructRef : public cVarRef
     cVarRef* GetBase()      { return (cVarRef*)GetChild(0); }
     cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
     cVarDecl* GetFieldDecl()     { return (cVarDecl*)(GetField()->GetDecl()); }
+    cTypeDecl* GetFieldType()    
+        { return (cTypeDecl*)(GetFieldDecl()->GetType()); }
+
+    virtual bool IsStruct()     { return GetFieldType()->IsStruct(); }
+    virtual bool IsArray()      { return GetFieldType()->IsArray(); }
+    virtual bool IsPointer()    { return GetFieldType()->IsPointer(); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };
-

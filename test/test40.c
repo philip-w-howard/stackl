@@ -7,7 +7,7 @@
 
 int main();
 
-int Interrupt_Vector[16];
+void *Interrupt_Vector[16];
 
 int systrap(int size, int op, int parm1)
 {

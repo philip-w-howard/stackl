@@ -1,6 +1,3 @@
-Update test40 to user "void *" for interrupt vector
-Add test for sizeof(void *)
-
 Function pointers?
     syntax and semantics?
 

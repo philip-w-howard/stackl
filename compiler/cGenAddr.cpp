@@ -18,19 +18,26 @@ void cGenAddr::VisitAllNodes(cAstNode *node) { node->Visit(this); }
 
 void cGenAddr::Visit(cArrayRef *node)
 {
+    int size;
     cVarRef *var = node->GetBase();
 
-    if (node->GetType()->IsPointer())
+    if (node->GetBase()->IsPointer())
+    {
         var->Visit(m_CodeGen);
+        size = node->GetType()->ElementSize();
+    }
     else
+    {
         var->Visit(this);
+        size = node->GetType()->Size();
+    }
 
     node->GetIndex()->Visit(m_CodeGen);
-    if (node->GetType()->ElementSize() == 1)
+    if (size == 1)
     {
         m_CodeGen->EmitInst("PLUS");
     } else {
-        m_CodeGen->EmitInst("PUSH", node->GetType()->Size());
+        m_CodeGen->EmitInst("PUSH", size);
         m_CodeGen->EmitInst("TIMES");
         m_CodeGen->EmitInst("PLUS");
     }

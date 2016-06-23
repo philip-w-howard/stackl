@@ -1,5 +1,10 @@
-#include <string.h>
-#include "test/io.h"
+//#include <string.h>
+//#include "test/io.h"
+
+void prints(char *str)
+{
+    asm("OUTS", str);
+}
 
 typedef struct
 {
