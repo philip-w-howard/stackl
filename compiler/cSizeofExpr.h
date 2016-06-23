@@ -15,17 +15,11 @@ class cSizeofExpr : public cExpr
         AddChild(nullptr);
     }
 
-    cSizeofExpr(cSymbol *sym) : cExpr()
+    cSizeofExpr(cTypeDecl *type) : cExpr()
     {
-        if (symbolTableRoot->Lookup(sym->Name()) == NULL)
-        {
-            ThrowSemanticError("Symbol " + sym->Name() + " not defined");
-            return;
-        }
-
         AddChild(nullptr);
-        AddChild(sym);
-        mItemSize = sym->GetDecl()->GetType()->Size();
+        AddChild(type);
+        mItemSize = type->Size();
     }
 
     virtual bool IsConst() { return true; }
@@ -38,10 +32,9 @@ class cSizeofExpr : public cExpr
         }
         else
         {
-            cSymbol *sym = (cSymbol*)GetChild(1);
-            mItemSize = sym->GetDecl()->GetType()->Size();
+            cTypeDecl *type = (cTypeDecl*)GetChild(1);
+            mItemSize = type->Size();
         }
-
 
         return mItemSize; 
     }

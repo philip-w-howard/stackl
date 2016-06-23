@@ -537,7 +537,7 @@ unary_expression
                 $$ = new cSizeofExpr($2);
                 if ($$->HasSemanticError()) YYERROR;
             }
-	| SIZEOF '(' TYPE_ID ')'
+	| SIZEOF '(' type ')'
             { 
                 $$ = new cSizeofExpr($3);
                 if ($$->HasSemanticError()) YYERROR;
