@@ -103,6 +103,7 @@
 %type <expr>            inclusive_or_expression
 %type <expr>            logical_and_expression
 %type <expr>            logical_or_expression
+%type <expr>            conditional_expression
 %type <expr>            constant_expression
 %type <expr>            assignment_expression
 %type <expr>            expr
@@ -417,12 +418,12 @@ asm_stmt : ASM '(' string_lit ')'
             }
 lval:     unary_expression
             { $$ = $1; }
-params:     params',' expr
+params:     params',' assignment_expression
             { 
                 $$ = $1; $$->AddNode($3); 
                 if ($$->HasSemanticError()) YYERROR;
             }
-        |   expr
+        |   assignment_expression
             { 
                 $$ = new cParams($1); 
                 if ($$->HasSemanticError()) YYERROR;
@@ -547,8 +548,8 @@ unary_expression
 cast_expression
 	: unary_expression
             { $$ = $1; }
-	| '(' TYPE_ID ')' cast_expression      
-                { semantic_error("Type casts not implemented"); }
+	| '(' type ')' cast_expression      
+                { semantic_error("Type casts not implemented"); YYERROR; }
 	;
 
 multiplicative_expression
@@ -692,8 +693,16 @@ logical_or_expression
 
 	;
 
+conditional_expression
+        : logical_or_expression     { $$ = $1; }
+        | logical_or_expression '?' expr ':' conditional_expression
+            { 
+              semantic_error("conditional ternary expression not implemented");
+              YYERROR; 
+            }
+
 constant_expression
-        : logical_or_expression
+        : conditional_expression
             { 
                 $$ = $1;
                 if (!$$->IsConst())
@@ -704,7 +713,7 @@ constant_expression
             }
 
 assignment_expression
-        : logical_or_expression
+        : conditional_expression
             { $$ = $1; }
         | lval '=' expr
             { 
@@ -767,10 +776,11 @@ assignment_expression
 expr
 	: assignment_expression
             { $$ = $1; }
-        /*
-        | expr ',' logical_or_expression
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
-        */
+        | expr ',' assignment_expression
+            { 
+                semantic_error("Not implemented " + std::to_string(__LINE__)); 
+                YYERROR;
+            }
 	;
 
 %%
