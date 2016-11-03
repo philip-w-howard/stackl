@@ -1,4 +1,4 @@
-COPTS=-Wall -g -c  -O0 -pthread -fpermissive
+COPTS=-Wall -g -c  -O0 -pthread
 COPTS2=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
@@ -30,8 +30,8 @@ opcode_defs.h: slasm
 	./slasm -defs
 
 stackl: $(OBJS)
-	g++ $(OBJS) -o stackl -lpthread -fpermissive
+	g++ $(OBJS) -o stackl -lpthread
 
 slasm: slasm.c formatstr.o
-	g++ -g -O0 slasm.c -o slasm formatstr.o -fpermissive
+	g++ -g -O0 slasm.c -o slasm formatstr.o
 
