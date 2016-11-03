@@ -12,7 +12,7 @@ static int  Memory_Size = DEFAULT_MEMORY_SIZE;
 static FILE *Mem_Log = NULL;
 static int Log_Enabled = 0;
 //***************************************
-static void write_log(int32_t address, int32_t value, char *label)
+static void write_log(int32_t address, int32_t value, const char *label)
 {
     if (Log_Enabled)
     {
