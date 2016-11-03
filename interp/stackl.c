@@ -90,7 +90,6 @@ void Process_Args(int argc, char **argv)
 }
 int main(int argc, char **argv)
 {
-
     int result;
 
     Process_Args(argc, argv);
