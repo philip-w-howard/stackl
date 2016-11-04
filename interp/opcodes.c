@@ -65,7 +65,7 @@ static int32_t pop(Machine_State *cpu)
     return Get_Word(cpu, cpu->SP);
 }
 //***********************************
-void check_priv(Machine_State *cpu, char *inst_name)
+void check_priv(Machine_State *cpu, const char *inst_name)
 {
     if (cpu->FLAG & FL_USER_MODE)
     {
