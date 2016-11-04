@@ -70,6 +70,7 @@
 %type <decl_list>       decls
 %type <decl>            decl
 %type <struct_decl>     struct_decl
+%type <var_decl>        func_pointer
 %type <var_decl>        var_decl
 %type <var_decl>        paramspec
 /* %type <int_val>         arrayspec */
@@ -165,6 +166,8 @@ var_decl:   type IDENTIFIER
                 $$ = new cVarDecl($1, $3); 
                 if ($$->HasSemanticError()) YYERROR;
             }
+        |   func_pointer
+            { $$ = $1; }
 type:   type '*'
             { 
                 $$ = cPointerType::PointerType($1); 
@@ -296,6 +299,10 @@ func_prefix: type IDENTIFIER '('
                 symbolTableRoot->IncreaseScope(); 
                 if ($$->HasSemanticError()) YYERROR;
             }
+func_pointer: type '(' '*' IDENTIFIER ')' '(' paramspec_list ')'
+            { semantic_error("Function pointers not implemented"); YYERROR; }
+            | type '(' '*' IDENTIFIER ')' '(' ')'
+            { semantic_error("Function pointers not implemented"); YYERROR; }
 
 paramspec_list:     
             paramspec_list',' paramspec 

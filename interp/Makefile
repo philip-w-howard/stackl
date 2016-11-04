@@ -24,14 +24,14 @@ clean:
 opcodes.o: opcodes.c opcode_defs.h
 
 .c.o: 
-	gcc $(COPTS) $< -o $@
+	g++ $(COPTS) $< -o $@
 
 opcode_defs.h: slasm
 	./slasm -defs
 
 stackl: $(OBJS)
-	gcc $(OBJS) -o stackl -lpthread
+	g++ $(OBJS) -o stackl -lpthread
 
 slasm: slasm.c formatstr.o
-	gcc -g -O0 slasm.c -o slasm formatstr.o
+	g++ -g -O0 slasm.c -o slasm formatstr.o
 

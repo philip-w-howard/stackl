@@ -15,7 +15,7 @@ typedef struct
     int32_t IVEC;       // Address if the Interrupt Vector Table
 } Machine_State;
 
-void Init_Machine();
+void Init_Machine(int mem_size);
 void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
 void Machine_Execute();

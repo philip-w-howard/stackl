@@ -31,7 +31,7 @@ static const char *HELP_STR =
 
 typedef struct
 {
-    char *op_name;
+    const char *op_name;
     int  num_params;
 } opcode_t;
 
@@ -116,7 +116,7 @@ static void add_label_def(char *label)
     if (g_Num_Label_Defs >= g_Label_Defs_Extent)
     {
         g_Label_Defs_Extent += 50;
-        g_Label_Defs = realloc(g_Label_Defs, 
+        g_Label_Defs = (label_def_t *)realloc(g_Label_Defs, 
                 g_Label_Defs_Extent*sizeof(label_def_t));
         if (g_Label_Defs == NULL) 
         {
@@ -145,7 +145,7 @@ static void add_label_ref(char *label)
     if (g_Num_Label_Refs >= g_Label_Refs_Extent)
     {
         g_Label_Refs_Extent += 50;
-        g_Label_Refs = realloc(g_Label_Refs, 
+        g_Label_Refs = (label_def_t *)realloc(g_Label_Refs, 
                 g_Label_Refs_Extent*sizeof(label_def_t));
         if (g_Label_Refs == NULL) 
         {
@@ -171,7 +171,7 @@ static void add_label_ref(char *label)
     g_Num_Label_Refs++;
 }
 
-static label_def_t *get_label_def(char *label)
+static label_def_t *get_label_def(const char *label)
 {
     int ii;
 
@@ -299,11 +299,12 @@ static void Add_File(char *filename)
     if (g_Num_Files >= g_Files_Extent)
     {
         g_Files_Extent += 20;
-        g_File_List = realloc(g_File_List, sizeof(char **)*g_Files_Extent);
+        g_File_List = (char **)realloc(g_File_List, 
+                                       sizeof(char **)*g_Files_Extent);
         assert(g_File_List != NULL);
     }
 
-    g_File_List[g_Num_Files] = malloc(strlen(filename)+1);
+    g_File_List[g_Num_Files] = (char *)malloc(strlen(filename)+1);
     strcpy(g_File_List[g_Num_Files], filename);
     g_Num_Files++;
 }
@@ -392,7 +393,7 @@ static void Process_Args(int argc, char **argv)
     }
 }
 
-static int32_t get_op_index(char *op_name)
+static int32_t get_op_index(const char *op_name)
 {
     int32_t ii;
     for (ii=0; ii<NUM_OPCODES; ii++)
@@ -587,7 +588,7 @@ static void process_asm(char *line)
     }
 }
 
-static char *make_filename(char *in_filename, char *extension)
+static char *make_filename(const char *in_filename, const char *extension)
 {
     static char out_filename[256];
     FILE *bin_file;
@@ -731,7 +732,7 @@ static int process_file(char *filename, FILE *listing)
     return 0;
 }
 
-static void update_single_vector(int offset, char *name)
+static void update_single_vector(int offset, const char *name)
 {
     int32_t label_address;
     label_def_t *label_def;
