@@ -111,12 +111,12 @@ static int g_Num_Label_Refs = 0;
 static int g_Label_Defs_Extent = 0;
 static int g_Label_Refs_Extent = 0;
 
-static void add_label_def(char *label)
+static void add_label_def(const char *label)
 {
     if (g_Num_Label_Defs >= g_Label_Defs_Extent)
     {
         g_Label_Defs_Extent += 50;
-        g_Label_Defs = (label_def_t *)realloc(g_Label_Defs, 
+        g_Label_Defs = (label_def_t*)realloc(g_Label_Defs, 
                 g_Label_Defs_Extent*sizeof(label_def_t));
         if (g_Label_Defs == NULL) 
         {
@@ -140,12 +140,12 @@ static void add_label_def(char *label)
     g_Num_Label_Defs++;
 }
 
-static void add_label_ref(char *label)
+static void add_label_ref(const char *label)
 {
     if (g_Num_Label_Refs >= g_Label_Refs_Extent)
     {
         g_Label_Refs_Extent += 50;
-        g_Label_Refs = (label_def_t *)realloc(g_Label_Refs, 
+        g_Label_Refs = (label_def_t*)realloc(g_Label_Refs, 
                 g_Label_Refs_Extent*sizeof(label_def_t));
         if (g_Label_Refs == NULL) 
         {
@@ -299,12 +299,11 @@ static void Add_File(char *filename)
     if (g_Num_Files >= g_Files_Extent)
     {
         g_Files_Extent += 20;
-        g_File_List = (char **)realloc(g_File_List, 
-                                       sizeof(char **)*g_Files_Extent);
+        g_File_List = (char**)realloc(g_File_List, sizeof(char **)*g_Files_Extent);
         assert(g_File_List != NULL);
     }
 
-    g_File_List[g_Num_Files] = (char *)malloc(strlen(filename)+1);
+    g_File_List[g_Num_Files] = (char*)malloc(strlen(filename)+1);
     strcpy(g_File_List[g_Num_Files], filename);
     g_Num_Files++;
 }
@@ -588,7 +587,7 @@ static void process_asm(char *line)
     }
 }
 
-static char *make_filename(const char *in_filename, const char *extension)
+static char *make_filename(char *in_filename, const char *extension)
 {
     static char out_filename[256];
     FILE *bin_file;

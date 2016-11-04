@@ -101,7 +101,7 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
         Command = value;
         if (Command & DMA_T_CMD_START_WRITE)
         {
-            char *buffer = (char *)Abs_Get_Addr(Address);
+            char *buffer = (char*)Abs_Get_Addr(Address);
             if (buffer == NULL) Machine_Check("DMA_T write from invalid address");
             printf("%s", buffer);
             Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);
