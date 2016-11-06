@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "stackl_debugger.h"
 
 #define MACHINE_CHECK_VECTOR    0
 #define TRAP_VECTOR             1
@@ -18,6 +19,7 @@ typedef struct
 void Init_Machine(int mem_size);
 void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
+void Machine_Execute_Debug(stackl_debugger& dbg);
 void Machine_Execute();
 void Machine_Check(const char *fmt, ...);
 void Machine_Signal_Interrupt(int from_hw, int32_t vector);

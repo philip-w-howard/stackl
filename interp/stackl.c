@@ -10,6 +10,9 @@
 #include "timer.h"
 #include "../version.h"
 
+#include "stackl_debugger.h"
+#include <string>
+
 // Use PATH_MAX from limits.h?
 //
 static char Input_File[256] = "";
@@ -19,11 +22,12 @@ static int Boot_Disk = 0;       // 1
 static int Use_PIO_Term = 0;    // 1
 static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
+static int Use_Debugger = 0;
 
 static const char *HELP_STR =
  "stackl [-boot] [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
  "       [-opcodes] [-help] [-version] [-loader]\n"
- "       [-M<mem size>] [-N<num instr>]\n";
+ "       [-M<mem size>] [-N<num instr>] [-dbg]\n";
 
 void Process_Args(int argc, char **argv)
 {
@@ -62,6 +66,8 @@ void Process_Args(int argc, char **argv)
                 Set_Max_Instr(atoi(&argv[ii][2]));
             else if (strcmp(arg, "opcodes") == 0)
                 Opcodes_Debug();
+            else if (strcmp(arg, "dbg") == 0)
+                Use_Debugger = 1;
             else if (strcmp(arg, "pio_term") == 0)
             {
                 Use_PIO_Term = 1;
@@ -90,6 +96,7 @@ void Process_Args(int argc, char **argv)
 }
 int main(int argc, char **argv)
 {
+
     int result;
 
     Process_Args(argc, argv);
@@ -131,8 +138,15 @@ int main(int argc, char **argv)
             return 3;
         }
     }
-
-    Machine_Execute();
+    
+    if (Use_Debugger)
+    {
+        string filename_str = Input_File;
+        stackl_debugger sdb( filename_str.substr( 0, filename_str.find_last_of( "." ) ) );
+        Machine_Execute_Debug( sdb );
+    }
+    else
+        Machine_Execute();
 
     return 0;
 }

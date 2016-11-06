@@ -85,6 +85,18 @@ void Machine_Execute()
     }
 }
 //***************************************
+void Machine_Execute_Debug(stackl_debugger& dbg)
+{
+    dbg.query_user(Regs.IP, Regs.FP);
+    while ( !(Regs.FLAG & FL_HALTED) )
+    {
+        pthread_mutex_lock(&Machine_Lock);
+        dbg.debug_check(Regs.IP, Regs.FP);
+        Execute(&Regs);
+        pthread_mutex_unlock(&Machine_Lock);
+    }
+}
+//***************************************
 void Machine_Signal_Interrupt(int from_hw, int32_t vector)
 {
     if (from_hw) pthread_mutex_lock(&Machine_Lock);
