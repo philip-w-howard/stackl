@@ -1,4 +1,5 @@
-COPTS=-Wall -g -c  -O0 -pthread -std=c++1y
+VPATH:=dbg
+COPTS=-Wall -g -c -O0 -pthread
 COPTS2=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
@@ -18,6 +19,7 @@ OBJS=stackl.o \
 	 function.o \
 	 string_utils.o \
 	 stackl_debugger.o \
+	 debugger_interface.o
 
 all: stackl slasm
 
@@ -33,17 +35,17 @@ clean:
 opcodes.o: opcodes.c opcode_defs.h
 
 .c.o: 
-	g++ $(COPTS) $< -o $@
+	gcc $(COPTS) $< -o $@
 
 .cpp.o:
-	g++ $(COPTS)  $< -o $@
+	g++ $(COPTS) $< -o $@ -std=c++1y
 
 opcode_defs.h: slasm
 	./slasm -defs
 
 stackl: $(OBJS)
-	g++ $(OBJS) -o stackl -lpthread -std=c++1y
+	gcc $(OBJS) -o stackl -lpthread -lstdc++ -lm
 
 slasm: slasm.c formatstr.o
-	g++ -g -O0 slasm.c -o slasm formatstr.o -std=c++1y
+	gcc -g -O0 slasm.c -o slasm formatstr.o
 

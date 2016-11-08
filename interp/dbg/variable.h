@@ -14,11 +14,11 @@ using std::vector;
 #include <set>
 using std::set;
 #include <string.h>
-//strcmp
 
 #include "rapidxml.hpp"
 using rapidxml::xml_node;
 using rapidxml::xml_attribute;
+#include "../machine.h"
 
 class struct_decl;
 
@@ -28,7 +28,7 @@ public:
 	variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context = nullptr );
 	variable() {}
 
-	string to_string( uint32_t fp ) const;
+	string to_string( Machine_State* cpu ) const;
 
 	inline size_t size() const { return _size; }
 	inline string name() const { return _name; }
@@ -36,6 +36,7 @@ public:
 	inline bool is_pointer() const { return _indirection != 0; }
 	inline bool is_array() const { return _array_ranges.size() != 0; }
 	inline bool is_struct() const { return _struct_decl != nullptr; }
+        string full_type() const;
 
 private:
 

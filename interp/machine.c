@@ -7,6 +7,7 @@
 #include "opcodes.h"
 #include "io_handler.h"
 #include "vmem.h"
+#include "dbg/debugger_interface.h"
 
 #define DEFAULT_MEMORY_SIZE  40000
 
@@ -80,18 +81,7 @@ void Machine_Execute()
     while ( !(Regs.FLAG & FL_HALTED) )
     {
         pthread_mutex_lock(&Machine_Lock);
-        Execute(&Regs);
-        pthread_mutex_unlock(&Machine_Lock);
-    }
-}
-//***************************************
-void Machine_Execute_Debug(stackl_debugger& dbg)
-{
-    dbg.query_user(Regs.IP, Regs.FP);
-    while ( !(Regs.FLAG & FL_HALTED) )
-    {
-        pthread_mutex_lock(&Machine_Lock);
-        dbg.debug_check(Regs.IP, Regs.FP);
+        dbg_check_break( &Regs );
         Execute(&Regs);
         pthread_mutex_unlock(&Machine_Lock);
     }

@@ -15,6 +15,8 @@
 #include "disk.h"
 #include "formatstr.h"
 
+#include "dbg/debugger_interface.h"
+
 static int Do_Debug = 0;
 
 void Loader_Debug()
@@ -203,6 +205,10 @@ int Load(const char *filename, int boot)
         fclose(input);
         return 0;
     }
+
+    dbg_load_info( &cpu, filename );
+    Set_Machine_State( &cpu );
+
     while (fgets(string, sizeof(string), input))
     {
         token = strtok(string, delims);
@@ -257,6 +263,7 @@ int Boot(const char *filename)
     top = Load(filename, 1);
     if (top == 0) return 1;
 
+    Get_Machine_State(&cpu);
     cpu.SP = top + WORD_SIZE;
     cpu.FP = cpu.SP;
     cpu.IP = cpu.BP + 2*WORD_SIZE;
