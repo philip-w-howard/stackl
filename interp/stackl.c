@@ -10,9 +10,6 @@
 #include "timer.h"
 #include "../version.h"
 
-#include "stackl_debugger.h"
-#include <string>
-
 // Use PATH_MAX from limits.h?
 //
 static char Input_File[256] = "";
@@ -139,14 +136,7 @@ int main(int argc, char **argv)
         }
     }
     
-    if (Use_Debugger)
-    {
-        string filename_str = Input_File;
-        stackl_debugger sdb( filename_str.substr( 0, filename_str.find_last_of( "." ) ) );
-        Machine_Execute_Debug( sdb );
-    }
-    else
-        Machine_Execute();
+    Machine_Execute();
 
     return 0;
 }

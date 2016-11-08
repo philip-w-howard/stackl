@@ -16,13 +16,13 @@ function::function( xml_node<char>* func_decl_node, unordered_map<string, struct
 
 	load_locals( func_decl_node->first_node( "StmtsList" ), type_context ); //start recursive search for local vars
 }
-
+#include <iostream>
 variable* function::var( const string & var_name )
 {
-	auto res = _locals.find( var_name );
-	if( res != _locals.end() )
-		return &res->second;
-	return nullptr;
+    auto res = _locals.find( var_name );
+    if( res != _locals.end() )
+	return &res->second;
+    else return nullptr;
 }
 
 //gotta do this recursively because nested scopes are inherently recursive

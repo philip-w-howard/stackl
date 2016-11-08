@@ -21,6 +21,7 @@ using rapidxml::xml_attribute;
 class abstract_syntax_tree
 {
 public:
+        abstract_syntax_tree() {}
 	abstract_syntax_tree( const string& filename );
 	void print_funcs();
 

@@ -36,3 +36,13 @@ bool string_utils::is_number( const string& num_text, int base, int* res )
 		strtol( num_text.c_str(), &p, base );
 	return *p == 0;
 }
+
+bool string_utils::begins_with( const string & input, const string & begin )
+{
+	return input.length() >= begin.length() && input.substr( 0, begin.length() ) == begin;
+}
+
+bool string_utils::ends_with( const string & input, const string & end )
+{
+	return input.length() >= end.length() && input.substr( input.length() - end.length() ) == end;
+}
