@@ -57,7 +57,7 @@ uint32_t asm_list::addr_of_line( const string & filename, uint32_t line_number )
     if( file_find != _file_and_line_to_addr.end() )
     {
 	uint32_t dif = UINT32_MAX; //we won't be able to debug a file with 2^32 empty lines :(
-	uint32_t cur_best_line_addr = 0;
+	uint32_t cur_best_line_addr = UINT32_MAX;
 	for( addr_line_t& al_t : file_find->second )
         {
             if( al_t.line_num == line_number )
@@ -83,21 +83,39 @@ uint32_t asm_list::addr_of_line( const string & filename, uint32_t line_number )
 
 uint32_t asm_list::line_of_addr( const string& filename, uint32_t address )
 {
-	auto file_find = _file_and_line_to_addr.find( filename );
-	if( file_find != _file_and_line_to_addr.end() )
-	{
-		uint32_t cur_best_line_num = UINT32_MAX;
-		for( addr_line_t& al_t : file_find->second )
-		{
-			if( al_t.addr == address && al_t.line_num < cur_best_line_num )
-			{
-				cur_best_line_num = al_t.line_num;
-			}
-		}
-		//return our best case, since we didnt find it if we got here
-		return cur_best_line_num;
+    auto file_find = _file_and_line_to_addr.find( filename );
+    if( file_find != _file_and_line_to_addr.end() )
+    {
+	uint32_t cur_best_line_num = UINT32_MAX;
+	for( addr_line_t& al_t : file_find->second )
+	{ //If the address passed has multiple lines we return the smallest line number
+	    if( al_t.addr == address && al_t.line_num < cur_best_line_num )
+	    {
+		cur_best_line_num = al_t.line_num;
+	    }
 	}
-	else return UINT32_MAX;
+        if( cur_best_line_num != UINT32_MAX )
+        {   //return our best case, since we didnt find it if we got here
+	    return cur_best_line_num;
+        }
+        else
+        {
+            uint32_t dif = UINT32_MAX;
+            for( addr_line_t& al_t : file_find->second )
+            { //if the address passed isnt a registered line number, find the most recent line number update
+                if( address > al_t.addr )
+                {
+                    if( address - al_t.addr < dif )
+                    {
+                        dif = address - al_t.addr;
+                        cur_best_line_num = al_t.line_num;
+                    }
+                }
+            }
+            return cur_best_line_num;
+        }
+    }
+    else return UINT32_MAX;
 }
 
 string asm_list::current_func( uint32_t cur_addr )
@@ -117,9 +135,23 @@ string asm_list::current_func( uint32_t cur_addr )
 
 string asm_list::current_file( uint32_t cur_addr )
 {
+    string best_filename = "unknown";
+    uint32_t dif = INT32_MAX;
     for( auto& f_dict : _file_and_line_to_addr )
-	for( addr_line_t& adt : f_dict.second )
-	    if( adt.addr == cur_addr )
+    {
+	for( addr_line_t& alt : f_dict.second )
+        {
+	    if( alt.addr == cur_addr )
 		return f_dict.first; //filename
-    return "unknown";
+            else if( alt.addr > cur_addr )
+            {
+                if( alt.addr - cur_addr < dif )
+                {
+                    dif = alt.addr - cur_addr;
+                    best_filename = f_dict.first;
+                }
+            }
+        }
+    }
+    return best_filename;
 }

@@ -17,11 +17,18 @@ struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, str
 	}
 }
 
-string struct_decl::to_string( Machine_State* cpu ) const
+string struct_decl::to_string( Machine_State* cpu, uint32_t indent_level ) const
 {
 	string ret = "";
 	for( auto& var : _fields )
-		ret += "\t" + var.to_string( cpu ) + '\n';
-        ret += "}";
+		ret += var.to_string( cpu, indent_level ) + '\n';
 	return ret;
+}
+
+variable* struct_decl::var( const string& var_name )
+{
+    for( variable& local_var : _fields )
+        if( local_var.name() == var_name )
+            return &local_var;
+    return nullptr;
 }

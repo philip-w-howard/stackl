@@ -2,6 +2,10 @@
 #include "struct_decl.h" //forward declaration found in variable.h
 //since a variable needs to know its type context but also a struct_decl holds variables
 
+#include <cstdio>
+
+#include "string_utils.h"
+
 extern "C"
 {
     #include "../vmem.h"
@@ -11,7 +15,6 @@ set<string> variable::builtins(
 {
     "char",
     "int",
-    "float"
 } );
 
 variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
@@ -111,39 +114,47 @@ void variable::parse_node_type( xml_node<char>* node, unordered_map<string, stru
     }
 }
 
-string variable::full_type() const
+string variable::definition() const
 {
-    string ft = _type;
-    ft += string( _indirection, '*' );
+    string def = _type;
+    def += string( _indirection, '*' );
+
+    def += " " + _name;
 
     if( _array_ranges.size() != 0 )
-    {
-        ft += ' ';
         for( size_t idx : _array_ranges )
-            ft += "[" + std::to_string( idx ) + "]";
-    }
-    return ft;
+            def += "[" + std::to_string( idx ) + "]";
+    return def;
 }
 
-string variable::to_string( Machine_State* cpu ) const
+variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
 {
-    string type = full_type();
-    string pre;
-    if( type != "char*" && ( is_pointer() || is_array() ) )
-        pre = _name + "(" + type + ") = 0x";
-    else
-        pre = _name + "(" + type + ") = ";
+    if( derefs == 0  ) //short cut.
+        return *this; //the algorithm would work fine with deref == 0, this just saves time.
+    if( derefs > _indirection )
+        throw "Variable does not have that many levels of indirection";
 
+    int32_t addr = cpu->FP + _offset;;
+    for( uint32_t i = 0; i < derefs; ++i )
+        addr = Get_Word( cpu, addr );
+
+    variable deref_var = *this; //create a copy
+    deref_var.offset( addr - cpu->FP ); //modify its offset relative to the current FP
+    deref_var.indirection( indirection() - derefs ); //modify its level of indirection
+
+    return deref_var;
+}
+
+string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
+{
+    string tabs = string( indent_level, '\t' );
+    string pre = tabs + definition() + " = ";
     if( _struct_decl == nullptr )
     {
         //NOTE TO SELF: this->to_string != std::to_string DO NOT LET THEM GET CONFUSED
-        if( _type == "int" )
+        if( is_pointer() || is_array() )
         {
-            return pre + std::to_string( Get_Word( cpu, cpu->FP + _offset ) );
-        }
-        else if( _type == "char" )
-        {
-            if( _indirection == 1 ) //special case because we want to print out the char*
+            if( _type == "char" && _indirection == 1 && !is_array() ) //is it a char*
             {
                 char v;
                 pre += "\"";
@@ -151,20 +162,28 @@ string variable::to_string( Machine_State* cpu ) const
                 for( int i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
                     pre += v;
                 pre += "\"";
-                return pre;
+                return pre; //special case: we want to print out the string it points to
             }
             else
             {
-                return pre + "'" + (char)Get_Byte( cpu, cpu->FP + _offset ) + "'";
+                return pre + string_utils::to_hex( Get_Word( cpu, cpu->FP + _offset ) );
             }
         }
+        else if( _type == "int" )
+        {
+            return pre + std::to_string( Get_Word( cpu, cpu->FP + _offset ) );
+        }
+        else if( _type == "char" )
+        {
+            return pre + "'" + (char)Get_Byte( cpu, cpu->FP + _offset ) + "'";
+        }
         else
-            return "?";
+            return string( "unable to print type " ) + _type;
     }
     else
     {
         Machine_State temp_state = *cpu;
         temp_state.FP += _offset;
-        return pre + "{\n" + _struct_decl->to_string( &temp_state );
+        return pre + "{\n" + _struct_decl->to_string( &temp_state, indent_level + 1 ) + tabs + "}";
     }
 }

@@ -49,7 +49,7 @@ private:
 	inline void remove_all_breakpoints() { _break_points.clear(); }
 
 	//is the current address in our list of break points?
-	inline bool should_break( uint32_t cur_addr ) const { return find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end(); }
+	bool should_break( uint32_t cur_addr );
 
 	/* This will get the value of the var and return it as a printable string.
 
@@ -80,5 +80,10 @@ private:
 	vector<uint32_t> _break_points;
 	abstract_syntax_tree _ast;
 	asm_list _lst;
-        bool _loaded;
+        bool _loaded = false;
+
+        string _prev_cmd = "";
+
+        uint32_t _prev_line = UINT32_MAX;
+        string _prev_file = "";
 };
