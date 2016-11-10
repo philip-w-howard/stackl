@@ -132,7 +132,7 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
     if( derefs == 0  ) //short cut.
         return *this; //the algorithm would work fine with deref == 0, this just saves time.
     if( derefs > _indirection )
-        throw "Variable does not have that many levels of indirection";
+        throw "Variable does not have that many levels of indirection.";
 
     int32_t addr = cpu->FP + _offset;;
     for( uint32_t i = 0; i < derefs; ++i )
@@ -147,7 +147,7 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
 
 string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
 {
-    string tabs = string( indent_level, '\t' );
+    string tabs = string( indent_level*4, ' ' );
     string pre = tabs + definition() + " = ";
     if( _struct_decl == nullptr )
     {
@@ -160,7 +160,14 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
                 pre += "\"";
                 int32_t addr = Get_Word( cpu, cpu->FP + _offset );
                 for( int i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
-                    pre += v;
+                {
+                    if( v == '\n' )
+                        pre += "\\n";
+                    else if( v == '\t' )
+                        pre += "\\t";
+                    else
+                        pre += v;
+                }
                 pre += "\"";
                 return pre; //special case: we want to print out the string it points to
             }

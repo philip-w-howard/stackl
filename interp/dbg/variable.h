@@ -43,6 +43,7 @@ public:
     inline bool is_pointer() const { return _indirection != 0; }
     inline bool is_array() const { return _array_ranges.size() != 0; }
     inline bool is_struct() const { return _struct_decl != nullptr; }
+    inline struct_decl* decl() { return _struct_decl; }
     string definition() const;
 
 private:

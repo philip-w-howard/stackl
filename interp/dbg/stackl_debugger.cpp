@@ -102,7 +102,7 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
 
 string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text )
 {
-    //array index/direct address access does not work currently
+    //array index does not work currently
     
     int32_t val;
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
@@ -123,10 +123,35 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
     while( txt[indirection++] == '*' ); //count the number of leading asterisks
     txt.erase( 0, --indirection ); //remove them 
 
-    variable* var = _ast.var( _lst.current_func( cpu->IP ), txt );
+    vector<string> var_fields = string_utils::string_split( txt, '.' );
+    variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
+    int32_t total_offset = var->offset();
+    for( uint32_t i = 1; i < var_fields.size(); ++i )
+    {
+        if( var->is_struct() && !var->is_pointer() && !var->is_array() )
+        {
+            var = var->decl()->var(var_fields[i]);
+            total_offset += var->offset();
+        }
+        else
+        {
+            return string( "'" ) + var->definition() + "' is not a struct type.";
+        }
+    }
+
     if( var != nullptr )
     {
-        variable res = var->deref( indirection, cpu );
+        variable res = *var; //create copy of var
+        res.offset( total_offset ); //modify its offset by the total dist from the FP
+        try
+        {
+            res = res.deref( indirection, cpu );
+        }
+        catch( const char* msg )
+        {
+            return msg;
+        }
+
         if( address_of )
             return string_utils::to_hex( res.address_of( cpu ) );
         else return res.to_string( cpu );
