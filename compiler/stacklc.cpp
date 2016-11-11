@@ -60,11 +60,14 @@ void Process_Args(int argc, char **argv)
                 Do_Ast = 1;
             else if (strcmp(arg, "c") == 0)
                 Do_Assembler = 0;
-            else if (strcmp(arg, "debug") == 0)
+            else if (strcmp(arg, "dbg") == 0)
+            {
                 Do_Debug = 1;
+                Do_Ast = 1;
+            }
             else if (strcmp(arg, "help") == 0)
             {
-                std::cout << "stacklc -help -version -yydebug -debug -ast <file>\n";
+                std::cout << "stacklc -help -version -yydebug -dbg -ast <file>\n";
                 exit(0);
             }
             else if (strcmp(arg, "version") == 0)
@@ -184,6 +187,7 @@ int main(int argc, char **argv)
         if (Do_Assembler)
         {
             string makebin("slasm ");
+            if (Do_Debug) makebin += "-list ";
             makebin += outfile_name;
 
             result = system(makebin.c_str());

@@ -216,7 +216,7 @@ static void open_input(char *name)
 }
 static int do_return(int val)
 {
-    if (Do_Debug) fprintf(stderr, "Scanned '%s': %d\n", yytext, val);
+    //if (Do_Debug) fprintf(stderr, "Scanned '%s': %d\n", yytext, val);
     return val;
 }
 static int process_string_lit()
