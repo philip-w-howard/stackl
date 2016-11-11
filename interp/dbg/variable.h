@@ -14,6 +14,7 @@ using std::vector;
 #include <set>
 using std::set;
 #include <string.h>
+#include <stdlib.h>
 
 #include "rapidxml.hpp"
 using rapidxml::xml_node;
@@ -25,18 +26,25 @@ class struct_decl;
 class variable
 {
 public:
-	variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context = nullptr );
-	variable() {}
+    variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context = nullptr );
+    variable() {}
 
-	string to_string( Machine_State* cpu ) const;
+    string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
+    variable deref( uint32_t derefs, Machine_State* cpu ) const;
+    
+    inline uint32_t address_of( Machine_State* cpu ) const { return _offset + cpu->FP; }
 
-	inline size_t size() const { return _size; }
-	inline string name() const { return _name; }
-	inline uint32_t offset() const { return _offset; }
-	inline bool is_pointer() const { return _indirection != 0; }
-	inline bool is_array() const { return _array_ranges.size() != 0; }
-	inline bool is_struct() const { return _struct_decl != nullptr; }
-        string full_type() const;
+    inline size_t size() const { return _size; }
+    inline string name() const { return _name; }
+    inline int32_t offset() const { return _offset; }
+    inline void offset( int32_t offset ) { _offset = offset; }
+    inline int32_t indirection() const { return _indirection; }
+    inline void indirection( int32_t indirection ) { _indirection = indirection; }
+    inline bool is_pointer() const { return _indirection != 0; }
+    inline bool is_array() const { return _array_ranges.size() != 0; }
+    inline bool is_struct() const { return _struct_decl != nullptr; }
+    inline struct_decl* decl() { return _struct_decl; }
+    string definition() const;
 
 private:
 
@@ -49,7 +57,7 @@ private:
 	void parse_node_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
 
 	string _type;
-	uint32_t _offset;
+	int32_t _offset;
 	size_t _size = 0;
 	string _name;
 

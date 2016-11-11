@@ -32,28 +32,55 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
 
 void abstract_syntax_tree::load( xml_document<char>& doc )
 {
-	for( xml_node<char>* node : doc.first_node()->all_nodes() )
+    for( xml_node<char>* node : doc.first_node()->all_nodes() )
+    {
+	if( strcmp( node->name(), "StructType" ) == 0 )
 	{
-		if( strcmp( node->name(), "StructType" ) == 0 )
-		{
-			struct_decl decl( node, _struct_decls );
-			_struct_decls[decl.name()] = decl;
-		}
-		else if( strcmp( node->name(), "VarDecl" ) == 0 )
-		{
-			variable var( node, _struct_decls );
-			_globals[var.name()] = var;
-		}
-		else if( strcmp( node->name(), "FuncDecl" ) == 0 )
-		{
-			function func( node, _struct_decls );
-			_functions[func.name()] = func;
-		}
+	    struct_decl decl( node, _struct_decls );
+	    _struct_decls[decl.name()] = decl;
 	}
+	else if( strcmp( node->name(), "VarDecl" ) == 0 )
+	{
+	    variable var( node, _struct_decls );
+	    _globals[var.name()] = var;
+	}
+	else if( strcmp( node->name(), "FuncDecl" ) == 0 )
+	{
+	    function func( node, _struct_decls );
+	    _functions[func.name()] = func;
+	}
+    }
 }
 
-void abstract_syntax_tree::print_funcs()
+string abstract_syntax_tree::all_locals( const string& func_name )
 {
-	for( auto& func : _functions )
-		std::cout << func.first << '\n';
+    string ret = "";
+    auto find_res = _functions.find( func_name );
+
+    if( find_res == _functions.end() )
+        return "Couldn't find function.\n";
+
+    for( auto& var_pair : find_res->second.get_locals() )
+        ret += var_pair.second.definition() + '\n';
+    if( ret.empty() )
+        return string( "No local variables found in " ) + func_name + '\n';
+    return ret;
+}
+
+string abstract_syntax_tree::all_globals()
+{
+    string ret = "";
+    for( auto& var_pair : _globals )
+        ret += var_pair.second.definition() + '\n';
+    if( ret.empty() )
+        return "No globals found\n";
+    return ret;
+}
+
+string abstract_syntax_tree::all_funcs()
+{
+    string ret = "";
+    for( auto& func_pair : _functions )
+        ret += func_pair.first + "()\n";
+    return ret;
 }

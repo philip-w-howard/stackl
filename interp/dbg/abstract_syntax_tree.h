@@ -23,7 +23,9 @@ class abstract_syntax_tree
 public:
         abstract_syntax_tree() {}
 	abstract_syntax_tree( const string& filename );
-	void print_funcs();
+	string all_funcs();
+        string all_locals( const string& func_name );
+        string all_globals();
 
 	inline unordered_map<string, variable>& globals() { return _globals; }
 	inline unordered_map<string, function>& functions() { return _functions; }

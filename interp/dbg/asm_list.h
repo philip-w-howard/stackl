@@ -21,7 +21,7 @@ public:
 
 	uint32_t addr_of_func( const string& func );
 	uint32_t addr_of_line( const string& filename, uint32_t line_number );
-	uint32_t line_of_addr( const string& filename, uint32_t address  );
+	uint32_t line_of_addr( const string& filename, uint32_t address );
 
 	string current_func( uint32_t cur_addr );
 	string current_file( uint32_t cur_addr );

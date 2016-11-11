@@ -2,6 +2,12 @@
 
 #include <iostream>
 #include <cmath>
+#include <cstdio>
+
+extern "C"
+{
+    #include "../vmem.h"
+}
 
 stackl_debugger::stackl_debugger( const char* filename )
 {
@@ -63,8 +69,8 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
 	return _lst.addr_of_line( file_line[0], stoi( file_line[1] ) );
     }
     else if( string_utils::is_number( break_point_text, 10, &res ) )
-    {
-	return _lst.addr_of_line( _lst.current_file( cur_addr ), res );
+    {   
+        return _lst.addr_of_line( _lst.current_file( cur_addr ), res );
     }
     else
     {
@@ -96,12 +102,59 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
 
 string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text )
 {
-    //THIS IS NAIVE INMPLIMENTATION ONLY WORKS ON NORMAL VARAIBLES
-    //no pointer deref/array index/direct address access
-    variable* var = _ast.var( _lst.current_func( cpu->IP ), var_text );
+    //array index does not work currently
+    
+    int32_t val;
+    if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
+    {
+        return string_utils::to_hex( Get_Word( cpu, val ) );
+    }
+    
+    string txt = var_text;
+
+    bool address_of = false;
+    if( txt[0] == '&' )
+    {
+        address_of = true;
+        txt.erase( 0, 1 );
+    }
+
+    uint32_t indirection = 0;
+    while( txt[indirection++] == '*' ); //count the number of leading asterisks
+    txt.erase( 0, --indirection ); //remove them 
+
+    vector<string> var_fields = string_utils::string_split( txt, '.' );
+    variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
+    int32_t total_offset = var->offset();
+    for( uint32_t i = 1; i < var_fields.size(); ++i )
+    {
+        if( var->is_struct() && !var->is_pointer() && !var->is_array() )
+        {
+            var = var->decl()->var(var_fields[i]);
+            total_offset += var->offset();
+        }
+        else
+        {
+            return string( "'" ) + var->definition() + "' is not a struct type.";
+        }
+    }
+
     if( var != nullptr )
     {
-	return var->to_string( cpu );
+        variable res = *var; //create copy of var
+        res.offset( total_offset ); //modify its offset by the total dist from the FP
+        try
+        {
+            res = res.deref( indirection, cpu );
+        }
+        catch( const char* msg )
+        {
+            return msg;
+        }
+
+        if( address_of )
+            return string_utils::to_hex( res.address_of( cpu ) );
+        else return res.to_string( cpu );
     }
     else
     {
@@ -128,6 +181,14 @@ void stackl_debugger::query_user( Machine_State* cpu )
     while( true )
     {
 	getline( cin, input );
+        
+        if( input == "" )
+        {
+            input = _prev_cmd;
+            cout << _prev_cmd << '\n';
+        }
+        else
+            _prev_cmd = input;
 
         size_t idx = input.find_first_of( ' ' );
         string cmd, params;
@@ -155,7 +216,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
 		case SUCCESS:
 		    final_addr = text_to_addr( params, cpu->IP );
 		    file_name = _lst.current_file( final_addr );
-		    cout << "breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << '\n';
+		    cout << "breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
 		    break;
 		case DUPLICATE:
 		    cout << "breakpoint already exists on that line.\n";
@@ -165,6 +226,29 @@ void stackl_debugger::query_user( Machine_State* cpu )
 		    break;
 	    }
 	}
+        else if( cmd == "removebreak" || cmd == "rbreak" || cmd == "rb" )
+        {
+            if( params.length() == 0 )
+                continue;
+
+            BREAKPOINT_RESULT res = remove_breakpoint( params, cpu->IP );
+            uint32_t final_addr;
+            string file_name;
+            switch( res )
+            {
+                case SUCCESS:
+                    final_addr = text_to_addr( params, cpu->IP );
+                    file_name = _lst.current_file( final_addr );
+                    cout << "breakpoint removed from " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
+                    break;
+                case NOT_FOUND:
+                    cout << "breakpoint doesnt exist on that line.\n";
+                    break;
+                case DUPLICATE:
+                    cout << "Not sure how you got here.\n";
+                    break;
+            }
+        }
 	else if( cmd == "continue" || cmd == "c" || cmd == "cont" )
 	{
 	    break;
@@ -179,32 +263,95 @@ void stackl_debugger::query_user( Machine_State* cpu )
             else
                 cout << "[list] [optional range]\n";
 	}
+        else if( cmd == "locals" || cmd == "listlocals" )
+        {
+            if( params.length() == 0 )
+            {
+                string cur_func = _lst.current_func( cpu->IP );
+                if( cur_func.empty() )
+                    cout << "Can't determine current function.\n";
+                else
+                    cout << _ast.all_locals( cur_func );
+            }
+            else
+            {
+                if( _lst.addr_of_func( params ) != UINT32_MAX )
+                {
+                    cout << _ast.all_locals( params );
+                }
+            }
+        }
+        else if( cmd == "globals" || cmd == "listglobals" )
+        {
+            cout << _ast.all_globals();
+        }
+        else if( cmd== "funcs" || cmd == "listfuncs" || cmd == "listfunctions" )
+        {
+            cout << _ast.all_funcs();
+        }
 	else if( cmd == "print" || cmd == "p" )
 	{
             if( params.length() == 0 )
                 continue; //no text? do nothing
 	    cout << var_to_string( cpu, params ) << '\n';
 	}
+        else if( cmd == "next" || cmd == "n" )
+        {
+            _prev_file = _lst.current_file( cpu->IP );
+            _prev_line = _lst.line_of_addr( _prev_file, cpu->IP );
+            break;
+        }
         else if( cmd == "help" )
         {
-            cout << "[breakpoint|break|b] [line_num|file:line_num|func_name] - adds breakpoint\n"
-                << "[print|p] [var_name|0xaddress] - prints the value of the variable\n"
-                << "[continue|cont|c] - runs program until the next breakpoint\n"
-                << "[list] - prints lines of code near the current execution line\n";
+            cout << "[breakpoint|break|b] [line_num|file:line_num|func_name] - Adds breakpoint\n"
+                << "[removebreak|rbreak|rb] [line_num|file:line_num|func_name] - Removes breakpoint\n"
+                << "[print|p] [var_name|0xaddress] - Prints the value of the variable\n"
+                << "[continue|cont|c] - Runs program until the next breakpoint\n"
+                << "[list] [optional line_num]- Prints lines of with within N lines\n"
+                << "[next|n] - Executes the current line of code\n"
+                << "[locals|listlocals] [optional func_name] - Print all local vars in current or specified function\n"
+                << "[globals|listglobals] - Print all global variables\n"
+                << "[funcs|listfuncs|listfunctions] - Print all functions\n"
+                << "[IP] - Prints the instruction pointer\n"
+                << "[FP] - Prints the frame pointer\n"
+                << "[BP] - Prints the base pointer\n"
+                << "[LP] - Prints the limit pointer\n"
+                << "[SP] - Prints the stack pointer\n"
+                << "Hitting enter repeats the last command entered.\n";
         }
         else if( cmd == "IP" )
-        {
             cout << "Instruction Pointer: " << cpu->IP << '\n';
-        }
         else if( cmd == "FP" )
-        {
             cout << "Frame Pointer: " << cpu->FP << '\n';
-        }
+        else if( cmd == "BP" )
+            cout << "Base Pointer: " << cpu->BP << '\n';
+        else if( cmd == "LP" )
+            cout << "Limit Pointer: " << cpu->LP << '\n';
+        else if( cmd == "SP" )
+            cout << "Stack Pointer: " << cpu->SP << '\n';
         else
         {
             cout << "huh?\n";
         }
     }
+}
+
+bool stackl_debugger::should_break( uint32_t cur_addr )
+{
+    if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
+        return true;
+    else if( _prev_line != UINT32_MAX )
+    {
+        string cur_file = _lst.current_file( cur_addr );
+        uint32_t cur_line = _lst.line_of_addr( cur_file, cur_addr );
+        if( cur_line != _prev_line || cur_file != _prev_file )
+        {
+            _prev_line = UINT32_MAX;
+            _prev_file = "";
+            return true;
+        }
+    }
+    return false;
 }
 
 string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
