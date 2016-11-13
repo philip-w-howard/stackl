@@ -30,7 +30,6 @@ private:
 
 	void load_locals( xml_node<char>* func_decl_node, unordered_map<string, struct_decl>& type_context );
 
-	uint32_t start_addr;
 	string _name;
 	unordered_map<string, variable> _locals; //key = var_name, value = variable
 	unordered_map<string, struct_decl> _local_types; //key = type_name, value = type_decl

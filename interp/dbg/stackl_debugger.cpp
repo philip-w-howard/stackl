@@ -312,6 +312,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
                 << "[locals|listlocals] [optional func_name] - Print all local vars in current or specified function\n"
                 << "[globals|listglobals] - Print all global variables\n"
                 << "[funcs|listfuncs|listfunctions] - Print all functions\n"
+                << "[exit|quit] - Exits current program\n"
                 << "[IP] - Prints the instruction pointer\n"
                 << "[FP] - Prints the frame pointer\n"
                 << "[BP] - Prints the base pointer\n"
@@ -319,16 +320,18 @@ void stackl_debugger::query_user( Machine_State* cpu )
                 << "[SP] - Prints the stack pointer\n"
                 << "Hitting enter repeats the last command entered.\n";
         }
+        else if( cmd == "exit" || cmd == "quit" )
+            exit( EXIT_SUCCESS );
         else if( cmd == "IP" )
             cout << "Instruction Pointer: " << cpu->IP << '\n';
         else if( cmd == "FP" )
-            cout << "Frame Pointer: " << cpu->FP << '\n';
+            cout << "Frame Pointer: " << string_utils::to_hex( cpu->FP ) << '\n';
         else if( cmd == "BP" )
-            cout << "Base Pointer: " << cpu->BP << '\n';
+            cout << "Base Pointer: " << string_utils::to_hex( cpu->BP ) << '\n';
         else if( cmd == "LP" )
-            cout << "Limit Pointer: " << cpu->LP << '\n';
+            cout << "Limit Pointer: " << string_utils::to_hex( cpu->LP ) << '\n';
         else if( cmd == "SP" )
-            cout << "Stack Pointer: " << cpu->SP << '\n';
+            cout << "Stack Pointer: " << string_utils::to_hex( cpu->SP ) << '\n';
         else
         {
             cout << "huh?\n";

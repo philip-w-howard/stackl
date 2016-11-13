@@ -21,13 +21,13 @@ public:
 	struct_decl() {}
 
 	string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
-	inline int size() const { return _size; }
+	inline size_t size() const { return _size; }
 	inline string name() const { return _name; }
         variable* var( const string& var_name );
 
 private:
 	vector<variable> _fields;
-	int _size = 0;
+	size_t _size = 0;
 	string _name;
 };
 
