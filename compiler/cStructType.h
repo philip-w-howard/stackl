@@ -9,13 +9,17 @@
 class cStructType : public cTypeDecl
 {
   public:
+    // modified by Joe
     cStructType(cSymbol *name, cScope *scope, cDeclsList *decls) 
         : cTypeDecl()
     {
         if (symbolTableRoot->LocalLookup(name->Name()) != nullptr)
         {
-            ThrowSemanticError(name->Name() +" already defined in local scope");
-            return;
+            if(scope != nullptr && decls != nullptr) {
+                ThrowSemanticError(name->Name() +" already defined in local scope");
+                return;
+            }
+
         }
 
         // if the symbol exists in an outer scope, we need to create a new one
@@ -31,6 +35,13 @@ class cStructType : public cTypeDecl
         mSize = 0;
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
+    }
+
+    // Added by Joe
+    void AddDecls(cScope *scope, cDeclsList *decls)
+    {
+        AddChild(decls);
+        mScope = scope;
     }
 
     bool Contains(cSymbol *sym)

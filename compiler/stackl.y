@@ -70,6 +70,7 @@
 %type <decl_list>       decls
 %type <decl>            decl
 %type <struct_decl>     struct_decl
+%type <struct_decl>     struct_header
 %type <var_decl>        func_pointer
 %type <var_decl>        var_decl
 %type <var_decl>        paramspec
@@ -168,6 +169,19 @@ var_decl:   type IDENTIFIER
             }
         |   func_pointer
             { $$ = $1; }
+        | STRUCT type IDENTIFIER
+            {
+                if (($2->IsPointer() && (cPointerType*)$2->ParentType()->IsStruct()) ||
+                    $2->IsStruct()) 
+                {
+                    $$ = new cVarDecl($2, $3);
+                    if ($$->HasSemanticError()) YYERROR; 
+                }
+                else {
+                    yyerror("~Struct decl not of type Struct.");
+                }
+            }
+
 type:   type '*'
             { 
                 $$ = cPointerType::PointerType($1); 
@@ -178,10 +192,29 @@ type:   type '*'
                 $$ = dynamic_cast<cTypeDecl*>($1->GetDecl()); 
                 if ($$->HasSemanticError()) YYERROR;
             }
-struct_decl:  TYPEDEF STRUCT open decls close IDENTIFIER    
-            { 
-                $$ = new cStructType($6, $3, $4); 
-                if ($$->HasSemanticError()) YYERROR;
+
+// Added by Joe
+struct_decl:  struct_header open decls close IDENTIFIER
+                {
+                    if ($1 == NULL)
+                    {
+                        $$ = new cStructType($5, $2, $3); 
+                        if ($$->HasSemanticError()) YYERROR;
+                    }
+                    else
+                    {
+                        $1->AddDecls($2,$3);
+                    }
+                }
+// Added by Joe
+struct_header:  TYPEDEF STRUCT IDENTIFIER
+            {
+                $$ = new cStructType($3, NULL, NULL);
+                if($$->HasSemanticError()) YYERROR;
+            }
+            | TYPEDEF STRUCT
+            {
+                $$ = NULL;
             }
 global_decls: global_decls global_decl  
             { 
