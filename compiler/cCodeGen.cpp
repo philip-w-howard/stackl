@@ -64,6 +64,8 @@ void cCodeGen::VisitAllNodes(cAstNode *node) { node->Visit(this); }
 
 void cCodeGen::EmitLineNumber(cAstNode *node)
 {
+    string inst = ".source " + node->SourceFile() + " " +  std::to_string(node->LineNumber());
+    EmitInst(inst);
     EmitComment("Source: " + node->SourceFile() + " Line: " +
             std::to_string(node->LineNumber()) );
 }
@@ -180,6 +182,8 @@ void cCodeGen::Visit(cFuncDecl *node)
     EmitLineNumber(node);
     if (node->IsDefinition())
     {
+        string inst = ".function " + node->GetName()->Name();
+        EmitInst(inst);
         EmitComment(node->GetName()->Name() + "\n");
         EmitLabel(node->GetName()->Name());
         int adj_size = (node->DeclsSize() / WORD_SIZE * WORD_SIZE) + WORD_SIZE;

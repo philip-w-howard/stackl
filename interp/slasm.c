@@ -8,6 +8,9 @@
 #include "formatstr.h"
 #include "../version.h"
 
+static char g_Function[256] = "";
+static char g_Source_File[256] = "";
+static int g_Source_Line = 0;
 static int g_Memory_Size = 65536;
 static int g_Num_Errors = 0;
 static int g_Line_Num = 0;
@@ -21,6 +24,8 @@ static char g_Interrupt[256] = "";
 static char g_Systrap[256] = "";
 static char g_Startup[256] = "";
 
+static int g_Make_Debug_Listing = 0;
+static FILE *g_Debug_Listing = NULL;
 static int g_Make_Listing = 0;
 static FILE *g_Listing = NULL;
 
@@ -368,6 +373,8 @@ static void Process_Args(int argc, char **argv)
                 printf(HELP_STR);
                 exit(0);
             }
+            else if (strcmp(arg, "dbg") == 0)
+                g_Make_Debug_Listing = 1;
             else if (strcmp(arg, "list") == 0)
                 g_Make_Listing = 1;
             else if (argv[ii][1] == 'M')
@@ -532,6 +539,18 @@ static void process_dot_cmd(char *line)
         str = strtok(NULL, "\n");
         process_data(str);
     }
+    else if (strcasecmp(token, ".source") == 0)
+    {
+        str = strtok(NULL, "\n ");
+        strcpy(g_Source_File, str);
+        str = strtok(NULL, "\n ");
+        g_Source_Line = atoi(str);
+    }
+    else if (strcasecmp(token, ".function") == 0)
+    {
+        str = strtok(NULL, "\n ");
+        strcpy(g_Function, str);
+    }
     else
         report_error("Unrecognized dot command");
 }
@@ -653,6 +672,13 @@ static void write_listing(FILE *listing, char *line)
             g_Memory_Index*word_size, g_Data_Memory_Index*word_size, line);
 }
 
+static void write_debug_listing(FILE *listing, char *line)
+{
+    int32_t word_size = sizeof(g_Memory[0]);
+    fprintf(listing, "Source: %6d %6d %s %s\n", 
+            g_Memory_Index*word_size, g_Source_Line, g_Function, g_Source_File);
+}
+
 static void write_symbol_table(FILE *listing)
 {
     int32_t word_size = sizeof(g_Memory[0]);
@@ -689,6 +715,7 @@ static int process_file(char *filename, FILE *listing)
         g_Line_Num++;
 
         if (g_Make_Listing) write_listing(listing, line);
+        if (g_Make_Debug_Listing) write_debug_listing(g_Debug_Listing, line);
 
         // trim comments
         comment = strchr(line, ';');
@@ -797,6 +824,20 @@ int main(int argc, char** argv)
         exit(1);
     }
 
+    if (g_Make_Debug_Listing)
+    {
+        g_Debug_Listing = fopen(make_filename(g_File_List[0], ".dbg"), "w");
+        if (g_Debug_Listing == NULL)
+        {
+            fprintf(stderr, "Unable to open debug listing file\n");
+            exit(2);
+        }
+        for (ii=0; ii<g_Num_Files; ii++)
+        {
+            fprintf(g_Debug_Listing, "FILE: %s\n", g_File_List[ii]);
+        }
+    }
+
     if (g_Make_Listing)
     {
         g_Listing = fopen(make_filename(g_File_List[0], ".lst"), "w");
@@ -837,6 +878,12 @@ int main(int argc, char** argv)
     {
         write_symbol_table(g_Listing);
         fclose(g_Listing);
+    }
+
+    if (g_Make_Debug_Listing) 
+    {
+        write_symbol_table(g_Debug_Listing);
+        fclose(g_Debug_Listing);
     }
     return 0;
 }
