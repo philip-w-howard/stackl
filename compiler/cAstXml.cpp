@@ -5,11 +5,25 @@ cAstXml::cAstXml(std::string filename) : cVisitor()
 {
     output.open(filename, std::ofstream::out);
     if (!output.is_open()) fatal_error("Unable to open " + filename);
+    output << "<?xml version=\"1.0\"?>\n";
+
+    time_t gm_time = time(NULL);
+    struct tm *gmt = gmtime(&gm_time);
+
+    output << "<Program>\n";
+    output << "<compiled time=\"" << 
+        gmt->tm_year+1900 << ":" << gmt->tm_mon+1 << ":" << gmt->tm_mday << 
+        " " << 
+        gmt->tm_hour << ":" << gmt->tm_min << ":" << gmt->tm_sec << "\" />\n";
 }
 
 cAstXml::~cAstXml()
 {
-    if (output.is_open()) output.close();
+    if (output.is_open()) 
+    {
+        output << "</Program>\n";
+        output.close();
+    }
 }
 
 void cAstXml::VisitAllNodes(cAstNode *node) { node->Visit(this); }

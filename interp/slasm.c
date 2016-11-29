@@ -787,6 +787,7 @@ int main(int argc, char** argv)
     FILE *input;
     char  line[1000];
     char *comment;
+    int ii;
 
     Process_Args(argc, argv);
 
@@ -804,6 +805,10 @@ int main(int argc, char** argv)
             fprintf(stderr, "Unable to open listing file\n");
             exit(2);
         }
+        for (ii=0; ii<g_Num_Files; ii++)
+        {
+            fprintf(g_Listing, "; FILE: %s\n", g_File_List[ii]);
+        }
     }
 
     g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
@@ -817,7 +822,6 @@ int main(int argc, char** argv)
     // leave room for vector table and startup jump
     g_Memory_Index = 4;
 
-    int ii;
     for (ii=0; ii<g_Num_Files; ii++)
     {
         process_file(g_File_List[ii], g_Listing);
