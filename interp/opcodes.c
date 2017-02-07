@@ -468,12 +468,12 @@ void Execute(Machine_State *cpu)
         case PUSHCVAR_OP:
             temp = cpu->FP + GET_INTVAL(IP, 1);
             DEBUG("PUSHCVAR %d %d", GET_INTVAL(IP, 1), Get_Byte(cpu, temp));
-            Set_Byte(cpu, cpu->SP, Get_Byte(cpu, temp));
+            Set_Word(cpu, cpu->SP, Get_Byte(cpu, temp));
             INC(SP, 1);
             INC(IP, 2);
             break;
         case POPCVAR_OP:
-            DEBUG("POPCVAR %d", GET_INTVAL(IP,1));
+            DEBUG("POPCVAR %d %d", GET_INTVAL(IP,1), GET_INTVAL(SP,-1));
             temp = cpu->FP + GET_INTVAL(IP, 1);
             INC(SP, -1);
             Set_Byte(cpu, temp, Get_Byte(cpu, cpu->SP));

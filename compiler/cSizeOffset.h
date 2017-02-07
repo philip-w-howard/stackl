@@ -24,4 +24,5 @@ class cSizeOffset : public cVisitor
         virtual void Visit(cVarDecl *node);
     protected:
         int m_offset;
+        int RoundUp(int val);
 };

@@ -71,8 +71,6 @@ class cCodeGen : public cVisitor
         int m_Next_Label = 1;
         cGenAddr *m_GenAddr;
 
-        static const int STACK_FRAME_SIZE = 8;
-
         void Write_Header();
         void EmitLineNumber(cAstNode *node);
 };
