@@ -89,6 +89,7 @@ static opcode_t op_list[] =
     {"pushvar", 1},
     {"popvar", 1},
     {"adjsp", 1},
+    {"popargs", 1},
     {"call", 1},
     {"pushcvar", 1},
     {"popcvar", 1},

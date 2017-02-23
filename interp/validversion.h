@@ -1,0 +1,5 @@
+#pragma once
+#define MIN_MAJOR_VERSION 0
+#define MAX_MAJOR_VERSION 0
+#define MIN_MINOR_VERSION 10
+#define MAX_MINOR_VERSION 99

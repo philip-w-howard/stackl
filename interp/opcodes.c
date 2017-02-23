@@ -559,6 +559,14 @@ void Execute(Machine_State *cpu)
             cpu->SP += GET_INTVAL(IP,0);
             INC(IP,1);
             break;
+        case POPARGS_OP:
+            DEBUG("POPARGS %d", GET_INTVAL(IP,1));
+            INC(IP,1);
+            temp = GET_INTVAL(SP, -1);
+            cpu->SP -= GET_INTVAL(IP,0);
+            SET_INTVAL( SP, -1, temp);
+            INC(IP,1);
+            break;
         case SWAP_OP:
             DEBUG("SWAP %d %d", GET_INTVAL(SP, -1), GET_INTVAL(SP, -2));
             temp = GET_INTVAL(SP, -1);

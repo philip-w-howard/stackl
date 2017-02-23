@@ -14,6 +14,7 @@
 #include "pio_term_int.h"
 #include "disk.h"
 #include "formatstr.h"
+#include "validversion.h"
 
 #include "dbg/debugger_interface.h"
 
@@ -37,6 +38,45 @@ static void debug_print(int32_t location, const char *fmt, ...)
     sprintf(format, "Loading at %d: %s\n", location, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
+}
+
+void fatal_version_error()
+{
+    fprintf(stderr, ".slb assembled with incompatible version\n");
+    fprintf(stderr, "Version must be at least %d.%d\n", 
+            MIN_MAJOR_VERSION, MIN_MINOR_VERSION);
+    exit(1);
+}
+
+void compare_version(char *version)
+{
+    static const char *v_delims = "V.-\n";
+    char *token;
+    int version_num;
+
+    token = strtok(version, v_delims);
+    if (token != NULL)
+    {
+        version_num = atoi(token);
+        if (version_num < MIN_MAJOR_VERSION) fatal_version_error();
+        if (version_num > MAX_MAJOR_VERSION) fatal_version_error();
+    }
+    else
+    {
+        fatal_version_error();
+    }
+
+    token = strtok(NULL, v_delims);
+    if (token != NULL)
+    {
+        version_num = atoi(token);
+        if (version_num < MIN_MINOR_VERSION) fatal_version_error();
+        if (version_num > MAX_MINOR_VERSION) fatal_version_error();
+    }
+    else
+    {
+        fatal_version_error();
+    }
 }
 
 void MemCpy(int32_t addr, char *sptr)
@@ -206,6 +246,9 @@ int Load(const char *filename, int boot)
         return 0;
     }
 
+    char *version = strtok(NULL, delims);
+    compare_version(version);
+
     dbg_load_info( &cpu, filename );
     Set_Machine_State( &cpu );
 
@@ -215,6 +258,11 @@ int Load(const char *filename, int boot)
         if (strcmp(token, "begindata") == 0) 
         {
             break;
+        }
+        else if (strcmp(token, "stackl") == 0)
+        {
+            char *version = strtok(NULL, delims);
+            compare_version(version);
         }
         else if (boot && strcmp(token, "pio_term") == 0)
         {
