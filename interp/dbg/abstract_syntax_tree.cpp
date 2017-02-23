@@ -1,14 +1,15 @@
 #include "abstract_syntax_tree.h"
-#include <iostream>
-
+#include <stdexcept>
+using std::runtime_error;
+ 
 abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 {
-	rapidxml::file<char> xml_file( filename.c_str() );
-	xml_document<char> doc;
-	doc.parse<0>( xml_file.data() );
-	load( doc );
+    rapidxml::file<char> xml_file( filename.c_str() );
+    xml_document<char> doc;
+    doc.parse<0>( xml_file.data() );
+    load( doc );
 }
-
+ 
 variable* abstract_syntax_tree::var( const string& func_name, const string & var_name )
 {
     auto func_iter = _functions.find( func_name );
@@ -16,57 +17,64 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
         return nullptr; //function doesnt exist
     else
     {
-	variable* var = func_iter->second.var( var_name );
-	if( var != nullptr )
-	    return var; //variable is in function
-	else //variable isn't in function
-	{
-	    auto var_iter = _globals.find( var_name );
-	    if( var_iter != _globals.end() )
-		return &var_iter->second; //variable isnt in globals
+        variable* var = func_iter->second.var( var_name );
+        if( var != nullptr )
+            return var; //variable is in function
+    else //variable isn't in function
+    {
+        auto var_iter = _globals.find( var_name );
+        if( var_iter != _globals.end() )
+        return &var_iter->second; //variable isnt in globals
             else return nullptr; //variable not in locals or globals
         }
     }
-    return nullptr; 
+    return nullptr;
 }
-
+ 
+#include <iostream>
 void abstract_syntax_tree::load( xml_document<char>& doc )
 {
-    for( xml_node<char>* node : doc.first_node()->all_nodes() )
+    const char* time_str = doc.first_node( "Program" )->first_node( "compiled" )->first_attribute( "time" )->value();
+    struct tm tm;
+    strptime( time_str, "%Y:%m:%d %H:%M:%S", &tm );
+    _compile_time = mktime( &tm );
+
+    for( xml_node<char>* node : doc.first_node( "Program" )->first_node( "DeclsList" )->all_nodes() )
     {
-	if( strcmp( node->name(), "StructType" ) == 0 )
-	{
-	    struct_decl decl( node, _struct_decls );
-	    _struct_decls[decl.name()] = decl;
-	}
-	else if( strcmp( node->name(), "VarDecl" ) == 0 )
-	{
-	    variable var( node, _struct_decls );
-	    _globals[var.name()] = var;
-	}
-	else if( strcmp( node->name(), "FuncDecl" ) == 0 )
-	{
-	    function func( node, _struct_decls );
-	    _functions[func.name()] = func;
-	}
+        if( strcmp( node->name(), "StructType" ) == 0 )
+        {
+            struct_decl decl( node, _struct_decls );
+            _struct_decls[decl.name()] = decl;
+        }
+        else if( strcmp( node->name(), "VarDecl" ) == 0 )
+        {
+            variable var( node, _struct_decls );
+            _globals[var.name()] = var;
+        }
+        else if( strcmp( node->name(), "FuncDecl" ) == 0 )
+        {
+            function func( node, _struct_decls );
+            _functions[func.name()] = func;
+        }
     }
 }
 
 string abstract_syntax_tree::all_locals( const string& func_name )
 {
     string ret = "";
+
     auto find_res = _functions.find( func_name );
 
     if( find_res == _functions.end() )
-        return "Couldn't find function.\n";
-
+        return "Couldn't find function " + func_name + ".\n";
+ 
     for( auto& var_pair : find_res->second.get_locals() )
         ret += var_pair.second.definition() + '\n';
     if( ret.empty() )
-        return string( "No local variables found in " ) + func_name + '\n';
+        return "No local variables in " + func_name + '\n';
     return ret;
 }
-
+ 
 string abstract_syntax_tree::all_globals()
 {
     string ret = "";
@@ -76,7 +84,7 @@ string abstract_syntax_tree::all_globals()
         return "No globals found\n";
     return ret;
 }
-
+ 
 string abstract_syntax_tree::all_funcs()
 {
     string ret = "";

@@ -9,6 +9,7 @@
 #include "disk.h"
 #include "timer.h"
 #include "../version.h"
+#include "dbg/debugger_interface.h"
 
 // Use PATH_MAX from limits.h?
 //
@@ -19,7 +20,6 @@ static int Boot_Disk = 0;       // 1
 static int Use_PIO_Term = 0;    // 1
 static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
-static int Use_Debugger = 0;
 
 static const char *HELP_STR =
  "stackl [-boot] [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
@@ -64,7 +64,7 @@ void Process_Args(int argc, char **argv)
             else if (strcmp(arg, "opcodes") == 0)
                 Opcodes_Debug();
             else if (strcmp(arg, "dbg") == 0)
-                Use_Debugger = 1;
+                dbg_enable();
             else if (strcmp(arg, "pio_term") == 0)
             {
                 Use_PIO_Term = 1;
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     else
     {
         result = Boot(Input_File);
-        if (result != 0) 
+        if (result != 0)
         {
             printf("Unable to execute %s\n", Input_File);
             return 3;

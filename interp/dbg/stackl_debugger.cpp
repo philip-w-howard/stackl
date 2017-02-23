@@ -3,6 +3,10 @@
 #include <iostream>
 #include <cmath>
 #include <cstdio>
+#include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <cstdlib>
 
 extern "C"
 {
@@ -20,12 +24,26 @@ stackl_debugger::stackl_debugger( const char* filename )
     try
     {
         _ast = abstract_syntax_tree( fname + ".ast" );
-        _lst = asm_list( fname + ".lst" );
-        _loaded = true;
+        _lst = asm_list( fname + ".dbg" );
+
+        struct stat attrib;
+        stat( filename, &attrib );
+        
+        struct tm* tm = gmtime( &attrib.st_mtime ); //convert from local to gm time
+        if( mktime( tm ) > _ast.compile_time() )
+        {
+            _loaded = false;
+            _failure_reason = "Debug files out of date.";
+        }
+        else
+        {
+            _loaded = true;
+        }
     }
-    catch( ... )
+    catch( exception& ex )
     {
-        _loaded= false;
+        _loaded = false;
+        _failure_reason = ex.what();
     }
 }
 
@@ -66,7 +84,7 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
     else if( break_point_text.find( ':' ) != string::npos )
     {
         vector<string> file_line = string_utils::string_split( break_point_text, ':' );
-	return _lst.addr_of_line( file_line[0], stoi( file_line[1] ) );
+	    return _lst.addr_of_line( file_line[0], stoi( file_line[1] ) );
     }
     else if( string_utils::is_number( break_point_text, 10, &res ) )
     {   
@@ -74,7 +92,7 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
     }
     else
     {
-	return _lst.addr_of_func( break_point_text );
+	    return _lst.addr_of_func( break_point_text );
     }
 }
 
@@ -125,6 +143,10 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
 
     vector<string> var_fields = string_utils::string_split( txt, '.' );
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
+    
+    if( var == nullptr )
+        return "Variable not found in current scope";
+
     int32_t total_offset = var->offset();
     for( uint32_t i = 1; i < var_fields.size(); ++i )
     {
@@ -156,10 +178,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
             return string_utils::to_hex( res.address_of( cpu ) );
         else return res.to_string( cpu );
     }
-    else
-    {
-    	return "Variable not found in current scope";
-    }
+    else return "Variable not found in current scope";
 }
 
 void stackl_debugger::debug_check( Machine_State* cpu )
@@ -169,8 +188,8 @@ void stackl_debugger::debug_check( Machine_State* cpu )
     if( should_break( cpu->IP ) )
     {
         string cur_file = _lst.current_file( cpu->IP );
-	cout << "Breakpoint hit on line " << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
-	query_user( cpu );
+	    cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+	    query_user( cpu );
     }
 }
 
@@ -180,12 +199,12 @@ void stackl_debugger::query_user( Machine_State* cpu )
     cout << "Enter command. 'help' for help.\n";
     while( true )
     {
-	getline( cin, input );
-        
+        getline( cin, input );
+            
         if( input == "" )
         {
             input = _prev_cmd;
-            cout << _prev_cmd << '\n';
+            cout << '\b' << _prev_cmd << '\n';
         }
         else
             _prev_cmd = input;
@@ -203,29 +222,32 @@ void stackl_debugger::query_user( Machine_State* cpu )
             params = input.substr( idx + 1 );
         }
 
-	if( cmd == "breakpoint" || cmd == "break" || cmd == "b" )
-	{
-            if( params.length() == 0 )
-                continue; //no text? do nothing
-
-	    BREAKPOINT_RESULT res = add_breakpoint( params, cpu->IP );
-	    uint32_t final_addr;
-	    string file_name;
-	    switch( res )
+	    if( cmd == "breakpoint" || cmd == "break" || cmd == "b" )
 	    {
-		case SUCCESS:
-		    final_addr = text_to_addr( params, cpu->IP );
-		    file_name = _lst.current_file( final_addr );
-		    cout << "breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
-		    break;
-		case DUPLICATE:
-		    cout << "breakpoint already exists on that line.\n";
-		    break;
-		case NOT_FOUND:
-		    cout << "couldn't find breakpoint location.\n";
-		    break;
+            if( params.length() == 0 )
+            {
+                cout << "Specifiy a breakpoint location.\n";
+                continue;
+            }
+
+            BREAKPOINT_RESULT res = add_breakpoint( params, cpu->IP );
+            uint32_t final_addr;
+            string file_name;
+            switch( res )
+            {
+            case SUCCESS:
+                final_addr = text_to_addr( params, cpu->IP );
+                file_name = _lst.current_file( final_addr );
+                cout << "breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
+                break;
+            case DUPLICATE:
+                cout << "breakpoint already exists on that line.\n";
+                break;
+            case NOT_FOUND:
+                cout << "couldn't find breakpoint location.\n";
+                break;
+            }
 	    }
-	}
         else if( cmd == "removebreak" || cmd == "rbreak" || cmd == "rb" )
         {
             if( params.length() == 0 )
@@ -249,12 +271,12 @@ void stackl_debugger::query_user( Machine_State* cpu )
                     break;
             }
         }
-	else if( cmd == "continue" || cmd == "c" || cmd == "cont" )
-	{
-	    break;
-	}
-	else if( cmd == "list" )
-	{
+        else if( cmd == "continue" || cmd == "c" || cmd == "cont" )
+        {
+            break;
+        }
+        else if( cmd == "list" )
+        {
             int32_t range;
             if( params.length() == 0 )
                 cout << get_nearby_lines( cpu->IP, 2 );
@@ -262,7 +284,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
 	        cout << get_nearby_lines( cpu->IP, range );
             else
                 cout << "[list] [optional range]\n";
-	}
+	    }
         else if( cmd == "locals" || cmd == "listlocals" )
         {
             if( params.length() == 0 )
@@ -285,20 +307,21 @@ void stackl_debugger::query_user( Machine_State* cpu )
         {
             cout << _ast.all_globals();
         }
-        else if( cmd== "funcs" || cmd == "listfuncs" || cmd == "listfunctions" )
+        else if( cmd== "funcs" || cmd == "functions" || cmd == "listfuncs" || cmd == "listfunctions" )
         {
             cout << _ast.all_funcs();
         }
-	else if( cmd == "print" || cmd == "p" )
-	{
+	    else if( cmd == "print" || cmd == "p" )
+	    {
             if( params.length() == 0 )
                 continue; //no text? do nothing
-	    cout << var_to_string( cpu, params ) << '\n';
-	}
+	        cout << var_to_string( cpu, params ) << '\n';
+	    }
         else if( cmd == "next" || cmd == "n" )
         {
             _prev_file = _lst.current_file( cpu->IP );
             _prev_line = _lst.line_of_addr( _prev_file, cpu->IP );
+            _stepping = true;
             break;
         }
         else if( cmd == "help" )
@@ -307,11 +330,11 @@ void stackl_debugger::query_user( Machine_State* cpu )
                 << "[removebreak|rbreak|rb] [line_num|file:line_num|func_name] - Removes breakpoint\n"
                 << "[print|p] [var_name|0xaddress] - Prints the value of the variable\n"
                 << "[continue|cont|c] - Runs program until the next breakpoint\n"
-                << "[list] [optional line_num]- Prints lines of with within N lines\n"
+                << "[list] optional[line_count]- Prints lines of with within N lines\n"
                 << "[next|n] - Executes the current line of code\n"
-                << "[locals|listlocals] [optional func_name] - Print all local vars in current or specified function\n"
+                << "[locals|listlocals] optional[func_name] - Print all local vars in current or specified function\n"
                 << "[globals|listglobals] - Print all global variables\n"
-                << "[funcs|listfuncs|listfunctions] - Print all functions\n"
+                << "[funcs|functions|listfuncs|listfunctions] - Print all functions\n"
                 << "[exit|quit] - Exits current program\n"
                 << "[IP] - Prints the instruction pointer\n"
                 << "[FP] - Prints the frame pointer\n"
@@ -343,14 +366,13 @@ bool stackl_debugger::should_break( uint32_t cur_addr )
 {
     if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
         return true;
-    else if( _prev_line != UINT32_MAX )
+    else if( _stepping )
     {
         string cur_file = _lst.current_file( cur_addr );
         uint32_t cur_line = _lst.line_of_addr( cur_file, cur_addr );
         if( cur_line != _prev_line || cur_file != _prev_file )
         {
-            _prev_line = UINT32_MAX;
-            _prev_file = "";
+            _stepping = false;
             return true;
         }
     }
@@ -364,15 +386,16 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
     string ret = "";
     string line;
     ifstream file;
+
     try
     {
-	file.open( cur_file );
-	if( !file.is_open() )
-	    throw 0; //this is kinda dumb... but it keeps us from duplicating code?
+	    file.open( cur_file );
+	    if( !file.is_open() )
+	        throw 0; //this is kinda dumb... but it keeps us from duplicating the error message?
     }
     catch( ... )
     {
-	return string( "Unable to open " ) + cur_file + '\n';
+	    return string( "Unable to open " ) + cur_file + '\n';
     }
 
     int i = 1; //files start on line 1
@@ -380,7 +403,7 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
     {
         if( i >= cur_line - range && i <= cur_line + range )
             ret += to_string( i ) + ". " + string( 3 - (int)log10( i ), ' ' ) + line + '\n';
-	++i;
+	    ++i;
     }
     return ret;
 }

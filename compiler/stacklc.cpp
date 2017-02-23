@@ -186,8 +186,17 @@ int main(int argc, char **argv)
 
         if (Do_Assembler)
         {
-            string makebin("slasm ");
-            if (Do_Debug) makebin += "-list -dbg ";
+            string makebin = "slasm ";
+            for (int ii=strlen(argv[0]); ii >= 0; ii-- )
+            {
+                if (argv[0][ii] == '/')
+                {
+                    argv[0][ii+1] = '\0';
+                    makebin = argv[0] + makebin;
+                    break;
+                }
+            }
+            if (Do_Debug) makebin += "-dbg ";
             makebin += outfile_name;
 
             result = system(makebin.c_str());

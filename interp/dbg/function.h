@@ -22,7 +22,7 @@ public:
 	function() {}
 
 	inline string name() const { return _name; }
-        inline unordered_map<string, variable>& get_locals() { return _locals; }
+	inline unordered_map<string, variable>& get_locals() { return _locals; }
 
 	variable* var( const string& var_name ); //returns nullptr if var not found
 
