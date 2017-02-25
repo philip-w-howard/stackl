@@ -21,6 +21,7 @@ typedef struct
 void Init_Machine(int mem_size);
 void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
+void Set_Debug_Info(debug_info debugger);
 void Machine_Execute();
 void Machine_Check(const char *fmt, ...);
 void Machine_Signal_Interrupt(int from_hw, int32_t vector);

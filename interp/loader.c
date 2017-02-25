@@ -108,6 +108,9 @@ int Load_Text(const char *filename)
     char *sptr;
     int32_t  slen;
 
+    fprintf(stderr, "Load_Text is no longer supported\n");
+    exit(1);
+
     Machine_State cpu;
     Get_Machine_State(&cpu);
     base = cpu.BP;
@@ -250,7 +253,7 @@ int Load(const char *filename, int boot)
     compare_version(version);
 
     dbg_load_info( &cpu, filename );
-    Set_Machine_State( &cpu );
+    Set_Debug_Info( cpu.debugger );
 
     while (fgets(string, sizeof(string), input))
     {

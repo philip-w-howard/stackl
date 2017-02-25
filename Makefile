@@ -1,5 +1,5 @@
-RELEASE  = ~/stackl_rel
-#RELEASE  = ~/bin
+#RELEASE  = ~/stackl_rel
+RELEASE  = ~/bin
 # RELEASE  = release
 EXTRA_INCLUDES = \
 	   system.h \

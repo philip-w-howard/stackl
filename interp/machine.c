@@ -30,6 +30,8 @@ void Machine_Check(const char *fmt, ...)
     sprintf(format, "Machine check: %s\n", fmt);
     vfprintf(stderr, format, args);
     va_end(args);
+    //fprintf(stderr, "%0x %d %d %d %d %d Final State\n", 
+    //        Regs.FLAG, Regs.BP, Regs.LP, Regs.IP, Regs.SP, Regs.FP);
     exit(-1);
 }
 //***************************************
@@ -51,6 +53,14 @@ void Init_Machine(int mem_size)
 
     pthread_mutex_unlock(&Machine_Lock);
 }
+//***************************************
+void Set_Debug_Info(debug_info debugger)
+{
+    pthread_mutex_lock(&Machine_Lock);
+    Regs.debugger = debugger;
+    pthread_mutex_unlock(&Machine_Lock);
+}
+
 //***************************************
 void Get_Machine_State(Machine_State *cpu)
 {
