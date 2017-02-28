@@ -1,7 +1,7 @@
 #include "abstract_syntax_tree.h"
 #include <stdexcept>
 using std::runtime_error;
- 
+
 abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 {
     rapidxml::file<char> xml_file( filename.c_str() );
@@ -9,7 +9,7 @@ abstract_syntax_tree::abstract_syntax_tree( const string& filename )
     doc.parse<0>( xml_file.data() );
     load( doc );
 }
- 
+
 variable* abstract_syntax_tree::var( const string& func_name, const string & var_name )
 {
     auto func_iter = _functions.find( func_name );
@@ -30,14 +30,13 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
     }
     return nullptr;
 }
- 
-#include <iostream>
+
 void abstract_syntax_tree::load( xml_document<char>& doc )
 {
     const char* time_str = doc.first_node( "Program" )->first_node( "compiled" )->first_attribute( "time" )->value();
     struct tm tm;
     strptime( time_str, "%Y:%m:%d %H:%M:%S", &tm );
-    _compile_time = mktime( &tm );
+    _compile_time = timegm( &tm );
 
     for( xml_node<char>* node : doc.first_node( "Program" )->first_node( "DeclsList" )->all_nodes() )
     {
@@ -67,14 +66,14 @@ string abstract_syntax_tree::all_locals( const string& func_name )
 
     if( find_res == _functions.end() )
         return "Couldn't find function " + func_name + ".\n";
- 
+
     for( auto& var_pair : find_res->second.get_locals() )
         ret += var_pair.second.definition() + '\n';
     if( ret.empty() )
         return "No local variables in " + func_name + '\n';
     return ret;
 }
- 
+
 string abstract_syntax_tree::all_globals()
 {
     string ret = "";
@@ -84,7 +83,7 @@ string abstract_syntax_tree::all_globals()
         return "No globals found\n";
     return ret;
 }
- 
+
 string abstract_syntax_tree::all_funcs()
 {
     string ret = "";

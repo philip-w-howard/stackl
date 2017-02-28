@@ -18,11 +18,11 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
         std::cout << "Debugger memory allocation failed.\n";
         exit( EXIT_FAILURE );
     }
-    
+
     if( !debugger->loaded() )
     {
         std::cout << "Error loading debugger: " << debugger->failure_reason() << '\n';
-        free( (void*)debugger ); //using 'delete' seg faults here. Programming.
+        delete debugger;
         exit( EXIT_FAILURE );
     }
 

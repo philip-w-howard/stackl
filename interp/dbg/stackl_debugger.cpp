@@ -28,9 +28,8 @@ stackl_debugger::stackl_debugger( const char* filename )
 
         struct stat attrib;
         stat( filename, &attrib );
-        
-        struct tm* tm = gmtime( &attrib.st_mtime ); //convert from local to gm time
-        if( mktime( tm ) > _ast.compile_time() )
+
+        if( attrib.st_mtime > _ast.compile_time() )
         {
             _loaded = false;
             _failure_reason = "Debug files out of date.";
@@ -87,7 +86,7 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
 	    return _lst.addr_of_line( file_line[0], stoi( file_line[1] ) );
     }
     else if( string_utils::is_number( break_point_text, 10, &res ) )
-    {   
+    {
         return _lst.addr_of_line( _lst.current_file( cur_addr ), res );
     }
     else
@@ -121,13 +120,13 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
 string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text )
 {
     //array index does not work currently
-    
+
     int32_t val;
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
     {
         return string_utils::to_hex( Get_Word( cpu, val ) );
     }
-    
+
     string txt = var_text;
 
     bool address_of = false;
@@ -139,11 +138,11 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
 
     uint32_t indirection = 0;
     while( txt[indirection++] == '*' ); //count the number of leading asterisks
-    txt.erase( 0, --indirection ); //remove them 
+    txt.erase( 0, --indirection ); //remove them
 
     vector<string> var_fields = string_utils::string_split( txt, '.' );
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
-    
+
     if( var == nullptr )
         return "Variable not found in current scope";
 
@@ -200,7 +199,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
     while( true )
     {
         getline( cin, input );
-            
+
         if( input == "" )
         {
             input = _prev_cmd;

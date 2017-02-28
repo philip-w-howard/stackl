@@ -3,6 +3,8 @@
 //since a variable needs to know its type context but also a struct_decl holds variables
 
 #include <cstdio>
+#include <stdexcept>
+using std::runtime_error;
 
 #include "string_utils.h"
 
@@ -11,7 +13,7 @@ extern "C"
     #include "../vmem.h"
 }
 
-set<string> variable::builtins( 
+set<string> variable::builtins(
 {
     "char",
     "int",
@@ -110,7 +112,7 @@ void variable::parse_node_type( xml_node<char>* node, unordered_map<string, stru
     }
     else
     {
-        //??
+        throw runtime_error( string( "Invalid AST: " ) + node->name() );
     }
 }
 

@@ -23,7 +23,7 @@ vector<string> string_utils::string_split( const string& s, const char delimiter
 }
 
 //http://stackoverflow.com/a/217605
-void string_utils::ltrim( string &s ) 
+void string_utils::ltrim( string &s )
 {
     s.erase( s.begin(), std::find_if( s.begin(), s.end(), std::not1( std::ptr_fun<int, int>( std::isspace ) ) ) );
 }
