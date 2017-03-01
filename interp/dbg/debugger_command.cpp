@@ -1,6 +1,13 @@
 #include "debugger_command.h"
+#include <stdexcept>
+using std::runtime_error;
 
-debugger_command::debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help ): _dbg(dbg), _func(func), _names(names), _help(help) {}
+debugger_command::debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help ): _dbg(dbg), _func(func), _names(names), _help(help)
+{
+    for( const string& name : _names )
+        if( name.find( ' ' ) != string::npos )
+            throw runtime_error( string( "Command names must be one word: \"" ) + name + "\"" );
+}
 
 bool debugger_command::called_by( const string& cmd ) const
 {

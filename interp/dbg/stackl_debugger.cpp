@@ -27,8 +27,8 @@ stackl_debugger::stackl_debugger( const char* filename )
 
     try
     {
-        _ast = abstract_syntax_tree( fname + ".ast" );
         _lst = asm_list( fname + ".dbg" );
+        _ast = abstract_syntax_tree( fname + ".ast", _lst.max_ip() );
         load_commands();
         check_compile_time( filename );
 
@@ -397,7 +397,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
 
 
     if( address_of )
-        return string_utils::to_hex( res.address_of( cpu ) );
+        return string_utils::to_hex( res.total_offset( cpu ) );
     else return res.to_string( cpu );
 }
 
@@ -430,6 +430,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
         else
             _prev_cmd = input;
 
+        //commands are always one word
         size_t idx = input.find_first_of( ' ' );
         string cmd, params;
         if( idx == string::npos )

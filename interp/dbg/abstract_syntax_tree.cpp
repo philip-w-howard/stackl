@@ -2,12 +2,12 @@
 #include <stdexcept>
 using std::runtime_error;
 
-abstract_syntax_tree::abstract_syntax_tree( const string& filename )
+abstract_syntax_tree::abstract_syntax_tree( const string& filename, uint32_t max_ip )
 {
     rapidxml::file<char> xml_file( filename.c_str() );
     xml_document<char> doc;
     doc.parse<0>( xml_file.data() );
-    load( doc );
+    load( doc, max_ip );
 }
 
 variable* abstract_syntax_tree::var( const string& func_name, const string & var_name )
@@ -20,18 +20,18 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
         variable* var = func_iter->second.var( var_name );
         if( var != nullptr )
             return var; //variable is in function
-    else //variable isn't in function
-    {
-        auto var_iter = _globals.find( var_name );
-        if( var_iter != _globals.end() )
-        return &var_iter->second; //variable isnt in globals
-            else return nullptr; //variable not in locals or globals
+        else //variable isn't in function
+        {
+            auto var_iter = _globals.find( var_name );
+            if( var_iter != _globals.end() )
+            return &var_iter->second; //variable isnt in globals
+                else return nullptr; //variable not in locals or globals
         }
     }
     return nullptr;
 }
 
-void abstract_syntax_tree::load( xml_document<char>& doc )
+void abstract_syntax_tree::load( xml_document<char>& doc, uint32_t max_ip )
 {
     const char* time_str = doc.first_node( "Program" )->first_node( "compiled" )->first_attribute( "time" )->value();
     struct tm tm;
@@ -48,6 +48,7 @@ void abstract_syntax_tree::load( xml_document<char>& doc )
         else if( strcmp( node->name(), "VarDecl" ) == 0 )
         {
             variable var( node, _struct_decls );
+            var.offset( var.offset() + max_ip );
             _globals[var.name()] = var;
         }
         else if( strcmp( node->name(), "FuncDecl" ) == 0 )

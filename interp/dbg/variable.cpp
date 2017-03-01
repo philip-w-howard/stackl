@@ -1,6 +1,7 @@
 #include "variable.h"
 #include "struct_decl.h" //forward declaration found in variable.h
 //since a variable needs to know its type context but also a struct_decl holds variables
+#include "stackl_debugger.h"
 
 #include <cstdio>
 #include <stdexcept>
@@ -38,7 +39,7 @@ variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>
 int32_t variable::total_offset( Machine_State* cpu ) const
 {
     if( _global )
-        return _offset + cpu->BP;
+        return _offset;
     else return _offset + cpu->FP;
 }
 
@@ -198,7 +199,7 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
     string pre = tabs + definition() + " = ";
     if( is_string() ) //special case: we want to print out the string
     {
-        int32_t addr = -1;
+        int32_t addr;
         char v;
 
         if( _indirection == 1 ) //is it a char*
@@ -207,7 +208,7 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
             addr = total_offset( cpu );
 
         pre += "\"";
-        for( int i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
+        for( uint32_t i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
         {
             if( v == '\n' )
                 pre += "\\n";
