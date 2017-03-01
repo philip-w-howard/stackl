@@ -637,6 +637,8 @@ static void write_output(char *in_filename)
         exit(1);
     }
 
+    fprintf(bin_file, "stackl %s slasm\n", VERSION);
+
     status = fprintf(bin_file, g_Header);
     if (status < 0)
     {
@@ -888,3 +890,4 @@ int main(int argc, char** argv)
     }
     return 0;
 }
+//#stackl V0.10.1-dev

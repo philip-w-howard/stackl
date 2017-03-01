@@ -1,3 +1,9 @@
+Machine Checks
+    call dbg function to inform debugger that it happened
+    Add numeric first param to indicate type of machine check
+    Clean up all Machine_Check call locations so nothing bad happens 
+        on Machine_Check
+    move opcode table to separate include file so dbg can include it
 Implement virtual memory
     Use bit in FLAG reg
     Need Page Table register

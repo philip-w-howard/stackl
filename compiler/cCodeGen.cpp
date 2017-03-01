@@ -19,7 +19,7 @@ void cCodeGen::Write_Header()
     string feature_name;
     cSymbol *feature;
 
-    m_Output << "#stackl " << VERSION << std::endl;
+    m_Output << "#stackl " << VERSION << " stacklc" << std::endl;
 
     feature_name = "$$feature" + std::to_string(feature_index++);
     while ((feature = symbolTableRoot->Lookup(feature_name)) != nullptr)
