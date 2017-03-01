@@ -54,3 +54,18 @@ string string_utils::to_hex( int32_t num )
     sprintf( buf, "%x", num );
     return string( "0x" ) + buf;
 }
+
+vector<uint32_t> string_utils::strip_array_indexes( string& var )
+{
+    vector<string> pieces = string_utils::string_split( var, '[' );
+    var = pieces[0];
+
+    vector<uint32_t> idxs;
+    try
+    {
+        for( uint32_t i = 1; i < pieces.size(); ++i ) //convert the int between each open/close bracket to an int, store it.
+            idxs.push_back( (uint32_t)stoi( string( pieces[i].begin(), pieces[i].end() - 1 ) ) );
+    }
+    catch( ... ) {}
+    return idxs;
+}

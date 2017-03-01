@@ -21,10 +21,25 @@ set<string> variable::builtins(
 
 variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
 {
+    xml_attribute<char>* global_att = var_node->first_attribute( "global" );
+    if( global_att != nullptr )
+        _global = strcmp( global_att->value(), "true" ) == 0;
+
     _offset = atoi( var_node->first_attribute( "offset" )->value() );
     _name = var_node->first_node( "Symbol" )->first_attribute( "name" )->value();
 
     parse_node_type( var_node->first_node(), global_type_context, local_type_context );
+
+    if( is_array() )
+        for( uint32_t range : _array_ranges )
+            _size *= range;
+}
+
+int32_t variable::total_offset( Machine_State* cpu ) const
+{
+    if( _global )
+        return _offset + cpu->BP;
+    else return _offset + cpu->FP;
 }
 
 void variable::parse_base_decl( xml_node<char>* node )
@@ -131,12 +146,12 @@ string variable::definition() const
 
 variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
 {
-    if( derefs == 0  ) //short cut.
+    if( derefs == 0 ) //short cut.
         return *this; //the algorithm would work fine with deref == 0, this just saves time.
     if( derefs > _indirection )
         throw "Variable does not have that many levels of indirection.";
 
-    int32_t addr = cpu->FP + _offset;;
+    int32_t addr = total_offset( cpu );
     for( uint32_t i = 0; i < derefs; ++i )
         addr = Get_Word( cpu, addr );
 
@@ -147,52 +162,108 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
     return deref_var;
 }
 
+variable variable::from_indexes( vector<uint32_t>& indexes ) const
+{
+    if( indexes.size() == 0 )
+        return *this;
+    if( indexes.size() > _array_ranges.size() )
+        throw "Array does not have that many dimensions.";
+
+    int32_t new_offset = _offset;
+    size_t new_size = _size;
+    for( uint32_t i = 0; i < indexes.size(); ++i )
+    {
+        if( indexes[i] >= _array_ranges[i] )
+            throw "Array index out of range.";
+
+        //every time we move down a dimension in our array,
+        //we have to reduce the size of our offset modification by
+        //the length of the dimension we just iterated over.
+        new_size /= _array_ranges[i];
+        new_offset += new_size * indexes[i];
+    }
+
+    variable indexed = *this;
+    indexed.offset( new_offset );
+
+    int32_t remaining_dimensions = _array_ranges.size() - indexes.size();
+    indexed._array_ranges.erase( indexed._array_ranges.begin(), ( indexed._array_ranges.end() - remaining_dimensions ) );
+    indexed._size = new_size;
+    return indexed;
+}
+
 string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
 {
     string tabs = string( indent_level*4, ' ' );
     string pre = tabs + definition() + " = ";
-    if( _struct_decl == nullptr )
+    if( is_string() ) //special case: we want to print out the string
     {
-        //NOTE TO SELF: this->to_string != std::to_string DO NOT LET THEM GET CONFUSED
-        if( is_pointer() || is_array() )
+        int32_t addr = -1;
+        char v;
+
+        if( _indirection == 1 ) //is it a char*
+            addr = Get_Word( cpu, total_offset( cpu ) );
+        else if( _array_ranges.size() == 1 ) //is it a char[]
+            addr = total_offset( cpu );
+
+        pre += "\"";
+        for( int i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
         {
-            if( _type == "char" && _indirection == 1 && !is_array() ) //is it a char*
-            {
-                char v;
-                pre += "\"";
-                int32_t addr = Get_Word( cpu, cpu->FP + _offset );
-                for( int i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
-                {
-                    if( v == '\n' )
-                        pre += "\\n";
-                    else if( v == '\t' )
-                        pre += "\\t";
-                    else
-                        pre += v;
-                }
-                pre += "\"";
-                return pre; //special case: we want to print out the string it points to
-            }
+            if( v == '\n' )
+                pre += "\\n";
+            else if( v == '\t' )
+                pre += "\\t";
             else
+                pre += v;
+        }
+        pre += "\"";
+        return pre;
+    }
+    else if( is_pointer() && !is_array() )
+    {
+        return pre + string_utils::to_hex( Get_Word( cpu, total_offset( cpu ) ) );
+    }
+    else if( is_array() )
+    {
+        pre += string_utils::to_hex( total_offset( cpu ) ) + " {\n";
+        vector<uint32_t> idx( 1 );
+        if( _array_ranges.size() == 1 )
+        {
+            //iterate over the first dimension of our array
+            for( uint32_t i = 0; i < _array_ranges[0]; ++i )
             {
-                return pre + string_utils::to_hex( Get_Word( cpu, cpu->FP + _offset ) );
+                idx[0] = i;
+                pre += from_indexes( idx ).to_string( cpu, indent_level + 1 ) + ",\n";
             }
-        }
-        else if( _type == "int" )
-        {
-            return pre + std::to_string( Get_Word( cpu, cpu->FP + _offset ) );
-        }
-        else if( _type == "char" )
-        {
-            return pre + "'" + (char)Get_Byte( cpu, cpu->FP + _offset ) + "'";
+            pre.erase( pre.end() - 2 ); //remove the last comma and newline
+            pre += "}";
+            return pre;
         }
         else
-            return string( "unable to print type " ) + _type;
+        {
+            size_t index_size = _size / _array_ranges[0];
+            for( uint32_t i = 0; i < _array_ranges[0]; ++i )
+            {
+                pre += tabs + '\t' + string_utils::to_hex( total_offset( cpu ) + ( i * index_size ) ) + ",\n";
+            }
+            pre += "}";
+            return pre;
+        }
     }
-    else
+    else if( _struct_decl != nullptr )
     {
         Machine_State temp_state = *cpu;
         temp_state.FP += _offset;
         return pre + "{\n" + _struct_decl->to_string( &temp_state, indent_level + 1 ) + tabs + "}";
     }
+    else if( _type == "int" )
+    {
+        return pre + std::to_string( Get_Word( cpu, total_offset( cpu ) ) );
+    }
+    else if( _type == "char" )
+    {
+        return pre + "'" + (char)Get_Byte( cpu, total_offset( cpu ) ) + "'";
+    }
+    else
+        return string( "unable to print type " ) + _type;
 }

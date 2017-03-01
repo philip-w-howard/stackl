@@ -1,6 +1,7 @@
 #pragma once
 #include "abstract_syntax_tree.h"
 #include "asm_list.h"
+#include "debugger_command.h"
 
 #include <string>
 using std::string;
@@ -59,13 +60,10 @@ private:
 	variable_name -> just the name of a local/global var
 	if variable_name is a pointer or array, it will print out the address that the variable holds
 	if variable_name is a struct, it will recursively print out the fields of the struct, including contained structs
-	if variable_name is a char pointer, it will print out the string at that location
-	*pointer -> dereferencing a pointer will print the value of the variable pointed to
-	note: this should inherently support multiple levels of indirection if written correctly. I think.
+	if variable_name is a char pointer or array, it will print out the string at that location
+	*pointer - dereferencing a pointer will print the value of the variable pointed to
+	This supports multiple levels of indirection.
 	array[X] will print the value of the variable at X index
-	MAYBE: array[X:Y] will print the value of all variables between X and Y inclusive
-	MAYBE MAYBE: array [:X] will print all variables up until X inclusive
-	MAYBE MAYBE: array [X:] will print all variables after X inclusive
 	*/
 	string var_to_string( Machine_State* cpu, const string& var_text );
 
@@ -78,6 +76,32 @@ private:
 	bool remove_breakpoint( uint32_t addr );
 	uint32_t text_to_addr( const string& break_point_text, uint32_t cur_addr );
 
+	void check_compile_time( const char* filename );
+
+	void load_commands();
+	vector<debugger_command> _commands;
+
+	bool cmd_breakpoint( string& params, Machine_State* cpu );
+	bool cmd_removebreak( string& params, Machine_State* cpu );
+	bool cmd_print( string& params, Machine_State* cpu );
+	bool cmd_continue( string& params, Machine_State* cpu );
+	bool cmd_list( string& params, Machine_State* cpu );
+	bool cmd_next( string& params, Machine_State* cpu );
+	bool cmd_locals( string& params, Machine_State* cpu );
+	bool cmd_globals( string& params, Machine_State* cpu );
+	bool cmd_funcs( string& params, Machine_State* cpu );
+	bool cmd_exit( string& params, Machine_State* cpu );
+	bool cmd_IP( string& params, Machine_State* cpu );
+	bool cmd_FP( string& params, Machine_State* cpu );
+	bool cmd_BP( string& params, Machine_State* cpu );
+	bool cmd_LP( string& params, Machine_State* cpu );
+	bool cmd_SP( string& params, Machine_State* cpu );
+	bool cmd_file( string& params, Machine_State* cpu );
+	bool cmd_program( string& params, Machine_State* cpu );
+	bool cmd_func( string& params, Machine_State* cpu );
+	bool cmd_help( string& params, Machine_State* cpu );
+
+	string _binary_name = "";
 	vector<uint32_t> _break_points;
 	abstract_syntax_tree _ast;
 	asm_list _lst;
