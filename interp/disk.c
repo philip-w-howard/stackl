@@ -37,10 +37,22 @@ static void init_disk()
     if (Disk_fd == -1)
     {
         Disk_fd = open(Disk_Filename, O_RDWR | O_SYNC);
-        if (Disk_fd < 0) Machine_Check("Failed to open disk drive");
+        if (Disk_fd < 0) 
+        {
+            Machine_Check(MC_HW_FAILURE, "Failed to open disk drive");
+
+            // inablity to open the disk is fatal even if we're debugging
+            exit(1);
+        }
 
         offset = lseek(Disk_fd, 0, SEEK_END);
-        if (offset < 0) Machine_Check("Unformatted disk");
+        if (offset < 0) 
+        {
+            Machine_Check(MC_HW_FAILURE, "Unformatted disk");
+
+            // inablity to access the disk is fatal even if we're debugging
+            exit(1);
+        }
 
         Num_Disk_Blocks = offset / DISK_BLOCK_SIZE;
     }
@@ -51,7 +63,7 @@ static void close_disk()
     int status;
 
     status = close(Disk_fd);
-    if (status != 0) Machine_Check("Failed to shut down disk drive");
+    if (status != 0) Machine_Check(MC_HW_FAILURE, "Failed to shut down disk drive");
 }
 //*************************************
 static int start_disk_read()
@@ -67,7 +79,13 @@ static int start_disk_read()
         Status |= DISK_STATUS_READ_BUSY;
 
         buffer = (char *)Abs_Get_Addr(Address);
-        if (buffer == NULL) Machine_Check("DISK_T read to invalid address");
+        if (buffer == NULL) 
+        {
+            Machine_Check(MC_HW_WARNING, "DISK_T read to invalid address");
+            pthread_mutex_unlock(&IO_Q_Lock);
+
+            return 2;
+        }
         pthread_mutex_unlock(&IO_Q_Lock);
 
         status = lseek(Disk_fd, Block*DISK_BLOCK_SIZE, SEEK_SET);
@@ -106,7 +124,13 @@ static int start_disk_write()
         Status |= DISK_STATUS_WRITE_BUSY;
 
         buffer = (char *)Abs_Get_Addr(Address);
-        if (buffer == NULL) Machine_Check("DISK_T write from invalid address");
+        if (buffer == NULL) 
+        {
+            Machine_Check(MC_HW_WARNING, "DISK_T write from invalid address");
+
+            pthread_mutex_unlock(&IO_Q_Lock);
+            return 2;
+        }
 
         pthread_mutex_unlock(&IO_Q_Lock);
 
@@ -190,7 +214,8 @@ static int32_t get_word(int32_t id, int32_t addr)
 //***********************************
 static int32_t get_byte(int32_t id, int32_t addr)
 {
-    Machine_Check("Disk: illegal byte register access");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR, 
+            "Disk: illegal byte register access");
     return 0xFFFFFFFF;
 }
 //***********************************
@@ -215,7 +240,8 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
 //***********************************
 static void set_byte(int32_t id, int32_t addr, int32_t value)
 {
-    Machine_Check("Disk: illegal byte register access");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR, 
+            "Disk: illegal byte register access");
 }
 //*************************************
 static void Disk_Finish()

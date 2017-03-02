@@ -10,7 +10,8 @@ static volatile uint32_t Timer_Limit_Reg = 0xFFFFFFFF;
 //***********************************
 static int32_t get_byte(int32_t id, int32_t addr)
 {
-    Machine_Check("timer registers are word wide");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+            "timer registers are word wide");
     return 0;
 }
 //***********************************
@@ -35,7 +36,8 @@ static int32_t get_word(int32_t id, int32_t addr)
 //***********************************
 static void set_byte(int32_t id, int32_t addr, int32_t value)
 {
-    Machine_Check("timer registers are word wide");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+            "timer registers are word wide");
 }
 //***********************************
 static void set_word(int32_t id, int32_t addr, int32_t value)

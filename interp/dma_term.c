@@ -42,19 +42,25 @@ static void *terminal_device(void *arg)
 
             size = Size;
             buffer = (char *)Abs_Get_Addr(Address);
-            if (buffer == NULL) Machine_Check("DMA_T read to invalid address");
-
-            pthread_mutex_unlock(&IO_Q_Lock);
-            buffer = fgets(buffer, size, stdin);
-
-            pthread_mutex_lock(&IO_Q_Lock);
-            Status &= ~DMA_T_STATUS_READ_BUSY;
-            Status |= DMA_T_STATUS_READ_DONE | DMA_T_STATUS_ATTN;
-            if (buffer == NULL) Status |= DMA_T_STATUS_READ_ERROR;
-
-            if (Command & DMA_T_CMD_INT_ENA) 
+            if (buffer == NULL) 
             {
-                Machine_Signal_Interrupt(1, DMA_T_VECTOR);
+                Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                        "DMA_T read to invalid address");
+            }
+            else
+            {
+                pthread_mutex_unlock(&IO_Q_Lock);
+                buffer = fgets(buffer, size, stdin);
+
+                pthread_mutex_lock(&IO_Q_Lock);
+                Status &= ~DMA_T_STATUS_READ_BUSY;
+                Status |= DMA_T_STATUS_READ_DONE | DMA_T_STATUS_ATTN;
+                if (buffer == NULL) Status |= DMA_T_STATUS_READ_ERROR;
+
+                if (Command & DMA_T_CMD_INT_ENA) 
+                {
+                    Machine_Signal_Interrupt(1, DMA_T_VECTOR);
+                }
             }
         }
         pthread_mutex_unlock(&IO_Q_Lock);
@@ -102,13 +108,20 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
         if (Command & DMA_T_CMD_START_WRITE)
         {
             char *buffer = (char*)Abs_Get_Addr(Address);
-            if (buffer == NULL) Machine_Check("DMA_T write from invalid address");
-            printf("%s", buffer);
-            Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);
-            Status |= DMA_T_STATUS_WRITE_DONE | DMA_T_STATUS_ATTN;
-            if (Command & DMA_T_CMD_INT_ENA) 
+            if (buffer == NULL) 
             {
-                Machine_Signal_Interrupt(0, DMA_T_VECTOR);
+                Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                        "DMA_T write from invalid address");
+            }
+            else
+            {
+                printf("%s", buffer);
+                Status &= ~(DMA_T_STATUS_WRITE_BUSY | DMA_T_STATUS_WRITE_ERROR);
+                Status |= DMA_T_STATUS_WRITE_DONE | DMA_T_STATUS_ATTN;
+                if (Command & DMA_T_CMD_INT_ENA) 
+                {
+                    Machine_Signal_Interrupt(0, DMA_T_VECTOR);
+                }
             }
         }
 

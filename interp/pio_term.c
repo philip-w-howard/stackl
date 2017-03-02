@@ -145,7 +145,8 @@ static int32_t get_byte(int32_t id, int32_t addr)
 //***********************************
 static int32_t get_word(int32_t id, int32_t addr)
 {
-    Machine_Check("pio_term registers are byte wide");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+            "pio_term registers are byte wide");
     return 0;
 }
 //***********************************
@@ -173,7 +174,8 @@ static void set_byte(int32_t id, int32_t addr, int32_t value)
 //***********************************
 static void set_word(int32_t id, int32_t addr, int32_t value)
 {
-    Machine_Check("pio_term registers are byte wide");
+    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+            "pio_term registers are byte wide");
 }
 //*************************************
 int PIO_T_Init()

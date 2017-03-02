@@ -329,7 +329,13 @@ int Boot_From_Disk()
     int status;
 
     status = Disk_Load_Boot_Block();
-    if (status != 0) Machine_Check("Invalid boot block");
+    if (status != 0) 
+    {
+        Machine_Check(0x00000004, "Invalid boot block");
+
+        // error booting is always fatal even if we're debugging
+        exit(1);
+    }
 
     Get_Machine_State(&cpu);
     cpu.SP = 1024;

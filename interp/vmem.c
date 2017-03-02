@@ -35,12 +35,12 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
 {
     if (address < 0)
     {
-        Machine_Check("Invalid address at %d\n", address);
+        Machine_Check(MC_ILLEGAL_ADDR, "Invalid address at %d\n", address);
     }
 
     if ( (address & 0x0003) && !is_char)
     {
-        Machine_Check("misaligned address %d\n", address);
+        Machine_Check(MC_ILLEGAL_ADDR, "misaligned address %d\n", address);
         exit(-1);
     }
 
@@ -48,7 +48,8 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
     {
         if (address < 0 || (address+WORD_SIZE) > regs->LP - regs->BP)
         {
-            Machine_Check("address %d out of bounds\n", address);
+            Machine_Check(MC_ILLEGAL_ADDR, 
+                    "address %d out of bounds\n", address);
             exit(-1);
         } 
 

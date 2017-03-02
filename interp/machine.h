@@ -23,6 +23,12 @@ void Get_Machine_State(Machine_State *cpu);
 void Set_Machine_State(Machine_State *cpu);
 void Set_Debug_Info(debug_info debugger);
 void Machine_Execute();
-void Machine_Check(const char *fmt, ...);
+void Machine_Check(int code, const char *fmt, ...);
 void Machine_Signal_Interrupt(int from_hw, int32_t vector);
 
+// Machine check codes
+#define MC_ILLEGAL_INST 0x00000001
+#define MC_ILLEGAL_ADDR 0x00000002
+#define MC_HW_FAILURE   0x00000004
+#define MC_HW_WARNING   0x00000008
+#define MC_PROT_INST    0x00000010

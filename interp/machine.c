@@ -21,7 +21,7 @@ void machine_debug()
     //printf("***************************** machine debug\n");
 }
 //**************************************
-void Machine_Check(const char *fmt, ...)
+void Machine_Check(int code, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -67,11 +67,13 @@ void Get_Machine_State(Machine_State *cpu)
     pthread_mutex_lock(&Machine_Lock);
     if (Regs.FLAG & FL_USER_MODE) 
     {
-        Machine_Check("Protected instruction exception");
+        Machine_Check(MC_PROT_INST, "Protected instruction exception");
     }
-
-    memcpy(cpu, &Regs, sizeof(Regs));
-    pthread_mutex_unlock(&Machine_Lock);
+    else
+    {
+        memcpy(cpu, &Regs, sizeof(Regs));
+        pthread_mutex_unlock(&Machine_Lock);
+    }
 }
 //***************************************
 void Set_Machine_State(Machine_State *cpu)
@@ -79,11 +81,13 @@ void Set_Machine_State(Machine_State *cpu)
     pthread_mutex_lock(&Machine_Lock);
     if (Regs.FLAG & FL_USER_MODE) 
     {
-        Machine_Check("Protected instruction exception");
+        Machine_Check(MC_PROT_INST, "Protected instruction exception");
     }
-
-    memcpy(&Regs, cpu, sizeof(Regs));
-    pthread_mutex_unlock(&Machine_Lock);
+    else
+    {
+        memcpy(&Regs, cpu, sizeof(Regs));
+        pthread_mutex_unlock(&Machine_Lock);
+    }
 }
 //***************************************
 void Machine_Execute()

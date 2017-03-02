@@ -84,19 +84,31 @@ static void *IO_Processor(void *arg)
                     if (Allow_INP_Instr)
                         fgets((char *)addr, 256, stdin);
                     else
-                        Machine_Check("Invalid IO code: %d", io_op);
+                    {
+                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                                "Invalid IO code: %d", io_op);
+                        io_op |= IO_ERROR;
+                    }
                     break;
                 case GETS_CALL:
                     if (Allow_INP_Instr)
                         scanf("%s", (char *)addr);
                     else
-                        Machine_Check("Invalid IO code: %d", io_op);
+                    {
+                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                                "Invalid IO code: %d", io_op);
+                        io_op |= IO_ERROR;
+                    }
                     break;
                 case GETI_CALL:
                     if (Allow_INP_Instr)
                         scanf("%d", (int32_t *)addr);
                     else
-                        Machine_Check("Invalid IO code: %d", io_op);
+                    {
+                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                                "Invalid IO code: %d", io_op);
+                        io_op |= IO_ERROR;
+                    }
                     break;
                 case EXEC_CALL:
                     if (Allow_INP_Instr)
@@ -106,10 +118,16 @@ static void *IO_Processor(void *arg)
                         Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                     }
                     else
-                        Machine_Check("Invalid IO code: %d", io_op);
+                    {
+                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                                "Invalid IO code: %d", io_op);
+                        io_op |= IO_ERROR;
+                    }
                     break;
                 default:
-                    Machine_Check("Invalid IO code: %d", io_op);
+                    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                            "Invalid IO code: %d", io_op);
+                    io_op |= IO_ERROR;
                     break;
             }
 
@@ -196,7 +214,8 @@ int32_t IO_Get_Word(int32_t address)
     if (handler != NULL)
         return handler->get_word(handler->id, address - handler->addr);
     else
-        Machine_Check("Get from invalid IO word address: 0X%08X\n", address);
+        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                "Get from invalid IO word address: 0X%08X\n", address);
     return 0xFFFFFFFF;
 }
 //*************************************
@@ -209,7 +228,8 @@ void IO_Set_Word(int32_t address, int32_t value)
     }
     else
     {
-        Machine_Check("Set to invalid IO word address: 0X%08X\n", address);
+        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                "Set to invalid IO word address: 0X%08X\n", address);
     }
 }
 //*************************************
@@ -219,7 +239,8 @@ int32_t IO_Get_Byte(int32_t address)
     if (handler != NULL)
         return handler->get_byte(handler->id, address - handler->addr);
     else
-        Machine_Check("Get from invalid IO byte address: 0X%08X\n", address);
+        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                "Get from invalid IO byte address: 0X%08X\n", address);
     return 0xFF;
 }
 //*************************************
@@ -232,7 +253,8 @@ void IO_Set_Byte(int32_t address, int32_t value)
     }
     else
     {
-        Machine_Check("Set to invalid IO byte address: 0X%08X\n", address);
+        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_ADDR,
+                "Set to invalid IO byte address: 0X%08X\n", address);
     }
 }
 //*************************************

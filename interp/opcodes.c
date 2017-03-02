@@ -65,12 +65,15 @@ static int32_t pop(Machine_State *cpu)
     return Get_Word(cpu, cpu->SP);
 }
 //***********************************
-void check_priv(Machine_State *cpu, const char *inst_name)
+int check_priv(Machine_State *cpu, const char *inst_name)
 {
     if (cpu->FLAG & FL_USER_MODE)
     {
-        Machine_Check("%s instruction while not in system mode", inst_name);
+        Machine_Check(MC_PROT_INST, 
+                "%s instruction while not in system mode", inst_name);
+        return 0;
     }
+    return 1;
 }
 //***************************************
 static void do_rti(Machine_State *cpu)
@@ -78,19 +81,20 @@ static void do_rti(Machine_State *cpu)
     int32_t flag;
     flag = cpu->FLAG;
 
-    check_priv(cpu, "RTI");
+    if (check_priv(cpu, "RTI"))
+    {
+        cpu->FP = pop(cpu);
+        cpu->IP = pop(cpu);
+        cpu->LP = pop(cpu);
+        cpu->BP = pop(cpu);
+        cpu->FLAG = pop(cpu);
 
-    cpu->FP = pop(cpu);
-    cpu->IP = pop(cpu);
-    cpu->LP = pop(cpu);
-    cpu->BP = pop(cpu);
-    cpu->FLAG = pop(cpu);
+        // re-enable any interrupts that occurred during this ISR
+        cpu->FLAG |= flag & FL_I_ALL;
 
-    // re-enable any interrupts that occurred during this ISR
-    cpu->FLAG |= flag & FL_I_ALL;
-
-    if (cpu->FLAG & FL_USER_MODE) 
-        cpu->SP -= cpu->BP;
+        if (cpu->FLAG & FL_USER_MODE) 
+            cpu->SP -= cpu->BP;
+    }
 }
 //***********************************************
 // FIX THIS: 
@@ -353,34 +357,42 @@ void Execute(Machine_State *cpu)
             break;
         case CLID_OP:
             DEBUG("CLID");
-            check_priv(cpu, "CLID");
-            SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
-            cpu->FLAG &= ~FL_INT_DIS;
-            INC(SP, 1);
-            INC(IP, 1);
+            if (check_priv(cpu, "CLID"))
+            {
+                SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
+                cpu->FLAG &= ~FL_INT_DIS;
+                INC(SP, 1);
+                INC(IP, 1);
+            }
             break;
         case SEID_OP:
             DEBUG("SEID");
-            check_priv(cpu, "SEID");
-            SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
-            cpu->FLAG |= FL_INT_DIS;
-            INC(SP, 1);
-            INC(IP, 1);
+            if (check_priv(cpu, "SEID"))
+            {
+                SET_INTVAL(SP, 0, cpu->FLAG & FL_INT_DIS); 
+                cpu->FLAG |= FL_INT_DIS;
+                INC(SP, 1);
+                INC(IP, 1);
+            }
             break;
         case OUTS_OP:
             DEBUG("OUTS %d", GET_INTVAL(SP,-1));
-            check_priv(cpu, "OUTS");
-            temp = pop(cpu);
-            printf("%s", (char *)Get_Addr(cpu, temp));
-            fflush(stdout);
-            INC(IP, 1);
+            if (check_priv(cpu, "OUTS"))
+            {
+                temp = pop(cpu);
+                printf("%s", (char *)Get_Addr(cpu, temp));
+                fflush(stdout);
+                INC(IP, 1);
+            }
             break;
         case INP_OP:
             temp = pop(cpu);
             DEBUG("INP %d %d", Get_Word(cpu, temp), Get_Word(cpu, temp+4));
-            check_priv(cpu, "INP");
-            Schedule_IO(cpu, temp);
-            INC(IP, 1);
+            if (check_priv(cpu, "INP"))
+            {
+                Schedule_IO(cpu, temp);
+                INC(IP, 1);
+            }
             break;
         /*
         case TRAPTOC_OP:
@@ -481,15 +493,16 @@ void Execute(Machine_State *cpu)
             break;
         case JMPUSER_OP:
             DEBUG("JMPUSER_%d", GET_INTVAL(IP,1));
-            check_priv(cpu, "JMPUSER");
+            if (check_priv(cpu, "JMPUSER"))
+            {
+                temp = GET_INTVAL(IP,1);
 
-            temp = GET_INTVAL(IP,1);
-
-            // need to update regs to reflect user mode
-            cpu->FLAG |= FL_USER_MODE;
-            //cpu->SP -= cpu->BP;
-            //cpu->FP -= cpu->BP;
-            cpu->IP = temp;
+                // need to update regs to reflect user mode
+                cpu->FLAG |= FL_USER_MODE;
+                //cpu->SP -= cpu->BP;
+                //cpu->FP -= cpu->BP;
+                cpu->IP = temp;
+            }
 
             break;
         case PUSHREG_OP:
@@ -525,32 +538,34 @@ void Execute(Machine_State *cpu)
         case POPREG_OP:
             DEBUG("POPREG %d", GET_INTVAL(IP,1));
             debug_break();
-            check_priv(cpu, "POPREG");
-            temp = GET_INTVAL(IP,1);
-            INC(IP,2);
-            switch (temp)
+            if (check_priv(cpu, "POPREG"))
             {
-                case BP_REG:
-                    cpu->BP = pop(cpu);
-                    break;
-                case LP_REG:
-                    cpu->LP = pop(cpu);
-                    break;
-                case IP_REG:
-                    cpu->IP = pop(cpu);
-                    break;
-                case SP_REG:
-                    cpu->SP = pop(cpu);
-                    break;
-                case FP_REG:
-                    cpu->FP = pop(cpu);
-                    break;
-                case FLAG_REG:
-                    cpu->FLAG = pop(cpu);
-                    break;
-                case IVEC_REG:
-                    cpu->IVEC = pop(cpu);
-                    break;
+                temp = GET_INTVAL(IP,1);
+                INC(IP,2);
+                switch (temp)
+                {
+                    case BP_REG:
+                        cpu->BP = pop(cpu);
+                        break;
+                    case LP_REG:
+                        cpu->LP = pop(cpu);
+                        break;
+                    case IP_REG:
+                        cpu->IP = pop(cpu);
+                        break;
+                    case SP_REG:
+                        cpu->SP = pop(cpu);
+                        break;
+                    case FP_REG:
+                        cpu->FP = pop(cpu);
+                        break;
+                    case FLAG_REG:
+                        cpu->FLAG = pop(cpu);
+                        break;
+                    case IVEC_REG:
+                        cpu->IVEC = pop(cpu);
+                        break;
+                }
             }
             break;
         case ADJSP_OP:
@@ -589,7 +604,8 @@ void Execute(Machine_State *cpu)
             INC(IP,1);
             break;
         default:
-            Machine_Check("Illegal instruction '%i' at %d\n", val, cpu->IP);
+            Machine_Check(MC_ILLEGAL_INST,
+                    "Illegal instruction '%i' at %d\n", val, cpu->IP);
             break;
     }
 }
