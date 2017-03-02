@@ -31,6 +31,7 @@ void cSizeOffset::Visit(cStructType *node)
 
     VisitAllChildren(node);
 
+    m_offset = RoundUp(m_offset);
     node->SetSize(m_offset);
     m_offset = offset;
 }
