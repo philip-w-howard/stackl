@@ -26,7 +26,7 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
         exit( EXIT_FAILURE );
     }
 
-    cpu->debugger = (stackl_debugger*)debugger;
+    cpu->debugger = (void*)debugger;
     debugger->query_user( cpu );
 }
 
@@ -37,6 +37,18 @@ void dbg_check_break( Machine_State* cpu )
         stackl_debugger* debugger = (stackl_debugger*)cpu->debugger;
         debugger->debug_check( cpu );
     }
+}
+
+int32_t dbg_machine_check( Machine_State* cpu )
+{
+    stackl_debugger* dbg = (stackl_debugger*)cpu->debugger;
+    if( dbg == nullptr )
+        return 0; //no debugger? tell machine check to call exit()
+
+    if( !dbg->debugging() )
+        dbg->query_user( cpu );
+
+    return 1;
 }
 
 void dbg_enable()

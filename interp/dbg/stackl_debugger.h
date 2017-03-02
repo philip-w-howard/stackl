@@ -29,6 +29,7 @@ public:
 	void debug_check( Machine_State* cpu  );
 	void query_user( Machine_State* cpu );
 
+	inline bool debugging() const { return _debugging; }
 	inline bool loaded() const { return _loaded; }
 	inline string failure_reason() const { return _failure_reason; }
 private:
@@ -100,15 +101,20 @@ private:
 	bool cmd_program( string& params, Machine_State* cpu );
 	bool cmd_func( string& params, Machine_State* cpu );
 	bool cmd_help( string& params, Machine_State* cpu );
+	bool cmd_breakpointi( string& params, Machine_State* cpu );
+	bool cmd_removebreaki( string& params, Machine_State* cpu );
+	bool cmd_nexti( string& params, Machine_State* cpu );
 
 	string _binary_name = "";
 	vector<uint32_t> _break_points;
 	abstract_syntax_tree _ast;
 	asm_list _lst;
 	bool _loaded = false;
+	bool _debugging = false;
 
 	string _prev_cmd = "";
 
+	bool _break_next_op = false;
 	bool _stepping = false;
 	uint32_t _prev_line = 0;
 	string _prev_file = "";

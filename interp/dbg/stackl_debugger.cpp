@@ -54,7 +54,9 @@ void stackl_debugger::check_compile_time( const char* filename )
 void stackl_debugger::load_commands()
 {
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpoint, { "breakpoint", "break", "b" }, "[line_num|file:line_num|func_name] - Adds breakpoint" ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpointi, { "breakpointi", "breaki", "bi" }, "[IP] - Adds breakpoint at the passed instruction pointer" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreak, { "removebreak", "rbreak", "rb" }, "[line_num|file:line_num|func_name] - Removes breakpoint" ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreaki, { "removebreaki", "rbreaki", "rbi" }, "[IP] - Removes breakpoint at the passed instruction pointer" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_print, { "print", "p" }, "[var_name|0xaddress] - Prints the value of the variable" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line" ) );
@@ -72,6 +74,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "- Prints the limit pointer" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "- Prints the stack pointer" ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text" ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction" ) );
 }
 
 bool stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -103,6 +106,34 @@ bool stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
     return true;
 }
 
+bool stackl_debugger::cmd_breakpointi( string& params, Machine_State* cpu )
+{
+    if( params.length() == 0 )
+    {
+        cout << "Specifiy a breakpoint location.\n";
+        return true;
+    }
+
+    try
+    {
+        uint32_t addr = stoi( params );
+        if( addr % 4 != 0 )
+        {
+            cout << "Misaligned instruction pointer.\n";
+            return true;
+        }
+        add_breakpoint( addr );
+        cout << "Breakpoint added on instruction pointer " << addr << ".\n";
+        return true;
+    }
+    catch( ... )
+    {
+        cout << "Enter a valid number.\n";
+        return true;
+    }
+    return true;
+}
+
 bool stackl_debugger::cmd_removebreak( string& params, Machine_State* cpu )
 {
     if( params.length() == 0 )
@@ -127,6 +158,37 @@ bool stackl_debugger::cmd_removebreak( string& params, Machine_State* cpu )
         case DUPLICATE:
             cout << "Not sure how you got here.\n";
             break;
+    }
+    return true;
+}
+
+
+bool stackl_debugger::cmd_removebreaki( string& params, Machine_State* cpu )
+{
+    if( params.length() == 0 )
+    {
+        cout << "Specifiy a breakpoint location.\n";
+        return true;
+    }
+
+    try
+    {
+        uint32_t addr = stoi( params );
+        if( addr % 4 != 0 )
+        {
+            cout << "Misaligned instruction pointer.\n";
+            return true;
+        }
+        if( remove_breakpoint( addr ) )
+            cout << "Breakpoint removed from instruction pointer " << addr << ".\n";
+        else
+            cout << "Breakpoint doesn't exist on instruction pointer " << addr << ".\n";
+        return true;
+    }
+    catch( ... )
+    {
+        cout << "Enter a valid number.\n";
+        return true;
     }
     return true;
 }
@@ -163,7 +225,7 @@ bool stackl_debugger::cmd_list( string& params, Machine_State* cpu )
         cout << get_nearby_lines( cpu->IP, 2 );
 
     else if( string_utils::is_number( params, 10, &range ) )
-    cout << get_nearby_lines( cpu->IP, range );
+        cout << get_nearby_lines( cpu->IP, range );
     else
         cout << "[list] [optional range]\n";
     return true;
@@ -174,6 +236,12 @@ bool stackl_debugger::cmd_next( string& params, Machine_State* cpu )
     _prev_file = _lst.current_file( cpu->IP );
     _prev_line = _lst.line_of_addr( _prev_file, cpu->IP );
     _stepping = true;
+    return false;
+}
+
+bool stackl_debugger::cmd_nexti( string& params, Machine_State* cpu )
+{
+    _break_next_op = true;
     return false;
 }
 
@@ -417,6 +485,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
 {
     string input;
     cout << "Enter a command.\n";
+    _debugging = true;
     while( true )
     {
         cout << "(dbg) ";
@@ -456,15 +525,21 @@ void stackl_debugger::query_user( Machine_State* cpu )
         }
         if( res == -1 ) //if res wasn't modified, we never ran a command
             cout << "huh?\n";
-        else if( res == 0 ) //return false means resume executing
+        else if( res == false ) //return false means resume executing
             break;
         else continue; //otherwise prompt for input again
     }
+    _debugging = false;
 }
 
 bool stackl_debugger::should_break( uint32_t cur_addr )
 {
-    if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
+    if( _break_next_op )
+    {
+        _break_next_op = false;
+        return true;
+    }
+    else if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
         return true;
     else if( _stepping )
     {
