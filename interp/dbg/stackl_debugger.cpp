@@ -441,7 +441,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
     if( var == nullptr )
         return "Variable not found in current scope";
 
-    variable res = var->from_indexes( indexes );
+    variable res = var->from_indexes( indexes, cpu );
 
     int32_t total_offset = res.offset();
     for( uint32_t i = 1; i < var_fields.size(); ++i )
@@ -450,12 +450,16 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
         {
             indexes = string_utils::strip_array_indexes( var_fields[i] ); //strip ending brackets to get the 'true' var name
             var = res.decl()->var( var_fields[i] ); //ask the type of the left for the variable object of the guy on the right
-            res = var->from_indexes( indexes ); //if there were any brackets, now we move through them
+
+            if( var == nullptr )
+                return string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'.";
+
+            res = var->from_indexes( indexes, cpu );
             total_offset += res.offset();
         }
         else
         {
-            return string( "'" ) + var->definition() + "' is not a struct type.";
+            return string( "'" ) + res.definition() + "' is not a struct type.";
         }
     }
 

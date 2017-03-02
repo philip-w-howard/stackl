@@ -31,12 +31,13 @@ public:
 
     string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
     variable deref( uint32_t derefs, Machine_State* cpu ) const;
-    variable from_indexes( vector<uint32_t>& indexes ) const;
+    variable from_indexes( vector<uint32_t>& indexes, Machine_State* cpu ) const;
 
     int32_t total_offset( Machine_State* cpu ) const;
 
     inline size_t size() const { return _size; }
     inline string name() const { return _name; }
+    inline string type() const { return _type; }
     inline int32_t offset() const { return _offset; }
     inline void offset( int32_t offset ) { _offset = offset; }
     inline int32_t indirection() const { return _indirection; }
@@ -50,6 +51,7 @@ public:
 
 private:
 
+    variable deref_ptr_from_index( vector<uint32_t>& indexes, Machine_State* cpu ) const;
 
     void parse_base_decl( xml_node<char>* node );
     //it's only three args I promise. and it's two pointers and a ref

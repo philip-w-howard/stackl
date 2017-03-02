@@ -157,16 +157,20 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
         addr = Get_Word( cpu, addr );
 
     variable deref_var = *this; //create a copy
-    deref_var.offset( addr - cpu->FP ); //modify its offset relative to the current FP
+    if( !_global ) //if it's a local variable then return locality
+        addr -= cpu->FP;
+    deref_var.offset( addr );
     deref_var.indirection( indirection() - derefs ); //modify its level of indirection
 
     return deref_var;
 }
 
-variable variable::from_indexes( vector<uint32_t>& indexes ) const
+variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu ) const
 {
     if( indexes.size() == 0 )
         return *this;
+    if( is_pointer() && !is_array() )
+        return deref_ptr_from_index( indexes, cpu );
     if( indexes.size() > _array_ranges.size() )
         throw "Array does not have that many dimensions.";
 
@@ -190,6 +194,23 @@ variable variable::from_indexes( vector<uint32_t>& indexes ) const
     int32_t remaining_dimensions = _array_ranges.size() - indexes.size();
     indexed._array_ranges.erase( indexed._array_ranges.begin(), ( indexed._array_ranges.end() - remaining_dimensions ) );
     indexed._size = new_size;
+    return indexed;
+}
+
+variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_State* cpu ) const
+{
+    if( indexes.size() > 1 )
+        throw "Cannot index pointer on more than one dimension.";
+
+    int32_t addr = Get_Word( cpu, total_offset( cpu ) );
+    addr += indexes[0] * _size;
+
+    if( !_global ) //if it's a local variable then return locality to the offset
+        addr -= cpu->FP;
+
+    variable indexed = *this;
+    indexed.offset( addr );
+    indexed._indirection -= 1;
     return indexed;
 }
 
@@ -234,7 +255,7 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
             for( uint32_t i = 0; i < _array_ranges[0]; ++i )
             {
                 idx[0] = i;
-                pre += from_indexes( idx ).to_string( cpu, indent_level + 1 ) + ",\n";
+                pre += from_indexes( idx, cpu ).to_string( cpu, indent_level + 1 ) + ",\n";
             }
             pre.erase( pre.end() - 2 ); //remove the last comma and newline
             pre += "}";
