@@ -1,12 +1,12 @@
 #include "asm_list.h"
- 
+
 #include <sstream>
 using std::stringstream;
 #include <algorithm>
 using std::find;
 #include <fstream>
 using std::ifstream;
- 
+
 asm_list::asm_list( const string& filename )
 {
     ifstream infile( filename );
@@ -28,6 +28,8 @@ asm_list::asm_list( const string& filename )
             string cur_func, cur_file;
             uint32_t ip, line_num;
             ss >> ip >> line_num >> cur_func >> cur_file;
+            if( ip > _max_ip )
+                _max_ip = ip;
             if( line_num != old_line_num && !cur_func.empty() && !cur_file.empty() )
             {
                 auto& f = _file_and_line_to_addr[directory+cur_file];
@@ -41,8 +43,9 @@ asm_list::asm_list( const string& filename )
             }
         }
     }
+    _max_ip += 4;
 }
- 
+
 uint32_t asm_list::addr_of_func( const string & func_name )
 {
     for( const func_addr_t& f_a : _func_to_addr )
@@ -50,7 +53,7 @@ uint32_t asm_list::addr_of_func( const string & func_name )
             return f_a.addr;
     return UINT32_MAX;
 }
- 
+
 //in this function we're looking for the line number that is the
 //smallest amount BIGGER THAN line_number.
 //aka: if we have { 12, 13, 17, 18 } and line_number is 14,
@@ -66,7 +69,7 @@ uint32_t asm_list::addr_of_line( const string & filename, uint32_t line_number )
         {
             if( al_t.line_num == line_number )
                 return al_t.addr; //if we have the line obviously just return it
- 
+
             if( al_t.line_num > line_number ) //is it a possible candidate?
             {
                 if( ( al_t.line_num - line_number ) < dif ) //is it a new best choice?
@@ -84,7 +87,7 @@ uint32_t asm_list::addr_of_line( const string & filename, uint32_t line_number )
     }
     else return UINT32_MAX;
 }
- 
+
 uint32_t asm_list::line_of_addr( const string& filename, uint32_t address )
 {
     auto file_find = _file_and_line_to_addr.find( filename );
@@ -121,12 +124,12 @@ uint32_t asm_list::line_of_addr( const string& filename, uint32_t address )
     }
     else return UINT32_MAX;
 }
- 
+
 string asm_list::current_func( uint32_t cur_addr )
 {
     func_addr_t* prev = nullptr;
     for( func_addr_t& f_a : _func_to_addr )
-    {
+    { //once we pass the address that was our lower bound, return the one we were looking at previously
         if( f_a.addr > cur_addr && prev != nullptr )
             return prev->func_name;
         else
@@ -134,9 +137,9 @@ string asm_list::current_func( uint32_t cur_addr )
     }
     if( prev == nullptr )
         return "";
-    else return prev->func_name;
+    else return prev->func_name; //if we get to the end then our last function was the guy we want
 }
- 
+
 string asm_list::current_file( uint32_t cur_addr )
 {
     string best_filename = "unknown";

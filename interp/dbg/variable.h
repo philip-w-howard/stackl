@@ -31,11 +31,13 @@ public:
 
     string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
     variable deref( uint32_t derefs, Machine_State* cpu ) const;
-    
-    inline uint32_t address_of( Machine_State* cpu ) const { return _offset + cpu->FP; }
+    variable from_indexes( vector<uint32_t>& indexes, Machine_State* cpu ) const;
+
+    int32_t total_offset( Machine_State* cpu ) const;
 
     inline size_t size() const { return _size; }
     inline string name() const { return _name; }
+    inline string type() const { return _type; }
     inline int32_t offset() const { return _offset; }
     inline void offset( int32_t offset ) { _offset = offset; }
     inline int32_t indirection() const { return _indirection; }
@@ -43,28 +45,31 @@ public:
     inline bool is_pointer() const { return _indirection != 0; }
     inline bool is_array() const { return _array_ranges.size() != 0; }
     inline bool is_struct() const { return _struct_decl != nullptr; }
+    inline bool is_string() const { return _type == "char" && ( ( _array_ranges.size() != 1 ) != ( _indirection != 1 ) ); } //logical XOR! (A==x XOR B==y) == (A!=x != B!=y)
     inline struct_decl* decl() { return _struct_decl; }
     string definition() const;
 
 private:
 
-	void parse_base_decl( xml_node<char>* node );
-	//it's only three args I promise. and it's two pointers and a ref
-	//I could typedef this to shrink it but I think the full type is more useful.
-	void parse_pointer_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
-	void parse_struct_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
-	void parse_array_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
-	void parse_node_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
+    variable deref_ptr_from_index( vector<uint32_t>& indexes, Machine_State* cpu ) const;
 
-	string _type;
-	int32_t _offset;
-	size_t _size = 0;
-	string _name;
+    void parse_base_decl( xml_node<char>* node );
+    //it's only three args I promise. and it's two pointers and a ref
+    //I could typedef this to shrink it but I think the full type is more useful.
+    void parse_pointer_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
+    void parse_struct_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
+    void parse_array_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
+    void parse_node_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
 
-	uint8_t _indirection = 0; //0 if it's not a pointer, >0 if it is
-	vector<size_t> _array_ranges; //.size() = 0 if its not an array, >0 if it is. each index is the range of that array level
-	struct_decl* _struct_decl = nullptr; //nullptr if its not a struct, otherwise it points to the structs decl
+    bool _global = false;
+    string _type = "";
+    int32_t _offset = 0;
+    size_t _size = 0;
+    string _name = "";
 
-	static set<string> builtins;
+    uint8_t _indirection = 0; //0 if it's not a pointer, >0 if it is
+    vector<size_t> _array_ranges; //.size() = 0 if its not an array, >0 if it is. each index is the range of that array level
+    struct_decl* _struct_decl = nullptr; //nullptr if its not a struct, otherwise it points to the structs decl
+
+    static set<string> builtins;
 };
-

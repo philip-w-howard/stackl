@@ -5,7 +5,7 @@ struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, str
 {
 	//get the first symbol and read its 'name' attribute
 	_name = struct_node->first_node( "Symbol" )->first_attribute( "name" )->value();
-	
+
 	//get every var decl in the decls list
 	for( xml_node<char>* xml_var : struct_node->first_node( "DeclsList" )->all_nodes() )
 	{

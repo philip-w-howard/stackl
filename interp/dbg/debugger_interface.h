@@ -7,6 +7,7 @@ extern "C" {
 
 void dbg_load_info( Machine_State* cpu, const char* filename );
 void dbg_check_break( Machine_State* cpu );
+int32_t dbg_machine_check( Machine_State* cpu );
 void dbg_enable();
 
 #ifdef __cplusplus

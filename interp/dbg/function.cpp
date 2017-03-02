@@ -51,10 +51,10 @@ void function::load_locals( xml_node<char>* upper_node, unordered_map<string, st
 		}
 		else
 		{ //if it's not, then recurse down
-			//the exit condition is that this node has no children, 
+			//the exit condition is that this node has no children,
 			//in which case the next level of recursion will exit immediately
 			//and the stack will unwind
-			load_locals( node, type_context ); 
+			load_locals( node, type_context );
 		}
 	}
 }
