@@ -32,7 +32,7 @@ void Machine_Check(int code, const char *fmt, ...)
     va_end(args);
     //fprintf(stderr, "%0x %d %d %d %d %d Final State\n", 
     //        Regs.FLAG, Regs.BP, Regs.LP, Regs.IP, Regs.SP, Regs.FP);
-    exit(-1);
+    if (!dbg_machine_check(code, &Regs)) exit(-1);
 }
 //***************************************
 void Init_Machine(int mem_size)
