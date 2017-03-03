@@ -205,7 +205,7 @@ bool stackl_debugger::cmd_removebreaki( string& params, Machine_State* cpu )
     try
     {
         uint32_t addr = stoi( params );
-        if( addr % 4 != 0 )
+        if( addr % sizeof( int32_t ) != 0 )
         {
             cout << "Misaligned instruction pointer.\n";
             return true;
@@ -265,7 +265,7 @@ bool stackl_debugger::cmd_printi( string& params, Machine_State* cpu )
         return true;
     }
 
-    if( addr % 4 != 0 )
+    if( addr % sizeof( int32_t ) != 0 )
     {
         cout << "Misaligned instruction pointer.\n";
         return true;
@@ -319,10 +319,7 @@ bool stackl_debugger::cmd_locals( string& params, Machine_State* cpu )
     }
     else
     {
-        if( _lst.addr_of_func( params ) != UINT32_MAX )
-        {
-            cout << _ast.all_locals( params );
-        }
+        cout << _ast.all_locals( params );
     }
     return true;
 }
@@ -403,12 +400,11 @@ bool stackl_debugger::cmd_help( string& params, Machine_State* cpu )
 
 string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 {
-    std::locale loc;
     string res = "";
     int32_t instr = Get_Word( cpu, addr );
 
     if( (int64_t)instr >= ( (int64_t)sizeof( op_list ) / (int64_t)sizeof( opcode_t ) ) )
-        return "Invalid Instruction Pointer.\n";
+        return "Invalid opcode found.\n";
 
     opcode_t op = op_list[instr];
     res += op.op_name;
@@ -416,7 +412,7 @@ string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 
     for( int32_t i = 0; i < op.num_params; ++i )
     {
-        addr += 4;
+        addr += sizeof( int32_t );
         res += " " + to_string( Get_Word( cpu, addr ) );
     }
 
@@ -497,6 +493,9 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
 string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
 {
     int32_t val;
+
+    string_utils::ltrim( var_text );
+
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
         return string_utils::to_hex( Get_Word( cpu, val ) );
 
@@ -541,10 +540,8 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
         }
     }
 
-    //variable res = *var; //create copy of var
     res.offset( total_offset ); //modify its offset by the total dist from the FP
     res = res.deref( indirection, cpu );
-
 
     if( address_of )
         return string_utils::to_hex( res.total_offset( cpu ) );
@@ -583,7 +580,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
         if( input == "" )
         {
             input = _prev_cmd;
-            cout << '\b' << _prev_cmd << '\n';
+            cout << "\e[A(dbg) " << _prev_cmd << '\n'; // "\e[A" moves the cursor up one line.
         }
         else
             _prev_cmd = input;
@@ -600,6 +597,7 @@ void stackl_debugger::query_user( Machine_State* cpu )
         {
             cmd = input.substr( 0, idx );
             params = input.substr( idx + 1 );
+            string_utils::ltrim( params );
         }
 
         int32_t res = -1;
@@ -620,8 +618,9 @@ void stackl_debugger::query_user( Machine_State* cpu )
                 }
             }
         }
+
         if( res == -1 ) //if res wasn't modified
-            cout << "Enter a command.\n";
+            cout << "Unknown command.\n";
         else if( res == false ) //return false means resume executing code
             break;
         else continue; //otherwise prompt for input again

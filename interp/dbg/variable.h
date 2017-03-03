@@ -45,8 +45,8 @@ public:
     inline bool is_pointer() const { return _indirection != 0; }
     inline bool is_array() const { return _array_ranges.size() != 0; }
     inline bool is_struct() const { return _struct_decl != nullptr; }
-    inline bool is_string() const { return _type == "char" && ( ( _array_ranges.size() != 1 ) != ( _indirection != 1 ) ); } //logical XOR! (A==x XOR B==y) == (A!=x != B!=y)
     inline struct_decl* decl() { return _struct_decl; }
+    bool is_string() const;
     string definition() const;
 
 private:

@@ -51,7 +51,7 @@ void variable::parse_base_decl( xml_node<char>* node )
 
 void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
 {
-    _size = 4; //I think?
+    _size = sizeof( int32_t ); //I think?
 
     string pointer_type = node->first_node( "Symbol" )->first_attribute( "name" )->value();
 
@@ -126,23 +126,32 @@ void variable::parse_node_type( xml_node<char>* node, unordered_map<string, stru
     {
         parse_array_type( node, global_type_context, local_type_context );
     }
-    else
-    {
-        throw runtime_error( string( "Invalid AST: " ) + node->name() );
-    }
+    else throw runtime_error( string( "Invalid AST: " ) + node->name() );
 }
 
 string variable::definition() const
 {
     string def = _type;
-    def += string( _indirection, '*' );
 
+    def += string( _indirection, '*' );
     def += " " + _name;
 
     if( _array_ranges.size() != 0 )
         for( size_t idx : _array_ranges )
             def += "[" + std::to_string( idx ) + "]";
+
     return def;
+}
+
+bool variable::is_string() const
+{
+    if( _type != "char" )
+        return false;
+    if( _indirection == 1 && _array_ranges.size() == 0 ) //char*
+        return true;
+    if( _indirection == 0 && _array_ranges.size() == 1 ) //char[]
+        return true;
+    return false; //anything else aint a string.
 }
 
 variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
@@ -157,11 +166,12 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
         addr = Get_Word( cpu, addr );
 
     variable deref_var = *this; //create a copy
-    if( !_global ) //if it's a local variable then return locality
+
+    if( !_global ) //if it's a local variable then return locality to the offset
         addr -= cpu->FP;
+
     deref_var.offset( addr );
     deref_var.indirection( indirection() - derefs ); //modify its level of indirection
-
     return deref_var;
 }
 
@@ -192,6 +202,7 @@ variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu )
     indexed.offset( new_offset );
 
     int32_t remaining_dimensions = _array_ranges.size() - indexes.size();
+
     indexed._array_ranges.erase( indexed._array_ranges.begin(), ( indexed._array_ranges.end() - remaining_dimensions ) );
     indexed._size = new_size;
     return indexed;
@@ -203,7 +214,7 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
         throw "Cannot index pointer on more than one dimension.";
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
-    addr += indexes[0] * _size;
+    addr += indexes[0] * sizeof( int32_t );
 
     if( !_global ) //if it's a local variable then return locality to the offset
         addr -= cpu->FP;
@@ -258,19 +269,14 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
                 pre += from_indexes( idx, cpu ).to_string( cpu, indent_level + 1 ) + ",\n";
             }
             pre.erase( pre.end() - 2 ); //remove the last comma and newline
-            pre += "}";
-            return pre;
         }
         else
         {
             size_t index_size = _size / _array_ranges[0];
             for( uint32_t i = 0; i < _array_ranges[0]; ++i )
-            {
                 pre += tabs + '\t' + string_utils::to_hex( total_offset( cpu ) + ( i * index_size ) ) + ",\n";
-            }
-            pre += "}";
-            return pre;
         }
+        return pre + tabs + "}";
     }
     else if( _struct_decl != nullptr )
     {
