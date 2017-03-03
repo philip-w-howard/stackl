@@ -2,7 +2,8 @@
 #include <stdexcept>
 using std::runtime_error;
 
-debugger_command::debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help ): _dbg(dbg), _func(func), _names(names), _help(help)
+debugger_command::debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help, bool op_dbg )
+    : _dbg( dbg ), _func( func ), _names( names ), _help( help ), _op_dbg( op_dbg )
 {
     for( const string& name : _names )
         if( name.find( ' ' ) != string::npos )

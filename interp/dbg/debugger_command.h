@@ -15,14 +15,16 @@ class debugger_command
 {
 public:
 
-    debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help );
+    debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help, bool op_dbg = false );
     bool called_by( const string& cmd ) const;
     bool run( string& params, Machine_State* cpu ) const;
     string to_string() const;
+    inline bool allowed_in_opcode_mode() const { return _op_dbg; }
 
 private:
     stackl_debugger& _dbg;
     op _func;
     set<string> _names;
     string _help;
+    bool _op_dbg;
 };

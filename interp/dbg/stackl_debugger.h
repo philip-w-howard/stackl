@@ -13,9 +13,6 @@ using std::vector;
 using std::find;
 #include <fstream>
 using std::ifstream;
-#include <iostream>
-using std::cout;
-using std::cin;
 
 #include"string_utils.h"
 #include "../machine.h"
@@ -66,7 +63,7 @@ private:
 	This supports multiple levels of indirection.
 	array[X] will print the value of the variable at X index
 	*/
-	string var_to_string( Machine_State* cpu, const string& var_text );
+	string var_to_string( Machine_State* cpu, string& var_text );
 
 	//'list' in gdb. maybe 2 lines above and below? obviously configurable.
 	string get_nearby_lines( uint32_t cur_addr, int32_t range );
@@ -75,16 +72,25 @@ private:
 	bool add_breakpoint( uint32_t addr );
 	//true if it was removed, false if it didnt exist
 	bool remove_breakpoint( uint32_t addr );
+	//converts a users breakpoint-formatted text into an instruction pointer
 	uint32_t text_to_addr( const string& break_point_text, uint32_t cur_addr );
 
-	void check_compile_time( const char* filename );
+	string opcode_to_string( uint32_t addr, Machine_State* cpu );
 
+	void check_compile_time( const char* filename );
+	bool file_exists( const string& filename );
+
+	void opcode_debug_mode( const string& filename );
+
+	//this function populates the _commands field.
 	void load_commands();
 	vector<debugger_command> _commands;
 
+	//each debugger command must have a function that is run when the command is invoked.
 	bool cmd_breakpoint( string& params, Machine_State* cpu );
 	bool cmd_removebreak( string& params, Machine_State* cpu );
 	bool cmd_print( string& params, Machine_State* cpu );
+	bool cmd_printi( string& params, Machine_State* cpu );
 	bool cmd_continue( string& params, Machine_State* cpu );
 	bool cmd_list( string& params, Machine_State* cpu );
 	bool cmd_next( string& params, Machine_State* cpu );
@@ -111,6 +117,7 @@ private:
 	asm_list _lst;
 	bool _loaded = false;
 	bool _debugging = false;
+	bool _opcode_debug = false;
 
 	string _prev_cmd = "";
 

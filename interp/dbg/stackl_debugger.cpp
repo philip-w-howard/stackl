@@ -1,6 +1,8 @@
 #include "stackl_debugger.h"
 
 #include <iostream>
+using std::cout;
+using std::cin;
 #include <cmath>
 #include <cstdio>
 #include <time.h>
@@ -10,10 +12,13 @@
 using std::runtime_error;
 #include <set>
 using std::set;
+#include <algorithm>
+using std::transform;
 
 extern "C"
 {
     #include "../vmem.h"
+    #include "../slasm.h"
 }
 
 stackl_debugger::stackl_debugger( const char* filename )
@@ -27,10 +32,17 @@ stackl_debugger::stackl_debugger( const char* filename )
 
     try
     {
-        _lst = asm_list( fname + ".dbg" );
-        _ast = abstract_syntax_tree( fname + ".ast", _lst.max_ip() );
+
+        if( !file_exists( fname + ".dbg" ) || !file_exists( fname + ".ast" ) )
+            opcode_debug_mode( fname );
+        else
+        {
+            _lst = asm_list( fname + ".dbg" );
+            _ast = abstract_syntax_tree( fname + ".ast", _lst.max_ip() );
+            check_compile_time( filename );
+        }
+
         load_commands();
-        check_compile_time( filename );
 
         //if we get to this point it's because there were no exceptions thrown above
         _loaded = true;
@@ -51,30 +63,49 @@ void stackl_debugger::check_compile_time( const char* filename )
         throw runtime_error( "Debug files out of date." );
 }
 
+bool stackl_debugger::file_exists( const string& filename )
+{
+    struct stat buffer;
+    return stat( filename.c_str(), &buffer ) == 0;
+}
+
+void stackl_debugger::opcode_debug_mode( const string& filename )
+{
+    char c;
+    cout << "Could not find debug files. Would you like to debug the binary? [y/n] ";
+    cin.get( c );
+    cin.ignore( INT32_MAX, '\n' );
+    if( c == 'n' )
+        throw runtime_error( "Debug files not found" );
+
+    _opcode_debug = true;
+}
+
 void stackl_debugger::load_commands()
 {
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpoint, { "breakpoint", "break", "b" }, "[line_num|file:line_num|func_name] - Adds breakpoint" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpointi, { "breakpointi", "breaki", "bi" }, "[IP] - Adds breakpoint at the passed instruction pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreak, { "removebreak", "rbreak", "rb" }, "[line_num|file:line_num|func_name] - Removes breakpoint" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreaki, { "removebreaki", "rbreaki", "rbi" }, "[IP] - Removes breakpoint at the passed instruction pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_print, { "print", "p" }, "[var_name|0xaddress] - Prints the value of the variable" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_next, { "next", "n" }, "[line_num|file:line_num|func_name] - Removes breakpoint" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_locals, { "locals", "listlocals" }, "- Print all local vars in current or specified function" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_funcs, { "funcs", "functions", "listfuncs", "listfunctions" }, "- Print all functions" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_file, { "file", "currentfile" }, "- Prints the filename of the currently executing source code" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "- Prints the instruction pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "- Prints the frame pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "- Prints the base pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "- Prints the limit pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "- Prints the stack pointer" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text" ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction" ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpoint, { "breakpoint", "break", "b" }, "[line_num|file:line_num|func_name] - Adds breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpointi, { "breakpointi", "breaki", "bi" }, "[IP] - Adds breakpoint at the passed instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreak, { "removebreak", "rbreak", "rb" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreaki, { "removebreaki", "rbreaki", "rbi" }, "[IP] - Removes breakpoint at the passed instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_print, { "print", "p" }, "[var_name|0xaddress] - Prints the value of the variable", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_printi, { "printi", "pi" }, "[IP|0xaddress] - Prints the value of the instruction at the passed location", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_next, { "next", "n" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_locals, { "locals", "listlocals" }, "- Print all local vars in current or specified function", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_funcs, { "funcs", "functions", "listfuncs", "listfunctions" }, "- Print all functions", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_file, { "file", "currentfile" }, "- Prints the filename of the currently executing source code", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "- Prints the instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "- Prints the frame pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "- Prints the base pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "- Prints the limit pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "- Prints the stack pointer", true) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
 }
 
 bool stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -213,6 +244,37 @@ bool stackl_debugger::cmd_print( string& params, Machine_State* cpu )
     return true;
 }
 
+bool stackl_debugger::cmd_printi( string& params, Machine_State* cpu )
+{
+    int32_t addr;
+    if( params.length() == 0 )
+    {
+        addr = cpu->IP;
+    }
+    else if( string_utils::begins_with( params, "0x" ) )
+    {
+        if( !string_utils::is_number( params, 16, &addr ) )
+        {
+            cout << "Please enter a valid number.\n";
+            return true;
+        }
+    }
+    else if( !string_utils::is_number( params, 10, &addr ) )
+    {
+        cout << "Please enter a valid number.\n";
+        return true;
+    }
+
+    if( addr % 4 != 0 )
+    {
+        cout << "Misaligned instruction pointer.\n";
+        return true;
+    }
+
+    cout << opcode_to_string( addr, cpu ) << '\n';
+    return true;
+}
+
 bool stackl_debugger::cmd_continue( string& params, Machine_State* cpu )
 {
     return false;
@@ -338,6 +400,29 @@ bool stackl_debugger::cmd_help( string& params, Machine_State* cpu )
     return true;
 }
 
+
+string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
+{
+    std::locale loc;
+    string res = "";
+    int32_t instr = Get_Word( cpu, addr );
+
+    if( (int64_t)instr >= ( (int64_t)sizeof( op_list ) / (int64_t)sizeof( opcode_t ) ) )
+        return "Invalid Instruction Pointer.\n";
+
+    opcode_t op = op_list[instr];
+    res += op.op_name;
+    transform( res.begin(), res.end(), res.begin(), ::toupper );
+
+    for( int32_t i = 0; i < op.num_params; ++i )
+    {
+        addr += 4;
+        res += " " + to_string( Get_Word( cpu, addr ) );
+    }
+
+    return res;
+}
+
 stackl_debugger::BREAKPOINT_RESULT stackl_debugger::add_breakpoint( const string& break_point_text, uint32_t cur_addr )
 {
     uint32_t bpl = text_to_addr( break_point_text, cur_addr );
@@ -409,31 +494,24 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
     else return false;
 }
 
-string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text )
+string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
 {
-    //array index does not work currently
-
     int32_t val;
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
         return string_utils::to_hex( Get_Word( cpu, val ) );
 
-    string txt = var_text;
-
-    //this function removes the end brackets if they exist
-    //vector<uint32_t> idxs = string_utils::strip_array_indexes( txt );
-
     bool address_of = false;
-    if( txt[0] == '&' )
+    if( var_text[0] == '&' )
     {
         address_of = true;
-        txt.erase( 0, 1 );
+        var_text.erase( 0, 1 );
     }
 
     uint32_t indirection = 0;
-    while( txt[indirection++] == '*' ); //count the number of leading asterisks
-    txt.erase( 0, --indirection ); //remove them
+    while( var_text[indirection++] == '*' ); //count the number of leading asterisks
+    var_text.erase( 0, --indirection ); //remove them
 
-    vector<string> var_fields = string_utils::string_split( txt, '.' );
+    vector<string> var_fields = string_utils::string_split( var_text, '.' );
 
     vector<uint32_t> indexes = string_utils::strip_array_indexes( var_fields[0] );
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
@@ -479,8 +557,15 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 
     if( should_break( cpu->IP ) )
     {
-        string cur_file = _lst.current_file( cpu->IP );
-	    cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+        if( _opcode_debug )
+        {
+            cout << "Breakpoint hit on instruction " << opcode_to_string( cpu->IP, cpu ) << '\n';
+        }
+        else
+        {
+            string cur_file = _lst.current_file( cpu->IP );
+	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+        }
 	    query_user( cpu );
     }
 }
@@ -522,14 +607,22 @@ void stackl_debugger::query_user( Machine_State* cpu )
         for( const debugger_command& command : _commands )
         {
             if( command.called_by( cmd ) )
-            { //the run the one they asked for
-                res = command.run( params, cpu );
-                break; //stop looking once we run our command
+            {
+                if( _opcode_debug && !command.allowed_in_opcode_mode() )
+                {
+                    cout << "You can't run this command without debug files available.\n";
+                    break;
+                }
+                else
+                {
+                    res = command.run( params, cpu );
+                    break; //stop iterating once we find our command
+                }
             }
         }
-        if( res == -1 ) //if res wasn't modified, we never ran a command
-            cout << "huh?\n";
-        else if( res == false ) //return false means resume executing
+        if( res == -1 ) //if res wasn't modified
+            cout << "Enter a command.\n";
+        else if( res == false ) //return false means resume executing code
             break;
         else continue; //otherwise prompt for input again
     }

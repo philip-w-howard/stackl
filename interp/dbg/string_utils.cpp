@@ -28,13 +28,13 @@ void string_utils::ltrim( string &s )
     s.erase( s.begin(), std::find_if( s.begin(), s.end(), std::not1( std::ptr_fun<int, int>( std::isspace ) ) ) );
 }
 
-bool string_utils::is_number( const string& num_text, int base, int* res )
+bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res )
 {
     char* p;
     if( res != nullptr )
-	*res = strtol( num_text.c_str(), &p, base );
+	    *res = strtol( num_text.c_str(), &p, base );
     else
-	strtol( num_text.c_str(), &p, base );
+	    strtol( num_text.c_str(), &p, base );
     return *p == 0;
 }
 
@@ -51,7 +51,7 @@ bool string_utils::ends_with( const string & input, const string & end )
 string string_utils::to_hex( int32_t num )
 {
     char buf[32];
-    sprintf( buf, "%x", num );
+    sprintf( buf, "%X", num );
     return string( "0x" ) + buf;
 }
 

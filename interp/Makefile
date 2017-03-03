@@ -35,11 +35,11 @@ clean:
 
 opcodes.o: opcodes.c opcode_defs.h
 
-.c.o: 
+.c.o:
 	gcc $(COPTS) $< -o $@
 
 .cpp.o:
-	g++ $(COPTS) $< -o $@ -std=c++1y
+	g++ $(COPTS) $< -o $@ -std=c++11
 
 opcode_defs.h: slasm
 	./slasm -defs
