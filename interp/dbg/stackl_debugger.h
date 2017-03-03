@@ -99,6 +99,7 @@ private:
 	bool cmd_funcs( string& params, Machine_State* cpu );
 	bool cmd_exit( string& params, Machine_State* cpu );
 	bool cmd_IP( string& params, Machine_State* cpu );
+	bool cmd_FLAG( string& params, Machine_State* cpu );
 	bool cmd_FP( string& params, Machine_State* cpu );
 	bool cmd_BP( string& params, Machine_State* cpu );
 	bool cmd_LP( string& params, Machine_State* cpu );
