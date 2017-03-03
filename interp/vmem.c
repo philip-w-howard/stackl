@@ -36,12 +36,13 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
     if (address < 0)
     {
         Machine_Check(MC_ILLEGAL_ADDR, "Invalid address at %d\n", address);
+        return -1;
     }
 
     if ( (address & 0x0003) && !is_char)
     {
         Machine_Check(MC_ILLEGAL_ADDR, "misaligned address %d\n", address);
-        exit(-1);
+        return -1;
     }
 
     if (regs != NULL && (regs->FLAG & FL_USER_MODE))
@@ -50,7 +51,7 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
         {
             Machine_Check(MC_ILLEGAL_ADDR, 
                     "address %d out of bounds\n", address);
-            exit(-1);
+            return -1;
         } 
 
         address = regs->BP + address;
@@ -64,6 +65,8 @@ int32_t Get_Word(Machine_State *cpu, int32_t address)
     int32_t value;
 
     address = validate_address(cpu, address, 0);
+    if (address < 0) return 0;
+
     if (address < Memory_Size)
         value = *(int32_t *)&Memory[address];
     else
@@ -76,6 +79,8 @@ int32_t Get_Word(Machine_State *cpu, int32_t address)
 void Set_Word(Machine_State *cpu, int32_t address, int32_t value)
 {
     address = validate_address(cpu, address, 0);
+    if (address < 0) return;
+
     write_log(address, value, "Set_Word");
     if (address < Memory_Size)
         *(int32_t *)&Memory[address] = value;
@@ -88,6 +93,8 @@ int32_t Get_Byte(Machine_State *cpu, int32_t address)
     int32_t value;
 
     address = validate_address(cpu, address, 1);
+    if (address < 0) return 0;
+
     if (address < Memory_Size)
         value = Memory[address];
     else
@@ -100,6 +107,8 @@ int32_t Get_Byte(Machine_State *cpu, int32_t address)
 void Set_Byte(Machine_State *cpu, int32_t address, int32_t value)
 {
     address = validate_address(cpu, address, 1);
+    if (address < 0) return;
+
     write_log(address, value, "Set_Byte");
     if (address < Memory_Size)
         Memory[address] = value;
@@ -111,6 +120,8 @@ void *Get_Addr(Machine_State *cpu, int32_t address)
 {
     //int value = Get_Word(address);
     address = validate_address(cpu, address, 1);
+    if (address < 0) return NULL;
+
     write_log(address, 0, "Get_Addr");
     return &Memory[address];
 }
