@@ -39,7 +39,7 @@ void dbg_check_break( Machine_State* cpu )
     }
 }
 
-int32_t dbg_machine_check( Machine_State* cpu )
+int32_t dbg_machine_check( int32_t code, Machine_State* cpu )
 {
     stackl_debugger* dbg = (stackl_debugger*)cpu->debugger;
     if( dbg == nullptr )
