@@ -87,7 +87,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpointi, { "breakpointi", "breaki", "bi" }, "[IP] - Adds breakpoint at the passed instruction pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreak, { "removebreak", "rbreak", "rb" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreaki, { "removebreaki", "rbreaki", "rbi" }, "[IP] - Removes breakpoint at the passed instruction pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_print, { "print", "p" }, "[var_name|0xaddress] - Prints the value of the variable", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_print, { "print", "p" }, "[var_name|0xaddress] - Prints the value of the variable", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_printi, { "printi", "pi" }, "[IP|0xaddress] - Prints the value of the instruction at the passed location", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line", false ) );
@@ -100,6 +100,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "- Prints the instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG" }, "- Prints the flags register", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "- Prints the frame pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "- Prints the base pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "- Prints the limit pointer", true ) );
@@ -346,6 +347,12 @@ bool stackl_debugger::cmd_exit( string& params, Machine_State* cpu )
 bool stackl_debugger::cmd_IP( string& params, Machine_State* cpu )
 {
     cout << "Instruction Pointer: " << cpu->IP << '\n';
+    return true;
+}
+
+bool stackl_debugger::cmd_FLAG( string& params, Machine_State* cpu )
+{
+    cout << "Flags: " << string_utils::to_hex( cpu->FLAG ) << '\n';
     return true;
 }
 
