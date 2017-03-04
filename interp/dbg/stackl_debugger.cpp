@@ -145,10 +145,10 @@ bool stackl_debugger::cmd_breakpointi( string& params, Machine_State* cpu )
         return true;
     }
 
-    try
+    int32_t addr;
+    if( string_utils::is_number( params, 10, &addr ) )
     {
-        uint32_t addr = stoi( params );
-        if( addr % 4 != 0 )
+        if( addr % sizeof( int32_t ) != 0 )
         {
             cout << "Misaligned instruction pointer.\n";
             return true;
@@ -157,7 +157,7 @@ bool stackl_debugger::cmd_breakpointi( string& params, Machine_State* cpu )
         cout << "Breakpoint added on instruction pointer " << addr << ".\n";
         return true;
     }
-    catch( ... )
+    else
     {
         cout << "Enter a valid number.\n";
         return true;
@@ -176,6 +176,7 @@ bool stackl_debugger::cmd_removebreak( string& params, Machine_State* cpu )
     BREAKPOINT_RESULT res = remove_breakpoint( params, cpu->IP );
     uint32_t final_addr;
     string file_name;
+
     switch( res )
     {
         case SUCCESS:
