@@ -27,7 +27,7 @@ asm_list::asm_list( const string& filename )
                 _max_ip = ip;
             if( line_num != old_line_num && !cur_func.empty() && !cur_file.empty() )
             {
-                auto& f = _file_and_line_to_addr[directory+cur_file];
+                auto& f = _file_and_line_to_addr[cur_file];
                 f.push_back( addr_line_t{ ip, line_num } );
                 old_line_num = line_num;
                 if( old_func_name == "" || old_func_name != cur_func )
