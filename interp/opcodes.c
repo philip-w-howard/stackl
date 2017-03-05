@@ -18,6 +18,8 @@
 #define INC(reg, amount)    cpu-> reg += amount*WORD_SIZE;
 #define OFFSET(v)           ((v)*WORD_SIZE)
 
+#define LINES_PER_HEADER 30     // for opcode lists
+
 int Do_Debug = 0;
 int Max_Instructions = INT_MAX;
 
@@ -40,13 +42,21 @@ void Set_Max_Instr(int max)
 #define DEBUG(...) debug_print(cpu,__VA_ARGS__);
 static void debug_print(Machine_State *cpu, const char *fmt, ...)
 {
-    if (!Do_Debug) return;
-
+    static int num_lines = 0;
     va_list args;
     va_start(args, fmt);
-
     char format[200];
-    sprintf(format, "%0x %d %d %d %d %d %s\n", 
+
+    if (!Do_Debug) return;
+
+    if (num_lines % LINES_PER_HEADER == 0)
+    {
+        fprintf(stderr, "\n%4s %6s %6s %6s %6s %6s\n", 
+                "Flag", "BP", "LP", "IP", "SP", "FP");
+    }
+    num_lines++;
+
+    sprintf(format, "%04x %6d %6d %6d %6d %6d %s\n", 
             cpu->FLAG, cpu->BP, cpu->LP, cpu->IP, cpu->SP, cpu->FP, fmt);
     vfprintf(stderr, format, args);
     va_end(args);
