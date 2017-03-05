@@ -51,12 +51,12 @@ static void debug_print(Machine_State *cpu, const char *fmt, ...)
 
     if (num_lines % LINES_PER_HEADER == 0)
     {
-        fprintf(stderr, "\n%4s %6s %6s %6s %6s %6s\n", 
+        fprintf(stderr, "\n%8s %6s %6s %6s %6s %6s\n", 
                 "Flag", "BP", "LP", "IP", "SP", "FP");
     }
     num_lines++;
 
-    sprintf(format, "%04x %6d %6d %6d %6d %6d %s\n", 
+    sprintf(format, "%08x %6d %6d %6d %6d %6d %s\n", 
             cpu->FLAG, cpu->BP, cpu->LP, cpu->IP, cpu->SP, cpu->FP, fmt);
     vfprintf(stderr, format, args);
     va_end(args);

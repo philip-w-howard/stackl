@@ -10,6 +10,8 @@
 
 #include "slasm.h"
 
+#define LINES_PER_HEADING 50
+
 static char g_Function[256] = "";
 static char g_Source_File[256] = "";
 static int g_Source_Line = 0;
@@ -606,7 +608,14 @@ static void write_output(char *in_filename)
 
 static void write_listing(FILE *listing, char *line)
 {
+    static int line_count = 0;
     int32_t word_size = sizeof(g_Memory[0]);
+    if (line_count % LINES_PER_HEADING == 0)
+    {
+        fprintf(listing, "%6s  %6s\n", "Code", "Data");
+    }
+    line_count++;
+
     fprintf(listing, "%6d  %6d     %s", 
             g_Memory_Index*word_size, g_Data_Memory_Index*word_size, line);
 }
