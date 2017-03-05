@@ -14,11 +14,6 @@ asm_list::asm_list( const string& filename )
     uint32_t old_line_num = UINT32_MAX;
     string old_func_name = "";
 
-    size_t path_idx = filename.find_last_of( "/\\" );
-    string directory = "";
-    if( path_idx != string::npos )
-        directory = filename.substr( 0, path_idx + 1 );
-
     while( getline( infile, line ) )
     {
         stringstream ss( line );
