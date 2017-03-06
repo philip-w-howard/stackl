@@ -36,7 +36,7 @@ static FILE *g_Listing = NULL;
 #define NUM_OPCODES (sizeof(op_list)/sizeof(opcode_t))
 static const char *DELIMS = " \t\n";
 static const char *HELP_STR =
- "slasm [-defs] [-M<mem size>] [-version] [-list] <source file>\n";
+ "slasm [-defs] [-M<mem size>] [-version] [-list] [-dbg] <source files>\n";
 
 //**************************************
 // label processing
