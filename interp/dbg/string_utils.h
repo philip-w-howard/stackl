@@ -18,4 +18,5 @@ public:
 	static bool ends_with( const string& input, const string& end );
 	static string to_hex( int32_t num );
 	static vector<uint32_t> strip_array_indexes( string& var );
+	static int32_t to_int( const string& text );
 };

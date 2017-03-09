@@ -1,5 +1,7 @@
 #include "string_utils.h"
 #include <cstdio>
+#include <stdexcept>
+using std::runtime_error;
 
 vector<string> string_utils::string_split( const string& s, const char delimiter )
 {
@@ -68,4 +70,22 @@ vector<uint32_t> string_utils::strip_array_indexes( string& var )
     }
     catch( ... ) {}
     return idxs;
+}
+
+int32_t string_utils::to_int( const string& text )
+{
+    int32_t addr;
+    if( string_utils::begins_with( text, "0x" ) )
+    {
+        if( !string_utils::is_number( text, 16, &addr ) )
+        {
+            throw runtime_error( "Not a number" );
+        }
+    }
+    else if( !string_utils::is_number( text, 10, &addr ) )
+    {
+        throw runtime_error( "Not a number" );
+    }
+
+    return addr;
 }

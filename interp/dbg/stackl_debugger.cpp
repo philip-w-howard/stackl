@@ -99,12 +99,12 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "- Prints the instruction pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG" }, "- Prints the flags register", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "- Prints the frame pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "- Prints the base pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "- Prints the limit pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "- Prints the stack pointer", true) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "optional[value] - Prints or sets the instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG" }, "optional[value] - Prints or sets the flags register", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "optional[value] - Prints or sets the frame pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "optional[value] - Prints or sets the base pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "optional[value] - Prints or sets the limit pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "optional[value] - Prints or sets the stack pointer", true) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
 }
@@ -253,18 +253,17 @@ bool stackl_debugger::cmd_printi( string& params, Machine_State* cpu )
     {
         addr = cpu->IP;
     }
-    else if( string_utils::begins_with( params, "0x" ) )
+    else
     {
-        if( !string_utils::is_number( params, 16, &addr ) )
+        try
         {
-            cout << "Please enter a valid number.\n";
+            addr = string_utils::to_int( params );
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
             return true;
         }
-    }
-    else if( !string_utils::is_number( params, 10, &addr ) )
-    {
-        cout << "Please enter a valid number.\n";
-        return true;
     }
 
     if( addr % sizeof( int32_t ) != 0 )
@@ -346,38 +345,140 @@ bool stackl_debugger::cmd_exit( string& params, Machine_State* cpu )
 
 bool stackl_debugger::cmd_IP( string& params, Machine_State* cpu )
 {
-    cout << "Instruction Pointer: " << cpu->IP << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Instruction Pointer: " << cpu->IP << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t addr = string_utils::to_int( params );
+            cpu->IP = addr;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_FLAG( string& params, Machine_State* cpu )
 {
-    cout << "Flags: " << string_utils::to_hex( cpu->FLAG ) << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Flags: " << cpu->FLAG << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t val = string_utils::to_int( params );
+            cpu->FLAG = val;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_FP( string& params, Machine_State* cpu )
 {
-    cout << "Frame Pointer: " << string_utils::to_hex( cpu->FP ) << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Frame Pointer: " << cpu->FP << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t addr = string_utils::to_int( params );
+            cpu->FP = addr;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_BP( string& params, Machine_State* cpu )
 {
-    cout << "Base Pointer: " << string_utils::to_hex( cpu->BP ) << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Base Pointer: " << cpu->BP << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t addr = string_utils::to_int( params );
+            cpu->BP = addr;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_LP( string& params, Machine_State* cpu )
 {
-    cout << "Limit Pointer: " << string_utils::to_hex( cpu->LP ) << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Limit Pointer: " << cpu->LP << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t addr = string_utils::to_int( params );
+            cpu->LP = addr;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_SP( string& params, Machine_State* cpu )
 {
-    cout << "Stack Pointer: " << string_utils::to_hex( cpu->SP ) << '\n';
-    return true;
+    if( params.empty() )
+    {
+        cout << "Stack Pointer: " << cpu->SP << '\n';
+        return true;
+    }
+    else
+    {
+        try
+        {
+            int32_t addr = string_utils::to_int( params );
+            cpu->SP = addr;
+            return true;
+        }
+        catch( runtime_error& )
+        {
+            cout << "Enter a valid number.\n";
+            return true;
+        }
+    }
 }
 
 bool stackl_debugger::cmd_file( string& params, Machine_State* cpu )

@@ -252,9 +252,6 @@ int Load(const char *filename, int boot)
     char *version = strtok(NULL, delims);
     compare_version(version);
 
-    dbg_load_info( &cpu, filename );
-    Set_Debug_Info( cpu.debugger );
-
     while (fgets(string, sizeof(string), input))
     {
         token = strtok(string, delims);
@@ -297,6 +294,9 @@ int Load(const char *filename, int boot)
             exit(-1);
         }
     }
+
+    dbg_load_info( &cpu, filename );
+    Set_Debug_Info( cpu.debugger );
 
     return max_addr;
 }
