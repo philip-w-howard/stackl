@@ -607,6 +607,8 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
 
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
         return string_utils::to_hex( Get_Word( cpu, val ) );
+    else if (string_utils::is_number( var_text, 10, &val ) )
+        return std::to_string(Get_Word( cpu, val ) );
 
     bool address_of = false;
     if( var_text[0] == '&' )
