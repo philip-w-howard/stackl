@@ -67,7 +67,7 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                std::cout << "stacklc -help -version -yydebug -dbg -ast <file>\n";
+                std::cout << "stacklc -c -help -version -yydebug -dbg -ast <file>\n";
                 exit(0);
             }
             else if (strcmp(arg, "version") == 0)
