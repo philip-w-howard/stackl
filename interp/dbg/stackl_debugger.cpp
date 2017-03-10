@@ -512,7 +512,7 @@ string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
     string res = "";
     int32_t instr = Get_Word( cpu, addr );
 
-    if( (int64_t)instr >= ( (int64_t)sizeof( op_list ) / (int64_t)sizeof( opcode_t ) ) )
+    if( (int64_t)instr >= ( (int64_t)sizeof( op_list ) / (int64_t)sizeof( opcode_t ) ) || instr < 0 )
         return "Invalid opcode found.\n";
 
     opcode_t op = op_list[instr];
