@@ -53,6 +53,9 @@ cCodeGen::cCodeGen(const char * filename) : cVisitor()
 
     cSymbol *startup = symbolTableRoot->Lookup("$$startup");
     if (startup != nullptr) EmitInst("#startup " + startup->Name());
+
+    cSymbol *stack_size = symbolTableRoot->Lookup("$$stack_size");
+    if (stack_size != nullptr) EmitInst("#stack_size " + stack_size->Name());
 }
 
 cCodeGen::~cCodeGen()

@@ -61,7 +61,7 @@
 %token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
-%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP FEATURE
+%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP FEATURE STACK_SIZE
 
 %type <decl_list>       program
 
@@ -295,6 +295,12 @@ global_decl: func_decl
                             string feature = "$$feature" + 
                                 std::to_string(g_Feature++);
                             symbolTableRoot->InsertRoot(feature, $3); 
+                        }
+        |   PRAGMA STACK_SIZE INT_VAL 
+                        {
+                            $$ = new cPragma("stack_size", std::to_string($3));
+                            cSymbol *size = new cSymbol(std::to_string($3));
+                            symbolTableRoot->InsertRoot( "$$stack_size", size); 
                         }
         | error ';'
             { $$ = NULL; }
