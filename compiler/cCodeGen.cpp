@@ -505,6 +505,16 @@ void cCodeGen::Visit(cVarDecl *node)
         }
         EmitInst(".codeseg");
     }
+    else if (node->HasInit())
+    {
+        node->GetInit()->Visit(this);
+
+        if (node->GetType()->Size() == 1)
+            EmitInst("POPCVAR " + std::to_string(node->GetOffset()));
+        else
+            EmitInst("POPVAR " + std::to_string(node->GetOffset()));
+    }
+
 }
 
 //void cCodeGen::Visit(cVarRef *node)             { VisitAllChildren(node); }

@@ -28,7 +28,7 @@ Makefile?
 9) Pointer arithmetic
 10) void functions
 11) function call via function address
-12) Unused
+12) variable init on decl line
 13) Structs
 14) Mixing decls and statements
     #define

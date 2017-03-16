@@ -128,5 +128,7 @@ int main()
         return 0;
     }
 
+    if (1) ;    // make sure we allow if with null statements
+
     return 0;
 }

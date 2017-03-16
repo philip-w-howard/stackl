@@ -153,6 +153,10 @@ decls:      decls decl
             }
 decl:       var_decl ';'
             { $$ = $1; }
+        |   var_decl '=' expr ';'
+            { $1->SetInit($3);
+              $$ = $1; 
+            }
         |   struct_decl ';'
             { $$ = $1; }
         |   typedef ';'
