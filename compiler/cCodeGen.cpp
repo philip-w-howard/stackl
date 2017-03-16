@@ -134,6 +134,19 @@ void cCodeGen::Visit(cBinaryExpr *node)
 }
 //void cCodeGen::Visit(cDecl *node)               { VisitAllChildren(node); }
 //void cCodeGen::Visit(cDeclsList *node)          { VisitAllChildren(node); }
+void cCodeGen::Visit(cDoWhileStmt *node)
+{
+    EmitLineNumber(node);
+    std::string start_loop = GenerateLabel();
+    std::string end_loop = GenerateLabel();
+
+    EmitLabel(start_loop);
+    node->GetStmt()->Visit(this);
+    node->GetCond()->Visit(this);
+    EmitInst("JUMPE", end_loop);
+    EmitInst("JUMP", start_loop);
+    EmitLabel(end_loop);
+}
 //void cCodeGen::Visit(cExpr *node)               { VisitAllChildren(node); }
 
 void cCodeGen::Visit(cExprStmt *node)

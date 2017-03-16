@@ -34,6 +34,7 @@ void cVisitor::Visit(cBaseDeclNode *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cBinaryExpr *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cDecl *node)               { VisitAllChildren(node); }
 void cVisitor::Visit(cDeclsList *node)          { VisitAllChildren(node); }
+void cVisitor::Visit(cDoWhileStmt *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cExpr *node)               { VisitAllChildren(node); }
 void cVisitor::Visit(cExprStmt *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cForStmt *node)            { VisitAllChildren(node); }

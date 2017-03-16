@@ -19,6 +19,7 @@
 #include "cBinaryExpr.h"
 #include "cDecl.h"
 #include "cDeclsList.h"
+#include "cDoWhileStmt.h"
 #include "cExpr.h"
 #include "cExprStmt.h"
 #include "cForStmt.h"

@@ -33,7 +33,7 @@ Makefile?
 14) Mixing decls and statements
     #define
     global consts with initializers
-15) Unused
+15) do while test
 16) Unused
 17) sizeof
 18) Test return value of functions

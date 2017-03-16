@@ -418,7 +418,11 @@ stmt:       decl
                 if ($$->HasSemanticError()) YYERROR;
             }
         |   DO stmt WHILE '(' expr ')' ';' 
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { 
+                $$ = new cDoWhileStmt($5, $2); 
+                if ($$->HasSemanticError()) YYERROR;
+            }
+
         |   SWITCH '(' expr ')' stmt
             { semantic_error("Not implemented " + std::to_string(__LINE__)); }
         |   expr ';'

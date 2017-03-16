@@ -10,6 +10,7 @@ class cBaseDeclNode;
 class cBinaryExpr;
 class cDecl;
 class cDeclsList;
+class cDoWhileStmt;
 class cExpr;
 class cExprStmt;
 class cForStmt;
@@ -58,6 +59,7 @@ class cVisitor
         virtual void Visit(cBinaryExpr *node);
         virtual void Visit(cDecl *node);
         virtual void Visit(cDeclsList *node);
+        virtual void Visit(cDoWhileStmt *node);
         virtual void Visit(cExpr *node);
         virtual void Visit(cExprStmt *node);
         virtual void Visit(cForStmt *node);
