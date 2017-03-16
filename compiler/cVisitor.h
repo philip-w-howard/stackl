@@ -35,6 +35,7 @@ class cStructRef;
 class cStructType;
 class cSymbol;
 class cTypeDecl;
+class cTypedef;
 class cUnaryExpr;
 class cVarDecl;
 class cVarRef;
@@ -82,6 +83,7 @@ class cVisitor
         virtual void Visit(cStructType *node);
         virtual void Visit(cSymbol *node);
         virtual void Visit(cTypeDecl *node);
+        virtual void Visit(cTypedef *node);
         virtual void Visit(cUnaryExpr *node);
         virtual void Visit(cVarDecl *node);
         virtual void Visit(cVarRef *node);

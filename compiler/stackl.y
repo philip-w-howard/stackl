@@ -82,6 +82,7 @@
 %type <sym_table>       open
 %type <sym_table>       close
 %type <type_decl>       type
+%type <type_decl>       typedef
 
 %type <decl_list>       paramspec_list
 %type <params>          params
@@ -154,6 +155,8 @@ decl:       var_decl ';'
             { $$ = $1; }
         |   struct_decl ';'
             { $$ = $1; }
+        |   typedef ';'
+            { $$ = $1; }
         |   error ';'
             { $$ = NULL; }
 
@@ -194,27 +197,19 @@ type:   type '*'
             }
 
 // Added by Joe
-struct_decl:  struct_header open decls close IDENTIFIER
+struct_decl:  struct_header open decls close 
                 {
-                    if ($1 == NULL)
-                    {
-                        $$ = new cStructType($5, $2, $3); 
-                        if ($$->HasSemanticError()) YYERROR;
-                    }
-                    else
-                    {
-                        $1->AddDecls($2,$3);
-                    }
+                    $$ = $1;
+                    $$->AddDecls($2, $3);
                 }
 // Added by Joe
-struct_header:  TYPEDEF STRUCT IDENTIFIER
+struct_header:  STRUCT IDENTIFIER 
             {
-                $$ = new cStructType($3, NULL, NULL);
-                if($$->HasSemanticError()) YYERROR;
+                $$ = new cStructType($2);
             }
-            | TYPEDEF STRUCT
+            | STRUCT 
             {
-                $$ = NULL;
+                $$ = new cStructType(nullptr);;
             }
 global_decls: global_decls global_decl  
             { 
@@ -227,9 +222,15 @@ global_decls: global_decls global_decl
                 if ($$->HasSemanticError()) YYERROR;
             }
 
+typedef:  TYPEDEF type IDENTIFIER 
+            { $$ = new cTypedef($2, $3); }
+        | TYPEDEF struct_decl IDENTIFIER 
+            { $$ = new cTypedef($2, $3); }
 global_decl: func_decl
             { $$ = $1; }
         | struct_decl ';'
+            { $$ = $1; }
+        | typedef ';'
             { $$ = $1; }
         | CONST type IDENTIFIER '=' constant_expression ';'
             { 

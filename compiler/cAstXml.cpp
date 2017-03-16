@@ -220,6 +220,10 @@ void cAstXml::Visit(cTypeDecl *node)
 {
     DefaultVisit(node, "TypeDecl");
 }
+void cAstXml::Visit(cTypedef *node)
+{
+    DefaultVisit(node, "Typedef");
+}
 void cAstXml::Visit(cUnaryExpr *node)
 {
     string attr = " op=\"" + node->OpToString() + "\" ";

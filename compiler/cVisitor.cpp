@@ -59,6 +59,7 @@ void cVisitor::Visit(cStructRef *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cStructType *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cSymbol *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cTypeDecl *node)           { VisitAllChildren(node); }
+void cVisitor::Visit(cTypedef *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cUnaryExpr *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cVarDecl *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cVarRef *node)             { VisitAllChildren(node); }
