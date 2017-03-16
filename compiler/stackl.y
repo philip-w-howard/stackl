@@ -820,15 +820,16 @@ assignment_expression
                 $$ = new cAssignExpr($1, new cBinaryExpr($1, RIGHT, $3)); 
                 if ($$->HasSemanticError()) YYERROR;
             }
-expr
-	: assignment_expression
+expr: assignment_expression
             { $$ = $1; }
+        /*
         | expr ',' assignment_expression
             { 
                 semantic_error("Not implemented " + std::to_string(__LINE__)); 
                 YYERROR;
             }
-	;
+	;   { $$ = nullptr; }
+        */
 
 %%
 
