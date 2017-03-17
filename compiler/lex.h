@@ -17,6 +17,7 @@
 #include "cAstNode.h"
 #include "cBaseDeclNode.h"
 #include "cBinaryExpr.h"
+#include "cCastExpr.h"
 #include "cDecl.h"
 #include "cDeclsList.h"
 #include "cDoWhileStmt.h"

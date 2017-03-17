@@ -1,6 +1,15 @@
+// Pointer arithmetic and type casting
 #include "test/io.h"
 int main()
 {
-    prints("Unused test\n");
+    int value1 = 0;
+    int value2 = 1;
+    *((int*)&value1 + 1) = 10;
+    //*(((char *)(&value1))+1) = 5;
+    printi(value1);
+    prints("\n");
+    printi(value2);
+    prints("\n");
+
     return 0;
 }

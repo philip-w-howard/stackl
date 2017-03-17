@@ -58,7 +58,7 @@ Makefile?
 35) Pass address of struct to func
 36) Precedence of ###################
 37) Interrupts, pragmas, and the flag reg
-38) Unused
+38) Type casts
 39) Test that pre-inc doesn't mess up the stack
 40) Test trap handlers
 

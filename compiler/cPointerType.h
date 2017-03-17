@@ -4,6 +4,7 @@
 
 #include "cTypeDecl.h"
 #include "cSymbol.h"
+#include "cSymbolTable.h"
 #include "cCodeGen.h"
 
 class cPointerType : public cTypeDecl

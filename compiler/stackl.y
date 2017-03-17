@@ -604,7 +604,7 @@ cast_expression
 	: unary_expression
             { $$ = $1; }
 	| '(' type ')' cast_expression      
-                { semantic_error("Type casts not implemented"); YYERROR; }
+            { $$ = new cCastExpr($2, $4); }
 	;
 
 multiplicative_expression
@@ -836,7 +836,7 @@ expr: assignment_expression
                 semantic_error("Not implemented " + std::to_string(__LINE__)); 
                 YYERROR;
             }
-	;   { $$ = nullptr; }
+	;
         */
 
 %%

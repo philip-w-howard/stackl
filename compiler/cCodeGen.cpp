@@ -129,7 +129,24 @@ void cCodeGen::Visit(cAssignExpr *node)
 void cCodeGen::Visit(cBinaryExpr *node)
 {
     node->GetLeft()->Visit(this);
+    /*
+    if (node->GetRight()->GetType()->IsPointer())
+    {
+        EmitInst("PUSH " +
+                std::to_string(node->GetRight()->GetType()->ElementSize()));
+        EmitInst("TIMES");
+    }
+    */
+
     node->GetRight()->Visit(this);
+    /*
+    if (node->GetLeft()->GetType()->IsPointer())
+    {
+        EmitInst("PUSH " +
+                std::to_string(node->GetLeft()->GetType()->ElementSize()));
+        EmitInst("TIMES");
+    }
+    */
     EmitInst(node->OpAsString());
 }
 //void cCodeGen::Visit(cDecl *node)               { VisitAllChildren(node); }
