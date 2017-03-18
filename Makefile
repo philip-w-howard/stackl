@@ -8,6 +8,7 @@ EXTRA_INCLUDES = \
 	   disk.h \
 
 INCLUDES = string.h \
+	   string.sl \
 	   machine_def.h \
 	   syscodes.h \
 	   pio_term.h \
@@ -42,11 +43,14 @@ clean:
 	rm -f copy2disk
 	rm -f makedisk
 	rm -f out
+	rm -f *.sl
 	rm -f test/*.sl
 	rm -f test/*.slb
 	rm -f test/*.lst
 	rm -f test/*.ast
 	rm -f test/*.xml
+	rm -f test/*.dbg
+	rm -f test/*.lst
 
 version: .git/refs/heads
 	echo "#pragma once" > version.h
@@ -67,6 +71,7 @@ execs: compiler interp
 	cp interp/stackl .
 	cp utils/copy2disk .
 	cp utils/makedisk .
+	stacklc -c string.c
 
 includes:
 	cp interp/syscodes.h .
