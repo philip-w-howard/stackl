@@ -25,6 +25,7 @@ class cPlainVarRef;
 class cPointerDeref;
 class cPointerType;
 class cPostfixExpr;
+class cPragma;
 class cPrefixExpr;
 class cReturnStmt;
 class cShortCircuitExpr;
@@ -75,6 +76,7 @@ class cVisitor
         virtual void Visit(cPointerDeref *node);
         virtual void Visit(cPointerType *node);
         virtual void Visit(cPostfixExpr *node);
+        virtual void Visit(cPragma *node);
         virtual void Visit(cPrefixExpr *node);
         virtual void Visit(cReturnStmt *node);
         virtual void Visit(cShortCircuitExpr *node);

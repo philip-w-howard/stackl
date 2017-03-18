@@ -9,7 +9,7 @@ typedef struct
     int b[3];
 } struct1_t;
 
-typedef struct s1
+typedef struct 
 {
     int a[3];
     //struct1_t s1[2];

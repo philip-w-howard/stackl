@@ -61,7 +61,7 @@
 %token  PTR LEFT RIGHT
 %token  ASM ASM2
 %token  DEFINE CONST
-%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP FEATURE STACK_SIZE
+%token  PRAGMA ONCE INTERRUPT SYSTRAP STARTUP FEATURE STACK_SIZE LIBRARY
 
 %type <decl_list>       program
 
@@ -300,6 +300,10 @@ global_decl: func_decl
                             string feature = "$$feature" + 
                                 std::to_string(g_Feature++);
                             symbolTableRoot->InsertRoot(feature, $3); 
+                        }
+        |   PRAGMA LIBRARY STRING_LIT 
+                        {
+                            $$ = new cPragma("library", $3);
                         }
         |   PRAGMA STACK_SIZE INT_VAL 
                         {

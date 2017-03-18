@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <unistd.h>     // for include path
+#include <limits.h>     // for include path
 
 #include "formatstr.h"
 #include "../version.h"
@@ -11,6 +13,8 @@
 #include "slasm.h"
 
 #define LINES_PER_HEADING 50
+
+static char g_Include_Path[PATH_MAX];
 
 static char g_Function[256] = "";
 static char g_Source_File[256] = "";
@@ -240,6 +244,33 @@ static int g_Files_Extent = 0;
 
 static void Add_File(char *filename)
 {
+    int ii;
+
+    char *ptr;
+    char path[PATH_MAX] = "";
+
+    if (*filename == '"')
+    {
+        ptr = strrchr(filename, '"');
+        if (ptr != NULL) *ptr = 0;
+        filename++;
+    }
+    else if (*filename == '<')
+    {
+        ptr = strrchr(filename, '>');
+        if (ptr != NULL) *ptr = 0;
+        filename++;
+        strcpy(path, g_Include_Path);
+    }
+
+    strcat(path, filename);
+
+    for (ii=0; ii<g_Num_Files; ii++)
+    {
+        // if the file is already in the list, don't re-add it.
+        if (strcmp(g_File_List[ii], path) == 0) return;
+    }
+
     if (g_Num_Files >= g_Files_Extent)
     {
         g_Files_Extent += 20;
@@ -247,8 +278,8 @@ static void Add_File(char *filename)
         assert(g_File_List != NULL);
     }
 
-    g_File_List[g_Num_Files] = (char*)malloc(strlen(filename)+1);
-    strcpy(g_File_List[g_Num_Files], filename);
+    g_File_List[g_Num_Files] = (char*)malloc(strlen(path)+1);
+    strcpy(g_File_List[g_Num_Files], path);
     g_Num_Files++;
 }
 
@@ -442,6 +473,15 @@ static void process_pound_cmd(char *line)
             return;
         }
         strcpy(g_Startup, name);
+    }
+    else if (strncmp(line, "#library", strlen("#library")) == 0)
+    {
+        name = strtok(line, " \n");
+        name = strtok(NULL, " \n");
+        if (name != NULL && strlen(name)!=0)
+        {
+            Add_File(name);
+        }
     }
     else
     {
@@ -757,12 +797,32 @@ static void update_vectors()
     }
 }
 
+// set the include path to be the same as the directory where the EXE is.
+void set_include_path()
+{
+    char *ptr;
+
+    if (readlink("/proc/self/exe", g_Include_Path, PATH_MAX) == -1)
+    {
+        strcpy(g_Include_Path, "");
+    }
+
+    ptr = strrchr(g_Include_Path, '/');
+    if (ptr != NULL)
+    {
+        ptr++;
+        *ptr = 0;
+    }
+}
+
 int main(int argc, char** argv)
 {
     FILE *input;
     char  line[1000];
     char *comment;
     int ii;
+
+    set_include_path();
 
     Process_Args(argc, argv);
 
@@ -835,4 +895,3 @@ int main(int argc, char** argv)
     }
     return 0;
 }
-//#stackl V0.10.1-dev

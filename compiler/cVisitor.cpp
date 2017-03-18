@@ -49,6 +49,7 @@ void cVisitor::Visit(cPlainVarRef *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cPointerDeref *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cPointerType *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cPostfixExpr *node)        { VisitAllChildren(node); }
+void cVisitor::Visit(cPragma *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cPrefixExpr *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cReturnStmt *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cShortCircuitExpr *node)   { VisitAllChildren(node); }

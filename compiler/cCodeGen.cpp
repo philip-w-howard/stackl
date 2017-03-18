@@ -21,12 +21,27 @@ void cCodeGen::Write_Header()
 
     m_Output << "#stackl " << VERSION << " stacklc" << std::endl;
 
+    /*
     feature_name = "$$feature" + std::to_string(feature_index++);
     while ((feature = symbolTableRoot->Lookup(feature_name)) != nullptr)
     {
         m_Output << "#" << feature->Name() << std::endl;
         feature_name = "$$feature" + std::to_string(feature_index++);
     }
+
+    // Handle vectors (if defined)
+    cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
+    if (interrupt != nullptr) EmitInst("#interrupt " + interrupt->Name());
+
+    cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
+    if (systrap != nullptr) EmitInst("#systrap " + systrap->Name());
+
+    cSymbol *startup = symbolTableRoot->Lookup("$$startup");
+    if (startup != nullptr) EmitInst("#startup " + startup->Name());
+
+    cSymbol *stack_size = symbolTableRoot->Lookup("$$stack_size");
+    if (stack_size != nullptr) EmitInst("#stack_size " + stack_size->Name());
+    */
 
     //m_Output << "#begindata" << std::endl;
 }
@@ -44,18 +59,6 @@ cCodeGen::cCodeGen(const char * filename) : cVisitor()
 
     Write_Header();
 
-    // Handle vectors (if defined)
-    cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
-    if (interrupt != nullptr) EmitInst("#interrupt " + interrupt->Name());
-
-    cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
-    if (systrap != nullptr) EmitInst("#systrap " + systrap->Name());
-
-    cSymbol *startup = symbolTableRoot->Lookup("$$startup");
-    if (startup != nullptr) EmitInst("#startup " + startup->Name());
-
-    cSymbol *stack_size = symbolTableRoot->Lookup("$$stack_size");
-    if (stack_size != nullptr) EmitInst("#stack_size " + stack_size->Name());
 }
 
 cCodeGen::~cCodeGen()
@@ -349,6 +352,11 @@ void cCodeGen::Visit(cPostfixExpr *node)
         EmitInst("POPCVARIND");
     else
         EmitInst("POPVARIND");
+}
+
+void cCodeGen::Visit(cPragma *node)
+{
+    EmitInst("#" + node->GetOp() + " " + node->GetArg());
 }
 
 void cCodeGen::Visit(cPrefixExpr *node)

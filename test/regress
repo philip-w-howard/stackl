@@ -1,6 +1,7 @@
 #!/bin/bash
 
 stacklc -c test/io.c
+stacklc -c string.c
 
 for test in `seq 1 47`; do
     test/runt test$test test/io.sl

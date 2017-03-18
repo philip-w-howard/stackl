@@ -4,7 +4,7 @@ int main()
 {
     int value1 = 0;
     int value2 = 1;
-    *((int*)&value1 + 1) = 10;
+    *(&value1 + 1) = 10;
     //*(((char *)(&value1))+1) = 5;
     printi(value1);
     prints("\n");
