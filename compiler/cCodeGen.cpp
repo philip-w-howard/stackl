@@ -15,9 +15,9 @@ const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
 void cCodeGen::Write_Header()
 {
-    int feature_index = 0;
-    string feature_name;
-    cSymbol *feature;
+    //int feature_index = 0;
+    //string feature_name;
+    //cSymbol *feature;
 
     m_Output << "#stackl " << VERSION << " stacklc" << std::endl;
 
