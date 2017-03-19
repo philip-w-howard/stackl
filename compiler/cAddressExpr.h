@@ -26,6 +26,7 @@ class cAddressExpr : public cExpr
     { return static_cast<cTypeDecl*>(GetChild(1)); }
 
     cVarRef* GetVar() { return (cVarRef*)GetChild(0); }
+    virtual bool IsPointer() { return true; }
 
     virtual int Size() { return cCodeGen::STACKL_WORD_SIZE; }
 

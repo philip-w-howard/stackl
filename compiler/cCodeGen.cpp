@@ -132,7 +132,8 @@ void cCodeGen::Visit(cAssignExpr *node)
 void cCodeGen::Visit(cBinaryExpr *node)
 {
     node->GetLeft()->Visit(this);
-    if (node->GetRight()->GetType()->ParentType()->IsPointer())
+    //if (node->GetRight()->GetType()->ParentType()->IsPointer())
+    if (node->GetRight()->IsPointer())
     {
         EmitInst("PUSH " +
                 std::to_string(node->GetRight()->GetType()->ElementSize()));
@@ -140,7 +141,8 @@ void cCodeGen::Visit(cBinaryExpr *node)
     }
 
     node->GetRight()->Visit(this);
-    if (node->GetLeft()->GetType()->ParentType()->IsPointer())
+    //if (node->GetLeft()->GetType()->ParentType()->IsPointer())
+    if (node->GetLeft()->IsPointer())
     {
         EmitInst("PUSH " +
                 std::to_string(node->GetLeft()->GetType()->ElementSize()));
