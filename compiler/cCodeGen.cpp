@@ -335,17 +335,10 @@ void cCodeGen::Visit(cPostfixExpr *node)
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    if (var->IsPointer())
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), 
-                    new cIntExpr(var->GetType()->ElementSize()));
-    }
-    else
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
-    }
+    // NOTE: Used to adjust for sizeof item for pointer arithmetic,
+    // but cBinaryExpr now does that.
+    performOp = 
+        new cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     var->Visit(this);
     performOp->Visit(this);
@@ -368,17 +361,10 @@ void cCodeGen::Visit(cPrefixExpr *node)
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    if (var->IsPointer())
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), 
-                    new cIntExpr(var->GetType()->ElementSize()));
-    }
-    else
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
-    }
+    // NOTE: Used to adjust for sizeof item for pointer arithmetic,
+    // but cBinaryExpr now does that.
+    performOp = 
+        new cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     performOp->Visit(this);
 
