@@ -161,3 +161,33 @@ char *itostr(int value, char *str)
     strrev(str);
     return str;
 }
+void *memcpy(void *dest, void *source, int size)
+{
+    char *src;
+    char *dst;
+    dst = (char *)dest;
+    src = (char *)source;
+
+    while (size-- != 0)
+    {
+        *dst = *src;
+        dst++; 
+        src++;
+    }
+
+    return dest;
+}
+
+void *memset(void *buff, int val, int size)
+{
+    char *dst;
+    dst = (char *)buff;
+
+    while (size-- != 0)
+    {
+        *dst = val;
+        dst++; 
+    }
+
+    return buff;
+}

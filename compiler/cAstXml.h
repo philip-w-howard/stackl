@@ -68,4 +68,6 @@ class cAstXml : public cVisitor
         void DefaultVisit(cAstNode *node, 
                 std::string name, 
                 std::string attr = std::string(""));
+
+        std::string EscapeBrackets(std::string text);
 };

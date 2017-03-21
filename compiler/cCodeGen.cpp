@@ -203,11 +203,22 @@ void cCodeGen::Visit(cFuncCall *node)
     // Need to pop the args off the stack without affecting the return val
     if (node->GetParams() != NULL)
     {
+        if (node->GetType()->IsVoid())
+        {
+            EmitInst("ADJSP -" + std::to_string(node->GetParams()->Size()));
+        }
+        else
+        {
+            EmitInst("POPARGS " + std::to_string(node->GetParams()->Size()));
+        }
+
+        /*
         for (int ii=0; ii<node->GetParams()->Size()/WORD_SIZE; ii++)
         {
             EmitInst("SWAP");
             EmitInst("POP");
         }
+        */
     }
 }
 

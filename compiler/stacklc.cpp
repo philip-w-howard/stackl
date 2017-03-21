@@ -41,6 +41,7 @@ void set_include_path()
         ptr++;
         *ptr = 0;
     }
+    strcat(Include_Path, "library/");
 }
 
 extern cDeclsList *yyast_root;

@@ -161,7 +161,7 @@ void cAstXml::Visit(cPragma *node)
     
     if (node->GetArg().length() > 0)
     {
-        attr += " arg=\"" + node->GetArg() + "\" ";
+        attr += " arg=\"" + EscapeBrackets(node->GetArg()) + "\" ";
     }
     DefaultVisit(node, "Pragma", attr);             
 }
@@ -242,3 +242,19 @@ void cAstXml::Visit(cWhileStmt *node){
     DefaultVisit(node, "While");
 }
 
+std::string cAstXml::EscapeBrackets(std::string text)
+{
+    std::string result;
+
+    for (auto it=text.begin(); it != text.end(); it++)
+    {
+        if ( (*it) == '<')
+            result += "&lt;";
+        else if ( (*it) == '>') 
+            result += "&gt;";
+        else
+            result.push_back(*it);
+    }
+
+    return result;
+}

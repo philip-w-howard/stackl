@@ -813,6 +813,7 @@ void set_include_path()
         ptr++;
         *ptr = 0;
     }
+    strcat(g_Include_Path, "library/");
 }
 
 int main(int argc, char** argv)
