@@ -18,6 +18,7 @@ set<string> variable::builtins(
 {
     "char",
     "int",
+    "void",
 } );
 
 variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
