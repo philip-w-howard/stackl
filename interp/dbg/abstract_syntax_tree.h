@@ -22,6 +22,8 @@ class abstract_syntax_tree
 public:
     abstract_syntax_tree() {}
     abstract_syntax_tree( const string& filename, uint32_t max_ip );
+    void add_ast( const string& filename, uint32_t max_ip );
+
     string all_funcs();
     string all_locals( const string& func_name );
     string all_globals();

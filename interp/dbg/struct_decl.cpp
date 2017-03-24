@@ -6,14 +6,16 @@ struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, str
 	//get the first symbol and read its 'name' attribute
 	_name = struct_node->first_node( "Symbol" )->first_attribute( "name" )->value();
 
+        live_type_context[ _name ] = *this;
+
 	//get every var decl in the decls list
 	for( xml_node<char>* xml_var : struct_node->first_node( "DeclsList" )->all_nodes() )
 	{
 		variable var( xml_var, live_type_context );
 
-		_size += var.size();
+		live_type_context[ _name ]._size += var.size();
 
-		_fields.push_back( var );
+		live_type_context[ _name ]._fields.push_back( var );
 	}
 }
 

@@ -7,6 +7,8 @@ using std::getline;
 using std::vector;
 #include <unordered_map>
 using std::unordered_map;
+#include <unordered_set>
+using std::unordered_set;
 
 #include "string_utils.h"
 
@@ -24,6 +26,7 @@ public:
     string current_file( uint32_t cur_addr );
 
     inline int32_t max_ip() const { return _max_ip; }
+    vector<string> file_list() const ;
 
 private:
 
@@ -42,4 +45,5 @@ private:
     uint32_t _max_ip = 0;
     vector<func_addr_t> _func_to_addr;
     unordered_map<string, vector<addr_line_t>> _file_and_line_to_addr;
+    unordered_set<string> _file_list;
 };

@@ -38,7 +38,13 @@ stackl_debugger::stackl_debugger( const char* filename )
         else
         {
             _lst = asm_list( fname + ".dbg" );
-            _ast = abstract_syntax_tree( fname + ".ast", _lst.max_ip() );
+            vector<string> file_list = _lst.file_list();
+            _ast = abstract_syntax_tree( );
+            for (unsigned int ii=0; ii<file_list.size(); ii++)
+            {
+                _ast.add_ast(file_list[ii], _lst.max_ip());
+            }
+
             check_compile_time( filename );
         }
 

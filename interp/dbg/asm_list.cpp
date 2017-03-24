@@ -37,7 +37,17 @@ asm_list::asm_list( const string& filename )
                 }
             }
         }
+        else if (token == "FILE:")
+        {
+            string fname;
+            ss >> fname;
+            size_t idx = fname.find_last_of( '.' );
+            if ( idx != string::npos )
+                fname.erase( idx );
+            _file_list.insert(fname + ".ast");
+        }
     }
+
     _max_ip += 4;
 }
 
@@ -156,4 +166,16 @@ string asm_list::current_file( uint32_t cur_addr )
         }
     }
     return best_filename;
+}
+
+vector<string> asm_list::file_list() const
+{
+    vector<string> list;
+
+    for (auto it=_file_list.begin(); it != _file_list.end(); it++)
+    {
+        list.push_back(*it);
+    }
+
+    return list;
 }

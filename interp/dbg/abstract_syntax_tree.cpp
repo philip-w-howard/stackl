@@ -2,8 +2,17 @@
 #include <stdexcept>
 using std::runtime_error;
 
+#include <iostream>     // for debug purposes only
+
 abstract_syntax_tree::abstract_syntax_tree( const string& filename, uint32_t max_ip )
 {
+    add_ast( filename, max_ip);
+}
+
+void abstract_syntax_tree::add_ast( const string& filename, uint32_t max_ip )
+{
+    std::cout << "Loading symbols for " << filename << std::endl;
+
     rapidxml::file<char> xml_file( filename.c_str() );
     xml_document<char> doc;
     doc.parse<0>( xml_file.data() );
@@ -40,10 +49,24 @@ void abstract_syntax_tree::load( xml_document<char>& doc, uint32_t max_ip )
 
     for( xml_node<char>* node : doc.first_node( "Program" )->first_node( "DeclsList" )->all_nodes() )
     {
-        if( strcmp( node->name(), "StructType" ) == 0 )
+        if( strcmp( node->name(), "Typedef" ) == 0 )
+        {
+            xml_node<char>* type = node->first_node();
+            if( strcmp( type->name(), "StructType" ) == 0 )
+            {
+                struct_decl decl( type, _struct_decls );
+
+                // constructor inserts the decl to handle forward refs
+                //_struct_decls[decl.name()] = decl;
+            }
+
+        }
+        else if( strcmp( node->name(), "StructType" ) == 0 )
         {
             struct_decl decl( node, _struct_decls );
-            _struct_decls[decl.name()] = decl;
+
+            // constructor inserts the decl to handle forward refs
+            //_struct_decls[decl.name()] = decl;
         }
         else if( strcmp( node->name(), "VarDecl" ) == 0 )
         {

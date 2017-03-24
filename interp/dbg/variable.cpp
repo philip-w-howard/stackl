@@ -76,6 +76,7 @@ void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, s
         }
         else
         {
+            fprintf(stderr, "We don't know the variable type\n");
             //we don't know what type it is?
             //kernel_panic();
             //throw "a flotation device";
