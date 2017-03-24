@@ -89,7 +89,7 @@ void stackl_debugger::opcode_debug_mode( const string& filename )
 
 void stackl_debugger::load_commands()
 {
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpoint, { "breakpoint", "break", "b" }, "[line_num|file:line_num|func_name] - Adds breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpoint, { "breakpoint", "break", "br", "b" }, "[line_num|file:line_num|func_name] - Adds breakpoint", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_breakpointi, { "breakpointi", "breaki", "bi" }, "[IP] - Adds breakpoint at the passed instruction pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreak, { "removebreak", "rbreak", "rb" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removebreaki, { "removebreaki", "rbreaki", "rbi" }, "[IP] - Removes breakpoint at the passed instruction pointer", true ) );
@@ -661,7 +661,8 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
     res = res.deref( indirection, cpu );
 
     if( address_of )
-        return string_utils::to_hex( res.total_offset( cpu ) );
+        return std::to_string( res.total_offset( cpu ) );
+        //return string_utils::to_hex( res.total_offset( cpu ) );
     else return res.to_string( cpu );
 }
 
