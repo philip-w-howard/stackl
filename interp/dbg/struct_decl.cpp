@@ -13,8 +13,10 @@ struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, str
 	{
 		variable var( xml_var, live_type_context );
 
+                // need to update ourself and the struct_decl in the context
+		_size += var.size();
 		live_type_context[ _name ]._size += var.size();
-
+		_fields.push_back( var );
 		live_type_context[ _name ]._fields.push_back( var );
 	}
 }
