@@ -118,14 +118,14 @@ void cCodeGen::Visit(cAssignExpr *node)
     // Need to dup the result in case the assign is treated as an expr
     EmitInst("DUP");
     node->GetVar()->Visit(m_GenAddr);
-    /*
+
     if (node->GetVar()->IsArrayRef() &&
+        !node->GetVar()->GetBase()->IsPointer() &&
         node->GetVar()->GetType()->IsPointer())
     {
         EmitInst("POPVARIND");
     }
-    */
-    if (node->GetVar()->IsArrayRef() && 
+    else if (node->GetVar()->IsArrayRef() && 
         node->GetVar()->GetType()->ElementSize() == 1)
     {
         EmitInst("POPCVARIND");
