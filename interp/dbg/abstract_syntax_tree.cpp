@@ -76,8 +76,11 @@ void abstract_syntax_tree::load( xml_document<char>& doc, uint32_t max_ip )
         }
         else if( strcmp( node->name(), "FuncDecl" ) == 0 )
         {
-            function func( node, _struct_decls );
-            _functions[func.name()] = func;
+            if (function::is_definition( node ))
+            {
+                function func( node, _struct_decls );
+                _functions[func.name()] = func;
+            }
         }
     }
 }

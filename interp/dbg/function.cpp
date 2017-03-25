@@ -58,3 +58,12 @@ void function::load_locals( xml_node<char>* upper_node, unordered_map<string, st
 		}
 	}
 }
+
+bool function::is_definition( xml_node<char>* func_decl_node)
+{
+	if ( func_decl_node->first_node( "StmtsList" ) == nullptr)
+            return false;
+        else
+            return true;
+}
+
