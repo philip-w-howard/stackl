@@ -61,7 +61,7 @@ class cFuncCall : public cVarRef
         }
     }
 
-    cExpr* GetBase()    { return (cExpr*)GetChild(0); }
+    virtual cExpr* GetBase()     { return (cExpr*)GetChild(0); }
     cParams* GetParams(){ return (cParams*)GetChild(1); }
     virtual bool IsFunc()        { return true; }
     cFuncDecl* GetFuncDecl()     { return (cFuncDecl*)(GetBase()->GetType()); }

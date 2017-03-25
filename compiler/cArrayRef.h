@@ -36,7 +36,7 @@ class cArrayRef : public cVarRef
         //baseType = baseType->ParentType();
     }
 
-    cVarRef* GetBase()            { return (cVarRef*)GetChild(0); }
+    virtual cExpr* GetBase()      { return (cVarRef*)GetChild(0); }
     //virtual cTypeDecl *GetType()  { return GetBase()->GetType(); }
     virtual cTypeDecl *GetType()  { return (cTypeDecl*)GetChild(2); }
     cExpr* GetIndex()             { return (cExpr*)GetChild(1); }

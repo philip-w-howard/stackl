@@ -89,7 +89,9 @@ void cCodeGen::Visit(cArrayRef *node)
 {
     EmitLineNumber(node);
     node->Visit(m_GenAddr);
-    if (node->GetType()->ElementSize() == 1)
+    if ( node->GetType()->IsPointer() && !node->GetBase()->IsPointer() )
+        EmitInst("PUSHVARIND");
+    else if (node->GetType()->ElementSize() == 1)
         EmitInst("PUSHCVARIND");
     else
         EmitInst("PUSHVARIND");
@@ -116,6 +118,13 @@ void cCodeGen::Visit(cAssignExpr *node)
     // Need to dup the result in case the assign is treated as an expr
     EmitInst("DUP");
     node->GetVar()->Visit(m_GenAddr);
+    /*
+    if (node->GetVar()->IsArrayRef() &&
+        node->GetVar()->GetType()->IsPointer())
+    {
+        EmitInst("POPVARIND");
+    }
+    */
     if (node->GetVar()->IsArrayRef() && 
         node->GetVar()->GetType()->ElementSize() == 1)
     {
@@ -133,7 +142,9 @@ void cCodeGen::Visit(cBinaryExpr *node)
 {
     node->GetLeft()->Visit(this);
     //if (node->GetRight()->GetType()->ParentType()->IsPointer())
-    if (node->GetRight()->IsPointer() && node->IsArithmetic())
+    if (node->GetRight()->IsPointer() && 
+            !node->GetLeft()->IsPointer() &&
+            node->IsArithmetic())
     {
         EmitInst("PUSH " +
                 std::to_string(node->GetRight()->GetType()->ElementSize()));
@@ -142,7 +153,9 @@ void cCodeGen::Visit(cBinaryExpr *node)
 
     node->GetRight()->Visit(this);
     //if (node->GetLeft()->GetType()->ParentType()->IsPointer())
-    if (node->GetLeft()->IsPointer() && node->IsArithmetic())
+    if (node->GetLeft()->IsPointer() && 
+            !node->GetRight()->IsPointer() &&
+            node->IsArithmetic())
     {
         EmitInst("PUSH " +
                 std::to_string(node->GetLeft()->GetType()->ElementSize()));

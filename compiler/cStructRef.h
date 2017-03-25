@@ -53,9 +53,9 @@ class cStructRef : public cVarRef
         return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
-    cVarRef* GetBase()      { return (cVarRef*)GetChild(0); }
-    cSymbol* GetField()     { return (cSymbol*)GetChild(1); }
-    cVarDecl* GetFieldDecl()     { return (cVarDecl*)(GetField()->GetDecl()); }
+    virtual cVarRef* GetBase()  { return (cVarRef*)GetChild(0); }
+    cSymbol* GetField()         { return (cSymbol*)GetChild(1); }
+    cVarDecl* GetFieldDecl()    { return (cVarDecl*)(GetField()->GetDecl()); }
     cTypeDecl* GetFieldType()    
         { return (cTypeDecl*)(GetFieldDecl()->GetType()); }
 

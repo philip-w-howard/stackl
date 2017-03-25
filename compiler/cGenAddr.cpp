@@ -19,7 +19,7 @@ void cGenAddr::VisitAllNodes(cAstNode *node) { node->Visit(this); }
 void cGenAddr::Visit(cArrayRef *node)
 {
     int size;
-    cVarRef *var = node->GetBase();
+    cExpr *var = node->GetBase();
 
     if (node->GetBase()->IsPointer())
     {

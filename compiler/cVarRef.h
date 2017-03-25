@@ -13,6 +13,7 @@ class cVarRef : public cExpr
     virtual bool IsLval()       { return !IsConst(); /* true; */ }
 
     virtual cTypeDecl *GetType() = 0;
+    virtual cExpr     *GetBase() { return this; }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

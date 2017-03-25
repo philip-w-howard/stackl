@@ -45,8 +45,8 @@ class cStructDeref : public cVarRef
         return dynamic_cast<cTypeDecl *>(GetField()->GetDecl()->GetType()); 
     }
 
-    cExpr* GetBase()    { return (cExpr*)GetChild(0); }
-    cSymbol* GetField() { return (cSymbol*)GetChild(1); }
+    virtual cExpr* GetBase()     { return (cExpr*)GetChild(0); }
+    cSymbol* GetField()          { return (cSymbol*)GetChild(1); }
     cVarDecl* GetFieldDecl()     { return (cVarDecl*)(GetField()->GetDecl()); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
