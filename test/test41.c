@@ -1,6 +1,6 @@
 // Test having a struct decl in a struct
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct test1 
 {

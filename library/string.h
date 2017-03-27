@@ -9,5 +9,6 @@ char * strchr(char *haystack, int needle);
 int strcmp(char *str1, char *str2);
 char *strrev(char *str);
 char *itostr(int value, char *str);
+char *xtostr(int value, char *str);
 void *memcpy(void *dest, void *src, int size);
 void *memset(void *buff, int val, int size);

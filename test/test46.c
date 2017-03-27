@@ -1,5 +1,4 @@
-#include "test/io.h"
-//int printi(int val);
+#include <sysio.h>
 
 int foo(char a, int b)
 {

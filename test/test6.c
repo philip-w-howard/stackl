@@ -1,4 +1,3 @@
-//#include "test/io.h"
 // Test character arrays and pointers
 int main()
 {

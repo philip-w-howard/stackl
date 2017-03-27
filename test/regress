@@ -1,8 +1,6 @@
 #!/bin/bash
 
-stacklc -c test/io.c
-
 for test in `seq 1 48`; do
-    test/runt test$test test/io.sl
+    test/runt test$test 
 done
 

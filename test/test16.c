@@ -1,4 +1,4 @@
-#include "test/io.h"
+#include <sysio.h>
 int main()
 {
     prints("Unused test\n");

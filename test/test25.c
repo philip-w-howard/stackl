@@ -1,5 +1,5 @@
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 char *a;
 char **b;

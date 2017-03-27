@@ -1,6 +1,6 @@
 // Test type 2 of main struct decl
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct 
 {

@@ -1,4 +1,4 @@
-#include "test/io.h"
+#include <sysio.h>
 void voidfunc()
 {
     asm("OUTS", "in voidfunc\n");

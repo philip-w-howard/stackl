@@ -2,7 +2,7 @@
 // This was a bug reported in V0.7.1
 //
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct
 {

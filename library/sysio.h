@@ -3,3 +3,4 @@
 
 int prints(char *msg);
 int printi(int val);
+int printx(int val);

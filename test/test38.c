@@ -1,5 +1,5 @@
 // Pointer arithmetic and type casting
-#include "test/io.h"
+#include <sysio.h>
 int main()
 {
     int value1 = 0;

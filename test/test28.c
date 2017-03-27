@@ -1,10 +1,5 @@
 //#include <string.h>
-//#include "test/io.h"
-
-void prints(char *str)
-{
-    asm("OUTS", str);
-}
+#include <sysio.h>
 
 typedef struct
 {

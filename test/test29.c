@@ -1,5 +1,5 @@
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 int g_a;
 int g_c;

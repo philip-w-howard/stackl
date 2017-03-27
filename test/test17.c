@@ -2,7 +2,7 @@
 // NOTE: This test is incomplete
 //
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct
 {

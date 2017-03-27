@@ -161,6 +161,50 @@ char *itostr(int value, char *str)
     strrev(str);
     return str;
 }
+
+char *xtostr(int value, char *str)
+{
+    char *ptr;
+    int minus;
+    int digit;
+
+    minus = 0;
+    ptr = str;
+    if (value == 0)
+    {
+        str[0] = '0';
+        str[1] = 0;
+        return str;
+    }
+    
+    if (value < 0)
+    {
+        minus = 1;
+        value = -value;
+    }
+
+    while (value > 0)
+    {
+        digit = value % 16;
+        if (digit < 10)
+            *ptr = digit + '0';
+        else
+            *ptr = digit + 'A' - 10;
+        ptr++;
+        value /= 16;
+    }
+
+    if (minus) 
+    {
+        *ptr = '-';
+        ptr++;
+    }
+    *ptr = 0;
+
+    strrev(str);
+    return str;
+}
+
 void *memcpy(void *dest, void *source, int size)
 {
     char *src;

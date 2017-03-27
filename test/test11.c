@@ -1,4 +1,4 @@
-#include "test/io.h"
+#include <sysio.h>
 void foo()
 {
     asm("OUTS", "in foo()\n");

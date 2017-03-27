@@ -1,6 +1,6 @@
 // linked list example program
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 #define NULL 0
 int COUNT; // total num nodes added

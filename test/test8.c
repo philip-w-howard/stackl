@@ -1,5 +1,5 @@
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 int f2();
 int f1(int a, int b);
 int f1(int a, int b)

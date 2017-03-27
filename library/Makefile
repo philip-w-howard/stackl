@@ -4,7 +4,7 @@ SLS = string.sl \
 all: $(SLS)
 
 clean: 
-	rm -f $(SLS)
+	rm -f *.sl
 
 %.sl : %.c
 	../stacklc -c $? 
