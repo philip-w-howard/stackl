@@ -16,3 +16,12 @@ int printi(int val)
     return 0;
 }
 
+
+int printx(int val)
+{
+    char buff[20];
+    xtostr(val, buff);
+    prints(buff);
+    return 0;
+}
+

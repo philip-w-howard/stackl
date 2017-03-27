@@ -8,6 +8,10 @@ int main()
     printi(x);
     prints("\n");
 
+    x = 0x1234;
+    printx(x);
+    prints("\n");
+
     x = 0;
     printi(x);
     prints("\n");
