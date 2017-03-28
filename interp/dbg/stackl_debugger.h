@@ -111,6 +111,7 @@ private:
 	bool cmd_breakpointi( string& params, Machine_State* cpu );
 	bool cmd_removebreaki( string& params, Machine_State* cpu );
 	bool cmd_nexti( string& params, Machine_State* cpu );
+	bool cmd_restart( string& params, Machine_State* cpu );
 
 	string _binary_name = "";
 	vector<uint32_t> _break_points;

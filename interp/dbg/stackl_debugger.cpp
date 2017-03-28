@@ -113,6 +113,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "optional[value] - Prints or sets the stack pointer", true) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_restart, { "restart", "re" }, "- Restarts the program at the beginning", true ) );
 }
 
 bool stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -512,6 +513,11 @@ bool stackl_debugger::cmd_help( string& params, Machine_State* cpu )
     return true;
 }
 
+bool stackl_debugger::cmd_restart( string& params, Machine_State* cpu )
+{
+    cpu->IP = 8;
+    return false;
+}
 
 string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 {
