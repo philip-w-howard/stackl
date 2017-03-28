@@ -382,6 +382,12 @@ static int32_t get_op_index(const char *op_name)
 
 static void store(int32_t value)
 {
+    if ((g_Data_Memory_Index + g_Memory_Index) > g_Memory_Size/4)
+    {
+        fprintf(stderr, "Execeeded stackl memory. Use -M to increase size\n");
+        exit(1);
+    }
+
     if (g_Use_Data)
         g_Data_Memory[g_Data_Memory_Index++] = value;
     else
@@ -690,6 +696,7 @@ static int process_file(char *filename, FILE *listing)
     char  line[1000];
     char *comment;
 
+    printf("Processing: %s\n", filename);
     input = fopen(filename, "r");
     if (input == NULL)
     {
@@ -861,13 +868,16 @@ int main(int argc, char** argv)
         }
     }
 
-    g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
-    g_Data_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
+    g_Memory = (int32_t *)malloc(g_Memory_Size);
+    g_Data_Memory = (int32_t *)malloc(g_Memory_Size);
     if (g_Memory == NULL || g_Data_Memory == NULL)
     {
         fprintf(stderr, "Out of memory\n");
         exit(1);
     }
+
+    memset(g_Memory, 0xDF, g_Memory_Size);
+    memset(g_Data_Memory, 0xBA, g_Memory_Size);
 
     // leave room for vector table and startup jump
     g_Memory_Index = 4;

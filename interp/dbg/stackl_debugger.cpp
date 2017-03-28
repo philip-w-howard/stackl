@@ -680,6 +680,7 @@ void stackl_debugger::debug_check( Machine_State* cpu )
         {
             string cur_file = _lst.current_file( cpu->IP );
 	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+            cout << get_nearby_lines( cpu->IP, 0) << '\n';
         }
 	    query_user( cpu );
     }
@@ -688,7 +689,6 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 void stackl_debugger::query_user( Machine_State* cpu )
 {
     string input;
-    cout << "Enter a command.\n";
     _debugging = true;
     while( true )
     {
