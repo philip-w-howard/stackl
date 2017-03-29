@@ -185,13 +185,13 @@ char *xtostr(int value, char *str)
 
     while (value > 0)
     {
-        digit = value % 16;
+        digit = value & 0x000F;
         if (digit < 10)
             *ptr = digit + '0';
         else
             *ptr = digit + 'A' - 10;
         ptr++;
-        value /= 16;
+        value >>= 4;
     }
 
     if (minus) 

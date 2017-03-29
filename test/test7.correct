@@ -1,20 +1,19 @@
 1234
 1234
+FEDC
+00A5
 0
 -789
-
 5
 1234
 this i
 fghij
-this is a test
-
+this isa test
 5
 1234
 this i
 fghij
 Checking strcmp
-
 strrev worked
 strrev worked
 itostr worked

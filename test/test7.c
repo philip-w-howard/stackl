@@ -12,6 +12,14 @@ int main()
     printx(x);
     prints("\n");
 
+    x = 0xFEDC;
+    printx(x);
+    prints("\n");
+
+    x = 0xA5;
+    printxn(x,4);
+    prints("\n");
+
     x = 0;
     printi(x);
     prints("\n");

@@ -5,6 +5,7 @@
 
 static volatile uint32_t Timer_CSR_Reg = 0;
 static volatile uint32_t Timer_Count_Reg = 0;
+static volatile uint32_t Timer_Time_Reg = 0;
 static volatile uint32_t Timer_Limit_Reg = 0xFFFFFFFF;
 
 //***********************************
@@ -25,10 +26,16 @@ static int32_t get_word(int32_t id, int32_t addr)
         Timer_CSR_Reg &= ~TIMER_CSR_INT;
     }
     else if (addr == 4) 
+    {
         value = Timer_Count_Reg;
+    }
     else if (addr == 8)
     {
         value = Timer_Limit_Reg;
+    }
+    else if (addr == 12)
+    {
+        value = Timer_Time_Reg;
     }
 
     return value;
@@ -58,7 +65,7 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
 //*************************************
 int Timer_Init()
 {
-    IO_Register_Handler(0, TIMER_CSR, 12,
+    IO_Register_Handler(0, TIMER_CSR, 16,
             get_word, get_byte, set_word, set_byte);
 
     return 0;
@@ -69,6 +76,7 @@ int Timer_Init()
 int Timer_Heartbeat()
 {
     Timer_Count_Reg++;
+    Timer_Time_Reg++;
     if (Timer_Count_Reg >= Timer_Limit_Reg)
     {
         Timer_CSR_Reg |= TIMER_CSR_INT;

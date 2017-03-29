@@ -696,7 +696,7 @@ static int process_file(char *filename, FILE *listing)
     char  line[1000];
     char *comment;
 
-    printf("Processing: %s\n", filename);
+    //printf("Processing: %s\n", filename);
     input = fopen(filename, "r");
     if (input == NULL)
     {
