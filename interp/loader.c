@@ -145,21 +145,25 @@ int Load(const char *filename, int boot)
             char *version = strtok(NULL, delims);
             compare_version(version);
         }
-        else if (boot && strcmp(token, "pio_term") == 0)
+        else if (boot && strcmp(token, "feature") == 0)
         {
-            PIO_T_Init();
-        }
-        else if (boot && strcmp(token, "dma_term") == 0)
-        {
-            DMA_T_Init();
-        }
-        else if (boot && strcmp(token, "disk") == 0)
-        {
-            Disk_Init();
-        }
-        else if (boot && strcmp(token, "inp") == 0)
-        {
-            IO_Enable_Inp();
+            token = strtok(NULL, delims);
+            if (boot && strcmp(token, "pio_term") == 0)
+            {
+                PIO_T_Init();
+            }
+            else if (boot && strcmp(token, "dma_term") == 0)
+            {
+                DMA_T_Init();
+            }
+            else if (boot && strcmp(token, "disk") == 0)
+            {
+                Disk_Init();
+            }
+            else if (boot && strcmp(token, "inp") == 0)
+            {
+                IO_Enable_Inp();
+            }
         }
         else if (strcmp(token, "stack_size") == 0)
         {
@@ -183,7 +187,6 @@ int Load(const char *filename, int boot)
     }
 
     // set the requested stack size in the first word above the code
-    if (stack_size != 1000) printf("Setting %d to %d\n", addr, stack_size);
     Set_Word(&cpu, addr, stack_size);
 
     dbg_load_info( &cpu, filename );

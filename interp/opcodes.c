@@ -89,6 +89,7 @@ int check_priv(Machine_State *cpu, const char *inst_name)
 static void do_rti(Machine_State *cpu)
 {
     int32_t flag;
+    int32_t new_flag;
     flag = cpu->FLAG;
 
     if (check_priv(cpu, "RTI"))
@@ -97,17 +98,19 @@ static void do_rti(Machine_State *cpu)
         cpu->IP = pop(cpu);
         cpu->LP = pop(cpu);
         cpu->BP = pop(cpu);
-        cpu->FLAG = pop(cpu);
+        new_flag = pop(cpu);    // cant store flag until after restoring SP
+        cpu->SP = pop(cpu);
+
+        cpu->FLAG = new_flag;
 
         // re-enable any interrupts that occurred during this ISR
         cpu->FLAG |= flag & FL_I_ALL;
 
-        if (cpu->FLAG & FL_USER_MODE) 
-            cpu->SP -= cpu->BP;
+        //if (cpu->FLAG & FL_USER_MODE) 
+        //    cpu->SP -= cpu->BP;
     }
 }
 //***********************************************
-// FIX THIS: 
 static void interrupt(Machine_State *cpu, int is_trap)
 {
     int32_t was_user;
@@ -133,6 +136,7 @@ static void interrupt(Machine_State *cpu, int is_trap)
         cpu->FLAG &= ~(FL_I_FIRST_INT << vector);
     }
 
+    push(cpu, cpu->SP);
     push(cpu, cpu->FLAG);
     push(cpu, cpu->BP);
     push(cpu, cpu->LP);

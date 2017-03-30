@@ -1,3 +1,5 @@
+#pragma once
+
 // Register definitions for SAVEREG and RESTREG
 #define BP_REG      0
 #define LP_REG      1
