@@ -4,19 +4,25 @@ using std::runtime_error;
 
 #include <iostream>     // for debug purposes only
 
-abstract_syntax_tree::abstract_syntax_tree( const string& filename, uint32_t max_ip )
+abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 {
-    add_ast( filename, max_ip);
+    add_ast( filename );
 }
 
-void abstract_syntax_tree::add_ast( const string& filename, uint32_t max_ip )
+void abstract_syntax_tree::add_ast( const string& filename )
 {
     std::cout << "Loading symbols for " << filename << std::endl;
 
     rapidxml::file<char> xml_file( filename.c_str() );
     xml_document<char> doc;
     doc.parse<0>( xml_file.data() );
-    load( doc, max_ip );
+    load( doc );
+}
+
+void abstract_syntax_tree::fixup_globals( unordered_map<string, int32_t>& global_offsets )
+{
+    for( auto& pair : _globals )
+        pair.second.offset( global_offsets[pair.first] );
 }
 
 variable* abstract_syntax_tree::var( const string& func_name, const string & var_name )
@@ -40,7 +46,7 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
     return nullptr;
 }
 
-void abstract_syntax_tree::load( xml_document<char>& doc, uint32_t max_ip )
+void abstract_syntax_tree::load( xml_document<char>& doc )
 {
     const char* time_str = doc.first_node( "Program" )->first_node( "compiled" )->first_attribute( "time" )->value();
     struct tm tm;
@@ -71,7 +77,6 @@ void abstract_syntax_tree::load( xml_document<char>& doc, uint32_t max_ip )
         else if( strcmp( node->name(), "VarDecl" ) == 0 )
         {
             variable var( node, _struct_decls );
-            var.offset( var.offset() + max_ip );
             _globals[var.name()] = var;
         }
         else if( strcmp( node->name(), "FuncDecl" ) == 0 )

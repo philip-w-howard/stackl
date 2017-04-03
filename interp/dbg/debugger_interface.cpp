@@ -3,6 +3,7 @@
 
 #include <iostream>
 using std::cout;
+using std::cin;
 
 static bool ENABLE = false;
 
@@ -11,17 +12,27 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
     if( !ENABLE )
         return;
 
+    if( cpu->debugger != nullptr )
+    {
+        char c;
+        cout << "A different binary is already being debugged. Would you like to debug the new one? [y/n] ";
+        cin.get( c );
+        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+        if( c == 'n' )
+            return;
+    }
+
     stackl_debugger* debugger = new stackl_debugger( filename );
 
     if( debugger == NULL )
     {
-        std::cout << "Debugger memory allocation failed.\n";
+        cout << "Debugger memory allocation failed.\n";
         exit( EXIT_FAILURE );
     }
 
     if( !debugger->loaded() )
     {
-        std::cout << "Error loading debugger: " << debugger->failure_reason() << '\n';
+        cout << "Error loading debugger: " << debugger->failure_reason() << '\n';
         delete debugger;
         exit( EXIT_FAILURE );
     }

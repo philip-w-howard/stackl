@@ -13,6 +13,7 @@ asm_list::asm_list( const string& filename )
     string line, token;
     uint32_t old_line_num = UINT32_MAX;
     string old_func_name = "";
+    bool symbol_table = false;
 
     while( getline( infile, line ) )
     {
@@ -23,8 +24,6 @@ asm_list::asm_list( const string& filename )
             string cur_func, cur_file;
             uint32_t ip, line_num;
             ss >> ip >> line_num >> cur_func >> cur_file;
-            if( ip > _max_ip )
-                _max_ip = ip;
             if( line_num != old_line_num && !cur_func.empty() && !cur_file.empty() )
             {
                 auto& f = _file_and_line_to_addr[cur_file];
@@ -46,9 +45,18 @@ asm_list::asm_list( const string& filename )
                 fname.erase( idx );
             _file_list.insert(fname + ".ast");
         }
-    }
+        else if( symbol_table )
+        {
+            string global_name;
+            ss >> global_name;
+            _global_offsets[global_name] = stoi( token );
 
-    _max_ip += 4;
+        }
+        else if( token == "Symbol" ) //"Symbol Table"
+        {
+            symbol_table = true;
+        }
+    }
 }
 
 uint32_t asm_list::addr_of_func( const string & func_name )
@@ -166,16 +174,4 @@ string asm_list::current_file( uint32_t cur_addr )
         }
     }
     return best_filename;
-}
-
-vector<string> asm_list::file_list() const
-{
-    vector<string> list;
-
-    for (auto it=_file_list.begin(); it != _file_list.end(); it++)
-    {
-        list.push_back(*it);
-    }
-
-    return list;
 }

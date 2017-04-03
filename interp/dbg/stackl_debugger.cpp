@@ -38,12 +38,12 @@ stackl_debugger::stackl_debugger( const char* filename )
         else
         {
             _lst = asm_list( fname + ".dbg" );
-            vector<string> file_list = _lst.file_list();
-            _ast = abstract_syntax_tree( );
-            for (unsigned int ii=0; ii<file_list.size(); ii++)
-            {
-                _ast.add_ast(file_list[ii], _lst.max_ip());
-            }
+            _ast = abstract_syntax_tree();
+
+            for( const string& file : _lst.file_list() )
+                _ast.add_ast( file );
+
+            _ast.fixup_globals( _lst.global_offsets() );
 
             check_compile_time( filename );
         }
@@ -80,7 +80,7 @@ void stackl_debugger::opcode_debug_mode( const string& filename )
     char c;
     cout << "Could not find debug files. Would you like to debug the binary? [y/n] ";
     cin.get( c );
-    cin.ignore( INT32_MAX, '\n' );
+    cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
     if( c == 'n' )
         throw runtime_error( "Debug files not found" );
 
@@ -107,10 +107,10 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "optional[value] - Prints or sets the instruction pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG" }, "optional[value] - Prints or sets the flags register", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP" }, "optional[value] - Prints or sets the frame pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP" }, "optional[value] - Prints or sets the base pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP" }, "optional[value] - Prints or sets the limit pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP" }, "optional[value] - Prints or sets the stack pointer", true) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP", "fp" }, "optional[value] - Prints or sets the frame pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP", "bp" }, "optional[value] - Prints or sets the base pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP", "lp" }, "optional[value] - Prints or sets the limit pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP", "sp" }, "optional[value] - Prints or sets the stack pointer", true) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_restart, { "restart", "re" }, "- Restarts the program at the beginning", true ) );
