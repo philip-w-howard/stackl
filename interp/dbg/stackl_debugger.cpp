@@ -105,8 +105,8 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP" }, "optional[value] - Prints or sets the instruction pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG" }, "optional[value] - Prints or sets the flags register", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_IP, { "IP", "ip" }, "optional[value] - Prints or sets the instruction pointer", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FLAG, { "FLAG", "flag" }, "optional[value] - Prints or sets the flags register", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP", "fp" }, "optional[value] - Prints or sets the frame pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP", "bp" }, "optional[value] - Prints or sets the base pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP", "lp" }, "optional[value] - Prints or sets the limit pointer", true ) );
