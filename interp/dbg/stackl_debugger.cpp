@@ -98,6 +98,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_next, { "next", "n" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_step, { "step", "s" }, "- Steps over the current line", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_locals, { "locals", "listlocals" }, "- Print all local vars in current or specified function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_funcs, { "funcs", "functions", "listfuncs", "listfunctions" }, "- Print all functions", false ) );
@@ -306,6 +307,15 @@ bool stackl_debugger::cmd_next( string& params, Machine_State* cpu )
     _prev_file = _lst.current_file( cpu->IP );
     _prev_line = _lst.line_of_addr( _prev_file, cpu->IP );
     _stepping = true;
+    return false;
+}
+
+bool stackl_debugger::cmd_step( string& params, Machine_State* cpu )
+{
+    _prev_fp = cpu->FP;
+    _prev_file = _lst.current_file( cpu->IP );
+    _prev_line = _lst.line_of_addr( _prev_file, cpu->IP );
+    _step_over = true;
     return false;
 }
 
@@ -676,7 +686,7 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 {
     if( !loaded() ) return;
 
-    if( should_break( cpu->IP ) )
+    if( should_break( cpu ) )
     {
         if( _opcode_debug )
         {
@@ -752,16 +762,15 @@ void stackl_debugger::query_user( Machine_State* cpu )
     _debugging = false;
 }
 
-bool stackl_debugger::should_break( uint32_t cur_addr )
+bool stackl_debugger::should_break( Machine_State* cpu )
 {
+    uint32_t cur_addr = cpu->IP;
     if( _break_next_op )
     {
         _break_next_op = false;
         return true;
     }
-    else if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
-        return true;
-    else if( _stepping )
+    else if( _stepping || _step_over )
     {
         string cur_file = _lst.current_file( cur_addr );
         uint32_t cur_line = _lst.line_of_addr( cur_file, cur_addr );
@@ -769,10 +778,22 @@ bool stackl_debugger::should_break( uint32_t cur_addr )
             return false; //then don't break
         if( cur_line != _prev_line || cur_file != _prev_file )
         { //if our current step has changed in either line or file, break.
-            _stepping = false;
-            return true;
+            if( _stepping )
+            {
+                _stepping = false;
+                return true;
+            }
+            else if( _step_over && (uint32_t)cpu->FP <= _prev_fp )
+            {
+                cout << "break " << cpu->FP << " <= " << _prev_fp << '\n';
+                _step_over = false;
+                return true;
+            }
+            else return false;
         }
     }
+    else if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
+        return true;
     return false; //otherwise dont break
 }
 

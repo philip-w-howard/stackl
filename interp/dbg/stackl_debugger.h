@@ -49,7 +49,7 @@ private:
 	inline void remove_all_breakpoints() { _break_points.clear(); }
 
 	//is the current address in our list of break points?
-	bool should_break( uint32_t cur_addr );
+	bool should_break( Machine_State* cpu );
 
 	/* This will get the value of the var and return it as a printable string.
 
@@ -94,6 +94,7 @@ private:
 	bool cmd_continue( string& params, Machine_State* cpu );
 	bool cmd_list( string& params, Machine_State* cpu );
 	bool cmd_next( string& params, Machine_State* cpu );
+	bool cmd_step( string& params, Machine_State* cpu );
 	bool cmd_locals( string& params, Machine_State* cpu );
 	bool cmd_globals( string& params, Machine_State* cpu );
 	bool cmd_funcs( string& params, Machine_State* cpu );
@@ -117,6 +118,7 @@ private:
 	vector<uint32_t> _break_points;
 	abstract_syntax_tree _ast;
 	asm_list _lst;
+
 	bool _loaded = false;
 	bool _debugging = false;
 	bool _opcode_debug = false;
@@ -125,8 +127,10 @@ private:
 
 	bool _break_next_op = false;
 	bool _stepping = false;
+	bool _step_over = false;
 	uint32_t _prev_line = 0;
 	string _prev_file = "";
+	uint32_t _prev_fp = 0;
 
 	string _failure_reason;
 };
