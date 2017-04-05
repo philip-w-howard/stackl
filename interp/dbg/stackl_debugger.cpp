@@ -785,7 +785,6 @@ bool stackl_debugger::should_break( Machine_State* cpu )
             }
             else if( _step_over && (uint32_t)cpu->FP <= _prev_fp )
             {
-                cout << "break " << cpu->FP << " <= " << _prev_fp << '\n';
                 _step_over = false;
                 return true;
             }
