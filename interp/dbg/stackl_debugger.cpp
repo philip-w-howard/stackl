@@ -569,7 +569,6 @@ void stackl_debugger::cmd_up( string& params, Machine_State* cpu )
         return;
     }
 
-    set_flag( CHANGED_CONTEXT, true );
     _context_history.push_back( { cpu->IP, cpu->FP } );
     cpu->IP = Get_Word( cpu, cpu->FP - 8 );
     cpu->FP = Get_Word( cpu, cpu->FP - 4 );
@@ -590,8 +589,6 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
     cpu->IP = context.IP;
     cpu->FP = context.FP;
-
-    set_flag( CHANGED_CONTEXT, !_context_history.empty() );
 
     string cur_file = _lst.current_file( cpu->IP );
     cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
@@ -781,12 +778,12 @@ void stackl_debugger::debug_check( Machine_State* cpu )
             cout << get_nearby_lines( cpu->IP, 0);
         }
 	    query_user( cpu );
-        if( get_flag( CHANGED_CONTEXT ) )
+
+        if( !_context_history.empty() ) //if the user ran an 'up' command but didn't move back down
         {
             cpu->FP = _context_history[0].FP;
             cpu->IP = _context_history[0].IP;
             _context_history.clear();
-            set_flag( CHANGED_CONTEXT, false );
         }
     }
 }
