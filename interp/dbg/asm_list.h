@@ -22,8 +22,8 @@ public:
     uint32_t addr_of_line( const string& filename, uint32_t line_number );
     uint32_t line_of_addr( const string& filename, uint32_t address );
 
-    string current_func( uint32_t cur_addr );
-    string current_file( uint32_t cur_addr );
+    string current_func( uint32_t cur_addr ) const;
+    string current_file( uint32_t cur_addr ) const;
 
     unordered_map<string, int32_t>& global_offsets() { return _global_offsets; }
     unordered_set<string>& file_list() { return _file_list; }

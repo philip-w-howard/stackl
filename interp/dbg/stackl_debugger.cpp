@@ -531,7 +531,7 @@ void stackl_debugger::cmd_watches( string& params, Machine_State* cpu )
 void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
 {
     //addr 12 holds the address of the first function jumped to by the interpreter
-    string init_func = _lst.current_func( Get_Word( cpu, 12 ) );
+    string init_func = get_init_func( cpu );
 
     uint32_t fp = cpu->FP;
     uint32_t ip = cpu->IP;
@@ -539,6 +539,9 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
     int32_t i = 0;
     string cur_func, cur_file, res;
     vector<string> contexts;
+
+    if( ip == 0 )
+        return; //dont do anything if the program hasn't started running yet
 
     do
     {
@@ -548,31 +551,50 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
 
         contexts.push_back( std::to_string( ++i ) + ". " + cur_func + "() at " + cur_file + ":" + std::to_string( cur_line ) );
 
-        ip = Get_Word( cpu, fp-8 );
-        fp = Get_Word( cpu, fp-4 );
+        ip = Get_Word( cpu, fp - 8 );
+        fp = Get_Word( cpu, fp - 4 );
 
     } while( cur_func != init_func );
 
-    for( i = contexts.size(); i >= 0; ++i )
-    {
-        cout << contexts[i] + '\n';
-    }
+    for( auto it = contexts.rbegin(); it != contexts.rend(); ++it )
+        cout << *it + '\n';
 }
 
 void stackl_debugger::cmd_up( string& params, Machine_State* cpu )
 {
-    if( !get_flag( CHANGED_CONTEXT ) )
+    string init_func = get_init_func( cpu );
+    if( _lst.current_func( cpu->IP ) == init_func )
     {
-        _original_fp = cpu->FP;
-        set_flag( CHANGED_CONTEXT, true );
-    } //TODO: THE REST OF THE UP/DOWN COMMANDS.
-    cout << "Not implimented\n";
+        cout << "You are unable to go up any further.\n";
+        return;
+    }
+
+    set_flag( CHANGED_CONTEXT, true );
+    _context_history.push_back( { cpu->IP, cpu->FP } );
+    cpu->IP = Get_Word( cpu, cpu->FP - 8 );
+    cpu->FP = Get_Word( cpu, cpu->FP - 4 );
+    string cur_file = _lst.current_file( cpu->IP );
+    cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
 }
 
 void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 {
-    cpu->FP = _original_fp;
-    cout << "Not implimented\n";
+    if( _context_history.empty() )
+    {
+        cout << "Already in the lowest context!\n";
+        return;
+    }
+
+    context_t context = _context_history.back();
+    _context_history.pop_back();
+
+    cpu->IP = context.IP;
+    cpu->FP = context.FP;
+
+    set_flag( CHANGED_CONTEXT, !_context_history.empty() );
+
+    string cur_file = _lst.current_file( cpu->IP );
+    cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
@@ -761,7 +783,9 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 	    query_user( cpu );
         if( get_flag( CHANGED_CONTEXT ) )
         {
-            cpu->FP = _original_fp;
+            cpu->FP = _context_history[0].FP;
+            cpu->IP = _context_history[0].IP;
+            _context_history.clear();
             set_flag( CHANGED_CONTEXT, false );
         }
     }
@@ -918,4 +942,9 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
 	    ++i;
     }
     return ret;
+}
+
+string stackl_debugger::get_init_func( Machine_State* cpu ) const
+{
+    return _lst.current_func( Get_Word( cpu, 12 ) );
 }

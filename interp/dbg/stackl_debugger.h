@@ -99,6 +99,8 @@ private:
 	bool file_exists( const string& filename );
 	//asks the user if they would like to debug opcodes only
 	void opcode_debug_mode();
+	//gets the function that acts as the entry point of the program
+	string get_init_func( Machine_State* cpu ) const;
 
 	//this function populates the _commands field.
 	void load_commands();
@@ -148,8 +150,14 @@ private:
 
 	uint32_t _prev_line = 0;
 	string _prev_file = "";
-	uint32_t _prev_fp = 0; //used for cycle-to-cycle checking for step commands
-	uint32_t _original_fp = 0; //used for moving between stack contexts.
+	uint32_t _prev_fp = 0; //used for step commands
+
+	typedef struct context_s
+	{
+		int32_t IP, FP;
+	} context_t;
+
+	vector<context_t> _context_history; //keeps track of previous frame pointers when calling 'up'
 
 	string _failure_reason; //the reason the debugger couldn't load. This is empty if the debugger loaded successfully.
 

@@ -138,28 +138,28 @@ uint32_t asm_list::line_of_addr( const string& filename, uint32_t address )
     else return UINT32_MAX;
 }
 
-string asm_list::current_func( uint32_t cur_addr )
+string asm_list::current_func( uint32_t cur_addr ) const
 {
     func_addr_t* prev = nullptr;
-    for( func_addr_t& f_a : _func_to_addr )
+    for( const func_addr_t& f_a : _func_to_addr )
     { //once we pass the address that was our lower bound, return the one we were looking at previously
         if( f_a.addr > cur_addr && prev != nullptr )
             return prev->func_name;
         else
-            prev = &f_a;
+            prev = const_cast<func_addr_t*>(&f_a);
     }
     if( prev == nullptr )
         return "";
     else return prev->func_name; //if we get to the end then our last function was the guy we want
 }
 
-string asm_list::current_file( uint32_t cur_addr )
+string asm_list::current_file( uint32_t cur_addr ) const
 {
     string best_filename = "unknown";
     uint32_t dif = INT32_MAX;
-    for( auto& f_dict : _file_and_line_to_addr )
+    for( const auto& f_dict : _file_and_line_to_addr )
     {
-        for( addr_line_t& alt : f_dict.second )
+        for( const addr_line_t& alt : f_dict.second )
         {
             if( alt.addr == cur_addr )
                 return f_dict.first; //filename
