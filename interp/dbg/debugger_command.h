@@ -9,7 +9,7 @@ using std::set;
 class stackl_debugger;
 
 //this points to a function in the stackl debugger that is invoked when the command is selected
-typedef bool (stackl_debugger::*op)( string& params, Machine_State* cpu );
+typedef void (stackl_debugger::*op)( string& params, Machine_State* cpu );
 
 class debugger_command
 {
@@ -17,7 +17,7 @@ public:
 
     debugger_command( stackl_debugger& dbg, op func, const set<string>& names, const string& help, bool op_dbg = false );
     bool called_by( const string& cmd ) const;
-    bool run( string& params, Machine_State* cpu ) const;
+    void run( string& params, Machine_State* cpu ) const;
     string to_string() const;
     inline bool allowed_in_opcode_mode() const { return _op_dbg; }
 

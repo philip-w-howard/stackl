@@ -13,6 +13,8 @@ using std::vector;
 using std::find;
 #include <fstream>
 using std::ifstream;
+#include <unordered_map>
+using std::unordered_map;
 
 #include"string_utils.h"
 #include "../machine.h"
@@ -26,8 +28,8 @@ public:
 	void debug_check( Machine_State* cpu  );
 	void query_user( Machine_State* cpu );
 
-	inline bool debugging() const { return _debugging; }
-	inline bool loaded() const { return _loaded; }
+	inline bool debugging() const { return get_flag( FLAG::DEBUGGING ); }
+	inline bool loaded() const { return get_flag( FLAG::LOADED ); }
 	inline string failure_reason() const { return _failure_reason; }
 private:
 	enum BREAKPOINT_RESULT
@@ -36,6 +38,21 @@ private:
 		NOT_FOUND,
 		DUPLICATE
 	};
+
+	enum FLAG
+	{
+		LOADED,
+		DEBUGGING,
+		OPCODE_DEBUG,
+		BREAK_NEXT_OP,
+		STEP_OVER,
+		STEP_INTO,
+		CHANGED_CONTEXT,
+		RESUME_EXECUTING
+	};
+
+	void set_flag( FLAG state, bool value );
+	bool get_flag( FLAG state ) const;
 
 	/*	Breakpoint text can be in the following formats:
 	main.cpp:75 (filename:line_number)
@@ -74,63 +91,67 @@ private:
 	bool remove_breakpoint( uint32_t addr );
 	//converts a users breakpoint-formatted text into an instruction pointer
 	uint32_t text_to_addr( const string& break_point_text, uint32_t cur_addr );
-
+	//converts the instruction at addr to slasm text
 	string opcode_to_string( uint32_t addr, Machine_State* cpu );
-
+	//checks the compile time of the passed source code filename against its matching debug file.
 	void check_compile_time( const char* filename );
+	//returns true if the file exists
 	bool file_exists( const string& filename );
-
-	void opcode_debug_mode( const string& filename );
+	//asks the user if they would like to debug opcodes only
+	void opcode_debug_mode();
 
 	//this function populates the _commands field.
 	void load_commands();
 	vector<debugger_command> _commands;
 
 	//each debugger command must have a function that is run when the command is invoked.
-	bool cmd_breakpoint( string& params, Machine_State* cpu );
-	bool cmd_removebreak( string& params, Machine_State* cpu );
-	bool cmd_print( string& params, Machine_State* cpu );
-	bool cmd_printi( string& params, Machine_State* cpu );
-	bool cmd_continue( string& params, Machine_State* cpu );
-	bool cmd_list( string& params, Machine_State* cpu );
-	bool cmd_next( string& params, Machine_State* cpu );
-	bool cmd_step( string& params, Machine_State* cpu );
-	bool cmd_locals( string& params, Machine_State* cpu );
-	bool cmd_globals( string& params, Machine_State* cpu );
-	bool cmd_funcs( string& params, Machine_State* cpu );
-	bool cmd_exit( string& params, Machine_State* cpu );
-	bool cmd_IP( string& params, Machine_State* cpu );
-	bool cmd_FLAG( string& params, Machine_State* cpu );
-	bool cmd_FP( string& params, Machine_State* cpu );
-	bool cmd_BP( string& params, Machine_State* cpu );
-	bool cmd_LP( string& params, Machine_State* cpu );
-	bool cmd_SP( string& params, Machine_State* cpu );
-	bool cmd_file( string& params, Machine_State* cpu );
-	bool cmd_program( string& params, Machine_State* cpu );
-	bool cmd_func( string& params, Machine_State* cpu );
-	bool cmd_help( string& params, Machine_State* cpu );
-	bool cmd_breakpointi( string& params, Machine_State* cpu );
-	bool cmd_removebreaki( string& params, Machine_State* cpu );
-	bool cmd_nexti( string& params, Machine_State* cpu );
-	bool cmd_restart( string& params, Machine_State* cpu );
+	void cmd_breakpoint( string& params, Machine_State* cpu );
+	void cmd_removebreak( string& params, Machine_State* cpu );
+	void cmd_print( string& params, Machine_State* cpu );
+	void cmd_printi( string& params, Machine_State* cpu );
+	void cmd_continue( string& params, Machine_State* cpu );
+	void cmd_list( string& params, Machine_State* cpu );
+	void cmd_next( string& params, Machine_State* cpu );
+	void cmd_step( string& params, Machine_State* cpu );
+	void cmd_locals( string& params, Machine_State* cpu );
+	void cmd_globals( string& params, Machine_State* cpu );
+	void cmd_funcs( string& params, Machine_State* cpu );
+	void cmd_exit( string& params, Machine_State* cpu );
+	void cmd_IP( string& params, Machine_State* cpu );
+	void cmd_FLAG( string& params, Machine_State* cpu );
+	void cmd_FP( string& params, Machine_State* cpu );
+	void cmd_BP( string& params, Machine_State* cpu );
+	void cmd_LP( string& params, Machine_State* cpu );
+	void cmd_SP( string& params, Machine_State* cpu );
+	void cmd_file( string& params, Machine_State* cpu );
+	void cmd_program( string& params, Machine_State* cpu );
+	void cmd_func( string& params, Machine_State* cpu );
+	void cmd_help( string& params, Machine_State* cpu );
+	void cmd_breakpointi( string& params, Machine_State* cpu );
+	void cmd_removebreaki( string& params, Machine_State* cpu );
+	void cmd_nexti( string& params, Machine_State* cpu );
+	void cmd_restart( string& params, Machine_State* cpu );
+	void cmd_watch( string& params, Machine_State* cpu );
+	void cmd_removewatch( string& params, Machine_State* cpu );
+	void cmd_watches( string& params, Machine_State* cpu );
+	void cmd_backtrace( string& params, Machine_State* cpu );
+	void cmd_up( string& params, Machine_State* cpu );
+	void cmd_down( string& params, Machine_State* cpu );
 
-	string _binary_name = "";
-	vector<uint32_t> _break_points;
-	abstract_syntax_tree _ast;
-	asm_list _lst;
+	string _binary_name = ""; //the name of the current binary being debugged
+	vector<uint32_t> _break_points; //list of instruction pointers to break at
+	unordered_map<string, string> _watches;
+	abstract_syntax_tree _ast; //the ast of the program currently being executed
+	asm_list _lst; //the data structure containing relationships between instructions and source code
 
-	bool _loaded = false;
-	bool _debugging = false;
-	bool _opcode_debug = false;
+	string _prev_cmd = ""; //the text of the command the user most recently ran
 
-	string _prev_cmd = "";
-
-	bool _break_next_op = false;
-	bool _stepping = false;
-	bool _step_over = false;
 	uint32_t _prev_line = 0;
 	string _prev_file = "";
-	uint32_t _prev_fp = 0;
+	uint32_t _prev_fp = 0; //used for cycle-to-cycle checking for step commands
+	uint32_t _original_fp = 0; //used for moving between stack contexts.
 
-	string _failure_reason;
+	string _failure_reason; //the reason the debugger couldn't load. This is empty if the debugger loaded successfully.
+
+	uint64_t _flags = 0; //the flags of the debugger itself
 };

@@ -15,9 +15,9 @@ bool debugger_command::called_by( const string& cmd ) const
     return _names.find( cmd ) != _names.end();
 }
 
-bool debugger_command::run( string& params, Machine_State* cpu ) const
+void debugger_command::run( string& params, Machine_State* cpu ) const
 {
-    return (_dbg.*_func)( params, cpu );
+    (_dbg.*_func)( params, cpu );
 }
 
 string debugger_command::to_string() const

@@ -72,6 +72,14 @@ vector<uint32_t> string_utils::strip_array_indexes( string& var )
     return idxs;
 }
 
+uint32_t string_utils::strip_indirection( string& var )
+{
+    uint32_t indirection = 0;
+    while( var[indirection++] == '*' ); //count the number of leading asterisks
+    var.erase( 0, --indirection ); //remove them
+    return indirection;
+}
+
 int32_t string_utils::to_int( const string& text )
 {
     int32_t addr;
