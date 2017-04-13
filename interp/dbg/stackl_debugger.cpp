@@ -65,8 +65,8 @@ void stackl_debugger::check_compile_time( const char* filename )
 {
     struct stat attrib;
     stat( filename, &attrib );
-    if( attrib.st_mtime > _ast.compile_time() )
-        throw runtime_error( "Debug files out of date." );
+    //if( attrib.st_mtime > _ast.compile_time() )
+    //    throw runtime_error( "Debug files out of date." );
 }
 
 bool stackl_debugger::file_exists( const string& filename )
@@ -97,7 +97,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_printi, { "printi", "pi" }, "[IP|0xaddress] - Prints the value of the instruction at the passed location", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_continue, { "continue", "cont", "c" }, "- Runs program until the next breakpoint", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_list, { "list" }, " optional[line_count] - Prints all source code within N lines of the current line", false ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_next, { "next", "n" }, "[line_num|file:line_num|func_name] - Removes breakpoint", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_next, { "next", "n" }, "- Steps into a function or over a line", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_step, { "step", "s" }, "- Steps over the current line", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_locals, { "locals", "listlocals" }, "- Print all local vars in current or specified function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables", false ) );
