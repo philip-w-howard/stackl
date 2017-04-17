@@ -1,6 +1,6 @@
 // Test having a struct decl in a struct
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct test1 
 {
@@ -10,9 +10,12 @@ typedef struct test1
     struct test1 next;
 } test2;
 
+test2 global;
+
 int main()
 {   
-    test1 testa;
+    test2 testa;
+    struct test1 testb;
     
     testa.next.a = 12;
     printi(testa.next.a);

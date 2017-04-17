@@ -1,11 +1,23 @@
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 int main()
 {
     int x;
 
     x = 1234;
     printi(x);
+    prints("\n");
+
+    x = 0x1234;
+    printx(x);
+    prints("\n");
+
+    x = 0xFEDC;
+    printx(x);
+    prints("\n");
+
+    x = 0xA5;
+    printxn(x,4);
     prints("\n");
 
     x = 0;
@@ -127,6 +139,8 @@ int main()
 
         return 0;
     }
+
+    if (1) ;    // make sure we allow if with null statements
 
     return 0;
 }

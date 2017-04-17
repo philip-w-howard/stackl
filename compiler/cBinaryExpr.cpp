@@ -136,6 +136,21 @@ std::string cBinaryExpr::OpAsString()
     return 0;
 }
 
+bool cBinaryExpr::IsArithmetic()
+{
+    switch (mOp)
+    {
+        case '+': 
+        case '-':
+        case '*':
+        case '/':
+        case '%':
+            return true;
+    }
+
+    return false;
+}
+
 /*
 int cBinaryExpr::OpAsInt()
 {

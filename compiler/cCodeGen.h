@@ -26,6 +26,7 @@ class cCodeGen : public cVisitor
         virtual void Visit(cBinaryExpr *node);
         //virtual void Visit(cDecl *node);
         //virtual void Visit(cDeclsList *node);
+        virtual void Visit(cDoWhileStmt *node);
         //virtual void Visit(cExpr *node);
         virtual void Visit(cExprStmt *node);
         virtual void Visit(cForStmt *node);
@@ -39,6 +40,7 @@ class cCodeGen : public cVisitor
         virtual void Visit(cPointerDeref *node);
         //virtual void Visit(cPointerType *node);
         virtual void Visit(cPostfixExpr *node);
+        virtual void Visit(cPragma *node);
         virtual void Visit(cPrefixExpr *node);
         virtual void Visit(cReturnStmt *node);
         virtual void Visit(cShortCircuitExpr *node);

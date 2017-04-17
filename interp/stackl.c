@@ -46,7 +46,7 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                printf(HELP_STR);
+                printf("%s", HELP_STR);
                 exit(0);
             }
             else if (strcmp(arg, "inp") == 0)
@@ -102,17 +102,17 @@ int main(int argc, char **argv)
     Init_IO(Use_Inp_Instr);
     Timer_Init();
 
-    if (Use_PIO_Term) 
+    if (Use_PIO_Term)
     {
         PIO_T_Init();
     }
 
-    if (Use_DMA_Term) 
+    if (Use_DMA_Term)
     {
         DMA_T_Init();
     }
 
-    if (Use_Disk) 
+    if (Use_Disk)
     {
         Disk_Init();
     }
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
     {
         printf("Need to specify an executable file\n");
         return 1;
-    } 
+    }
     else
     {
         result = Boot(Input_File);
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
             return 3;
         }
     }
-    
+
     Machine_Execute();
 
     return 0;

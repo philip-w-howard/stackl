@@ -1,7 +1,7 @@
 // Test multidimensional arrays
 //
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 int main()
 {

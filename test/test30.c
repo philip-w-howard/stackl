@@ -1,7 +1,7 @@
 // Test arrays of structs
 //
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 typedef struct
 {
@@ -9,7 +9,7 @@ typedef struct
     int b[3];
 } struct1_t;
 
-typedef struct
+typedef struct 
 {
     int a[3];
     //struct1_t s1[2];

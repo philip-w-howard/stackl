@@ -1,7 +1,7 @@
 // This code used to segfault because the struct was not word-sized so the 
 // array was not word aligned
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 int main()
 {
     typedef struct 

@@ -1,7 +1,7 @@
 // Test return value of integer functions
 //
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 int empty()
 { }

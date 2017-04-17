@@ -3,6 +3,7 @@
 #include <string>
 
 #include "cTypeDecl.h"
+#include "cDeclsList.h"
 #include "cSymbol.h"
 #include "cSymbolTable.h"
 
@@ -10,16 +11,20 @@ class cStructType : public cTypeDecl
 {
   public:
     // modified by Joe
-    cStructType(cSymbol *name, cScope *scope, cDeclsList *decls) 
+    cStructType(cSymbol *name)
         : cTypeDecl()
     {
+        if (name == nullptr)
+        {
+            mSequence++;
+            name = new cSymbol("$$unnamed_struct_" + std::to_string(mSequence));
+        }
+
         if (symbolTableRoot->LocalLookup(name->Name()) != nullptr)
         {
-            if(scope != nullptr && decls != nullptr) {
-                ThrowSemanticError(name->Name() +" already defined in local scope");
-                return;
-            }
-
+            ThrowSemanticError(name->Name() +
+                    " already defined in local scope");
+            return;
         }
 
         // if the symbol exists in an outer scope, we need to create a new one
@@ -30,14 +35,12 @@ class cStructType : public cTypeDecl
         }
 
         AddChild(name);
-        AddChild(decls);
-        mScope = scope;
+        mScope = nullptr;
         mSize = 0;
         name->SetDecl(this);
         symbolTableRoot->Insert(name);
     }
 
-    // Added by Joe
     void AddDecls(cScope *scope, cDeclsList *decls)
     {
         AddChild(decls);
@@ -65,5 +68,6 @@ class cStructType : public cTypeDecl
 
   protected:
     cScope      *mScope;
+    static int  mSequence;
 };
 

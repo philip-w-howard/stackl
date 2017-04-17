@@ -1,5 +1,5 @@
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 const int ONE = 1;
 #define TWO 2

@@ -15,18 +15,33 @@ const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
 void cCodeGen::Write_Header()
 {
-    int feature_index = 0;
-    string feature_name;
-    cSymbol *feature;
+    //int feature_index = 0;
+    //string feature_name;
+    //cSymbol *feature;
 
     m_Output << "#stackl " << VERSION << " stacklc" << std::endl;
 
+    /*
     feature_name = "$$feature" + std::to_string(feature_index++);
     while ((feature = symbolTableRoot->Lookup(feature_name)) != nullptr)
     {
         m_Output << "#" << feature->Name() << std::endl;
         feature_name = "$$feature" + std::to_string(feature_index++);
     }
+
+    // Handle vectors (if defined)
+    cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
+    if (interrupt != nullptr) EmitInst("#interrupt " + interrupt->Name());
+
+    cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
+    if (systrap != nullptr) EmitInst("#systrap " + systrap->Name());
+
+    cSymbol *startup = symbolTableRoot->Lookup("$$startup");
+    if (startup != nullptr) EmitInst("#startup " + startup->Name());
+
+    cSymbol *stack_size = symbolTableRoot->Lookup("$$stack_size");
+    if (stack_size != nullptr) EmitInst("#stack_size " + stack_size->Name());
+    */
 
     //m_Output << "#begindata" << std::endl;
 }
@@ -44,15 +59,6 @@ cCodeGen::cCodeGen(const char * filename) : cVisitor()
 
     Write_Header();
 
-    // Handle vectors (if defined)
-    cSymbol *interrupt = symbolTableRoot->Lookup("$$interrupt");
-    if (interrupt != nullptr) EmitInst("#interrupt " + interrupt->Name());
-
-    cSymbol *systrap = symbolTableRoot->Lookup("$$systrap");
-    if (systrap != nullptr) EmitInst("#systrap " + systrap->Name());
-
-    cSymbol *startup = symbolTableRoot->Lookup("$$startup");
-    if (startup != nullptr) EmitInst("#startup " + startup->Name());
 }
 
 cCodeGen::~cCodeGen()
@@ -83,7 +89,9 @@ void cCodeGen::Visit(cArrayRef *node)
 {
     EmitLineNumber(node);
     node->Visit(m_GenAddr);
-    if (node->GetType()->ElementSize() == 1)
+    if ( node->GetType()->IsPointer() && !node->GetBase()->IsPointer() )
+        EmitInst("PUSHVARIND");
+    else if (node->GetType()->ElementSize() == 1)
         EmitInst("PUSHCVARIND");
     else
         EmitInst("PUSHVARIND");
@@ -110,7 +118,14 @@ void cCodeGen::Visit(cAssignExpr *node)
     // Need to dup the result in case the assign is treated as an expr
     EmitInst("DUP");
     node->GetVar()->Visit(m_GenAddr);
-    if (node->GetVar()->IsArrayRef() && 
+
+    if (node->GetVar()->IsArrayRef() &&
+        !node->GetVar()->GetBase()->IsPointer() &&
+        node->GetVar()->GetType()->IsPointer())
+    {
+        EmitInst("POPVARIND");
+    }
+    else if (node->GetVar()->IsArrayRef() && 
         node->GetVar()->GetType()->ElementSize() == 1)
     {
         EmitInst("POPCVARIND");
@@ -126,11 +141,43 @@ void cCodeGen::Visit(cAssignExpr *node)
 void cCodeGen::Visit(cBinaryExpr *node)
 {
     node->GetLeft()->Visit(this);
+    //if (node->GetRight()->GetType()->ParentType()->IsPointer())
+    if (node->GetRight()->IsPointer() && 
+            !node->GetLeft()->IsPointer() &&
+            node->IsArithmetic())
+    {
+        EmitInst("PUSH " +
+                std::to_string(node->GetRight()->GetType()->ElementSize()));
+        EmitInst("TIMES");
+    }
+
     node->GetRight()->Visit(this);
+    //if (node->GetLeft()->GetType()->ParentType()->IsPointer())
+    if (node->GetLeft()->IsPointer() && 
+            !node->GetRight()->IsPointer() &&
+            node->IsArithmetic())
+    {
+        EmitInst("PUSH " +
+                std::to_string(node->GetLeft()->GetType()->ElementSize()));
+        EmitInst("TIMES");
+    }
     EmitInst(node->OpAsString());
 }
 //void cCodeGen::Visit(cDecl *node)               { VisitAllChildren(node); }
 //void cCodeGen::Visit(cDeclsList *node)          { VisitAllChildren(node); }
+void cCodeGen::Visit(cDoWhileStmt *node)
+{
+    EmitLineNumber(node);
+    std::string start_loop = GenerateLabel();
+    std::string end_loop = GenerateLabel();
+
+    EmitLabel(start_loop);
+    node->GetStmt()->Visit(this);
+    node->GetCond()->Visit(this);
+    EmitInst("JUMPE", end_loop);
+    EmitInst("JUMP", start_loop);
+    EmitLabel(end_loop);
+}
 //void cCodeGen::Visit(cExpr *node)               { VisitAllChildren(node); }
 
 void cCodeGen::Visit(cExprStmt *node)
@@ -169,11 +216,22 @@ void cCodeGen::Visit(cFuncCall *node)
     // Need to pop the args off the stack without affecting the return val
     if (node->GetParams() != NULL)
     {
+        if (node->GetType()->IsVoid())
+        {
+            EmitInst("ADJSP -" + std::to_string(node->GetParams()->Size()));
+        }
+        else
+        {
+            EmitInst("POPARGS " + std::to_string(node->GetParams()->Size()));
+        }
+
+        /*
         for (int ii=0; ii<node->GetParams()->Size()/WORD_SIZE; ii++)
         {
             EmitInst("SWAP");
             EmitInst("POP");
         }
+        */
     }
 }
 
@@ -301,17 +359,10 @@ void cCodeGen::Visit(cPostfixExpr *node)
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    if (var->IsPointer())
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), 
-                    new cIntExpr(var->GetType()->ElementSize()));
-    }
-    else
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
-    }
+    // NOTE: Used to adjust for sizeof item for pointer arithmetic,
+    // but cBinaryExpr now does that.
+    performOp = 
+        new cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     var->Visit(this);
     performOp->Visit(this);
@@ -322,6 +373,11 @@ void cCodeGen::Visit(cPostfixExpr *node)
         EmitInst("POPVARIND");
 }
 
+void cCodeGen::Visit(cPragma *node)
+{
+    EmitInst("#" + node->GetOp() + " " + node->GetArg());
+}
+
 void cCodeGen::Visit(cPrefixExpr *node)
 {
     cBinaryExpr *performOp;
@@ -329,17 +385,10 @@ void cCodeGen::Visit(cPrefixExpr *node)
     EmitLineNumber(node);
     cVarRef *var = node->GetExpr();
 
-    if (var->IsPointer())
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), 
-                    new cIntExpr(var->GetType()->ElementSize()));
-    }
-    else
-    {
-        performOp = new 
-            cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
-    }
+    // NOTE: Used to adjust for sizeof item for pointer arithmetic,
+    // but cBinaryExpr now does that.
+    performOp = 
+        new cBinaryExpr(node->GetExpr(), node->GetOp(), new cIntExpr(1));
 
     performOp->Visit(this);
 
@@ -502,6 +551,16 @@ void cCodeGen::Visit(cVarDecl *node)
         }
         EmitInst(".codeseg");
     }
+    else if (node->HasInit())
+    {
+        node->GetInit()->Visit(this);
+
+        if (node->GetType()->Size() == 1)
+            EmitInst("POPCVAR " + std::to_string(node->GetOffset()));
+        else
+            EmitInst("POPVAR " + std::to_string(node->GetOffset()));
+    }
+
 }
 
 //void cCodeGen::Visit(cVarRef *node)             { VisitAllChildren(node); }

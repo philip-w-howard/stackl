@@ -14,8 +14,10 @@
 #include "cSymbolTable.h"
 #include "cBaseDeclNode.h"
 #include "cPointerType.h"
+#include "cStructType.h"
 
 int cSymbol::totalSymbols = 0;              // total symbols created
+int cStructType::mSequence = 0;             // total unnamed structs
 cSymbolTable *symbolTableRoot;              // global symbol table
 
 //*******************************************
@@ -141,10 +143,5 @@ void cSymbolTable::InitDefaultTable()
     sym = new cSymbol("void");
     Insert(sym);
     sym->SetDecl(new cBaseDeclNode(sym, 1, true));
-
-    // Need a type for character constants
-    sym = new cSymbol("char*");
-    Insert(sym);
-    sym->SetDecl(new cPointerType(sym));
 }
 

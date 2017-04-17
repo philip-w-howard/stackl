@@ -28,12 +28,12 @@ Makefile?
 9) Pointer arithmetic
 10) void functions
 11) function call via function address
-12) Unused
+12) variable init on decl line
 13) Structs
 14) Mixing decls and statements
     #define
     global consts with initializers
-15) Unused
+15) do while test
 16) Unused
 17) sizeof
 18) Test return value of functions
@@ -58,7 +58,7 @@ Makefile?
 35) Pass address of struct to func
 36) Precedence of ###################
 37) Interrupts, pragmas, and the flag reg
-38) Unused
+38) Type casts
 39) Test that pre-inc doesn't mess up the stack
 40) Test trap handlers
 

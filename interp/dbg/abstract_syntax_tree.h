@@ -21,7 +21,10 @@ class abstract_syntax_tree
 {
 public:
     abstract_syntax_tree() {}
-    abstract_syntax_tree( const string& filename, uint32_t max_ip );
+    abstract_syntax_tree( const string& filename );
+    void add_ast( const string& filename );
+    void fixup_globals( unordered_map<string, int32_t>& global_offsets );
+
     string all_funcs();
     string all_locals( const string& func_name );
     string all_globals();
@@ -36,7 +39,7 @@ public:
 
 private:
 
-    void load( xml_document<char>& doc, uint32_t max_ip );
+    void load( xml_document<char>& doc );
 
     //key = symbol name, value = object with that name
     unordered_map<string, variable> _globals;

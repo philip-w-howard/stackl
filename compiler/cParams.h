@@ -39,10 +39,10 @@ class cParams : public cAstNode
         int size = 0;
         for (int ii=0; ii<NumChildren(); ii++)
         {
-            if ( GetParam(ii)->GetType()->IsArray())
+            //if ( GetParam(ii)->GetType()->IsArray())
                 size += cCodeGen::STACKL_WORD_SIZE;
-            else
-                size += GetParam(ii)->Size();
+            //else
+                //size += GetParam(ii)->Size();
         }
 
         return size;

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <unistd.h>     // for include path
+#include <limits.h>     // for include path
 
 #include "formatstr.h"
 #include "../version.h"
@@ -11,6 +13,8 @@
 #include "slasm.h"
 
 #define LINES_PER_HEADING 50
+
+static char g_Include_Path[PATH_MAX];
 
 static char g_Function[256] = "";
 static char g_Source_File[256] = "";
@@ -195,9 +199,9 @@ static void update_single_label(int label_index)
     g_Memory[mem_address] = label_address;
     if (g_Make_Listing)
     {
-        fprintf(g_Listing, "Fixup %s at %d to %d\n", 
-                g_Label_Refs[label_index].label, 
-                mem_address*sizeof(int32_t), label_address);
+        fprintf(g_Listing, "Fixup %s at %d to %d\n",
+                g_Label_Refs[label_index].label,
+                mem_address*(int32_t)sizeof(int32_t), label_address);
     }
 }
 
@@ -240,6 +244,33 @@ static int g_Files_Extent = 0;
 
 static void Add_File(char *filename)
 {
+    int ii;
+
+    char *ptr;
+    char path[PATH_MAX] = "";
+
+    if (*filename == '"')
+    {
+        ptr = strrchr(filename, '"');
+        if (ptr != NULL) *ptr = 0;
+        filename++;
+    }
+    else if (*filename == '<')
+    {
+        ptr = strrchr(filename, '>');
+        if (ptr != NULL) *ptr = 0;
+        filename++;
+        strcpy(path, g_Include_Path);
+    }
+
+    strcat(path, filename);
+
+    for (ii=0; ii<g_Num_Files; ii++)
+    {
+        // if the file is already in the list, don't re-add it.
+        if (strcmp(g_File_List[ii], path) == 0) return;
+    }
+
     if (g_Num_Files >= g_Files_Extent)
     {
         g_Files_Extent += 20;
@@ -247,8 +278,8 @@ static void Add_File(char *filename)
         assert(g_File_List != NULL);
     }
 
-    g_File_List[g_Num_Files] = (char*)malloc(strlen(filename)+1);
-    strcpy(g_File_List[g_Num_Files], filename);
+    g_File_List[g_Num_Files] = (char*)malloc(strlen(path)+1);
+    strcpy(g_File_List[g_Num_Files], path);
     g_Num_Files++;
 }
 
@@ -309,7 +340,7 @@ static void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "help") == 0)
             {
-                printf(HELP_STR);
+                printf("%s", HELP_STR);
                 exit(0);
             }
             else if (strcmp(arg, "dbg") == 0)
@@ -326,7 +357,7 @@ static void Process_Args(int argc, char **argv)
             else
             {
                 fprintf(stderr, "Unrecognized option %s\n", argv[ii]);
-                fprintf(stderr, HELP_STR);
+                fprintf(stderr, "%s", HELP_STR);
                 exit(-1);
             }
         }
@@ -351,6 +382,12 @@ static int32_t get_op_index(const char *op_name)
 
 static void store(int32_t value)
 {
+    if ((g_Data_Memory_Index + g_Memory_Index) > g_Memory_Size/4)
+    {
+        fprintf(stderr, "Execeeded stackl memory. Use -M to increase size\n");
+        exit(1);
+    }
+
     if (g_Use_Data)
         g_Data_Memory[g_Data_Memory_Index++] = value;
     else
@@ -442,6 +479,15 @@ static void process_pound_cmd(char *line)
             return;
         }
         strcpy(g_Startup, name);
+    }
+    else if (strncmp(line, "#library", strlen("#library")) == 0)
+    {
+        name = strtok(line, " \n");
+        name = strtok(NULL, " \n");
+        if (name != NULL && strlen(name)!=0)
+        {
+            Add_File(name);
+        }
     }
     else
     {
@@ -552,7 +598,7 @@ static char *make_filename(char *in_filename, const char *extension)
     int status;
 
     strcpy(out_filename, in_filename);
-    
+
     char *end_of_root = strstr(out_filename, ".sl");
     if (end_of_root != NULL)
         strcpy(end_of_root, extension);
@@ -577,7 +623,7 @@ static void write_output(char *in_filename)
 
     fprintf(bin_file, "stackl %s slasm\n", VERSION);
 
-    status = fprintf(bin_file, g_Header);
+    status = fprintf(bin_file, "%s", g_Header);
     if (status < 0)
     {
         fprintf(stderr, "Unable to create output file\n");
@@ -639,7 +685,7 @@ static void write_symbol_table(FILE *listing)
     {
         label_address = g_Label_Defs[ii].offset;
         if (g_Label_Defs[ii].is_data) label_address += g_Memory_Index;
-        fprintf(listing, "%6d   %s\n", 
+        fprintf(listing, "%6d   %s\n",
                 label_address*word_size, g_Label_Defs[ii].label);
     }
 }
@@ -650,6 +696,7 @@ static int process_file(char *filename, FILE *listing)
     char  line[1000];
     char *comment;
 
+    //printf("Processing: %s\n", filename);
     input = fopen(filename, "r");
     if (input == NULL)
     {
@@ -669,7 +716,7 @@ static int process_file(char *filename, FILE *listing)
         comment = strchr(line, ';');
         if (comment != NULL) *comment = 0;
 
-        if (line[0] == '.') 
+        if (line[0] == '.')
             process_dot_cmd(line);
         else if (line[0] == '#')
             process_pound_cmd(line);
@@ -682,8 +729,8 @@ static int process_file(char *filename, FILE *listing)
     fclose(input);
 
     // append the data memory to the actual memory
-    memcpy(&g_Memory[g_Memory_Index], 
-            g_Data_Memory, 
+    memcpy(&g_Memory[g_Memory_Index],
+            g_Data_Memory,
             g_Data_Memory_Index*sizeof(int32_t));
 
     // fix-up the label references
@@ -713,7 +760,7 @@ static void update_single_vector(int offset, const char *name)
 
     label_def = get_label_def(name);
 
-    if (label_def == NULL) 
+    if (label_def == NULL)
     {
         fprintf(stderr, "Undefined label: %s\n", name);
         exit(1);
@@ -725,8 +772,8 @@ static void update_single_vector(int offset, const char *name)
     g_Memory[offset] = label_address;
     if (g_Make_Listing)
     {
-        fprintf(g_Listing, "Fixup %s at %d to %d\n", 
-                name, offset*sizeof(int32_t), label_address);
+        fprintf(g_Listing, "Fixup %s at %d to %d\n",
+                name, offset*(int32_t)sizeof(int32_t), label_address);
     }
 }
 static void update_vectors()
@@ -757,6 +804,25 @@ static void update_vectors()
     }
 }
 
+// set the include path to be the same as the directory where the EXE is.
+void set_include_path()
+{
+    char *ptr;
+
+    if (readlink("/proc/self/exe", g_Include_Path, PATH_MAX) == -1)
+    {
+        strcpy(g_Include_Path, "");
+    }
+
+    ptr = strrchr(g_Include_Path, '/');
+    if (ptr != NULL)
+    {
+        ptr++;
+        *ptr = 0;
+    }
+    strcat(g_Include_Path, "library/");
+}
+
 int main(int argc, char** argv)
 {
     FILE *input;
@@ -764,11 +830,13 @@ int main(int argc, char** argv)
     char *comment;
     int ii;
 
+    set_include_path();
+
     Process_Args(argc, argv);
 
     if (g_Num_Files == 0)
     {
-        printf(HELP_STR);
+        printf("%s", HELP_STR);
         exit(1);
     }
 
@@ -800,13 +868,16 @@ int main(int argc, char** argv)
         }
     }
 
-    g_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
-    g_Data_Memory = (int32_t *)malloc(g_Memory_Size/sizeof(int32_t));
+    g_Memory = (int32_t *)malloc(g_Memory_Size);
+    g_Data_Memory = (int32_t *)malloc(g_Memory_Size);
     if (g_Memory == NULL || g_Data_Memory == NULL)
     {
         fprintf(stderr, "Out of memory\n");
         exit(1);
     }
+
+    memset(g_Memory, 0xDF, g_Memory_Size);
+    memset(g_Data_Memory, 0xBA, g_Memory_Size);
 
     // leave room for vector table and startup jump
     g_Memory_Index = 4;
@@ -822,17 +893,16 @@ int main(int argc, char** argv)
 
     write_output(g_File_List[0]);
 
-    if (g_Make_Listing) 
+    if (g_Make_Listing)
     {
         write_symbol_table(g_Listing);
         fclose(g_Listing);
     }
 
-    if (g_Make_Debug_Listing) 
+    if (g_Make_Debug_Listing)
     {
         write_symbol_table(g_Debug_Listing);
         fclose(g_Debug_Listing);
     }
     return 0;
 }
-//#stackl V0.10.1-dev

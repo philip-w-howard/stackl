@@ -18,6 +18,7 @@ set<string> variable::builtins(
 {
     "char",
     "int",
+    "void",
 } );
 
 variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
@@ -75,6 +76,7 @@ void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, s
         }
         else
         {
+            fprintf(stderr, "We don't know the variable type\n");
             //we don't know what type it is?
             //kernel_panic();
             //throw "a flotation device";
@@ -254,7 +256,8 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
     }
     else if( is_pointer() && !is_array() )
     {
-        return pre + string_utils::to_hex( Get_Word( cpu, total_offset( cpu ) ) );
+        //return pre + string_utils::to_hex( Get_Word( cpu, total_offset( cpu ) ) );
+        return pre + std::to_string( Get_Word( cpu, total_offset( cpu ) ) );
     }
     else if( is_array() )
     {
@@ -274,7 +277,8 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
         {
             size_t index_size = _size / _array_ranges[0];
             for( uint32_t i = 0; i < _array_ranges[0]; ++i )
-                pre += tabs + '\t' + string_utils::to_hex( total_offset( cpu ) + ( i * index_size ) ) + ",\n";
+                //pre += tabs + '\t' + string_utils::to_hex( total_offset( cpu ) + ( i * index_size ) ) + ",\n";
+                pre += tabs + '\t' + std::to_string( total_offset( cpu ) + ( i * index_size ) ) + ",\n";
         }
         return pre + tabs + "}";
     }

@@ -1,6 +1,6 @@
 // Test copying data over from struct to struct
 #include <string.h>
-#include "test/io.h"
+#include <sysio.h>
 
 #define NULL 0
 

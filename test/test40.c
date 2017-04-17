@@ -1,6 +1,6 @@
 // test the syscall interface
 
-#include "machine_def.h"
+#include <machine_def.h>
 
 #define EXIT_CALL 1
 #define PRINTS_CALL 2

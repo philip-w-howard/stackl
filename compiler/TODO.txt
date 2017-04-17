@@ -23,6 +23,4 @@ const optimizations
 
 redo test suite
 
-allow structs separate from typedef?
-
 static vars at global and local level

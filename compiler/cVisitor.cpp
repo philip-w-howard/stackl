@@ -32,8 +32,10 @@ void cVisitor::Visit(cAssignExpr *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cAstNode *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cBaseDeclNode *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cBinaryExpr *node)         { VisitAllChildren(node); }
+void cVisitor::Visit(cCastExpr *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cDecl *node)               { VisitAllChildren(node); }
 void cVisitor::Visit(cDeclsList *node)          { VisitAllChildren(node); }
+void cVisitor::Visit(cDoWhileStmt *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cExpr *node)               { VisitAllChildren(node); }
 void cVisitor::Visit(cExprStmt *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cForStmt *node)            { VisitAllChildren(node); }
@@ -47,6 +49,7 @@ void cVisitor::Visit(cPlainVarRef *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cPointerDeref *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cPointerType *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cPostfixExpr *node)        { VisitAllChildren(node); }
+void cVisitor::Visit(cPragma *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cPrefixExpr *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cReturnStmt *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cShortCircuitExpr *node)   { VisitAllChildren(node); }
@@ -59,6 +62,7 @@ void cVisitor::Visit(cStructRef *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cStructType *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cSymbol *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cTypeDecl *node)           { VisitAllChildren(node); }
+void cVisitor::Visit(cTypedef *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cUnaryExpr *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cVarDecl *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cVarRef *node)             { VisitAllChildren(node); }

@@ -21,7 +21,7 @@ class cPointerDeref : public cVarRef
         }
     }
 
-    cExpr* GetBase()             { return (cExpr*)GetChild(0); }
+    virtual cExpr* GetBase()     { return (cExpr*)GetChild(0); }
     virtual cTypeDecl* GetType() { return GetBase()->GetType()->ParentType(); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }

@@ -95,126 +95,6 @@ void MemCpy(int32_t addr, char *sptr)
     Set_Byte(&cpu, addr, *sptr);
 }
 
-//***************************************
-//int Load(Machine_State *cpu, const char *filename, int base, int top)
-int Load_Text(const char *filename)
-{
-    int32_t base;
-    int32_t top;
-    int32_t loc;
-    int32_t value;
-    char record_type[20];
-    char string[256];
-    char *sptr;
-    int32_t  slen;
-
-    fprintf(stderr, "Load_Text is no longer supported\n");
-    exit(1);
-
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-    base = cpu.BP;
-    top  = cpu.LP;
-
-    int32_t byte = base;
-    int32_t max_byte = byte;
-    FILE *input = fopen(filename, "r");
-
-    if (input == NULL) 
-    {
-        strcpy(string, filename);
-        strcat(string, ".sl");
-        input = fopen(string, "r");
-        if (input == NULL) return 0;
-    }
-
-    fscanf(input, "%s", record_type);
-
-    while (!feof(input) && record_type[0] != 'X')
-    {
-        switch (record_type[0])
-        {
-            case 'D':
-                fscanf(input, "%d %d", &byte, &value);
-                byte += base;
-                DEBUG(byte, "D: %d", value);
-                Set_Word(&cpu, byte, value);
-                byte += WORD_SIZE;
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
-                {
-                    fprintf(stderr, "Memory overflow while loading\n");
-                    exit(-1);
-                }
-                break;
-            case 'F':
-                fscanf(input, "%d %d", &loc, &value);
-                loc += base;
-                DEBUG(loc, "F: %d", value);
-                if (loc >= max_byte)
-                {
-                    fprintf(stderr, "File format error: fixup record precedes data: %d %d\n", loc, max_byte);
-                    exit(-1);
-                }
-                Set_Word(&cpu, loc, value);
-                break;
-            case 'G':
-                fscanf(input, "%d %s %d", &byte, string, &slen);
-                byte += base;
-                DEBUG(byte, "G: %s %d %d", string, byte, slen);
-                while (slen > 0)
-                {
-                    Set_Word(&cpu, byte, value);
-                    byte += WORD_SIZE;
-                    slen -= WORD_SIZE;
-                }
-
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
-                {
-                    fprintf(stderr, "Memory overflow while loading\n");
-                    exit(-1);
-                }
-                break;
-            case 'S':
-                fscanf(input, "%d", &byte);
-                byte += base;
-                fgets(string, sizeof(string), input);
-                DEBUG(byte, "S: %s", input);
-                slen = strlen(string);
-                if (string[slen - 1] != '\n')
-                {
-                    fprintf(stderr, "File format error: string longer than MAX string size\n");
-                    exit(-1);
-                }
-
-                sptr = format_string(string);
-                slen = strlen(sptr);
-
-                MemCpy(byte, sptr);
-                byte += ((slen + WORD_SIZE)/WORD_SIZE)*WORD_SIZE;
-                max_byte = max_byte>byte ? max_byte : byte;
-                if (max_byte > top)
-                {
-                    fprintf(stderr, "Memory overflow while loading\n");
-                    exit(-1);
-                }
-
-                break;
-            case 'C':
-                fgets(string, sizeof(string), input);
-                break;
-
-            default:
-                fprintf(stderr, "File format error: Unrecognized record type\n");
-                break;
-        }
-        fscanf(input, "%s", record_type);
-    }
-
-    return max_byte;
-}
-
 //*************************************************
 // Load a binary file (.slb)
 int Load(const char *filename, int boot)
@@ -227,6 +107,7 @@ int Load(const char *filename, int boot)
     char string[256];
     char *token;
     const char *delims = " \n";
+    int stack_size = 1000;
 
     Machine_State cpu;
     Get_Machine_State(&cpu);
@@ -264,21 +145,31 @@ int Load(const char *filename, int boot)
             char *version = strtok(NULL, delims);
             compare_version(version);
         }
-        else if (boot && strcmp(token, "pio_term") == 0)
+        else if (boot && strcmp(token, "feature") == 0)
         {
-            PIO_T_Init();
+            token = strtok(NULL, delims);
+            if (boot && strcmp(token, "pio_term") == 0)
+            {
+                PIO_T_Init();
+            }
+            else if (boot && strcmp(token, "dma_term") == 0)
+            {
+                DMA_T_Init();
+            }
+            else if (boot && strcmp(token, "disk") == 0)
+            {
+                Disk_Init();
+            }
+            else if (boot && strcmp(token, "inp") == 0)
+            {
+                IO_Enable_Inp();
+            }
         }
-        else if (boot && strcmp(token, "dma_term") == 0)
+        else if (strcmp(token, "stack_size") == 0)
         {
-            DMA_T_Init();
-        }
-        else if (boot && strcmp(token, "disk") == 0)
-        {
-            Disk_Init();
-        }
-        else if (boot && strcmp(token, "inp") == 0)
-        {
-            IO_Enable_Inp();
+            token = strtok(NULL, delims);
+            if (token != NULL) stack_size = atoi(token);
+            if (stack_size < 0) stack_size = 0;
         }
     }
 
@@ -294,6 +185,9 @@ int Load(const char *filename, int boot)
             exit(-1);
         }
     }
+
+    // set the requested stack size in the first word above the code
+    Set_Word(&cpu, addr, stack_size);
 
     dbg_load_info( &cpu, filename );
     Set_Debug_Info( cpu.debugger );

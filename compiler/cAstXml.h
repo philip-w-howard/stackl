@@ -57,6 +57,7 @@ class cAstXml : public cVisitor
         virtual void Visit(cStructType *node);
         virtual void Visit(cSymbol *node);
         virtual void Visit(cTypeDecl *node);
+        virtual void Visit(cTypedef *node);
         virtual void Visit(cUnaryExpr *node);
         virtual void Visit(cVarDecl *node);
         virtual void Visit(cVarRef *node);
@@ -67,4 +68,6 @@ class cAstXml : public cVisitor
         void DefaultVisit(cAstNode *node, 
                 std::string name, 
                 std::string attr = std::string(""));
+
+        std::string EscapeBrackets(std::string text);
 };
