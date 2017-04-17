@@ -214,7 +214,7 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
         throw "Cannot index pointer on more than one dimension.";
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
-    addr += indexes[0] * sizeof( int32_t );
+    addr += indexes[0] * _size;
 
     if( !_global ) //if it's a local variable then return locality to the offset
         addr -= cpu->FP;
