@@ -71,5 +71,5 @@ private:
     vector<size_t> _array_ranges; //.size() = 0 if its not an array, >0 if it is. each index is the range of that array level
     struct_decl* _struct_decl = nullptr; //nullptr if its not a struct, otherwise it points to the structs decl
 
-    static set<string> builtins;
+    static unordered_map<string, size_t> builtins;
 };

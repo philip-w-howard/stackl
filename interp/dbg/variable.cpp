@@ -14,11 +14,11 @@ extern "C"
     #include "../vmem.h"
 }
 
-set<string> variable::builtins(
+unordered_map<string, size_t> variable::builtins(
 {
-    "char",
-    "int",
-    "void",
+    { "char", 1 },
+    { "int", 4 },
+    { "void", 4 }
 } );
 
 variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
@@ -52,8 +52,6 @@ void variable::parse_base_decl( xml_node<char>* node )
 
 void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context )
 {
-    _size = sizeof( int32_t ); //I think?
-
     string pointer_type = node->first_node( "Symbol" )->first_attribute( "name" )->value();
 
     //count the number of asterisks, that's our indirection level
@@ -63,7 +61,8 @@ void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, s
     //and that's the type
     _type = pointer_type;
 
-    if( builtins.find( _type ) == builtins.end() ) //if the type is not a builtin type
+    auto builtin_iter = builtins.find( _type );
+    if( builtin_iter == builtins.end() ) //if the type is not a builtin type
     {
         auto global_type = global_type_context.find( _type );
         if( global_type != global_type_context.end() )
@@ -85,6 +84,10 @@ void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, s
             //new uint64_t[SIZE_MAX]; -> does the user have 34.35 gigs of ram quick and easy test
         }
         _size = _struct_decl->size();
+    }
+    else
+    {
+        _size = builtin_iter->second;
     }
 }
 
@@ -216,7 +219,7 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
         throw "Cannot index pointer on more than one dimension.";
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
-    addr += indexes[0] * sizeof( int32_t );
+    addr += indexes[0] * _size;
 
     if( !_global ) //if it's a local variable then return locality to the offset
         addr -= cpu->FP;
@@ -268,7 +271,7 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
             //iterate over the first dimension of our array
             for( uint32_t i = 0; i < _array_ranges[0]; ++i )
             {
-                idx[0] = i;
+                idx[0] = i; //use our 'from_indexes' function to ask the variable for itself[i]
                 pre += from_indexes( idx, cpu ).to_string( cpu, indent_level + 1 ) + ",\n";
             }
             pre.erase( pre.end() - 2 ); //remove the last comma and newline
