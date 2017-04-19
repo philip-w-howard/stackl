@@ -22,12 +22,11 @@ public:
 
 	string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
 	inline size_t size() const { return _size; }
-	inline string name() const { return _name; }
-        variable* var( const string& var_name );
+    inline string name() const { return _name; }
+    variable* var( const string& var_name );
 
 private:
 	vector<variable> _fields;
 	size_t _size = 0;
 	string _name;
 };
-

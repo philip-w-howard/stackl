@@ -16,7 +16,7 @@ function::function( xml_node<char>* func_decl_node, unordered_map<string, struct
 
 	load_locals( func_decl_node->first_node( "StmtsList" ), type_context ); //start recursive search for local vars
 }
-#include <iostream>
+
 variable* function::var( const string & var_name )
 {
     auto res = _locals.find( var_name );

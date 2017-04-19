@@ -61,18 +61,12 @@ void abstract_syntax_tree::load( xml_document<char>& doc )
             if( strcmp( type->name(), "StructType" ) == 0 )
             {
                 struct_decl decl( type, _struct_decls );
-
-                // constructor inserts the decl to handle forward refs
-                //_struct_decls[decl.name()] = decl;
             }
 
         }
         else if( strcmp( node->name(), "StructType" ) == 0 )
         {
             struct_decl decl( node, _struct_decls );
-
-            // constructor inserts the decl to handle forward refs
-            //_struct_decls[decl.name()] = decl;
         }
         else if( strcmp( node->name(), "VarDecl" ) == 0 )
         {

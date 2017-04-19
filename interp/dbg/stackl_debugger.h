@@ -15,10 +15,14 @@ using std::find;
 using std::ifstream;
 #include <unordered_map>
 using std::unordered_map;
+#include <chrono>
+using std::chrono::high_resolution_clock;
+using std::chrono::milliseconds;
+using std::chrono::duration;
+using std::chrono::duration_cast;
 
 #include"string_utils.h"
 #include "../machine.h"
-
 
 class stackl_debugger
 {
@@ -47,7 +51,8 @@ private:
 		BREAK_NEXT_OP,
 		STEP_OVER,
 		STEP_INTO,
-		RESUME_EXECUTING
+		RESUME_EXECUTING,
+        TIMER
 	};
 
 	void set_flag( FLAG state, bool value );
@@ -100,6 +105,8 @@ private:
 	void opcode_debug_mode();
 	//gets the function that acts as the entry point of the program
 	string get_init_func( Machine_State* cpu ) const;
+    //gets a map of the watched variables that changed.
+    unordered_map<string, string> changed_watches( Machine_State* cpu );
 
 	//this function populates the _commands field.
 	void load_commands();
@@ -138,6 +145,7 @@ private:
 	void cmd_backtrace( string& params, Machine_State* cpu );
 	void cmd_up( string& params, Machine_State* cpu );
 	void cmd_down( string& params, Machine_State* cpu );
+    void cmd_timer( string& params, Machine_State* cpu );
 
 	string _binary_name = ""; //the name of the current binary being debugged
 	vector<uint32_t> _break_points; //list of instruction pointers to break at
@@ -161,4 +169,6 @@ private:
 	string _failure_reason; //the reason the debugger couldn't load. This is empty if the debugger loaded successfully.
 
 	uint64_t _flags = 0; //the flags of the debugger itself
+
+    high_resolution_clock::time_point _start_time;
 };

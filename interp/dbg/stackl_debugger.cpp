@@ -121,6 +121,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_backtrace, { "backtrace", "callstack", "bt" }, "- Prints the callstack.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "- Moves the framepointer up one context.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
 }
 
 void stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -240,9 +241,9 @@ void stackl_debugger::cmd_print( string& params, Machine_State* cpu )
     {
         cout << var_to_string( cpu, params ) << '\n';
     }
-    catch( const char* err )
+    catch( const exception& err )
     {
-        cout << err << '\n';
+        cout << err.what() << '\n';
     }
 }
 
@@ -502,10 +503,11 @@ void stackl_debugger::cmd_watch( string& params, Machine_State* cpu )
     {
         string name = params;
         _watches[name] = var_to_string( cpu, params );
+        cout << name <<  " is now being watched.\n";
     }
-    catch( const char* err )
+    catch( const exception& err )
     {
-        cout << err << '\n';
+        cout << err.what() << '\n';
     }
 }
 
@@ -592,6 +594,12 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
     string cur_file = _lst.current_file( cpu->IP );
     cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+}
+
+void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
+{
+    set_flag( TIMER, !get_flag( TIMER ) );
+    cout << "Timer enabled.\n";
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
@@ -714,7 +722,6 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
         var_text.erase( 0, 1 );
     }
 
-
     vector<string> var_fields = string_utils::string_split( var_text, '.' );
 
     uint32_t indirection = string_utils::strip_indirection( var_fields[0] );
@@ -722,12 +729,11 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
 
     if( var == nullptr )
-        throw "Variable not found in current scope";
+        throw runtime_error( "Variable not found in current scope" );
 
     variable res = var->from_indexes( indexes, cpu );
     res = res.deref( indirection, cpu );
 
-    int32_t total_offset = res.offset();
     for( uint32_t i = 1; i < var_fields.size(); ++i )
     {
         if( res.is_struct() ) //the guy left of the '.' operator
@@ -740,20 +746,16 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
             var = res.decl()->var( var_fields[i] );
 
             if( var == nullptr )
-                throw ( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." ).c_str();
+                throw runtime_error( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." );
 
-            res = var->from_indexes( indexes, cpu );
+            variable temp = *var; //make a variable of the guy on the right and make sure his offset is correct
+            temp.offset( temp.offset() + res.offset() );
+
+            res = temp.from_indexes( indexes, cpu );
             res = res.deref( indirection, cpu );
-
-            total_offset += res.offset();
         }
-        else
-        {
-            throw ( string( "'" ) + res.definition() + "' is not a struct type." ).c_str();
-        }
+        else throw runtime_error( string( "'" ) + res.definition() + "' is not a struct type." );
     }
-
-    res.offset( total_offset ); //modify its offset by the total dist from the FP
 
     if( address_of )
         return std::to_string( res.total_offset( cpu ) );
@@ -773,10 +775,25 @@ void stackl_debugger::debug_check( Machine_State* cpu )
         }
         else
         {
+            for( const auto& pair : changed_watches( cpu ) )
+            {
+                cout << "Watch on '" << pair.first << "' triggered.\n";
+                cout << '\t' << pair.second << '\n';
+                _watches[pair.first] = pair.second;
+            }
+
             string cur_file = _lst.current_file( cpu->IP );
 	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+            if( get_flag( TIMER ) )
+            {
+                duration<float> dur = high_resolution_clock::now() - _start_time;
+                milliseconds ms = duration_cast<milliseconds>( dur );
+                cout << ms.count() << "ms elapsed.\n";
+            }
             cout << get_nearby_lines( cpu->IP, 0);
+
         }
+
 	    query_user( cpu );
 
         if( !_context_history.empty() ) //if the user ran an 'up' command but didn't move back down
@@ -850,6 +867,8 @@ void stackl_debugger::query_user( Machine_State* cpu )
         else continue; //otherwise prompt for input again
     }
     set_flag( DEBUGGING, false );
+    if( get_flag( TIMER ) )
+        _start_time = high_resolution_clock::now();
 }
 
 bool stackl_debugger::should_break( Machine_State* cpu )
@@ -885,29 +904,26 @@ bool stackl_debugger::should_break( Machine_State* cpu )
     }
     else if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
         return true;
-    else if( !_watches.empty() )
-    {
-        bool changed = false;
-        for( const auto& pair : _watches )
-        {
-            string var_name = pair.first;
-            try
-            {
-                string res = var_to_string( cpu, var_name );
-                if( res != pair.second )
-                {
-                    _watches[pair.first] = res;
-                    cout << "\tWatch on variable '" << pair.first << "' triggered.\n";
-                    cout << '\t' << res << '\n';
-                    changed = true;
-                }
-            }
-            catch( ... ) {}
-        }
-        if( changed )
-            return true;
-    }
+    else if( !_watches.empty() && !changed_watches( cpu ).empty() )
+        return true;
     return false; //otherwise dont break
+}
+
+unordered_map<string, string> stackl_debugger::changed_watches( Machine_State* cpu )
+{
+    unordered_map<string, string> ret;
+    for( const auto& pair : _watches )
+    {
+        string var_name = pair.first;
+        try
+        {
+            string res = var_to_string( cpu, var_name );
+            if( res != pair.second )
+                ret[pair.first] = res;
+        }
+        catch( ... ) {}
+    }
+    return ret;
 }
 
 string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
