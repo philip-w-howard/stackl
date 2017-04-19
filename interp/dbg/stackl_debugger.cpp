@@ -598,8 +598,16 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
 {
-    set_flag( TIMER, !get_flag( TIMER ) );
-    cout << "Timer enabled.\n";
+    if( get_flag( TIMER ) )
+    {
+        set_flag( TIMER, false );
+        cout  << "Timer disabled.\n";
+    }
+    else
+    {
+        set_flag( TIMER, true );
+        cout << "Timer enabled.\n";
+    }
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
