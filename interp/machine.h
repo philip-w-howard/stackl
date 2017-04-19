@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #define MACHINE_CHECK_VECTOR    0
+#define HW_INTERRUPT_VECTOR     0
 #define TRAP_VECTOR             1
 
 typedef void* debug_info;

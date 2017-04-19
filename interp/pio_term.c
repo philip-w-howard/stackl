@@ -39,7 +39,8 @@ static void set_nonblock(int nonblock)
     if (nonblock)
     {
         //turn off canonical mode
-        ttystate.c_lflag &= ~(ICANON | ECHO);
+        //ttystate.c_lflag &= ~(ICANON | ECHO);
+        ttystate.c_lflag &= ~ICANON;
         //minimum of number input read.
         ttystate.c_cc[VMIN] = 1;
     }

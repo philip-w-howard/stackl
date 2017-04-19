@@ -134,6 +134,12 @@ static void interrupt(Machine_State *cpu, int is_trap)
 
         // turn off pending bit for HW interrupts
         cpu->FLAG &= ~(FL_I_FIRST_INT << vector);
+
+        // if IVEC not set, use ISR at offset zero
+        if (cpu->IVEC == 0)
+        {
+            vector = HW_INTERRUPT_VECTOR;
+        }
     }
 
     push(cpu, cpu->SP);
