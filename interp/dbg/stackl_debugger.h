@@ -107,6 +107,10 @@ private:
 	string get_init_func( Machine_State* cpu ) const;
     //gets a map of the watched variables that changed.
     unordered_map<string, string> changed_watches( Machine_State* cpu );
+    //given what the user typed in, what's the text of the command they want to run
+    string command_from_input( const string& input );
+    //given what the user typed in, what's the text parameters to the command they want to run
+    string params_from_input( const string& input );
 
 	//this function populates the _commands field.
 	void load_commands();

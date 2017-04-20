@@ -122,6 +122,12 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "- Moves the framepointer up one context.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
+
+    const size_t size = _commands.size();
+    for( size_t i = 0; i < size; ++i )
+        for( size_t j = i + 1; j < size; ++j ) //slight optimization by only checking i+1, since previous values have already been compared.
+            if( i != j && _commands[i].has_same_name( _commands[j] ) )
+                throw runtime_error( _commands[i].to_string() + " has the same name as " + _commands[j].to_string() );
 }
 
 void stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -744,25 +750,24 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
 
     for( uint32_t i = 1; i < var_fields.size(); ++i )
     {
-        if( res.is_struct() ) //the guy left of the '.' operator
-        {
-            //strip ending brackets and asterisks to get the 'true' var name
-            indirection = string_utils::strip_indirection( var_fields[i] );
-            indexes = string_utils::strip_array_indexes( var_fields[i] );
+        if( !res.is_struct() ) //the struct left of the '.' operator
+            throw runtime_error( string( "'" ) + res.definition() + "' is not a struct type." );
 
-            //ask the type of the left for the variable object of the guy on the right
-            var = res.decl()->var( var_fields[i] );
+        //strip ending brackets and asterisks to get the 'true' var name
+        indirection = string_utils::strip_indirection( var_fields[i] );
+        indexes = string_utils::strip_array_indexes( var_fields[i] );
 
-            if( var == nullptr )
-                throw runtime_error( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." );
+        //ask the type of the left for the variable object of the guy on the right
+        var = res.decl()->var( var_fields[i] );
 
-            variable temp = *var; //make a variable of the guy on the right and make sure his offset is correct
-            temp.offset( temp.offset() + res.offset() );
+        if( var == nullptr )
+            throw runtime_error( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." );
 
-            res = temp.from_indexes( indexes, cpu );
-            res = res.deref( indirection, cpu );
-        }
-        else throw runtime_error( string( "'" ) + res.definition() + "' is not a struct type." );
+        variable temp = *var; //make a variable of the field on the right and make sure his offset is correct
+        temp.offset( temp.offset() + res.offset() );
+
+        res = temp.from_indexes( indexes, cpu );
+        res = res.deref( indirection, cpu );
     }
 
     if( address_of )
@@ -777,29 +782,27 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 
     if( should_break( cpu ) )
     {
-        if( get_flag( OPCODE_DEBUG ) )
+        for( const auto& pair : changed_watches( cpu ) )
         {
-            cout << "Breakpoint hit on instruction " << opcode_to_string( cpu->IP, cpu ) << '\n';
+            cout << "Watch on '" << pair.first << "' triggered.\n";
+            cout << '\t' << pair.second << '\n';
+            _watches[pair.first] = pair.second;
         }
-        else
-        {
-            for( const auto& pair : changed_watches( cpu ) )
-            {
-                cout << "Watch on '" << pair.first << "' triggered.\n";
-                cout << '\t' << pair.second << '\n';
-                _watches[pair.first] = pair.second;
-            }
 
+        if( !get_flag( OPCODE_DEBUG ) )
+        {
             string cur_file = _lst.current_file( cpu->IP );
 	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
-            if( get_flag( TIMER ) )
-            {
-                duration<float> dur = high_resolution_clock::now() - _start_time;
-                milliseconds ms = duration_cast<milliseconds>( dur );
-                cout << ms.count() << "ms elapsed.\n";
-            }
             cout << get_nearby_lines( cpu->IP, 0);
+        }
+        else
+            cout << "Breakpoint hit on instruction " << opcode_to_string( cpu->IP, cpu ) << '\n';
 
+        if( get_flag( TIMER ) )
+        {
+            duration<float> dur = high_resolution_clock::now() - _start_time;
+            milliseconds ms = duration_cast<milliseconds>( dur );
+            cout << ms.count() << "ms elapsed.\n";
         }
 
 	    query_user( cpu );
@@ -813,11 +816,34 @@ void stackl_debugger::debug_check( Machine_State* cpu )
     }
 }
 
+string stackl_debugger::command_from_input( const string& input )
+{
+    //commands are always one word
+    size_t idx = input.find_first_of( ' ' );
+    if( idx == string::npos )
+        return input;
+    else
+        return input.substr( 0, idx );
+}
+
+string stackl_debugger::params_from_input( const string& input )
+{
+    //commands are always one word
+    size_t idx = input.find_first_of( ' ' );
+    if( idx != string::npos )
+    {
+        string params = input.substr( idx + 1 );
+        string_utils::ltrim( params );
+        return params;
+    }
+    else return "";
+}
+
 void stackl_debugger::query_user( Machine_State* cpu )
 {
     string input;
     set_flag( DEBUGGING, true );
-    while( true )
+    while( !get_flag( RESUME_EXECUTING ) )
     {
         cout << "(dbg) ";
         getline( cin, input );
@@ -830,20 +856,8 @@ void stackl_debugger::query_user( Machine_State* cpu )
         else
             _prev_cmd = input;
 
-        //commands are always one word
-        size_t idx = input.find_first_of( ' ' );
-        string cmd_txt, params;
-        if( idx == string::npos )
-        {
-            cmd_txt = input;
-            params = "";
-        }
-        else
-        {
-            cmd_txt = input.substr( 0, idx );
-            params = input.substr( idx + 1 );
-            string_utils::ltrim( params );
-        }
+        string cmd_txt = command_from_input( input );
+        string params = params_from_input( input );
 
         bool ran = false;
         //look at every command object and determine which one the user asked for
@@ -852,29 +866,22 @@ void stackl_debugger::query_user( Machine_State* cpu )
             if( command.called_by( cmd_txt ) )
             {
                 if( get_flag( OPCODE_DEBUG ) && !command.allowed_in_opcode_mode() )
-                {
                     cout << "You can't run this command without debug files available.\n";
-                    break;
-                }
                 else
                 {
                     command.run( params, cpu );
                     ran = true;
-                    break; //stop iterating once we find our command
                 }
+                break; //stop checking for more commands once we find it
             }
         }
 
         if( !ran ) //if res wasn't modified
             cout << "Unknown command.\n";
-        else if( get_flag( RESUME_EXECUTING ) )
-        {
-            set_flag( RESUME_EXECUTING, false );
-            break;
-        }
-        else continue; //otherwise prompt for input again
     }
+
     set_flag( DEBUGGING, false );
+    set_flag( RESUME_EXECUTING, false ); //if we get here we've already dropped out of the while loop
     if( get_flag( TIMER ) )
         _start_time = high_resolution_clock::now();
 }
@@ -937,7 +944,7 @@ unordered_map<string, string> stackl_debugger::changed_watches( Machine_State* c
 string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
 {
     string cur_file = _lst.current_file( cur_addr );
-    int cur_line = (int)_lst.line_of_addr( cur_file, cur_addr );
+    int32_t cur_line = (int32_t)_lst.line_of_addr( cur_file, cur_addr );
     string ret = "";
     string line;
     ifstream file;

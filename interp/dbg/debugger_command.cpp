@@ -29,3 +29,11 @@ string debugger_command::to_string() const
     ret += "] " + _help;
     return ret;
 }
+
+bool debugger_command::has_same_name( const debugger_command& cmd ) const
+{
+    for( const string& name : _names )
+        if( cmd.called_by( name ) )
+            return true;
+    return false;
+}
