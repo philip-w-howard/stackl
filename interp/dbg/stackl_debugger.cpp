@@ -65,8 +65,17 @@ void stackl_debugger::check_compile_time( const char* filename )
 {
     struct stat attrib;
     stat( filename, &attrib );
-    //if( attrib.st_mtime > _ast.compile_time() )
-    //    throw runtime_error( "Debug files out of date." );
+    //20 second window. If the compile takes longer than this, it'll think the files are out of date.
+    //But it'll just prompt the user at that point.
+    if( attrib.st_mtime > _ast.compile_time() + 20 )
+    {
+        char c;
+        cout << "Debug files for " << filename << " are out of date. Continue anyways? [y/n] ";
+        cin.get( c );
+        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+        if( c == 'n' )
+            throw runtime_error( string( "Debug files for " ) + filename + " out of date." );
+    }
 }
 
 bool stackl_debugger::file_exists( const string& filename )
