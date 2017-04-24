@@ -46,10 +46,10 @@ class cFuncCall : public cVarRef
             // FIX THIS: need to check types is some meaningful way
             // Allow ptr <--> int and char <--> int, but disallow 
             // every other difference
-            /*
             for (int ii=0; ii<args->NumChildren(); ii++)
             {
-                if (args->GetDecl(ii)->GetType() !=
+                if (!cTypeDecl::IsCompatibleWith(
+                            args->GetDecl(ii)->GetType(), 
                             params->GetParam(ii)->GetType()))
                 {
                     ThrowSemanticError("Argument " + std::to_string(ii+1) +
@@ -57,7 +57,6 @@ class cFuncCall : public cVarRef
                     return;
                 }
             }
-            */
         }
     }
 

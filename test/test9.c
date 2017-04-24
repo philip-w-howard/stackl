@@ -27,9 +27,9 @@ int main()
             if (*ptr++ != data[ii]) 
             {
                 prints("pointer error ");
-                printi(ptr);
+                printi((int)ptr);
                 prints(" ");
-                printi(&data[ii]);
+                printi((int)&data[ii]);
                 prints("\n");
             }
             else

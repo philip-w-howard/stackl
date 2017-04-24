@@ -61,7 +61,7 @@ int main()
             prints("Error at offset ");
             printi(index);
             prints(" ");
-            printi(datap[index]);
+            printi((int)datap[index]);
             prints("\n");
         }
         else

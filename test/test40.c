@@ -29,7 +29,7 @@ int syscall(int size, int op, int parm1)
 
 int prints(char *string)
 {
-    syscall(3, PRINTS_CALL, string);
+    syscall(3, PRINTS_CALL, (char)string);
     return 0;
 }
 

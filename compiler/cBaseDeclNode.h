@@ -25,6 +25,7 @@ class cBaseDeclNode : public cTypeDecl
     }
 
     virtual bool IsType() { return true; }
+    virtual bool IsInt()  { return !mIsVoid; }
     virtual bool IsVoid() { return mIsVoid; }
     virtual cSymbol* GetName()            { return (cSymbol*)GetChild(0); }
 

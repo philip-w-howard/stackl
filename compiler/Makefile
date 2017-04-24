@@ -10,6 +10,7 @@ OBJS= scanner.o \
 	 cSizeOffset.o \
 	 cGenAddr.o \
 	 cCodeGen.o \
+	 cTypeDecl.o \
 
 all: stacklc
 

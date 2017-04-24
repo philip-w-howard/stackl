@@ -17,17 +17,17 @@ typedef struct node
 //     COUNT = COUNT + 1;
 // }
 
-void displayAll(node dlist)
+void displayAll(node *dlist)
 {
     struct node * travel;
 
-    travel = &dlist;
+    travel = dlist;
     prints("\n------------ Displaying All Nodes----------\n");
-    while ( travel->next != NULL)
+    while ( travel != NULL)
     {
-        travel = travel->next;
         prints("\nNode with ID: ");
         printi(travel->key);
+        travel = travel->next;
     }
 }
 

@@ -23,6 +23,8 @@ class cTypeDecl : public cDecl
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
+    static bool IsCompatibleWith(cTypeDecl *left, cTypeDecl *right);
+
   protected:
     int mSize;
 };

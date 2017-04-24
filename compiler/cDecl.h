@@ -19,6 +19,7 @@ class cDecl : public cStmt
     virtual bool IsStruct() { return false; }
     virtual bool IsPointer(){ return false; }
     virtual bool IsArray()  { return false; }
+    virtual bool IsInt()    { return false; }
     virtual cSymbol *GetName()      = 0;
     //virtual int GetOffset() = 0;
     virtual cTypeDecl *GetType();
@@ -26,4 +27,5 @@ class cDecl : public cStmt
     virtual cFuncDecl *GetFunc();
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
 };

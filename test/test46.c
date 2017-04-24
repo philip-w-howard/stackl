@@ -11,6 +11,6 @@ int foo(char a, int b)
 
 int main()
 {
-    foo(5,4);
+    foo((char)5,4);
     return 0;
 }
