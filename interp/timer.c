@@ -89,3 +89,11 @@ int Timer_Heartbeat()
     }
     return 0;
 }
+
+//*************************************
+// for internal interpreter use
+uint32_t Timer_Current_Time()
+{
+    return Timer_Time_Reg;
+}
+

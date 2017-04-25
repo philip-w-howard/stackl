@@ -14,3 +14,7 @@
 
 int Timer_Init();                       // called by interpreter
 int Timer_Heartbeat();                  // called by interpreter
+
+// For internal interpreter use only
+uint32_t Timer_Current_Time();          // returns number of inst executed
+
