@@ -26,7 +26,8 @@ class cArrayRef : public cVarRef
             return;
         }
 
-        //if (baseType->IsPointer()) baseType = baseType->ParentType();
+        // BUG IN QUESTION
+        if (baseType->IsPointer()) baseType = baseType->ParentType();
         if (baseType->IsArray()) baseType = baseType->ParentType();
 
         AddChild(base);

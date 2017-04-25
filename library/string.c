@@ -116,7 +116,7 @@ char *strrev(char *str)
     {
         temp = *start;
         *start = *end;
-        *end = temp;
+        *end = (char)temp;
         start++;
         end--;
     }
@@ -146,7 +146,7 @@ char *itostr(int value, char *str)
 
     while (value > 0)
     {
-        *ptr = (value % 10) + '0';
+        *ptr = (char)((value % 10) + '0');
         ptr++;
         value /= 10;
     }
@@ -187,9 +187,9 @@ char *xtostr(int value, char *str)
     {
         digit = value & 0x000F;
         if (digit < 10)
-            *ptr = digit + '0';
+            *ptr = (char)(digit + '0');
         else
-            *ptr = digit + 'A' - 10;
+            *ptr = (char)(digit + 'A' - 10);
         ptr++;
         value >>= 4;
     }
@@ -229,7 +229,7 @@ void *memset(void *buff, int val, int size)
 
     while (size-- != 0)
     {
-        *dst = val;
+        *dst = (char)val;
         dst++; 
     }
 

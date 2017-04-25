@@ -89,8 +89,15 @@ void cCodeGen::Visit(cArrayRef *node)
 {
     EmitLineNumber(node);
     node->Visit(m_GenAddr);
-    if ( node->GetType()->IsPointer() && !node->GetBase()->IsPointer() )
-        EmitInst("PUSHVARIND");
+    //if ( node->GetType()->IsPointer() && !node->GetBase()->IsPointer() )
+        //EmitInst("PUSHVARIND");
+    if (node->GetType()->IsPointer())
+    {
+        if (node->GetType()->Size() == 1)
+            EmitInst("PUSHCVARIND");
+        else
+            EmitInst("PUSHVARIND");
+    }
     else if (node->GetType()->ElementSize() == 1)
         EmitInst("PUSHCVARIND");
     else

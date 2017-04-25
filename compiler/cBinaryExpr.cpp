@@ -228,8 +228,10 @@ cTypeDecl *cBinaryExpr::GetType()
     cTypeDecl *integer = dynamic_cast<cTypeDecl *>
             (symbolTableRoot->Lookup("int")->GetDecl());
 
+    if (character==NULL) fatal_error("Couldn't get type of char");
     if (integer==NULL) fatal_error("Couldn't get type of int");
 
+    if (left->IsPointer() && right->IsPointer() && IsArithmetic()) return integer;
     if (left == right) return left;
 
     if (left->IsPointer() && (right==integer || right==character)) return left;

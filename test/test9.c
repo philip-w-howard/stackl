@@ -17,7 +17,7 @@ int main()
 
         for (ii=0; ii<10; ii++)
         {
-            data[ii] = ii;
+            data[ii] = (char)ii;
         }
 
         char *ptr;

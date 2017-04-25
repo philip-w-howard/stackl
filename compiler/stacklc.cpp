@@ -50,7 +50,7 @@ char Input_File[200] = "";
 int  Do_Debug = 0;
 int  Do_Ast = 0;
 int  Do_Assembler = 1;
-int  Do_Type_Checks = 0;
+int  Do_Type_Checks = 1;
 void Process_Args(int argc, char **argv)
 {
     for (int ii=1; ii<argc; ii++)

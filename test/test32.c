@@ -25,7 +25,7 @@ int main()
     int jj;
     int *datap;
 
-    datap = data;
+    datap = (int*)data;
 
     index = 1;
     for (ii=0; ii<3; ii++)

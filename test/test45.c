@@ -6,7 +6,7 @@
 
 typedef struct tag_name {
    int a;
-   struct tag_name next;
+   struct tag_name *next;
 } tag;
 
 int main()

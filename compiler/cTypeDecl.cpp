@@ -11,7 +11,9 @@ bool cTypeDecl::IsCompatibleWith(cTypeDecl *left, cTypeDecl *right)
     if (left == right) return true;
     if (left->IsInt() && right->IsInt() && left->Size() > right->Size())
         return true;
-    if (left->IsPointer() && right->IsPointer())
+    if (left->IsPointer() && right->IsInt()) return true;
+    if (left->IsPointer() && 
+            (right->IsPointer() || right->GetType()->IsFunc()))
     {
         cPointerType *ptr = dynamic_cast<cPointerType*>(left);
         if (ptr == nullptr) 
