@@ -178,15 +178,8 @@ var_decl:   type IDENTIFIER
             { $$ = $1; }
         | STRUCT type IDENTIFIER
             {
-                if (($2->IsPointer() && (cPointerType*)$2->ParentType()->IsStruct()) ||
-                    $2->IsStruct()) 
-                {
-                    $$ = new cVarDecl($2, $3);
-                    if ($$->HasSemanticError()) YYERROR; 
-                }
-                else {
-                    yyerror("~Struct decl not of type Struct.");
-                }
+                $$ = new cVarDecl($2, $3, true);
+                if ($$->HasSemanticError()) YYERROR; 
             }
 
 type:   type '*'

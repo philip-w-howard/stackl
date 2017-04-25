@@ -10,7 +10,7 @@
 class cVarDecl : public cDecl
 {
   public:
-    cVarDecl(cTypeDecl *type, cSymbol *name) : cDecl()
+    cVarDecl(cTypeDecl *type, cSymbol *name, bool isStruct=false) : cDecl()
     {
         if (symbolTableRoot->LocalLookup(name->Name()) != nullptr)
         {
@@ -18,6 +18,19 @@ class cVarDecl : public cDecl
             return;
         }
 
+        // FIX THIS: what about 2-star pointers?
+        if (isStruct)
+        {
+            if ((type->IsPointer() && (cPointerType*)type->ParentType()->IsStruct()) ||
+                 type->IsStruct())
+            {}
+            else
+            {
+                ThrowSemanticError(name->Name() +" Struct decl not of type Struct");
+                return;
+            }
+        }
+        
         // if the symbol exists in an outer scope, we need to create a new one
         // instead of re-using the outer scoped symbol
         if (symbolTableRoot->Lookup(name->Name()) != nullptr)
