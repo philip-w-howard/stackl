@@ -65,8 +65,17 @@ void stackl_debugger::check_compile_time( const char* filename )
 {
     struct stat attrib;
     stat( filename, &attrib );
-    //if( attrib.st_mtime > _ast.compile_time() )
-    //    throw runtime_error( "Debug files out of date." );
+    //20 second window. If the compile takes longer than this, it'll think the files are out of date.
+    //But it'll just prompt the user at that point.
+    if( attrib.st_mtime > _ast.compile_time() + 20 )
+    {
+        char c;
+        cout << "Debug files for " << filename << " are out of date. Continue anyways? [y/n] ";
+        cin.get( c );
+        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+        if( c == 'n' )
+            throw runtime_error( string( "Debug files for " ) + filename + " out of date." );
+    }
 }
 
 bool stackl_debugger::file_exists( const string& filename )
@@ -121,6 +130,13 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_backtrace, { "backtrace", "callstack", "bt" }, "- Prints the callstack.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "- Moves the framepointer up one context.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
+
+    const size_t size = _commands.size();
+    for( size_t i = 0; i < size; ++i )
+        for( size_t j = i + 1; j < size; ++j ) //slight optimization by only checking i+1, since previous values have already been compared.
+            if( i != j && _commands[i].has_same_name( _commands[j] ) )
+                throw runtime_error( _commands[i].to_string() + " has the same name as " + _commands[j].to_string() );
 }
 
 void stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -240,9 +256,9 @@ void stackl_debugger::cmd_print( string& params, Machine_State* cpu )
     {
         cout << var_to_string( cpu, params ) << '\n';
     }
-    catch( const char* err )
+    catch( const exception& err )
     {
-        cout << err << '\n';
+        cout << err.what() << '\n';
     }
 }
 
@@ -502,10 +518,11 @@ void stackl_debugger::cmd_watch( string& params, Machine_State* cpu )
     {
         string name = params;
         _watches[name] = var_to_string( cpu, params );
+        cout << name <<  " is now being watched.\n";
     }
-    catch( const char* err )
+    catch( const exception& err )
     {
-        cout << err << '\n';
+        cout << err.what() << '\n';
     }
 }
 
@@ -592,6 +609,20 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
     string cur_file = _lst.current_file( cpu->IP );
     cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+}
+
+void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
+{
+    if( get_flag( TIMER ) )
+    {
+        set_flag( TIMER, false );
+        cout  << "Timer disabled.\n";
+    }
+    else
+    {
+        set_flag( TIMER, true );
+        cout << "Timer enabled.\n";
+    }
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
@@ -714,7 +745,6 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
         var_text.erase( 0, 1 );
     }
 
-
     vector<string> var_fields = string_utils::string_split( var_text, '.' );
 
     uint32_t indirection = string_utils::strip_indirection( var_fields[0] );
@@ -722,38 +752,32 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
 
     if( var == nullptr )
-        throw "Variable not found in current scope";
+        throw runtime_error( "Variable not found in current scope" );
 
     variable res = var->from_indexes( indexes, cpu );
     res = res.deref( indirection, cpu );
 
-    int32_t total_offset = res.offset();
     for( uint32_t i = 1; i < var_fields.size(); ++i )
     {
-        if( res.is_struct() ) //the guy left of the '.' operator
-        {
-            //strip ending brackets and asterisks to get the 'true' var name
-            indirection = string_utils::strip_indirection( var_fields[i] );
-            indexes = string_utils::strip_array_indexes( var_fields[i] );
+        if( !res.is_struct() ) //the struct left of the '.' operator
+            throw runtime_error( string( "'" ) + res.definition() + "' is not a struct type." );
 
-            //ask the type of the left for the variable object of the guy on the right
-            var = res.decl()->var( var_fields[i] );
+        //strip ending brackets and asterisks to get the 'true' var name
+        indirection = string_utils::strip_indirection( var_fields[i] );
+        indexes = string_utils::strip_array_indexes( var_fields[i] );
 
-            if( var == nullptr )
-                throw ( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." ).c_str();
+        //ask the type of the left for the variable object of the guy on the right
+        var = res.decl()->var( var_fields[i] );
 
-            res = var->from_indexes( indexes, cpu );
-            res = res.deref( indirection, cpu );
+        if( var == nullptr )
+            throw runtime_error( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." );
 
-            total_offset += res.offset();
-        }
-        else
-        {
-            throw ( string( "'" ) + res.definition() + "' is not a struct type." ).c_str();
-        }
+        variable temp = *var; //make a variable of the field on the right and make sure his offset is correct
+        temp.offset( temp.offset() + res.offset() );
+
+        res = temp.from_indexes( indexes, cpu );
+        res = res.deref( indirection, cpu );
     }
-
-    res.offset( total_offset ); //modify its offset by the total dist from the FP
 
     if( address_of )
         return std::to_string( res.total_offset( cpu ) );
@@ -767,16 +791,29 @@ void stackl_debugger::debug_check( Machine_State* cpu )
 
     if( should_break( cpu ) )
     {
-        if( get_flag( OPCODE_DEBUG ) )
+        for( const auto& pair : changed_watches( cpu ) )
         {
-            cout << "Breakpoint hit on instruction " << opcode_to_string( cpu->IP, cpu ) << '\n';
+            cout << "Watch on '" << pair.first << "' triggered.\n";
+            cout << '\t' << pair.second << '\n';
+            _watches[pair.first] = pair.second;
         }
-        else
+
+        if( !get_flag( OPCODE_DEBUG ) )
         {
             string cur_file = _lst.current_file( cpu->IP );
 	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
             cout << get_nearby_lines( cpu->IP, 0);
         }
+        else
+            cout << "Breakpoint hit on instruction " << opcode_to_string( cpu->IP, cpu ) << '\n';
+
+        if( get_flag( TIMER ) )
+        {
+            duration<float> dur = high_resolution_clock::now() - _start_time;
+            milliseconds ms = duration_cast<milliseconds>( dur );
+            cout << ms.count() << "ms elapsed.\n";
+        }
+
 	    query_user( cpu );
 
         if( !_context_history.empty() ) //if the user ran an 'up' command but didn't move back down
@@ -788,11 +825,34 @@ void stackl_debugger::debug_check( Machine_State* cpu )
     }
 }
 
+string stackl_debugger::command_from_input( const string& input )
+{
+    //commands are always one word
+    size_t idx = input.find_first_of( ' ' );
+    if( idx == string::npos )
+        return input;
+    else
+        return input.substr( 0, idx );
+}
+
+string stackl_debugger::params_from_input( const string& input )
+{
+    //commands are always one word
+    size_t idx = input.find_first_of( ' ' );
+    if( idx != string::npos )
+    {
+        string params = input.substr( idx + 1 );
+        string_utils::ltrim( params );
+        return params;
+    }
+    else return "";
+}
+
 void stackl_debugger::query_user( Machine_State* cpu )
 {
     string input;
     set_flag( DEBUGGING, true );
-    while( true )
+    while( !get_flag( RESUME_EXECUTING ) )
     {
         cout << "(dbg) ";
         getline( cin, input );
@@ -805,20 +865,8 @@ void stackl_debugger::query_user( Machine_State* cpu )
         else
             _prev_cmd = input;
 
-        //commands are always one word
-        size_t idx = input.find_first_of( ' ' );
-        string cmd_txt, params;
-        if( idx == string::npos )
-        {
-            cmd_txt = input;
-            params = "";
-        }
-        else
-        {
-            cmd_txt = input.substr( 0, idx );
-            params = input.substr( idx + 1 );
-            string_utils::ltrim( params );
-        }
+        string cmd_txt = command_from_input( input );
+        string params = params_from_input( input );
 
         bool ran = false;
         //look at every command object and determine which one the user asked for
@@ -827,29 +875,24 @@ void stackl_debugger::query_user( Machine_State* cpu )
             if( command.called_by( cmd_txt ) )
             {
                 if( get_flag( OPCODE_DEBUG ) && !command.allowed_in_opcode_mode() )
-                {
                     cout << "You can't run this command without debug files available.\n";
-                    break;
-                }
                 else
                 {
                     command.run( params, cpu );
                     ran = true;
-                    break; //stop iterating once we find our command
                 }
+                break; //stop checking for more commands once we find it
             }
         }
 
         if( !ran ) //if res wasn't modified
             cout << "Unknown command.\n";
-        else if( get_flag( RESUME_EXECUTING ) )
-        {
-            set_flag( RESUME_EXECUTING, false );
-            break;
-        }
-        else continue; //otherwise prompt for input again
     }
+
     set_flag( DEBUGGING, false );
+    set_flag( RESUME_EXECUTING, false ); //if we get here we've already dropped out of the while loop
+    if( get_flag( TIMER ) )
+        _start_time = high_resolution_clock::now();
 }
 
 bool stackl_debugger::should_break( Machine_State* cpu )
@@ -885,35 +928,32 @@ bool stackl_debugger::should_break( Machine_State* cpu )
     }
     else if( find( _break_points.begin(), _break_points.end(), cur_addr ) != _break_points.end() )
         return true;
-    else if( !_watches.empty() )
-    {
-        bool changed = false;
-        for( const auto& pair : _watches )
-        {
-            string var_name = pair.first;
-            try
-            {
-                string res = var_to_string( cpu, var_name );
-                if( res != pair.second )
-                {
-                    _watches[pair.first] = res;
-                    cout << "\tWatch on variable '" << pair.first << "' triggered.\n";
-                    cout << '\t' << res << '\n';
-                    changed = true;
-                }
-            }
-            catch( ... ) {}
-        }
-        if( changed )
-            return true;
-    }
+    else if( !_watches.empty() && !changed_watches( cpu ).empty() )
+        return true;
     return false; //otherwise dont break
+}
+
+unordered_map<string, string> stackl_debugger::changed_watches( Machine_State* cpu )
+{
+    unordered_map<string, string> ret;
+    for( const auto& pair : _watches )
+    {
+        string var_name = pair.first;
+        try
+        {
+            string res = var_to_string( cpu, var_name );
+            if( res != pair.second )
+                ret[pair.first] = res;
+        }
+        catch( ... ) {}
+    }
+    return ret;
 }
 
 string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
 {
     string cur_file = _lst.current_file( cur_addr );
-    int cur_line = (int)_lst.line_of_addr( cur_file, cur_addr );
+    int32_t cur_line = (int32_t)_lst.line_of_addr( cur_file, cur_addr );
     string ret = "";
     string line;
     ifstream file;
