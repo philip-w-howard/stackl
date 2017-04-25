@@ -7,12 +7,20 @@ int main()
     a = "testing\n";
     char ** b;
     b = &a;
+    prints("b ");
+    prints(*b);
     char *** c;
     c = &b;
+    prints("c ");
+    prints(**c);
     char ** d;
     d = c[0];
+    prints("d ");
+    prints(*d);
     char * e;
-    e = b[0];
+    e = d[0];
+    prints("e ");
+    prints(e);
 
     int z;
     z = 12345;

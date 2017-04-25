@@ -25,6 +25,7 @@ void cGenAddr::Visit(cArrayRef *node)
     {
         var->Visit(m_CodeGen);
         size = node->GetType()->ElementSize();
+        //size = node->GetBase()->Size();
     }
     else
     {

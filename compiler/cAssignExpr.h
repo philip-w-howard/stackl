@@ -19,6 +19,16 @@ class cAssignExpr : public cExpr
             cVarRef* varref  = dynamic_cast<cVarRef*>(var);
             assert(varref != NULL);
         }
+
+        // don't type check asm expressions
+        if (!expr->IsAsm())
+        {
+            if (!cTypeDecl::IsCompatibleWith(var->GetType(), expr->GetType()))
+            {
+                ThrowSemanticError("Assignment of incompatible types");
+            }
+        }
+
         AddChild(var);
         AddChild(expr);
     }

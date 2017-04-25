@@ -36,6 +36,8 @@ class cAsmNode : public cExpr
         mTwoWord = true;
     }
 
+    virtual bool IsAsm() { return true; }
+
     virtual cTypeDecl *GetType()
     {
         fatal_error("Illegal to call GetType on cAsmNode");

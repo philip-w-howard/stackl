@@ -27,6 +27,7 @@ class cStructRef : public cVarRef
             return;
         }
 
+        // need to check IsPointer?
         if (base->IsArrayRef())
             baseType = base->GetType()->ParentType();
         else

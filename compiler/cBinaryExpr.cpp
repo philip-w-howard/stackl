@@ -223,6 +223,8 @@ cTypeDecl *cBinaryExpr::GetType()
 {
     cTypeDecl *left = GetLeft()->GetType();;
     cTypeDecl *right = GetRight()->GetType();;
+    cTypeDecl *character = dynamic_cast<cTypeDecl *>
+            (symbolTableRoot->Lookup("char")->GetDecl());
     cTypeDecl *integer = dynamic_cast<cTypeDecl *>
             (symbolTableRoot->Lookup("int")->GetDecl());
 
@@ -230,8 +232,8 @@ cTypeDecl *cBinaryExpr::GetType()
 
     if (left == right) return left;
 
-    if (left->IsPointer() && right==integer) return left;
-    if (right->IsPointer() && left==integer) return right;
+    if (left->IsPointer() && (right==integer || right==character)) return left;
+    if (right->IsPointer() && (left==integer || left==character)) return right;
 
     if (left->Size() == 1 && right->Size() == 1) return left;
 

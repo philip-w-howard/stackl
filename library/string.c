@@ -100,7 +100,7 @@ char *strrev(char *str)
     char *end;
     int  temp;
 
-    if (str == 0) return 0;
+    if (str == (char *)0) return 0;
 
     end = str;
     start = str;

@@ -22,6 +22,7 @@ class cExpr : public cStmt
     virtual bool IsArrayRef()   { return false; }
 
     virtual bool IsConst()      { return false; }
+    virtual bool IsAsm()        { return false; }
     virtual int  ConstValue()   { return 0; }
 
     //virtual int Size()          { return GetType()->ElementSize(); }

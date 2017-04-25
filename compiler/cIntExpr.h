@@ -18,7 +18,13 @@ class cIntExpr : public cExpr
 
     virtual cTypeDecl *GetType()
     {
-        cDecl *type = symbolTableRoot->Lookup("int")->GetDecl();
+        cDecl *type;
+
+        if (mValue >= -128 && mValue <= 127)
+            type = symbolTableRoot->Lookup("char")->GetDecl();
+        else
+            type = symbolTableRoot->Lookup("int")->GetDecl();
+
         return dynamic_cast<cTypeDecl *>(type);
     }
 
