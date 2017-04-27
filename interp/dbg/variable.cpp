@@ -215,7 +215,7 @@ variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu )
 
 variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_State* cpu ) const
 {
-    if( indexes.size() == 1 )
+    if( indexes.size() != 1 )
         throw runtime_error( "Cannot index pointer on more than one dimension." );
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
