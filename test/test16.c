@@ -10,7 +10,7 @@ int main()
     int bp;
     int lp;
     
-    if (msg < 0 || msg >= (lp - bp) || localInt ) 
+    if ((int)msg < 0 || (int)msg >= (lp - bp) || (int)localInt ) 
         lp = 1;
 
     asm("OUTS", "Bug in type of logical ops is fixed\n");

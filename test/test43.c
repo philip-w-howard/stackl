@@ -23,7 +23,7 @@ void displayAll(node *dlist)
 
     travel = dlist;
     prints("\n------------ Displaying All Nodes----------\n");
-    while ( travel != NULL)
+    while ( travel != (node*)NULL)
     {
         prints("\nNode with ID: ");
         printi(travel->key);

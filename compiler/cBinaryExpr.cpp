@@ -138,12 +138,24 @@ std::string cBinaryExpr::OpAsString()
 
 bool cBinaryExpr::IsLogical()
 {
+    if (IsComparative()) return true;
+
+    switch (mOp)
+    {
+        case AND: 
+        case OR : 
+            return true;
+    }
+
+    return false;
+}
+
+bool cBinaryExpr::IsComparative()
+{
     switch (mOp)
     {
         case '>': 
         case '<': 
-        case AND: 
-        case OR : 
         case EQ : 
         case NE : 
         case LE : 
@@ -236,6 +248,43 @@ int cBinaryExpr::OpAsInt()
     return 0;
 }
 */
+
+bool cBinaryExpr::TypesAreCompatible()
+{
+    cTypeDecl *left = GetLeft()->GetType();;
+    cTypeDecl *right = GetRight()->GetType();;
+    cTypeDecl *character = dynamic_cast<cTypeDecl *>
+            (symbolTableRoot->Lookup("char")->GetDecl());
+    cTypeDecl *integer = dynamic_cast<cTypeDecl *>
+            (symbolTableRoot->Lookup("int")->GetDecl());
+    bool leftint = ( left == integer || left == character );
+    bool rightint = ( right == integer || right == character );
+
+    if (character==NULL) fatal_error("Couldn't get type of char");
+    if (integer==NULL) fatal_error("Couldn't get type of int");
+
+    // can't perform operations on void
+    if (left->IsVoid() || right->IsVoid()) return false;
+
+    // operations on same types are OK
+    if (left == right) return true;
+
+    // arithmetic between pointers and integers is OK
+    if (IsArithmetic())
+    {
+        if (left->IsPointer() && rightint) return true;
+        if (right->IsPointer() && leftint) return true;
+    }
+
+    // promote chars to ints
+    if (leftint && rightint) return true;
+
+    // allow pointer comparisons/arithmetic of any type pointers
+    if (left->IsPointer() && right->IsPointer() && 
+            (IsArithmetic() || IsComparative())) return true;
+
+    return false;
+}
 
 cTypeDecl *cBinaryExpr::GetType()
 {

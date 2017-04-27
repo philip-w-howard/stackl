@@ -13,7 +13,7 @@ class cBinaryExpr : public cExpr
         AddChild(left);
         AddChild(right);
         mOp = op;
-        if (GetType() == NULL)
+        if (!TypesAreCompatible())
         {
             ThrowSemanticError("Incompatible types in binary operation");
         }
@@ -33,6 +33,8 @@ class cBinaryExpr : public cExpr
 
     bool IsArithmetic();
     bool IsLogical();
+    bool IsComparative();
+    bool TypesAreCompatible();
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:

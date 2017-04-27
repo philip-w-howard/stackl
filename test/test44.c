@@ -36,7 +36,7 @@ int main()
     te.next = NULL;
 
     travel = &ta;
-    while(travel->next != NULL)
+    while(travel->next != (void *)NULL)
     {
         printi(travel->a);
         travel = travel->next;

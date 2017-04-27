@@ -54,22 +54,22 @@ int main()
         vptr = 0;
         for (ii=0; ii<10; ii++)
         {
-            if (cptr++ != ii) 
+            if (cptr++ != (char*)ii) 
                 prints("char pointer arithmetic error\n");
             else
                 prints("char pointer arithmetic OK\n");
 
-            if (iptr++ != ii*4) 
+            if (iptr++ != (int *)(ii*4)) 
                 prints("int pointer arithmetic error\n");
             else
                 prints("int pointer arithmetic OK\n");
 
-            if (sptr++ != ii*sizeof(struct_t)) 
+            if (sptr++ != (struct_t*)(ii*sizeof(struct_t)) )
                 prints("struct pointer arithmetic error\n");
             else
                 prints("struct pointer arithmetic OK\n");
 
-            if (vptr++ != ii) 
+            if (vptr++ != (void*)ii) 
                 prints("void pointer arithmetic error\n");
             else
                 prints("void pointer arithmetic OK\n");
