@@ -75,7 +75,7 @@ void variable::parse_pointer_type( xml_node<char>* node, unordered_map<string, s
         }
         else
         {
-            fprintf(stderr, "We don't know the variable type\n");
+            throw runtime_error( _type + " is an unknown type" );
             //we don't know what type it is?
             //kernel_panic();
             //throw "a flotation device";
@@ -164,7 +164,7 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
     if( derefs == 0 ) //short cut.
         return *this; //the algorithm would work fine with deref == 0, this just saves time.
     if( derefs > _indirection )
-        throw "Variable does not have that many levels of indirection.";
+        throw runtime_error( "Variable does not have that many levels of indirection." );
 
     int32_t addr = total_offset( cpu );
     for( uint32_t i = 0; i < derefs; ++i )
@@ -187,14 +187,14 @@ variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu )
     if( is_pointer() && !is_array() )
         return deref_ptr_from_index( indexes, cpu );
     if( indexes.size() > _array_ranges.size() )
-        throw "Array does not have that many dimensions.";
+        throw runtime_error( "Array does not have that many dimensions." );
 
     int32_t new_offset = _offset;
     size_t new_size = _size;
     for( uint32_t i = 0; i < indexes.size(); ++i )
     {
         if( indexes[i] >= _array_ranges[i] )
-            throw "Array index out of range.";
+            throw runtime_error( "Array index out of range." );
 
         //every time we move down a dimension in our array,
         //we have to reduce the size of our offset modification by
@@ -215,8 +215,8 @@ variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu )
 
 variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_State* cpu ) const
 {
-    if( indexes.size() > 1 )
-        throw "Cannot index pointer on more than one dimension.";
+    if( indexes.size() == 1 )
+        throw runtime_error( "Cannot index pointer on more than one dimension." );
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
     addr += indexes[0] * _size;

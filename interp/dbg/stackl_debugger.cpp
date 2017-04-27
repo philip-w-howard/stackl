@@ -14,6 +14,7 @@ using std::runtime_error;
 using std::set;
 #include <algorithm>
 using std::transform;
+using std::remove_if;
 
 extern "C"
 {
@@ -658,20 +659,38 @@ string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 
 stackl_debugger::BREAKPOINT_RESULT stackl_debugger::add_breakpoint( const string& break_point_text, uint32_t cur_addr )
 {
-    uint32_t bpl = text_to_addr( break_point_text, cur_addr );
+    uint32_t bpl;
+    try
+    {
+        bpl = text_to_addr( break_point_text, cur_addr );
+    }
+    catch( const exception& ex )
+    {
+        return BREAKPOINT_RESULT::NOT_FOUND;
+    }
+
     if( bpl != UINT32_MAX )
     {
-	if( add_breakpoint( bpl ) )
-	    return BREAKPOINT_RESULT::SUCCESS;
-	else
-	    return BREAKPOINT_RESULT::DUPLICATE;
+        if( add_breakpoint( bpl ) )
+            return BREAKPOINT_RESULT::SUCCESS;
+       else
+           return BREAKPOINT_RESULT::DUPLICATE;
     }
     else return BREAKPOINT_RESULT::NOT_FOUND;
 }
 
 stackl_debugger::BREAKPOINT_RESULT stackl_debugger::remove_breakpoint( const string & break_point_text, uint32_t cur_addr )
 {
-    uint32_t bpl = text_to_addr( break_point_text, cur_addr );
+    uint32_t bpl;
+    try
+    {
+        bpl = text_to_addr( break_point_text, cur_addr );
+    }
+    catch( const exception& ex )
+    {
+        return BREAKPOINT_RESULT::NOT_FOUND;
+    }
+
     if( bpl != UINT32_MAX )
     {
     	if( remove_breakpoint( bpl ) )
@@ -693,7 +712,8 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
     else if( break_point_text.find( ':' ) != string::npos )
     {
         vector<string> file_line = string_utils::string_split( break_point_text, ':' );
-	    return _lst.addr_of_line( file_line[0], stoi( file_line[1] ) );
+        int32_t user_line = string_utils::to_int( file_line[1] );
+	    return _lst.addr_of_line( file_line[0], user_line );
     }
     else if( string_utils::is_number( break_point_text, 10, &res ) )
     {
@@ -731,7 +751,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
 {
     int32_t val;
 
-    string_utils::ltrim( var_text );
+    var_text.erase( remove_if( var_text.begin(), var_text.end(), isspace ), var_text.end() ); //remove spaces
 
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
         return string_utils::to_hex( Get_Word( cpu, val ) );
