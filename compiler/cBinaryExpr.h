@@ -32,6 +32,7 @@ class cBinaryExpr : public cExpr
     std::string OpAsString();
 
     bool IsArithmetic();
+    bool IsLogical();
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
   protected:

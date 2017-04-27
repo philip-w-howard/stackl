@@ -136,6 +136,24 @@ std::string cBinaryExpr::OpAsString()
     return 0;
 }
 
+bool cBinaryExpr::IsLogical()
+{
+    switch (mOp)
+    {
+        case '>': 
+        case '<': 
+        case AND: 
+        case OR : 
+        case EQ : 
+        case NE : 
+        case LE : 
+        case GE : 
+            return true;
+    }
+
+    return false;
+}
+
 bool cBinaryExpr::IsArithmetic()
 {
     switch (mOp)
@@ -230,6 +248,9 @@ cTypeDecl *cBinaryExpr::GetType()
 
     if (character==NULL) fatal_error("Couldn't get type of char");
     if (integer==NULL) fatal_error("Couldn't get type of int");
+
+    // The result of every logical in int
+    if (IsLogical()) return integer;
 
     if (left->IsPointer() && right->IsPointer() && IsArithmetic()) return integer;
     if (left == right) return left;
