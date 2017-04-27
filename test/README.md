@@ -34,7 +34,7 @@ Makefile?
     #define
     global consts with initializers
 15) do while test
-16) Unused
+16) checks that GetType() for binary logical ops works
 17) sizeof
 18) Test return value of functions
     empty if's and while's
