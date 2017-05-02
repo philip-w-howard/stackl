@@ -58,7 +58,7 @@ stackl_debugger::stackl_debugger( const char* filename )
                 if( file_exists( filename ) )
                 {
                     _ast.add_ast( filename );
-                    check_compile_time( filename );
+                    check_compile_time( fname, filename );
                 }
                 else
                     opcode_debug_mode( filename );
@@ -79,10 +79,10 @@ stackl_debugger::stackl_debugger( const char* filename )
     }
 }
 
-void stackl_debugger::check_compile_time( const string& filename )
+void stackl_debugger::check_compile_time( const string& binaryfile, const string& filename )
 {
     struct stat attrib;
-    stat( filename.c_str(), &attrib );
+    stat( binaryfile.c_str(), &attrib );
     if( attrib.st_mtime > _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA )
     {
         char c;
