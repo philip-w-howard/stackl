@@ -3,6 +3,7 @@
 #include <string>
 #include "cExpr.h"
 #include "cSymbolTable.h"
+#include "cPointerType.h"
 
 class cStringLit : public cExpr
 {
@@ -19,8 +20,11 @@ class cStringLit : public cExpr
 
     virtual cTypeDecl *GetType()
     {
-        return dynamic_cast<cTypeDecl *>
-            (symbolTableRoot->Lookup("char*")->GetDecl());
+        return cPointerType::PointerType(
+                dynamic_cast<cTypeDecl*>
+                (symbolTableRoot->Lookup("char")->GetDecl()));
+        //return dynamic_cast<cTypeDecl *>
+            //(symbolTableRoot->Lookup("char*")->GetDecl());
     }
 
     virtual std::string GetString() { return mStr; }
