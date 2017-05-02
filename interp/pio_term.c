@@ -29,15 +29,21 @@ static void PIO_T_Finish();
 // Enable/Disable nonblocking mode
 // Code from:
 // http://cc.byexamples.com/2007/04/08/non-blocking-user-input-in-loop-without-ncurses/
-static void set_nonblock(int nonblock)
+static int g_is_nonblock = 0;
+int pio_set_nonblock(int nonblock)
 {
+    int was_nonblock;
+
     struct termios ttystate;
          
+    was_nonblock = g_is_nonblock;
+
     //get the terminal state
     tcgetattr(STDIN_FILENO, &ttystate);
 
     if (nonblock)
     {
+        g_is_nonblock = 1;
         //turn off canonical mode
         //ttystate.c_lflag &= ~(ICANON | ECHO);
         ttystate.c_lflag &= ~ICANON;
@@ -46,11 +52,14 @@ static void set_nonblock(int nonblock)
     }
     else
     {
+        g_is_nonblock = 0;
         //turn on canonical mode
         ttystate.c_lflag |= ICANON | ECHO;
     }
     //set the terminal attributes.
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+
+    return was_nonblock;
 }
 //********************************************
 // Check to see if a character is available on stdin
@@ -67,6 +76,7 @@ static int kbhit()
     FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
     select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
     hit = FD_ISSET(STDIN_FILENO, &fds);
+    if (!is_nonblock) return 0;
     return hit;
 }
 //*************************************
@@ -181,7 +191,7 @@ static void set_word(int32_t id, int32_t addr, int32_t value)
 //*************************************
 int PIO_T_Init()
 {
-    set_nonblock(1);
+    pio_set_nonblock(1);
 
     IO_Q_Halt_Thread = 0;
     XDR_Written = 0;
@@ -204,5 +214,5 @@ static void PIO_T_Finish()
     pthread_cond_signal(&IO_Q_Cond);
     pthread_join(IO_Q_Thread_1, NULL);
     pthread_join(IO_Q_Thread_2, NULL);
-    set_nonblock(0);
+    pio_set_nonblock(0);
 }
