@@ -98,11 +98,11 @@ private:
 	//converts the instruction at addr to slasm text
 	string opcode_to_string( uint32_t addr, Machine_State* cpu );
 	//checks the compile time of the passed source code filename against its matching debug file.
-	void check_compile_time( const char* filename );
+	void check_compile_time( const string& filename );
 	//returns true if the file exists
 	bool file_exists( const string& filename );
 	//asks the user if they would like to debug opcodes only
-	void opcode_debug_mode();
+	void opcode_debug_mode( const string& filename);
 	//gets the function that acts as the entry point of the program
 	string get_init_func( Machine_State* cpu ) const;
     //gets a map of the watched variables that changed.
@@ -150,6 +150,7 @@ private:
 	void cmd_up( string& params, Machine_State* cpu );
 	void cmd_down( string& params, Machine_State* cpu );
     void cmd_timer( string& params, Machine_State* cpu );
+    void cmd_clear( string& params, Machine_State* cpu );
 
 	string _binary_name = ""; //the name of the current binary being debugged
 	vector<uint32_t> _break_points; //list of instruction pointers to break at
@@ -174,5 +175,7 @@ private:
 
 	uint64_t _flags = 0; //the flags of the debugger itself
 
+    //used if timer is enabled
     high_resolution_clock::time_point _start_time;
+    uint32_t _instructions_executed = 0;
 };

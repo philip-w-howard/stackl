@@ -2,7 +2,8 @@
 #include <stdexcept>
 using std::runtime_error;
 
-#include <iostream>     // for debug purposes only
+#include <iostream>
+using std::cout;
 
 abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 {
@@ -11,12 +12,12 @@ abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 
 void abstract_syntax_tree::add_ast( const string& filename )
 {
-    std::cout << "Loading symbols for " << filename << std::endl;
+    cout << "Loading symbols for " << filename << std::endl;
 
     rapidxml::file<char> xml_file( filename.c_str() );
     xml_document<char> doc;
     doc.parse<0>( xml_file.data() );
-    load( doc );
+    load( filename, doc );
 }
 
 void abstract_syntax_tree::fixup_globals( unordered_map<string, int32_t>& global_offsets )
@@ -46,12 +47,12 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
     return nullptr;
 }
 
-void abstract_syntax_tree::load( xml_document<char>& doc )
+void abstract_syntax_tree::load( const string& filename, xml_document<char>& doc )
 {
     const char* time_str = doc.first_node( "Program" )->first_node( "compiled" )->first_attribute( "time" )->value();
     struct tm tm;
     strptime( time_str, "%Y:%m:%d %H:%M:%S", &tm );
-    _compile_time = timegm( &tm );
+    _compile_times[filename] = timegm( &tm );
 
     for( xml_node<char>* node : doc.first_node( "Program" )->first_node( "DeclsList" )->all_nodes() )
     {

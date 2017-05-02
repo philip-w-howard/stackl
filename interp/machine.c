@@ -28,7 +28,7 @@ void Machine_Check(int code, const char *fmt, ...)
     sprintf(format, "Machine check: %s\n", fmt);
     vfprintf(stderr, format, args);
     va_end(args);
-    //fprintf(stderr, "%0x %d %d %d %d %d Final State\n", 
+    //fprintf(stderr, "%0x %d %d %d %d %d Final State\n",
     //        Regs.FLAG, Regs.BP, Regs.LP, Regs.IP, Regs.SP, Regs.FP);
     if (!dbg_machine_check(code, &Regs)) exit(-1);
 }

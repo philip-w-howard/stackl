@@ -33,19 +33,18 @@ public:
     inline unordered_map<string, function>& functions() { return _functions; }
     inline unordered_map<string, struct_decl>& struct_decls() { return _struct_decls; }
 
-    inline time_t compile_time() const { return _compile_time; }
+    inline time_t compile_time( const string& filename ) const { return _compile_times.at( filename ); }
 
     variable* var( const string& func_name, const string& var_name );
 
 private:
 
-    void load( xml_document<char>& doc );
+    void load( const string& filename, xml_document<char>& doc );
 
     //key = symbol name, value = object with that name
     unordered_map<string, variable> _globals;
     unordered_map<string, function> _functions;
     unordered_map<string, struct_decl> _struct_decls;
-
-    time_t _compile_time;
+    unordered_map<string, time_t> _compile_times;
 
 };

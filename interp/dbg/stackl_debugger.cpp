@@ -1,5 +1,6 @@
 #include "stackl_debugger.h"
 
+#include <signal.h>
 #include <iostream>
 using std::cout;
 using std::cin;
@@ -20,33 +21,49 @@ extern "C"
 {
     #include "../vmem.h"
     #include "../slasm.h"
+    #include "../pio_term_int.h"
+    #include "../timer.h"
 }
+
+//I tried with the variable name here. I really did.
+//It's the number of seconds that a debug file can be compiled BEFORE the binary is generated.
+//Effectively this is a "max compile time" before the debugger will ask if the debug files are out of date.
+//We want to keep it as low as is reasonable, otherwise users could accidentally run with out of date files
+    //and not be notified. That's no good.
+const static int MAX_DEBUG_FILE_TIME_DELTA = 30;
 
 stackl_debugger::stackl_debugger( const char* filename )
 {
     string fname = filename;
     _binary_name = fname;
 
-    size_t idx =  fname.find_last_of( '.' );
+    size_t idx = fname.find_last_of( '.' );
     if( idx != string::npos )
         fname.erase( idx );
 
     try
     {
 
-        if( !file_exists( fname + ".dbg" ) || !file_exists( fname + ".ast" ) )
-            opcode_debug_mode();
+        if( !file_exists( fname + ".dbg" ) )
+        {
+            opcode_debug_mode( fname + ".dbg" );
+        }
         else
         {
             _lst = asm_list( fname + ".dbg" );
             _ast = abstract_syntax_tree();
 
-            for( const string& file : _lst.file_list() )
-                _ast.add_ast( file );
-
+            for( const string& filename : _lst.file_list() )
+            {
+                if( file_exists( filename ) )
+                {
+                    _ast.add_ast( filename );
+                    check_compile_time( filename );
+                }
+                else
+                    opcode_debug_mode( filename );
+            }
             _ast.fixup_globals( _lst.global_offsets() );
-
-            check_compile_time( filename );
         }
 
         load_commands();
@@ -62,20 +79,18 @@ stackl_debugger::stackl_debugger( const char* filename )
     }
 }
 
-void stackl_debugger::check_compile_time( const char* filename )
+void stackl_debugger::check_compile_time( const string& filename )
 {
     struct stat attrib;
-    stat( filename, &attrib );
-    //20 second window. If the compile takes longer than this, it'll think the files are out of date.
-    //But it'll just prompt the user at that point.
-    if( attrib.st_mtime > _ast.compile_time() + 20 )
+    stat( filename.c_str(), &attrib );
+    if( attrib.st_mtime > _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA )
     {
         char c;
-        cout << "Debug files for " << filename << " are out of date. Continue anyways? [y/n] ";
+        cout << "Debug file " << filename << " maybe be out of date. Continue anyways? [y/n] ";
         cin.get( c );
         cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
         if( c == 'n' )
-            throw runtime_error( string( "Debug files for " ) + filename + " out of date." );
+            throw runtime_error( string( "Debug file " ) + filename + " is out of date." );
     }
 }
 
@@ -85,14 +100,14 @@ bool stackl_debugger::file_exists( const string& filename )
     return stat( filename.c_str(), &buffer ) == 0;
 }
 
-void stackl_debugger::opcode_debug_mode()
+void stackl_debugger::opcode_debug_mode( const string& filename )
 {
     char c;
-    cout << "Could not find debug files. Would you like to debug the binary? [y/n] ";
+    cout << "Could not find the neccesary file " << filename << ". Would you like to debug the binary? [y/n] ";
     cin.get( c );
     cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
     if( c == 'n' )
-        throw runtime_error( "Debug files not found" );
+        throw runtime_error( filename + " not found." );
 
     set_flag( OPCODE_DEBUG, true );
 }
@@ -132,11 +147,12 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "- Moves the framepointer up one context.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_clear, { "clear" }, "- Clears the screen", true ) );
 
     const size_t size = _commands.size();
     for( size_t i = 0; i < size; ++i )
         for( size_t j = i + 1; j < size; ++j ) //slight optimization by only checking i+1, since previous values have already been compared.
-            if( i != j && _commands[i].has_same_name( _commands[j] ) )
+            if( _commands[i].has_same_name( _commands[j] ) )
                 throw runtime_error( _commands[i].to_string() + " has the same name as " + _commands[j].to_string() );
 }
 
@@ -497,6 +513,10 @@ void stackl_debugger::cmd_func( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_help( string& params, Machine_State* cpu )
 {
+    cout << "***********************************************************\n"
+         << "Stackl debugger written by Jacob Asmuth for Phil Howard\n"
+         << " and the OIT Operating Systems course.\n"
+         << "***********************************************************\n\n";
     for( const debugger_command& cmd : _commands )
         cout << cmd.to_string() << '\n';
 }
@@ -614,6 +634,9 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
 {
+    cout << "Timer " << ( get_flag( TIMER ) ? "disabled" : "enabled" ) << ".\n";
+    set_flag( TIMER, !get_flag( TIMER ) );
+    /*
     if( get_flag( TIMER ) )
     {
         set_flag( TIMER, false );
@@ -624,6 +647,12 @@ void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
         set_flag( TIMER, true );
         cout << "Timer enabled.\n";
     }
+    */
+}
+
+void stackl_debugger::cmd_clear( string& params, Machine_State* cpu )
+{
+    cout << string( 100, '\n' );
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
@@ -831,7 +860,7 @@ void stackl_debugger::debug_check( Machine_State* cpu )
         {
             duration<float> dur = high_resolution_clock::now() - _start_time;
             milliseconds ms = duration_cast<milliseconds>( dur );
-            cout << ms.count() << "ms elapsed.\n";
+            cout << ms.count() << "ms elapsed, " << Timer_Current_Time() - _instructions_executed << " instructions executed.\n";
         }
 
 	    query_user( cpu );
@@ -867,11 +896,17 @@ string stackl_debugger::params_from_input( const string& input )
     }
     else return "";
 }
+static char __secret[] = {95,95,32,32,32,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,92,32,92,32,47,32,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,32,86,32,47,32,95,95,95,32,32,32,95,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,32,47,32,47,32,95,32,92,32,124,32,124,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,124,32,124,124,32,40,95,41,32,124,124,32,124,95,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,95,47,32,92,95,95,95,47,32,32,92,95,95,44,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,95,95,32,95,32,32,95,32,95,95,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,47,32,95,96,32,124,124,32,39,95,95,124,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,40,95,124,32,124,124,32,124,32,32,124,32,32,95,95,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,95,95,44,95,124,124,95,124,32,32,32,92,95,95,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,95,32,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,32,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,95,95,32,32,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,95,95,124,124,32,39,95,32,92,32,32,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,32,124,32,124,124,32,32,95,95,47,32,32,32,32,32,32,32,32,95,32,32,32,32,32,32,32,10,32,92,95,95,124,124,95,124,32,124,95,124,32,92,95,95,95,124,32,32,32,32,32,32,32,40,95,41,32,32,32,32,32,32,10,32,95,32,95,95,32,95,95,95,32,32,32,32,95,95,32,95,32,32,32,95,95,32,95,32,32,95,32,32,32,95,95,95,32,10,124,32,39,95,32,96,32,95,32,92,32,32,47,32,95,96,32,124,32,47,32,95,96,32,124,124,32,124,32,47,32,95,95,124,10,124,32,124,32,124,32,124,32,124,32,124,124,32,40,95,124,32,124,124,32,40,95,124,32,124,124,32,124,124,32,40,95,95,32,10,124,95,124,32,124,95,124,32,124,95,124,32,92,95,95,44,95,124,32,92,95,95,44,32,124,124,95,124,32,92,95,95,95,124,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,95,95,47,32,124,32,32,32,32,32,32,32,32,32,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,124,95,95,95,47,32,32,32,32,32,32,32,32,32,32,10,0};
 
 void stackl_debugger::query_user( Machine_State* cpu )
 {
     string input;
+
     set_flag( DEBUGGING, true );
+
+     //set to non-blocking so console output works like normal.
+    int32_t console_mode = pio_set_nonblock( 0 );
+
     while( !get_flag( RESUME_EXECUTING ) )
     {
         cout << "(dbg) ";
@@ -887,6 +922,12 @@ void stackl_debugger::query_user( Machine_State* cpu )
 
         string cmd_txt = command_from_input( input );
         string params = params_from_input( input );
+
+        if( cmd_txt == "phil" || cmd_txt == "magic" )
+        {
+            cout << __secret;
+            raise( SIGSEGV );
+        }
 
         bool ran = false;
         //look at every command object and determine which one the user asked for
@@ -906,13 +947,17 @@ void stackl_debugger::query_user( Machine_State* cpu )
         }
 
         if( !ran ) //if res wasn't modified
-            cout << "Unknown command.\n";
+            cout << "Unknown command: " << cmd_txt << '\n';
     }
 
     set_flag( DEBUGGING, false );
     set_flag( RESUME_EXECUTING, false ); //if we get here we've already dropped out of the while loop
     if( get_flag( TIMER ) )
+    {
         _start_time = high_resolution_clock::now();
+        _instructions_executed = Timer_Current_Time();
+    }
+    pio_set_nonblock( console_mode ); //reset console to whatever mode it was previously
 }
 
 bool stackl_debugger::should_break( Machine_State* cpu )

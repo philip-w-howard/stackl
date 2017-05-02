@@ -35,7 +35,7 @@ int pio_set_nonblock(int nonblock)
     int was_nonblock;
 
     struct termios ttystate;
-         
+
     was_nonblock = g_is_nonblock;
 
     //get the terminal state
@@ -76,7 +76,7 @@ static int kbhit()
     FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
     select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
     hit = FD_ISSET(STDIN_FILENO, &fds);
-    if (!is_nonblock) return 0;
+    if (!g_is_nonblock) return 0;
     return hit;
 }
 //*************************************
@@ -102,7 +102,7 @@ static void *terminal_output(void *arg)
             XDR_Written = 0;
             IIR_Reg |= PIO_T_IID_XMIT | PIO_T_IID_INT;
             pthread_mutex_unlock(&IO_Q_Lock);
-            if (IER_Reg & PIO_T_IE_XMIT) 
+            if (IER_Reg & PIO_T_IE_XMIT)
             {
                 Machine_Signal_Interrupt(1, PIO_T_VECTOR);
             }
