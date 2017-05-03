@@ -20,4 +20,5 @@ public:
 	static vector<uint32_t> strip_array_indexes( string& var );
 	static uint32_t strip_indirection( string& var );
 	static int32_t to_int( const string& text );
+    static bool get_yesno( const string& question );
 };

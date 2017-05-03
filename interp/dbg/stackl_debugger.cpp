@@ -85,11 +85,8 @@ void stackl_debugger::check_compile_time( const string& filename )
     stat( filename.c_str(), &attrib );
     if( attrib.st_mtime > _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA )
     {
-        char c;
-        cout << "Debug file " << filename << " maybe be out of date. Continue anyways? [y/n] ";
-        cin.get( c );
-        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
-        if( c == 'n' )
+        string prompt = "Debug file " << filename << " may be out of date. Continue anyways?";
+        if( !string_utils::get_yesno( prompt ) )
             throw runtime_error( string( "Debug file " ) + filename + " is out of date." );
     }
 }
@@ -634,25 +631,13 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
 {
-    cout << "Timer " << ( get_flag( TIMER ) ? "disabled" : "enabled" ) << ".\n";
     set_flag( TIMER, !get_flag( TIMER ) );
-    /*
-    if( get_flag( TIMER ) )
-    {
-        set_flag( TIMER, false );
-        cout  << "Timer disabled.\n";
-    }
-    else
-    {
-        set_flag( TIMER, true );
-        cout << "Timer enabled.\n";
-    }
-    */
+    cout << "Timer " << ( get_flag( TIMER ) ? "enabled" : "disabled" ) << ".\n";
 }
 
 void stackl_debugger::cmd_clear( string& params, Machine_State* cpu )
 {
-    cout << string( 100, '\n' );
+    system( "clear" );
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )

@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <stdexcept>
 using std::runtime_error;
+#include <iostream>
+using std::cout;
 
 vector<string> string_utils::string_split( const string& s, const char delimiter )
 {
@@ -96,4 +98,13 @@ int32_t string_utils::to_int( const string& text )
     }
 
     return addr;
+}
+
+bool string_utils::get_yesno( const string& question )
+{
+    char c;
+    cout << question << "[Y/n] ";
+    cin.get( c );
+    cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+    return c == 'y';
 }
