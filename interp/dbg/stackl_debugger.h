@@ -98,7 +98,7 @@ private:
 	//converts the instruction at addr to slasm text
 	string opcode_to_string( uint32_t addr, Machine_State* cpu );
 	//checks the compile time of the passed source code filename against its matching debug file.
-	void check_compile_time( const string& filename );
+	void check_compile_time( const string& binaryname, const string& filename );
 	//returns true if the file exists
 	bool file_exists( const string& filename );
 	//asks the user if they would like to debug opcodes only
