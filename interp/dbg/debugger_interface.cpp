@@ -1,9 +1,8 @@
 #include "debugger_interface.h"
 #include "stackl_debugger.h"
-
+#include "string_utils.h"
 #include <iostream>
 using std::cout;
-using std::cin;
 
 static bool ENABLE = false;
 
@@ -13,13 +12,14 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
         return;
 
     if( cpu->debugger != nullptr )
-    {
-        char c;
-        cout << "A different binary is already being debugged. Would you like to debug the new one? [y/n] ";
-        cin.get( c );
-        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
-        if( c == 'n' )
-            return;
+    { //if a debugger object already exists
+        string prompt = string( filename ) + " is being loaded. Would you like to debug it?";
+        if( string_utils::get_yesno( prompt ) )
+        { //they want to debug the new binary, delete the current debugger
+            delete (stackl_debugger*)cpu->debugger;
+            cpu->debugger = nullptr;
+        }
+        else return; //they want to keep debugging the existing binary, just stop here.
     }
 
     stackl_debugger* debugger = new stackl_debugger( filename );
