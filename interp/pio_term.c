@@ -29,7 +29,7 @@ static void PIO_T_Finish();
 // Enable/Disable nonblocking mode
 // Code from:
 // http://cc.byexamples.com/2007/04/08/non-blocking-user-input-in-loop-without-ncurses/
-static int g_is_nonblock = 0;
+static volatile int g_is_nonblock = 0;
 int pio_set_nonblock(int nonblock)
 {
     int was_nonblock;

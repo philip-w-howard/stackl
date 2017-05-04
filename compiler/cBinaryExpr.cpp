@@ -249,8 +249,12 @@ int cBinaryExpr::OpAsInt()
 }
 */
 
+extern int Do_Type_Checks;
+
 bool cBinaryExpr::TypesAreCompatible()
 {
+    if (!Do_Type_Checks) return true;
+
     cTypeDecl *left = GetLeft()->GetType();;
     cTypeDecl *right = GetRight()->GetType();;
     cTypeDecl *character = dynamic_cast<cTypeDecl *>

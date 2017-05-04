@@ -96,7 +96,15 @@ class cVarDecl : public cDecl
     virtual void SetOffset(int offset)  { mOffset = offset; }
     virtual int  GetOffset()            { return mOffset; }
 
-    virtual cTypeDecl* GetType()    { return (cTypeDecl*)GetChild(0); }
+    virtual cTypeDecl* GetType()    
+    { 
+        cTypeDecl* type = (cTypeDecl*)GetChild(0);
+
+        if (IsConst() && HasInit() && type->IsInt()) 
+            return GetInit()->GetType();
+        else
+            return (cTypeDecl*)GetChild(0); 
+    }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }
     virtual cExpr*   GetArraySize() { return (cExpr*)GetChild(2); }
     virtual cExpr*   GetInit()      { return (cExpr*)GetChild(3); }

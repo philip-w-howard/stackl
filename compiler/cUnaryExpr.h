@@ -4,6 +4,7 @@
 
 #include "cExpr.h"
 #include "cSymbol.h"
+#include "cSymbolTable.h"
 
 class cUnaryExpr : public cExpr
 {
@@ -33,7 +34,22 @@ class cUnaryExpr : public cExpr
         return 0;
     }
 
-    virtual cTypeDecl *GetType() { return GetExpr()->GetType(); }
+    virtual cTypeDecl *GetType() 
+    { 
+        if (IsConst())
+        {
+            cDecl* type;
+            int value = ConstValue();
+            if (value >= -128 && value <= 127)
+                type = symbolTableRoot->Lookup("char")->GetDecl();
+            else
+                type = symbolTableRoot->Lookup("int")->GetDecl();
+
+            return dynamic_cast<cTypeDecl *>(type);
+        }
+
+        return GetExpr()->GetType(); 
+    }
 
     std::string OpToString()
     {

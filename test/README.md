@@ -40,7 +40,7 @@ Makefile?
     empty if's and while's
 19) Scopes
 20) Global variables accessed in different functions
-21) Unused
+21) Make sure const ints are correct type (char/int)
 22) Hex values and bitwise operators (more earlier?) ###################
 23) Addresses and derefferences of multple stars
     check for completeness and validity     ###################
