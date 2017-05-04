@@ -25,6 +25,11 @@ class cParams : public cAstNode
     // constructor places first decl in list
     cParams(cExpr *expr) : cAstNode()
     {
+        if (expr->GetType()->IsStruct())
+        {
+            ThrowSemanticError("Can't pass structs as function params");
+        }
+
         AddChild(expr);
     }
 
