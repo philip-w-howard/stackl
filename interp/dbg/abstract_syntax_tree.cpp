@@ -28,12 +28,12 @@ void abstract_syntax_tree::fixup_globals( unordered_map<string, int32_t>& global
 
 variable* abstract_syntax_tree::var( const string& func_name, const string & var_name )
 {
-    auto func_iter = _functions.find( func_name );
-    if( func_iter == _functions.end() )
+    function* func = this->func( func_name );
+    if( func == nullptr )
         return nullptr; //function doesnt exist
     else
     {
-        variable* var = func_iter->second.var( var_name );
+        variable* var = func->var( var_name );
         if( var != nullptr )
             return var; //variable is in function
         else //variable isn't in function
@@ -44,6 +44,14 @@ variable* abstract_syntax_tree::var( const string& func_name, const string & var
                 else return nullptr; //variable not in locals or globals
         }
     }
+    return nullptr;
+}
+
+function* abstract_syntax_tree::func( const string& func_name )
+{
+    auto func_iter = _functions.find( func_name );
+    if( func_iter != _functions.end() )
+        return &func_iter->second;
     return nullptr;
 }
 
@@ -115,6 +123,6 @@ string abstract_syntax_tree::all_funcs()
 {
     string ret = "";
     for( auto& func_pair : _functions )
-        ret += func_pair.first + "()\n";
+        ret += func_pair.second.to_string() + "\n";
     return ret;
 }

@@ -36,6 +36,7 @@ public:
     inline time_t compile_time( const string& filename ) const { return _compile_times.at( filename ); }
 
     variable* var( const string& func_name, const string& var_name );
+    function* func( const string& func_name );
 
 private:
 

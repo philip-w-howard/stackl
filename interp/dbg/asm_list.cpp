@@ -155,7 +155,7 @@ string asm_list::current_func( uint32_t cur_addr ) const
 
 string asm_list::current_file( uint32_t cur_addr ) const
 {
-    string best_filename = "unknown";
+    string best_filename = "unknown function";
     uint32_t dif = INT32_MAX;
     for( const auto& f_dict : _file_and_line_to_addr )
     {

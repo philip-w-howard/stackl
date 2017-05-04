@@ -11,11 +11,11 @@ using std::cin;
 #include <sys/types.h>
 #include <cstdlib>
 using std::runtime_error;
-#include <set>
-using std::set;
 #include <algorithm>
 using std::transform;
 using std::remove_if;
+#include <exception>
+using std::exception;
 
 extern "C"
 {
@@ -30,27 +30,20 @@ extern "C"
 //Effectively this is a "max compile time" before the debugger will ask if the debug files are out of date.
 //We want to keep it as low as is reasonable, otherwise users could accidentally run with out of date files
     //and not be notified. That's no good.
-const static int MAX_DEBUG_FILE_TIME_DELTA = 30;
+const static int MAX_DEBUG_FILE_TIME_DELTA = 10;
 
-stackl_debugger::stackl_debugger( const char* filename )
+stackl_debugger::stackl_debugger( const char* filename ): _binary_name( string_utils::change_ext( filename, ".slb" ) )
 {
-    string fname = filename;
-    _binary_name = fname;
-
-    size_t idx = fname.find_last_of( '.' );
-    if( idx != string::npos )
-        fname.erase( idx );
-
+    string dbg_file = string_utils::change_ext( filename, ".dbg" );
     try
     {
-
-        if( !file_exists( fname + ".dbg" ) )
+        if( !file_exists( dbg_file ) )
         {
-            opcode_debug_mode( fname + ".dbg" );
+            opcode_debug_mode( dbg_file );
         }
         else
         {
-            _lst = asm_list( fname + ".dbg" );
+            _lst = asm_list( dbg_file );
             _ast = abstract_syntax_tree();
 
             for( const string& filename : _lst.file_list() )
@@ -58,7 +51,7 @@ stackl_debugger::stackl_debugger( const char* filename )
                 if( file_exists( filename ) )
                 {
                     _ast.add_ast( filename );
-                    check_compile_time( fname, filename );
+                    check_compile_time( _binary_name, filename );
                 }
                 else
                     opcode_debug_mode( filename );
@@ -82,14 +75,17 @@ stackl_debugger::stackl_debugger( const char* filename )
 void stackl_debugger::check_compile_time( const string& binaryfile, const string& filename )
 {
     struct stat attrib;
-    stat( binaryfile.c_str(), &attrib );
+    string source_file = string_utils::change_ext( filename, ".c" );
+
+    if( file_exists( source_file ) ) //get last time the source code file was modified
+        stat( source_file.c_str(), &attrib );
+    else //if we can't find a matching source file then use the binary
+        stat( binaryfile.c_str(), &attrib );
+
     if( attrib.st_mtime > _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA )
     {
-        char c;
-        cout << "Debug file " << filename << " maybe be out of date. Continue anyways? [y/n] ";
-        cin.get( c );
-        cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
-        if( c == 'n' )
+        string prompt = "Debug file " + filename + " may be out of date. Continue anyways?";
+        if( !string_utils::get_yesno( prompt ) )
             throw runtime_error( string( "Debug file " ) + filename + " is out of date." );
     }
 }
@@ -102,11 +98,8 @@ bool stackl_debugger::file_exists( const string& filename )
 
 void stackl_debugger::opcode_debug_mode( const string& filename )
 {
-    char c;
-    cout << "Could not find the neccesary file " << filename << ". Would you like to debug the binary? [y/n] ";
-    cin.get( c );
-    cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
-    if( c == 'n' )
+    string prompt = "Could not find the neccesary file " + filename + ". Would you like to debug the binary?";
+    if( !string_utils::get_yesno( prompt ) )
         throw runtime_error( filename + " not found." );
 
     set_flag( OPCODE_DEBUG, true );
@@ -508,15 +501,19 @@ void stackl_debugger::cmd_program( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_func( string& params, Machine_State* cpu )
 {
-    cout << _lst.current_func( cpu->IP ) << '\n';
+    function* func = _ast.func( _lst.current_func( cpu->IP ) );
+    if( func != nullptr )
+        cout << func->to_string() << '\n';
+    else
+        cout << "Couldn't determine current function.\n";
 }
 
 void stackl_debugger::cmd_help( string& params, Machine_State* cpu )
 {
     cout << "***********************************************************\n"
-         << "Stackl debugger written by Jacob Asmuth for Phil Howard\n"
-         << " and the OIT Operating Systems course.\n"
-         << "***********************************************************\n\n";
+            "Stackl debugger written by Jacob Asmuth for Phil Howard\n"
+            " and the OIT Operating Systems course.\n"
+            "***********************************************************\n\n";
     for( const debugger_command& cmd : _commands )
         cout << cmd.to_string() << '\n';
 }
@@ -568,7 +565,6 @@ void stackl_debugger::cmd_watches( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
 {
-    //addr 12 holds the address of the first function jumped to by the interpreter
     string init_func = get_init_func( cpu );
 
     uint32_t fp = cpu->FP;
@@ -587,7 +583,14 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
         cur_file = _lst.current_file( ip );
         cur_line = _lst.line_of_addr( cur_file, ip );
 
-        contexts.push_back( std::to_string( ++i ) + ". " + cur_func + "() at " + cur_file + ":" + std::to_string( cur_line ) );
+        string full_func;
+        function* func_ptr = _ast.func( cur_func );
+        if( func_ptr != nullptr )
+            full_func = func_ptr->to_string();
+        else
+            break; //we found a garbage function so we're out
+
+        contexts.push_back( std::to_string( ++i ) + ". " + full_func + " at " + cur_file + ":" + std::to_string( cur_line ) );
 
         ip = Get_Word( cpu, fp - 8 );
         fp = Get_Word( cpu, fp - 4 );
@@ -634,25 +637,13 @@ void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_timer( string& params, Machine_State* cpu )
 {
-    cout << "Timer " << ( get_flag( TIMER ) ? "disabled" : "enabled" ) << ".\n";
     set_flag( TIMER, !get_flag( TIMER ) );
-    /*
-    if( get_flag( TIMER ) )
-    {
-        set_flag( TIMER, false );
-        cout  << "Timer disabled.\n";
-    }
-    else
-    {
-        set_flag( TIMER, true );
-        cout << "Timer enabled.\n";
-    }
-    */
+    cout << "Timer " << ( get_flag( TIMER ) ? "enabled" : "disabled" ) << ".\n";
 }
 
 void stackl_debugger::cmd_clear( string& params, Machine_State* cpu )
 {
-    cout << string( 100, '\n' );
+    system( "clear" );
 }
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
@@ -722,9 +713,9 @@ stackl_debugger::BREAKPOINT_RESULT stackl_debugger::remove_breakpoint( const str
 
     if( bpl != UINT32_MAX )
     {
-    	if( remove_breakpoint( bpl ) )
+        if( remove_breakpoint( bpl ) )
             return BREAKPOINT_RESULT::SUCCESS;
-	else
+    else
             return BREAKPOINT_RESULT::NOT_FOUND;
     }
     else return BREAKPOINT_RESULT::NOT_FOUND;
@@ -742,7 +733,7 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
     {
         vector<string> file_line = string_utils::string_split( break_point_text, ':' );
         int32_t user_line = string_utils::to_int( file_line[1] );
-	    return _lst.addr_of_line( file_line[0], user_line );
+        return _lst.addr_of_line( file_line[0], user_line );
     }
     else if( string_utils::is_number( break_point_text, 10, &res ) )
     {
@@ -750,7 +741,7 @@ uint32_t stackl_debugger::text_to_addr( const string& break_point_text, uint32_t
     }
     else
     {
-	    return _lst.addr_of_func( break_point_text );
+        return _lst.addr_of_func( break_point_text );
     }
 }
 
@@ -759,8 +750,8 @@ bool stackl_debugger::add_breakpoint( uint32_t addr )
 {
     if( find( _break_points.begin(), _break_points.end(), addr ) == _break_points.end() )
     {
-    	_break_points.push_back( addr );
-    	return true;
+        _break_points.push_back( addr );
+        return true;
     }
     else return false;
 }
@@ -850,7 +841,7 @@ void stackl_debugger::debug_check( Machine_State* cpu )
         if( !get_flag( OPCODE_DEBUG ) )
         {
             string cur_file = _lst.current_file( cpu->IP );
-	        cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+            cout << "Breakpoint hit on " << cur_file << ":" << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
             cout << get_nearby_lines( cpu->IP, 0);
         }
         else
@@ -863,7 +854,7 @@ void stackl_debugger::debug_check( Machine_State* cpu )
             cout << ms.count() << "ms elapsed, " << Timer_Current_Time() - _instructions_executed << " instructions executed.\n";
         }
 
-	    query_user( cpu );
+        query_user( cpu );
 
         if( !_context_history.empty() ) //if the user ran an 'up' command but didn't move back down
         {
@@ -935,18 +926,16 @@ void stackl_debugger::query_user( Machine_State* cpu )
         {
             if( command.called_by( cmd_txt ) )
             {
+                ran = true;
                 if( get_flag( OPCODE_DEBUG ) && !command.allowed_in_opcode_mode() )
                     cout << "You can't run this command without debug files available.\n";
                 else
-                {
                     command.run( params, cpu );
-                    ran = true;
-                }
                 break; //stop checking for more commands once we find it
             }
         }
 
-        if( !ran ) //if res wasn't modified
+        if( !ran )
             cout << "Unknown command: " << cmd_txt << '\n';
     }
 
@@ -1025,13 +1014,13 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
 
     try
     {
-	    file.open( cur_file ); //this can throw an exception
-	    if( !file.is_open() )
-	        throw 0; //this is kinda dumb... but it keeps us from duplicating the error message?
+        file.open( cur_file ); //this can throw an exception
+        if( !file.is_open() )
+            throw 0; //this is kinda dumb... but it keeps us from duplicating the error message?
     }
     catch( ... )
     {
-	    return string( "Unable to open " ) + cur_file + '\n';
+        return string( "Unable to open " ) + cur_file + '\n';
     }
 
     int i = 1; //files start on line 1
@@ -1041,11 +1030,12 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
             ret += to_string( i ) + ". " + string( 3 - (int)log10( i ), ' ' ) + line + '\n';
         if( i > cur_line + range )
             break;
-	    ++i;
+        ++i;
     }
     return ret;
 }
 
+//address 12 holds the address of the first function jumped to by the interpreter
 string stackl_debugger::get_init_func( Machine_State* cpu ) const
 {
     return _lst.current_func( Get_Word( cpu, 12 ) );

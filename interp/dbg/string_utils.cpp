@@ -2,6 +2,9 @@
 #include <cstdio>
 #include <stdexcept>
 using std::runtime_error;
+#include <iostream>
+using std::cout;
+using std::cin;
 
 vector<string> string_utils::string_split( const string& s, const char delimiter )
 {
@@ -12,13 +15,13 @@ vector<string> string_utils::string_split( const string& s, const char delimiter
 
     while( end <= string::npos )
     {
-	output.emplace_back( s.substr( start, end - start ) );
+    output.emplace_back( s.substr( start, end - start ) );
 
         if( end == string::npos )
-	    break;
+        break;
 
-	    start = end + 1;
-	    end = s.find_first_of( delimiter, start );
+        start = end + 1;
+        end = s.find_first_of( delimiter, start );
     }
 
     return output;
@@ -34,9 +37,9 @@ bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res
 {
     char* p;
     if( res != nullptr )
-	    *res = strtol( num_text.c_str(), &p, base );
+        *res = strtol( num_text.c_str(), &p, base );
     else
-	    strtol( num_text.c_str(), &p, base );
+        strtol( num_text.c_str(), &p, base );
     return *p == 0;
 }
 
@@ -96,4 +99,18 @@ int32_t string_utils::to_int( const string& text )
     }
 
     return addr;
+}
+
+bool string_utils::get_yesno( const string& question )
+{
+    char c;
+    cout << question << " [Y/n] ";
+    cin.get( c );
+    cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+    return c == 'y' || c == 'Y';
+}
+
+string string_utils::change_ext( const string& filename, const string& new_ext )
+{
+    return filename.substr( 0, filename.find_last_of( "." ) ) + new_ext;
 }
