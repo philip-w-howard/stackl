@@ -1,26 +1,16 @@
-Make a proper pre-processor
+doubly defined functions from separate compilation units
+Doubly defined global vars from separate compilation units:
 
-Function pointers?
-    syntax and semantics?
+Make a proper pre-processor
 
 function return types
     validate the type of thing in return statement
     Don't force return 0 at end of functions
 
-test for stack for pre/post inc/dec
-
-Add semantic checks
-    function param number and type
-
 Implement machine check interrupt vector. User mode machine checks trap, OS mode machine checks halt.
-
-Allow int <--> ptr conversions, but prohibit others
-    Implement cast syntax? or just default conversion?
 
 figure out gcc generating dependencies
 
 const optimizations
-
-redo test suite
 
 static vars at global and local level

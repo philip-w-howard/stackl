@@ -211,7 +211,7 @@ int PIO_T_Init()
 static void PIO_T_Finish()
 {
     IO_Q_Halt_Thread = 1;
-    pthread_cond_signal(&IO_Q_Cond);
+    pthread_cond_broadcast(&IO_Q_Cond);
     pthread_join(IO_Q_Thread_1, NULL);
     pthread_join(IO_Q_Thread_2, NULL);
     pio_set_nonblock(0);

@@ -146,7 +146,7 @@ static void *IO_Processor(void *arg)
 static void Finish_IO()
 {
     IO_Q_Halt_Thread = 1;
-    pthread_cond_signal(&IO_Q_Cond);
+    pthread_cond_broadcast(&IO_Q_Cond);
     pthread_join(IO_Q_Thread, NULL);
 }
 //*************************************
