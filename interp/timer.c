@@ -92,7 +92,7 @@ int Timer_Heartbeat()
 
 //*************************************
 // for internal interpreter use
-uint32_t Timer_Current_Time()
+int Timer_Current_Time()
 {
     return Timer_Time_Reg;
 }
