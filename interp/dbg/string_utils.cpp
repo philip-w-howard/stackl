@@ -5,6 +5,10 @@ using std::runtime_error;
 #include <iostream>
 using std::cout;
 using std::cin;
+extern "C"
+{
+    #include "../pio_term_int.h"
+}
 
 vector<string> string_utils::string_split( const string& s, const char delimiter )
 {
@@ -103,10 +107,12 @@ int32_t string_utils::to_int( const string& text )
 
 bool string_utils::get_yesno( const string& question )
 {
+    int32_t previous_mode = pio_set_nonblock( 0 );
     char c;
     cout << question << " [Y/n] ";
     cin.get( c );
     cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+    pio_set_nonblock( previous_mode );
     return c == 'y' || c == 'Y';
 }
 
