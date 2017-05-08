@@ -25,6 +25,8 @@ extern "C"
     #include "../timer.h"
 }
 
+#include "expression.h"
+
 //I tried with the variable name here. I really did.
 //It's the number of seconds that a debug file can be compiled BEFORE the binary is generated.
 //Effectively this is a "max compile time" before the debugger will ask if the debug files are out of date.
@@ -141,6 +143,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_clear, { "clear" }, "- Clears the screen", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_printmem, { "printmem", "pm" }, "[address|0xaddress] - Prints memory at the passed address", true ) );
 
     const size_t size = _commands.size();
     for( size_t i = 0; i < size; ++i )
@@ -264,7 +267,8 @@ void stackl_debugger::cmd_print( string& params, Machine_State* cpu )
 
     try
     {
-        cout << var_to_string( cpu, params ) << '\n';
+        string parsed = expression( params ).eval( cpu );
+        cout << var_to_string( cpu, parsed, true ) << '\n';
     }
     catch( const exception& err )
     {
@@ -296,6 +300,28 @@ void stackl_debugger::cmd_printi( string& params, Machine_State* cpu )
         cout << "Misaligned instruction pointer.\n";
     else
         cout << opcode_to_string( addr, cpu ) << '\n';
+}
+
+void stackl_debugger::cmd_printmem( string& params, Machine_State* cpu )
+{
+    if( params.empty() )
+    {
+        cout << "You must pass an address to print.\n";
+        return;
+    }
+
+    int32_t addr;
+    try
+    {
+        addr = string_utils::to_int( params );
+    }
+    catch( runtime_error& )
+    {
+        cout << "Enter a valid number.\n";
+        return;
+    }
+
+    cout << Get_Word( cpu, addr ) << '\n';
 }
 
 void stackl_debugger::cmd_continue( string& params, Machine_State* cpu )
@@ -535,7 +561,7 @@ void stackl_debugger::cmd_watch( string& params, Machine_State* cpu )
     try
     {
         string name = params;
-        _watches[name] = var_to_string( cpu, params );
+        _watches[name] = var_to_string( cpu, params, false );
         cout << name <<  " is now being watched.\n";
     }
     catch( const exception& err )
@@ -767,16 +793,14 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
     else return false;
 }
 
-string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
+string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text, bool prepend_def )
 {
     int32_t val;
 
-    var_text.erase( remove_if( var_text.begin(), var_text.end(), isspace ), var_text.end() ); //remove spaces
-
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
-        return string_utils::to_hex( Get_Word( cpu, val ) );
+        return string_utils::to_hex( val );
     else if (string_utils::is_number( var_text, 10, &val ) )
-        return std::to_string(Get_Word( cpu, val ) );
+        return std::to_string( val );
 
     bool address_of = false;
     if( var_text[0] == '&' )
@@ -792,7 +816,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
     variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
 
     if( var == nullptr )
-        throw runtime_error( "Variable not found in current scope" );
+        throw runtime_error( string( var_text ) + " not found in current scope" );
 
     variable res = var->from_indexes( indexes, cpu );
     res = res.deref( indirection, cpu );
@@ -822,7 +846,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text )
     if( address_of )
         return std::to_string( res.total_offset( cpu ) );
         //return string_utils::to_hex( res.total_offset( cpu ) );
-    else return res.to_string( cpu );
+    else return res.to_string( cpu, 0, prepend_def );
 }
 
 void stackl_debugger::debug_check( Machine_State* cpu )
@@ -995,7 +1019,7 @@ unordered_map<string, string> stackl_debugger::changed_watches( Machine_State* c
         string var_name = pair.first;
         try
         {
-            string res = var_to_string( cpu, var_name );
+            string res = var_to_string( cpu, var_name, false );
             if( res != pair.second )
                 ret[pair.first] = res;
         }

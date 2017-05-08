@@ -20,7 +20,9 @@ OBJS=stackl.o \
 	 string_utils.o \
 	 stackl_debugger.o \
 	 debugger_interface.o \
-	 debugger_command.o
+	 debugger_command.o \
+	 expression.o \
+	 operation.o
 
 all: stackl slasm
 

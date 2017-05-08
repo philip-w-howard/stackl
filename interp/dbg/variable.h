@@ -29,7 +29,7 @@ public:
     variable( xml_node<char>* var_node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context = nullptr );
     variable() {}
 
-    string to_string( Machine_State* cpu, uint32_t indent_level = 0 ) const;
+    string to_string( Machine_State* cpu, uint32_t indent_level = 0, bool prepend_def = false ) const;
     variable deref( uint32_t derefs, Machine_State* cpu ) const;
     variable from_indexes( vector<uint32_t>& indexes, Machine_State* cpu ) const;
 

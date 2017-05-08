@@ -230,10 +230,14 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
     return indexed;
 }
 
-string variable::to_string( Machine_State* cpu, uint32_t indent_level ) const
+string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prepend_def ) const
 {
+
     string tabs = string( indent_level*4, ' ' );
-    string pre = tabs + definition() + " = ";
+    string pre = "";
+    if( prepend_def )
+        pre = tabs + definition() + " = ";
+
     if( is_string() ) //special case: we want to print out the string
     {
         int32_t addr;

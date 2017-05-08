@@ -26,6 +26,7 @@ using std::chrono::duration_cast;
 
 class stackl_debugger
 {
+    friend class operation;
 public:
     stackl_debugger( const char* filename );
 
@@ -35,6 +36,7 @@ public:
     inline bool debugging() const { return get_flag( FLAG::DEBUGGING ); }
     inline bool loaded() const { return get_flag( FLAG::LOADED ); }
     inline string failure_reason() const { return _failure_reason; }
+
 private:
     enum BREAKPOINT_RESULT
     {
@@ -84,7 +86,7 @@ private:
     This supports multiple levels of indirection.
     array[X] will print the value of the variable at X index
     */
-    string var_to_string( Machine_State* cpu, string& var_text );
+    string var_to_string( Machine_State* cpu, string& var_text, bool prepend_def );
 
     //'list' in gdb. maybe 2 lines above and below? obviously configurable.
     string get_nearby_lines( uint32_t cur_addr, int32_t range );
@@ -151,6 +153,8 @@ private:
     void cmd_down( string& params, Machine_State* cpu );
     void cmd_timer( string& params, Machine_State* cpu );
     void cmd_clear( string& params, Machine_State* cpu );
+    void cmd_printmem( string& params, Machine_State* cpu );
+    
 
     string _binary_name = ""; //the name of the current binary being debugged
     vector<uint32_t> _break_points; //list of instruction pointers to break at
