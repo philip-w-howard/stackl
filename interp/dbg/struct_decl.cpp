@@ -25,7 +25,7 @@ string struct_decl::to_string( Machine_State* cpu, uint32_t indent_level ) const
 {
     string ret = "";
     for( auto& var : _fields )
-        ret += var.to_string( cpu, indent_level ) + '\n';
+        ret += var.to_string( cpu, indent_level, true ) + '\n';
     return ret;
 }
 

@@ -5,6 +5,10 @@ using std::runtime_error;
 #include <iostream>
 using std::cout;
 using std::cin;
+extern "C"
+{
+    #include "../pio_term_int.h"
+}
 
 vector<string> string_utils::string_split( const string& s, const char delimiter )
 {
@@ -15,10 +19,10 @@ vector<string> string_utils::string_split( const string& s, const char delimiter
 
     while( end <= string::npos )
     {
-    output.emplace_back( s.substr( start, end - start ) );
+        output.emplace_back( s.substr( start, end - start ) );
 
         if( end == string::npos )
-        break;
+            break;
 
         start = end + 1;
         end = s.find_first_of( delimiter, start );
@@ -40,6 +44,16 @@ bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res
         *res = strtol( num_text.c_str(), &p, base );
     else
         strtol( num_text.c_str(), &p, base );
+    return *p == 0;
+}
+
+bool string_utils::is_number( const string& num_text, int32_t base, int64_t* res )
+{
+    char* p;
+    if( res != nullptr )
+        *res = strtoll( num_text.c_str(), &p, base );
+    else
+        strtoll( num_text.c_str(), &p, base );
     return *p == 0;
 }
 
@@ -103,10 +117,12 @@ int32_t string_utils::to_int( const string& text )
 
 bool string_utils::get_yesno( const string& question )
 {
+    int32_t previous_mode = pio_set_nonblock( 0 );
     char c;
     cout << question << " [Y/n] ";
     cin.get( c );
     cin.ignore( INT32_MAX, '\n' ); //ignore 2^31 characters up until the next newline
+    pio_set_nonblock( previous_mode );
     return c == 'y' || c == 'Y';
 }
 

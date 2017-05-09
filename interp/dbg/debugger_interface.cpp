@@ -16,8 +16,9 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
         string prompt = string( filename ) + " is being loaded. Would you like to debug it?";
         if( string_utils::get_yesno( prompt ) )
         { //they want to debug the new binary, delete the current debugger
-            delete (stackl_debugger*)cpu->debugger;
+            stackl_debugger* debugger = (stackl_debugger*)cpu->debugger;
             cpu->debugger = nullptr;
+            delete debugger;
         }
         else return; //they want to keep debugging the existing binary, just stop here.
     }

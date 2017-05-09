@@ -92,8 +92,11 @@ int Timer_Heartbeat()
 
 //*************************************
 // for internal interpreter use
+<<<<<<< HEAD
 // Has to be declared "int" instead of "uint32_t" because the 
 // .h includes this prototype and the .h is included by stackl code
+=======
+>>>>>>> 93551cedf6ce5efb0ec8c2b8705a86f5f4783519
 int Timer_Current_Time()
 {
     return Timer_Time_Reg;
