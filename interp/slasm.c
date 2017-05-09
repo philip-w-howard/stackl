@@ -59,6 +59,18 @@ static int g_Num_Label_Refs = 0;
 static int g_Label_Defs_Extent = 0;
 static int g_Label_Refs_Extent = 0;
 
+static label_def_t *get_label_def(const char *label)
+{
+    int ii;
+
+    for (ii=0; ii<g_Num_Label_Defs; ii++)
+    {
+       if (strcmp(label, g_Label_Defs[ii].label) == 0) return &g_Label_Defs[ii];
+    }
+
+    return NULL;
+}
+
 static void add_label_def(const char *label)
 {
     if (g_Num_Label_Defs >= g_Label_Defs_Extent)
@@ -71,6 +83,12 @@ static void add_label_def(const char *label)
             fprintf(stderr, "Unable to allocate memory\n");
             exit(1);
         }
+    }
+
+    if (get_label_def(label) != NULL)
+    {
+        fprintf(stderr, "Duplicate label: %s\n", label);
+        exit(1);
     }
 
     strcpy(g_Label_Defs[g_Num_Label_Defs].label, label);
@@ -117,21 +135,6 @@ static void add_label_ref(const char *label)
     }
 
     g_Num_Label_Refs++;
-}
-
-static label_def_t *get_label_def(const char *label)
-{
-    int ii;
-
-    for (ii=0; ii<g_Num_Label_Defs; ii++)
-    {
-       if (strcmp(label, g_Label_Defs[ii].label) == 0) return &g_Label_Defs[ii];
-    }
-
-    fprintf(stderr, "Undefined label: %s\n", label);
-    exit(1);
-
-    return NULL;
 }
 
 static void fixup_offsets()
@@ -181,6 +184,12 @@ static void update_single_label(int label_index)
     label_def_t *label_def;
 
     label_def = get_label_def(g_Label_Refs[label_index].label);
+    if (label_def == NULL)
+    {
+        fprintf(stderr, "Undefined label: %s\n", 
+                g_Label_Refs[label_index].label);
+        exit(1);
+    }
 
     if (label_def == NULL) 
     {
@@ -759,6 +768,11 @@ static void update_single_vector(int offset, const char *name)
     label_def_t *label_def;
 
     label_def = get_label_def(name);
+    if (label_def == NULL)
+    {
+        fprintf(stderr, "Undefined label: %s\n", name);
+        exit(1);
+    }
 
     if (label_def == NULL)
     {
