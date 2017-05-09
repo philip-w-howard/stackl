@@ -114,6 +114,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 ">>"                        Return(RIGHT);
 "asm"                       Return(ASM);
 "asm2"                      Return(ASM2);
+"extern"                    Return(EXTERN);
 "static"                    Return(STATIC);
 "const"                     Return(CONST);
 "#define"                   Return(DEFINE);

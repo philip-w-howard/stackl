@@ -45,7 +45,7 @@
 %token <string>    STRING_LIT
 %token <symbol>    CHAR
 
-%token STATIC VOLATILE 
+%token STATIC VOLATILE EXTERN
 %token  VOID
 %token  DO FOR WHILE IF ELSE SWITCH CASE GOTO
 %token  BREAK CONTINUE
@@ -225,6 +225,8 @@ typedef:  TYPEDEF type IDENTIFIER
             { $$ = new cTypedef($2, $3); }
 global_decl: func_decl
             { $$ = $1; }
+        | STATIC func_decl
+            { $$ = $2; }
         | struct_decl ';'
             { $$ = $1; }
         | typedef ';'
@@ -259,6 +261,12 @@ global_decl: func_decl
                 var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
+            }
+        | STATIC var_decl ';'
+            { 
+                $2->SetGlobal();
+                $2->SetStatic();
+                $$ = $2; 
             }
         | var_decl ';'
             { 

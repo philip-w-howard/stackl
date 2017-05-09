@@ -49,6 +49,7 @@ class cVarDecl : public cDecl
         mIsGlobal   = false;
         mHasInit    = false;
         mIsConst    = false;
+        mIsStatic   = false;
     }
 
     cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl()
@@ -85,8 +86,10 @@ class cVarDecl : public cDecl
     }
     void SetGlobal()        { mIsGlobal = true; }
     void SetConst()         { mIsConst = true; }
+    void SetStatic()         { mIsStatic = true; }
 
     virtual bool IsGlobal() { return mIsGlobal; }
+    virtual bool IsStatic() { return mIsStatic; }
     virtual bool IsConst()  
         { return mIsConst; }
         //{ return GetInit()!=nullptr && GetInit()->IsConst(); }
@@ -105,6 +108,14 @@ class cVarDecl : public cDecl
         else
             return (cTypeDecl*)GetChild(0); 
     }
+    virtual std::string GetVarName()   
+    { 
+        std::string name = GetName()->Name();
+        if (IsGlobal() && IsStatic())
+            return "$" + name;
+        else
+            return name;
+    }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(1); }
     virtual cExpr*   GetArraySize() { return (cExpr*)GetChild(2); }
     virtual cExpr*   GetInit()      { return (cExpr*)GetChild(3); }
@@ -116,5 +127,6 @@ class cVarDecl : public cDecl
     bool      mIsGlobal;
     bool      mHasInit;
     bool      mIsConst;
+    bool      mIsStatic;
 };
 

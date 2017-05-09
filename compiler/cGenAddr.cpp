@@ -74,7 +74,7 @@ void cGenAddr::Visit(cPlainVarRef *node)
         fatal_error("Attempted to generate code for a cVarRef without a decl");
     if (var->IsGlobal())
     {
-        m_CodeGen->EmitInst("PUSH", var->GetName()->Name());
+        m_CodeGen->EmitInst("PUSH", var->GetVarName());
     } else {
         m_CodeGen->EmitInst("PUSH", var->GetOffset());
         m_CodeGen->EmitInst("PUSHFP");

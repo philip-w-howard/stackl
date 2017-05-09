@@ -13,6 +13,7 @@ class cDecl : public cStmt
   public:
     cDecl() : cStmt() {}
 
+    virtual bool IsStatic() { return false; }
     virtual bool IsType()   { return false; }
     virtual bool IsVar()    { return false; }
     virtual bool IsFunc()   { return false; }

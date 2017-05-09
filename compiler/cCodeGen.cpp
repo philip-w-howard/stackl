@@ -546,7 +546,7 @@ void cCodeGen::Visit(cVarDecl *node)
     if (node->IsGlobal())
     {
         EmitInst(".dataseg");
-        EmitLabel(node->GetName()->Name());
+        EmitLabel(node->GetVarName());
         if (node->IsConst() && node->HasInit())
         {
             EmitInst(".data", node->GetInit()->ConstValue());
@@ -612,7 +612,7 @@ void cCodeGen::EmitInst(string inst)
 string cCodeGen::GenerateLabel()
 {
     m_Next_Label++;
-    string label("$LABEL_");
+    string label("$$LABEL_");
     label += std::to_string(m_Next_Label);
     return label;
 }
