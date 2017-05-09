@@ -238,6 +238,7 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl($2, $3);
                 var->SetInit($5);
                 var->SetGlobal();
+                var->SetStatic();
                 var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
@@ -249,6 +250,7 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl(type, $2);
                 var->SetInit(new cIntExpr($3));
                 var->SetGlobal();
+                var->SetStatic();
                 var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
@@ -260,9 +262,16 @@ global_decl: func_decl
                 cVarDecl *var = new cVarDecl(type, $2);
                 var->SetInit(new cIntExpr(-$4));
                 var->SetGlobal();
+                var->SetStatic();
                 var->SetConst();
                 $$ = var;
                 if ($$->HasSemanticError()) YYERROR;
+            }
+        | EXTERN var_decl ';'
+            { 
+                $2->SetGlobal();
+                $2->SetExtern();
+                $$ = $2; 
             }
         | STATIC var_decl ';'
             { 

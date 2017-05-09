@@ -544,7 +544,7 @@ void cCodeGen::Visit(cVarDecl *node)
 
     // If global, emit label and allocate space
     EmitLineNumber(node);
-    if (node->IsGlobal())
+    if (node->IsGlobal() && !node->IsExtern())
     {
         EmitInst(".dataseg");
         EmitLabel(node->GetVarName());

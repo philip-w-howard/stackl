@@ -50,6 +50,7 @@ class cVarDecl : public cDecl
         mHasInit    = false;
         mIsConst    = false;
         mIsStatic   = false;
+        mIsExtern   = false;
     }
 
     cVarDecl(cVarDecl *base, cExpr *arraySize) : cDecl()
@@ -87,9 +88,11 @@ class cVarDecl : public cDecl
     void SetGlobal()        { mIsGlobal = true; }
     void SetConst()         { mIsConst = true; }
     void SetStatic()         { mIsStatic = true; }
+    void SetExtern()         { mIsExtern = true; }
 
     virtual bool IsGlobal() { return mIsGlobal; }
     virtual bool IsStatic() { return mIsStatic; }
+    virtual bool IsExtern() { return mIsExtern; }
     virtual bool IsConst()  
         { return mIsConst; }
         //{ return GetInit()!=nullptr && GetInit()->IsConst(); }
@@ -128,5 +131,6 @@ class cVarDecl : public cDecl
     bool      mHasInit;
     bool      mIsConst;
     bool      mIsStatic;
+    bool      mIsExtern;
 };
 
