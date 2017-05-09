@@ -64,7 +64,7 @@ class cFuncCall : public cVarRef
     virtual bool IsFunc()        { return true; }
     cFuncDecl* GetFuncDecl()     { return (cFuncDecl*)(GetBase()->GetType()); }
     virtual cTypeDecl *GetType() { return GetFuncDecl()->ReturnType(); }
-    std::string GetFuncName()    { return GetFuncDecl()->GetName()->Name(); }
+    std::string GetFuncName()    { return GetFuncDecl()->GetFuncName(); }
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 

@@ -247,10 +247,10 @@ void cCodeGen::Visit(cFuncDecl *node)
     EmitLineNumber(node);
     if (node->IsDefinition())
     {
-        string inst = ".function " + node->GetName()->Name();
+        string inst = ".function " + node->GetFuncName();
         EmitInst(inst);
-        EmitComment(node->GetName()->Name() + "\n");
-        EmitLabel(node->GetName()->Name());
+        EmitComment(node->GetFuncName() + "\n");
+        EmitLabel(node->GetFuncName());
         int adj_size = (node->DeclsSize() / WORD_SIZE * WORD_SIZE) + WORD_SIZE;
         if (node->DeclsSize() != 0)
         {
@@ -316,7 +316,8 @@ void cCodeGen::Visit(cPlainVarRef *node)
 {
     if (node->IsFunc())
     {
-        EmitInst("PUSH", node->GetName()->Name());
+        cDecl *decl = node->GetName()->GetDecl();
+        EmitInst("PUSH", dynamic_cast<cFuncDecl*>(decl)->GetFuncName());
     }
     else
     {

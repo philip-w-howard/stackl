@@ -226,7 +226,9 @@ typedef:  TYPEDEF type IDENTIFIER
 global_decl: func_decl
             { $$ = $1; }
         | STATIC func_decl
-            { $$ = $2; }
+            {   $2->SetStatic();
+                $$ = $2; 
+            }
         | struct_decl ';'
             { $$ = $1; }
         | typedef ';'

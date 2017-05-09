@@ -23,6 +23,7 @@ class cFuncDecl : public cTypeDecl
         AddChild(nullptr); // stmts
         mHasStatements  = false;
         mDeclsSize      = 0;
+        mIsStatic       = false;
         mSize = cCodeGen::STACKL_WORD_SIZE;
 
         // Do semantic checks
@@ -112,10 +113,20 @@ class cFuncDecl : public cTypeDecl
 
     virtual bool IsFunc()           { return true; }
     virtual bool IsType()           { return false; }
+    virtual bool IsStatic()         { return mIsStatic; }
     virtual void SetSize(int size)  { mDeclsSize = size; }
+    virtual void SetStatic()        { mIsStatic = true; }
     virtual int  GetSize()          { return mDeclsSize; }
 
     cSymbol* GetName()          { return (cSymbol*)GetChild(0); }
+    std::string GetFuncName()
+    { 
+        std::string name = GetName()->Name();
+        if (IsStatic())
+            return "$" + name;
+        else
+            return name;
+    }
     cTypeDecl* ReturnType()     { return (cTypeDecl*)GetChild(1); }
     cDeclsList* GetParams()     { return (cDeclsList*)GetChild(2); }
     cStmtsList* GetStmts()      { return (cStmtsList*)GetChild(3); }
@@ -128,5 +139,6 @@ class cFuncDecl : public cTypeDecl
     bool mHasStatements;
     bool mHasParams;
     int mDeclsSize;
+    bool mIsStatic;
 };
 
