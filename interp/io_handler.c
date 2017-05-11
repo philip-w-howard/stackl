@@ -18,6 +18,7 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 typedef struct
 {
     int32_t io_blk_addr;
+    int32_t  buff;
 } io_op_t;
 
 static io_op_t IO_Q[IO_Q_SIZE];
@@ -48,7 +49,7 @@ static void *IO_Processor(void *arg)
     int32_t io_blk_addr;
     int32_t io_op;
     int32_t status;
-    void *addr;
+    char *addr;
 
     while (IO_Q_Halt_Thread == 0)
     {
@@ -66,6 +67,7 @@ static void *IO_Processor(void *arg)
             // alread have the lock from above
             // pthread_mutex_lock(&IO_Q_Lock);
             io_blk_addr = IO_Q[IO_Q_Tail].io_blk_addr;
+            addr        = Abs_Get_Addr( IO_Q[IO_Q_Tail].buff );
 
             IO_Q_Tail++;
             IO_Q_Tail %= IO_Q_SIZE;
@@ -75,60 +77,47 @@ static void *IO_Processor(void *arg)
             io_op = Abs_Get_Word(io_blk_addr);
             io_op &= ~IO_FLAGS;
 
-            addr = Abs_Get_Addr( Abs_Get_Word(io_blk_addr + WORD_SIZE));
             Abs_Set_Word(io_blk_addr, io_op | IO_PENDING);
 
-            switch (io_op)
+            if (!Allow_INP_Instr)
             {
-                case GETL_CALL:
-                    if (Allow_INP_Instr)
+                Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
+                        "INP instruction not enabled: %d", io_op);
+                io_op |= IO_ERROR;
+            }
+            else
+            {
+                switch (io_op)
+                {
+                    case GETL_CALL:
                         fgets((char *)addr, 256, stdin);
-                    else
-                    {
-                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
-                                "Invalid IO code: %d", io_op);
-                        io_op |= IO_ERROR;
-                    }
-                    break;
-                case GETS_CALL:
-                    if (Allow_INP_Instr)
+                        break;
+                    case GETS_CALL:
                         scanf("%s", (char *)addr);
-                    else
-                    {
-                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
-                                "Invalid IO code: %d", io_op);
-                        io_op |= IO_ERROR;
-                    }
-                    break;
-                case GETI_CALL:
-                    if (Allow_INP_Instr)
+                        break;
+                    case GETI_CALL:
                         scanf("%d", (int32_t *)addr);
-                    else
-                    {
-                        Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
-                                "Invalid IO code: %d", io_op);
-                        io_op |= IO_ERROR;
-                    }
-                    break;
-                case EXEC_CALL:
-                    if (Allow_INP_Instr)
-                    {
+                        break;
+                    case EXEC_CALL:
                         status = Load( (char *)addr, 0);
                         if (status == 0) io_op |= IO_ERROR;
                         Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
-                    }
-                    else
-                    {
+                        break;
+                    case PRINTS_CALL:
+                        while (*addr)
+                        {
+                            usleep(10); // ~100000 baud
+                            fputc(*addr, stdout);
+                            fflush(stdout);
+                            addr++;
+                        }
+                        break;
+                    default:
                         Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
                                 "Invalid IO code: %d", io_op);
                         io_op |= IO_ERROR;
-                    }
-                    break;
-                default:
-                    Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
-                            "Invalid IO code: %d", io_op);
-                    io_op |= IO_ERROR;
-                    break;
+                        break;
+                }
             }
 
             io_op |= IO_COMPLETE;
@@ -180,6 +169,7 @@ void Schedule_IO(Machine_State *cpu, int32_t io_blk_addr)
     pthread_mutex_lock(&IO_Q_Lock);
 
     IO_Q[IO_Q_Head].io_blk_addr = io_blk_addr;
+    IO_Q[IO_Q_Head].buff        = Get_Word(cpu, io_blk_addr + WORD_SIZE);
 
     op = Get_Word(cpu, io_blk_addr);
     op &= ~IO_FLAGS;
@@ -189,8 +179,8 @@ void Schedule_IO(Machine_State *cpu, int32_t io_blk_addr)
     IO_Q_Head++;
     IO_Q_Head %= IO_Q_SIZE;
 
-    pthread_mutex_unlock(&IO_Q_Lock);
     pthread_cond_signal(&IO_Q_Cond);
+    pthread_mutex_unlock(&IO_Q_Lock);
 }
 
 //*************************************

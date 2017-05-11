@@ -185,6 +185,7 @@ void Execute(Machine_State *cpu)
         !(cpu->FLAG & FL_INT_MODE)    &&
         !(cpu->FLAG & FL_INT_DIS))
     {
+        DEBUG("INTERRUPT");
         interrupt(cpu, 0);
         return;
     }
