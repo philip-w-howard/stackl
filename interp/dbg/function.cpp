@@ -6,7 +6,17 @@ using std::cout;
 function::function( xml_node<char>* func_decl_node, unordered_map<string, struct_decl>& type_context )
 {
     _name = func_decl_node->first_node( "Symbol" )->first_attribute( "name" )->value();
-    _return_type = func_decl_node->first_node( "BaseDecl" )->first_node( "Symbol" )->first_attribute( "name" )->value();
+    for( xml_node<char>* node: func_decl_node->all_nodes() )
+    {
+        if( strcmp( node->name(), "DeclsList") == 0 )
+            continue;
+        else if( strcmp( node->name(), "StmtsList" ) == 0 )
+            continue;
+        else if( strcmp( node->name(), "Symbol" ) == 0 )
+            continue;
+        else
+            _return_type = node->first_node( "Symbol" )->first_attribute( "name" )->value();
+    }
 
     xml_node<char>* decls_list = func_decl_node->first_node( "DeclsList" );  //all the arguments to the func
     if( decls_list != nullptr ) //function might not have args
@@ -75,7 +85,7 @@ bool function::is_definition( xml_node<char>* func_decl_node)
 
 string function::to_string() const
 {
-    string ret = _name + "(";
+    string ret = _return_type + " " + _name + "(";
 
     if( _args.size() > 0 )
     {
