@@ -287,6 +287,9 @@ bool cBinaryExpr::TypesAreCompatible()
     if (left->IsPointer() && right->IsPointer() && 
             (IsArithmetic() || IsComparative())) return true;
 
+    if (left->IsPointer() && right->IsInt() && IsComparative()) return true;
+    if (right->IsPointer() && left->IsInt() && IsComparative()) return true;
+
     return false;
 }
 

@@ -1,3 +1,8 @@
+HALT:
+    user mode: trap handler? or Machine Check ISR?
+INP instruction: ISR on completion option
+OUTS instruction: ISR on completion option: async
+
 Machine Checks
     call dbg function to inform debugger that it happened
 Implement virtual memory
@@ -7,3 +12,6 @@ Implement virtual memory
 Machine Check handler
     user mode: trap
     system mode: halt
+
+Better documentation of INP instruction including error codes
+
