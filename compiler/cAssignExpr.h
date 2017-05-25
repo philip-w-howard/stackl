@@ -14,7 +14,7 @@ class cAssignExpr : public cExpr
     {
         if (!var->IsLval()) 
         {
-            ThrowSemanticError("lval must be a variable");
+            ThrowSemanticError("lval must be a variable that's not a struct nor an array");
         } else {
             cVarRef* varref  = dynamic_cast<cVarRef*>(var);
             assert(varref != NULL);

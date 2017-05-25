@@ -1,4 +1,5 @@
 // Test copying data over from struct to struct
+// NOTE: the compiler doesn't support this, so this should generate an error
 #include <string.h>
 #include <sysio.h>
 
@@ -19,6 +20,7 @@ int main()
     btx = xtx;
 
     printi(btx.a);
+    printi((int)btx.next);
     prints("\nTest J205 Complete\n"); 
     return 0;
 }

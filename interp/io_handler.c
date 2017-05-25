@@ -106,7 +106,7 @@ static void *IO_Processor(void *arg)
                     case PRINTS_CALL:
                         while (*addr)
                         {
-                            usleep(10); // ~100000 baud
+                            usleep(100); // ~100000 baud
                             fputc(*addr, stdout);
                             fflush(stdout);
                             addr++;

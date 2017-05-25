@@ -1,2 +1,2 @@
 // definition of semantic error reporting function
-int semantic_error(std::string msg);
+int semantic_error(std::string msg, int line);

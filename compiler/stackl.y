@@ -31,7 +31,7 @@
 
 %{
     int yyerror(const char *msg);
-    int semantic_error(std::string msg);
+    int semantic_error(std::string msg, int line);
 
     cDeclsList *yyast_root = NULL;
     int g_Feature = 0;
@@ -360,9 +360,9 @@ func_prefix: type IDENTIFIER '('
                 if ($$->HasSemanticError()) YYERROR;
             }
 func_pointer: type '(' '*' IDENTIFIER ')' '(' paramspec_list ')'
-            { semantic_error("Function pointers not implemented"); YYERROR; }
+            { semantic_error("Function pointers not implemented", yylineno); YYERROR; }
             | type '(' '*' IDENTIFIER ')' '(' ')'
-            { semantic_error("Function pointers not implemented"); YYERROR; }
+            { semantic_error("Function pointers not implemented", yylineno); YYERROR; }
 
 paramspec_list:     
             paramspec_list',' paramspec 
@@ -440,7 +440,7 @@ stmt:       decl
             }
 
         |   SWITCH '(' expr ')' stmt
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   expr ';'
             { 
                 $$ = new cExprStmt($1); 
@@ -459,11 +459,11 @@ stmt:       decl
                 if ($$->HasSemanticError()) YYERROR;
             }
         |   BREAK ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   CONTINUE ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   GOTO IDENTIFIER ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   asm_stmt ';'
             { $$ = $1; }
 
@@ -768,7 +768,7 @@ conditional_expression
         : logical_or_expression     { $$ = $1; }
         | logical_or_expression '?' expr ':' conditional_expression
             { 
-              semantic_error("conditional ternary expression not implemented");
+              semantic_error("conditional ternary expression not implemented", yylineno);
               YYERROR; 
             }
 
@@ -778,7 +778,7 @@ constant_expression
                 $$ = $1;
                 if (!$$->IsConst())
                 {
-                    semantic_error("Expression is not constant");
+                    semantic_error("Expression is not constant", yylineno);
                     YYERROR;
                 }
             }
@@ -793,7 +793,7 @@ assignment_expression
             }
         | lval '=' asm_stmt
             { $$ = new cAssignExpr($1, $3); }
-            //{ semantic_error("Not implemented " + std::to_string(__LINE__)); }
+            //{ semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         | lval PLUS_EQ expr
             { 
                 $$ = new cAssignExpr($1, new cBinaryExpr($1, '+', $3)); 
@@ -849,7 +849,7 @@ expr: assignment_expression
         /*
         | expr ',' assignment_expression
             { 
-                semantic_error("Not implemented " + std::to_string(__LINE__)); 
+                semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); 
                 YYERROR;
             }
 	;
@@ -864,9 +864,9 @@ int yyerror(const char *msg)
 
     return 0;
 }
-int semantic_error(std::string msg)
+int semantic_error(std::string msg, int line)
 {
-    std::cerr << "ERROR: " << msg << " on line " << yylineno 
+    std::cerr << "ERROR: " << msg << " on line " << line 
         << " of " << yycurrentfile << "\n";
     
     yynerrs++;

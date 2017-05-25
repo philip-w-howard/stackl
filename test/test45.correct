@@ -1,2 +1,2 @@
-12
-Test J205 Complete
+ERROR: lval must be a variable that's not a struct nor an array on line 20 of test/test45.c
+1 Errors in compile

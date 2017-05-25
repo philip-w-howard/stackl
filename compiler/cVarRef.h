@@ -10,7 +10,9 @@ class cVarRef : public cExpr
   public:
     cVarRef() : cExpr() {}
 
-    virtual bool IsLval()       { return !IsConst(); /* true; */ }
+    virtual bool IsLval()       { return !IsConst() && 
+                                         !IsStruct() && 
+                                         !IsArray();  }
 
     virtual bool IsStruct()     { return GetType()->IsStruct(); }
     virtual bool IsArray()      { return GetType()->IsArray(); }

@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     {
         if (program == NULL)
         {
-            semantic_error("Source produced no output ");
+            semantic_error("Source produced no output ", 0);
             exit(-2);
         }
 

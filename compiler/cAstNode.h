@@ -22,7 +22,7 @@ extern int yylineno;
 extern char yycurrentfile[];
 
 // called to throw a semantic error
-extern int semantic_error(std::string error);
+extern int semantic_error(std::string error, int line);
 
 void fatal_error(std::string msg);
 class cAstNode
@@ -83,7 +83,7 @@ class cAstNode
         string mSourceFile;             // source file the node was created from
         void ThrowSemanticError(std::string msg)
         {
-            semantic_error(msg);
+            semantic_error(msg, mLineNumber);
             mSemanticError = true;
         }
 
