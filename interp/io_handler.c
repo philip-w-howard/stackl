@@ -100,7 +100,7 @@ static void *IO_Processor(void *arg)
                         break;
                     case EXEC_CALL:
                         status = Load( (char *)addr, 0);
-                        if (status == 0) io_op |= IO_ERROR;
+                        if (status <= 0) io_op |= IO_ERROR;
                         Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                         break;
                     case PRINTS_CALL:

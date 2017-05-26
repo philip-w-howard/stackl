@@ -97,6 +97,8 @@ void MemCpy(int32_t addr, char *sptr)
 
 //*************************************************
 // Load a binary file (.slb)
+//
+// Returns negative on failure, positive on success
 int Load(const char *filename, int boot)
 {
     int32_t top;
@@ -181,8 +183,10 @@ int Load(const char *filename, int boot)
         max_addr = max_addr>addr ? max_addr : addr;
         if (max_addr > top)
         {
-            fprintf(stderr, "Memory overflow while loading\n");
-            exit(-1);
+            //fprintf(stderr, "Memory overflow while loading\n");
+            //exit(-1);
+
+            return -1;
         }
     }
 
@@ -206,7 +210,7 @@ int Boot(const char *filename)
     Set_Machine_State(&cpu);
 
     top = Load(filename, 1);
-    if (top == 0) return 1;
+    if (top <= 0) return 1;
 
     Get_Machine_State(&cpu);
     cpu.SP = top + WORD_SIZE;
