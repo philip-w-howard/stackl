@@ -47,7 +47,7 @@ static const char *HELP_STR =
 //**************************************
 typedef struct
 {
-    char label[50];
+    char label[100];
     int  is_data;
     int32_t  offset;
 } label_def_t;
@@ -163,17 +163,32 @@ static void fixup_offsets()
 static void clean_locals()
 {
     int ii;
+    char buff[sizeof(g_Label_Refs[0].label)];
 
     for (ii=0; ii<g_Num_Label_Refs; ii++)
     {
         if (g_Label_Refs[ii].label[0] == '$')
-            g_Label_Refs[ii].label[0] = '#';
+        {
+            strcpy(buff, "#");
+            strcat(buff, g_Source_File);
+            strcat(buff, "#");
+            strcat(buff, &g_Label_Refs[ii].label[1]);
+            strcpy(g_Label_Refs[ii].label, buff);
+            //g_Label_Refs[ii].label[0] = '#';
+        }
     }
 
     for (ii=0; ii<g_Num_Label_Defs; ii++)
     {
         if (g_Label_Defs[ii].label[0] == '$')
-            g_Label_Defs[ii].label[0] = '#';
+        {
+            strcpy(buff, "#");
+            strcat(buff, g_Source_File);
+            strcat(buff, "#");
+            strcat(buff, &g_Label_Defs[ii].label[1]);
+            strcpy(g_Label_Defs[ii].label, buff);
+            //g_Label_Defs[ii].label[0] = '#';
+        }
     }
 }
 
