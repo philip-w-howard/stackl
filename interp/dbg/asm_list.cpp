@@ -49,8 +49,11 @@ asm_list::asm_list( const string& filename )
         {
             string global_name;
             ss >> global_name;
-            _global_offsets[global_name] = stoi( token );
 
+            if( global_name[0] == '#' )
+                global_name.erase( 0, 1 );
+
+            _offsets[global_name] = stoi( token );
         }
         else if( token == "Symbol" ) //"Symbol Table"
         {

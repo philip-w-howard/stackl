@@ -58,7 +58,8 @@ stackl_debugger::stackl_debugger( const char* filename ): _binary_name( string_u
                 else
                     opcode_debug_mode( filename );
             }
-            _ast.fixup_globals( _lst.global_offsets() );
+            _ast.fixup_globals( _lst.offsets() );
+            _lst.cleanup_offset_map(); //we're done with this part of the lst's memory
         }
 
         load_commands();
@@ -121,6 +122,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_step, { "step", "s" }, "- Steps over the current line", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_locals, { "locals", "listlocals" }, "- Print all local vars in current or specified function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_statics, { "statics", "liststatics" }, "optional[filename] - Print all static variables in specified file or all files.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_funcs, { "funcs", "functions", "listfuncs", "listfunctions" }, "- Print all functions", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_file, { "file", "currentfile" }, "- Prints the filename of the currently executing source code", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary", true ) );
@@ -672,6 +674,15 @@ void stackl_debugger::cmd_clear( string& params, Machine_State* cpu )
     system( "clear" );
 }
 
+
+void stackl_debugger::cmd_statics( string& params, Machine_State* cpu )
+{
+    if( params.empty() )
+        cout << _ast.all_statics();
+    else
+        cout << _ast.statics_in( params );
+}
+
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
 {
     _flags ^= ( -(int32_t)value ^ _flags ) & ( 1 << (int32_t)flag );
@@ -813,7 +824,7 @@ string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text, boo
 
     uint32_t indirection = string_utils::strip_indirection( var_fields[0] );
     vector<uint32_t> indexes = string_utils::strip_array_indexes( var_fields[0] );
-    variable* var = _ast.var( _lst.current_func( cpu->IP ), var_fields[0] );
+    variable* var = _ast.var( _lst.current_file( cpu->IP ), _lst.current_func( cpu->IP ), var_fields[0] );
 
     if( var == nullptr )
         throw runtime_error( string( var_text ) + " not found in current scope" );

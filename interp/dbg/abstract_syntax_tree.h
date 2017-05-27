@@ -28,6 +28,8 @@ public:
     string all_funcs();
     string all_locals( const string& func_name );
     string all_globals();
+    string all_statics();
+    string statics_in( const string& filename );
 
     inline unordered_map<string, variable>& globals() { return _globals; }
     inline unordered_map<string, function>& functions() { return _functions; }
@@ -35,7 +37,7 @@ public:
 
     inline time_t compile_time( const string& filename ) const { return _compile_times.at( filename ); }
 
-    variable* var( const string& func_name, const string& var_name );
+    variable* var( const string& cur_file, const string& func_name, const string& var_name );
     function* func( const string& func_name );
 
 private:
@@ -44,6 +46,7 @@ private:
 
     //key = symbol name, value = object with that name
     unordered_map<string, variable> _globals;
+    unordered_map<string, unordered_map<string, variable>> _statics;
     unordered_map<string, function> _functions;
     unordered_map<string, struct_decl> _struct_decls;
     unordered_map<string, time_t> _compile_times;

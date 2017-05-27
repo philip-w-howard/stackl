@@ -25,7 +25,8 @@ public:
     string current_func( uint32_t cur_addr ) const;
     string current_file( uint32_t cur_addr ) const;
 
-    unordered_map<string, int32_t>& global_offsets() { return _global_offsets; }
+    unordered_map<string, int32_t>& offsets() { return _offsets; }
+    void cleanup_offset_map() { _offsets.clear(); } //The map is only needed at startup.
     unordered_set<string>& file_list() { return _file_list; }
 
 
@@ -46,6 +47,6 @@ private:
     uint32_t _max_ip = 0;
     vector<func_addr_t> _func_to_addr;
     unordered_map<string, vector<addr_line_t>> _file_and_line_to_addr;
-    unordered_map<string, int32_t> _global_offsets;
+    unordered_map<string, int32_t> _offsets;
     unordered_set<string> _file_list;
 };

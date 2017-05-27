@@ -25,7 +25,12 @@ variable::variable( xml_node<char>* var_node, unordered_map<string, struct_decl>
 {
     xml_attribute<char>* global_att = var_node->first_attribute( "global" );
     if( global_att != nullptr )
+    {
         _global = strcmp( global_att->value(), "true" ) == 0;
+        xml_attribute<char>* static_att = var_node->first_attribute( "static" );
+        if( static_att != nullptr )
+            _static = strcmp( static_att->value(), "true" ) == 0;
+    }
 
     _offset = atoi( var_node->first_attribute( "offset" )->value() );
     _name = var_node->first_node( "Symbol" )->first_attribute( "name" )->value();
@@ -234,9 +239,9 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
 {
 
     string tabs = string( indent_level*4, ' ' );
-    string pre = "";
+    string pre = tabs;
     if( prepend_def )
-        pre = tabs + definition() + " = ";
+        pre += definition() + " = ";
 
     if( is_string() ) //special case: we want to print out the string
     {

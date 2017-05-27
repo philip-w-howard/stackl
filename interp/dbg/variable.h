@@ -38,6 +38,8 @@ public:
     inline size_t size() const { return _size; }
     inline string name() const { return _name; }
     inline string type() const { return _type; }
+    inline bool is_static() const { return _static; }
+    inline bool is_global() const { return _global; }
     inline int32_t offset() const { return _offset; }
     inline void offset( int32_t offset ) { _offset = offset; }
     inline int32_t indirection() const { return _indirection; }
@@ -62,6 +64,7 @@ private:
     void parse_node_type( xml_node<char>* node, unordered_map<string, struct_decl>& global_type_context, unordered_map<string, struct_decl>* local_type_context );
 
     bool _global = false;
+    bool _static = false;
     string _type = "";
     int32_t _offset = 0;
     size_t _size = 0;
