@@ -26,7 +26,7 @@ using std::chrono::duration_cast;
 
 class stackl_debugger
 {
-    friend class operation;
+
 public:
     stackl_debugger( const char* filename );
 
@@ -130,6 +130,7 @@ private:
     void cmd_locals( string& params, Machine_State* cpu );
     void cmd_globals( string& params, Machine_State* cpu );
     void cmd_funcs( string& params, Machine_State* cpu );
+    void cmd_statics( string& params, Machine_State* cpu );
     void cmd_exit( string& params, Machine_State* cpu );
     void cmd_IP( string& params, Machine_State* cpu );
     void cmd_FLAG( string& params, Machine_State* cpu );
@@ -153,9 +154,6 @@ private:
     void cmd_down( string& params, Machine_State* cpu );
     void cmd_timer( string& params, Machine_State* cpu );
     void cmd_clear( string& params, Machine_State* cpu );
-    void cmd_printmem( string& params, Machine_State* cpu );
-    void cmd_statics( string& params, Machine_State* cpu );
-
 
     string _binary_name = ""; //the name of the current binary being debugged
     vector<uint32_t> _break_points; //list of instruction pointers to break at

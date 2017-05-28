@@ -47,16 +47,6 @@ bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res
     return *p == 0;
 }
 
-bool string_utils::is_number( const string& num_text, int32_t base, int64_t* res )
-{
-    char* p;
-    if( res != nullptr )
-        *res = strtoll( num_text.c_str(), &p, base );
-    else
-        strtoll( num_text.c_str(), &p, base );
-    return *p == 0;
-}
-
 bool string_utils::begins_with( const string & input, const string & begin )
 {
     return input.length() >= begin.length() && input.substr( 0, begin.length() ) == begin;

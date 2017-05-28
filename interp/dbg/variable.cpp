@@ -169,9 +169,10 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
     if( derefs == 0 ) //short cut.
         return *this; //the algorithm would work fine with deref == 0, this just saves time.
     if( derefs > _indirection )
-        throw runtime_error( "Variable does not have that many levels of indirection." );
+        throw runtime_error( definition() + " does not have that many levels of indirection." );
 
     int32_t addr = total_offset( cpu );
+
     for( uint32_t i = 0; i < derefs; ++i )
         addr = Get_Word( cpu, addr );
 
@@ -181,7 +182,8 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
         addr -= cpu->FP;
 
     deref_var.offset( addr );
-    deref_var.indirection( indirection() - derefs ); //modify its level of indirection
+    deref_var._indirection -= derefs;
+
     return deref_var;
 }
 
@@ -192,14 +194,14 @@ variable variable::from_indexes( vector<uint32_t>& indexes, Machine_State* cpu )
     if( is_pointer() && !is_array() )
         return deref_ptr_from_index( indexes, cpu );
     if( indexes.size() > _array_ranges.size() )
-        throw runtime_error( "Array does not have that many dimensions." );
+        throw runtime_error( definition() + " does not have " + std::to_string( indexes.size() ) + " dimensions." );
 
     int32_t new_offset = _offset;
     size_t new_size = _size;
     for( uint32_t i = 0; i < indexes.size(); ++i )
     {
         if( indexes[i] >= _array_ranges[i] )
-            throw runtime_error( "Array index out of range." );
+            throw runtime_error( definition() + " out of bounds on dimension " + std::to_string( i ) + "." );
 
         //every time we move down a dimension in our array,
         //we have to reduce the size of our offset modification by
@@ -224,6 +226,7 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
         throw runtime_error( "Cannot index pointer on more than one dimension." );
 
     int32_t addr = Get_Word( cpu, total_offset( cpu ) );
+
     addr += indexes[0] * _size;
 
     if( !_global ) //if it's a local variable then return locality to the offset
@@ -233,6 +236,24 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
     indexed.offset( addr );
     indexed._indirection -= 1;
     return indexed;
+}
+
+variable variable::parse_field_access( Machine_State* cpu, string& rhs ) const
+{
+    variable* _this = const_cast<variable*>( this );
+    if( !is_struct() )
+        throw runtime_error( string( "'" ) + definition() + "' is not a struct type." );
+
+    uint32_t indirection = string_utils::strip_indirection( rhs );
+    vector<uint32_t> indexes = string_utils::strip_array_indexes( rhs );
+    variable* field = _this->decl()->var( rhs );
+
+    if( field == nullptr )
+        throw runtime_error( string( "'" ) + rhs + "' is not a field of type '" + type() + "'." );
+
+    variable res = *field;
+    res._offset += _offset;
+    return res.from_indexes( indexes, cpu ).deref( indirection, cpu );
 }
 
 string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prepend_def ) const
@@ -273,7 +294,8 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     }
     else if( is_array() )
     {
-        pre += string_utils::to_hex( total_offset( cpu ) ) + " {\n";
+        //pre += string_utils::to_hex( total_offset( cpu ) ) + " {\n";
+        pre += std::to_string( total_offset( cpu ) ) + " {\n";
         vector<uint32_t> idx( 1 );
         if( _array_ranges.size() == 1 )
         {
