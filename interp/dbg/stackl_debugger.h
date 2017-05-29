@@ -35,6 +35,7 @@ public:
 
     inline bool debugging() const { return get_flag( FLAG::DEBUGGING ); }
     inline bool loaded() const { return get_flag( FLAG::LOADED ); }
+    inline bool opcode_mode() const { return get_flag( FLAG::OPCODE_DEBUG ); }
     inline string failure_reason() const { return _failure_reason; }
 
 private:
@@ -77,18 +78,21 @@ private:
     /* This will get the value of the var and return it as a printable string.
 
     var text can be in the following formats:
-    0x312312 (0Xhex_address) -> prints the value at that memory location
-    variable_name -> just the name of a local/global var
-    if variable_name is a pointer or array, it will print out the address that the variable holds
-    if variable_name is a struct, it will recursively print out the fields of the struct, including contained structs
-    if variable_name is a char pointer or array, it will print out the string at that location
-    *pointer - dereferencing a pointer will print the value of the variable pointed to
-    This supports multiple levels of indirection.
-    array[X] will print the value of the variable at X index
-    */
-    string var_to_string( Machine_State* cpu, string& var_text, bool prepend_def );
+    0xAAFF (0Xhex_address) -> prints the 4 byte value at that memory location
+    1414 (decimal address) -> prints the 4 byte value at that memory location
 
-    //'list' in gdb. maybe 2 lines above and below? obviously configurable.
+    variable_name -> just the name of a local/static/global var
+        if variable_name is a pointer or array, it will print out the address that the variable holds
+        if variable_name is a struct, it will recursively print out the fields of the struct, including contained structs
+        if variable_name is a char pointer or char array, it will print out data as a string
+        if variable_name is an array, it will print out every index of the array
+    *pointer - dereferencing a pointer will print the value of the variable pointed to
+        This supports multiple levels of indirection.
+    array[X] will print the value of the variable at X index. This works with pointers or arrays.
+    */
+    string var_to_string( Machine_State* cpu, const string& var_text, bool prepend_def );
+
+    //'list' in gdb.
     string get_nearby_lines( uint32_t cur_addr, int32_t range );
 
     //true if addr was added, false if it already exists

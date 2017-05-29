@@ -143,6 +143,9 @@ uint32_t asm_list::line_of_addr( const string& filename, uint32_t address )
 
 string asm_list::current_func( uint32_t cur_addr ) const
 {
+    if( cur_addr == 0 ) //program hasn't started running yet
+        return "";
+
     func_addr_t* prev = nullptr;
     for( const func_addr_t& f_a : _func_to_addr )
     { //once we pass the address that was our lower bound, return the one we were looking at previously
@@ -158,7 +161,7 @@ string asm_list::current_func( uint32_t cur_addr ) const
 
 string asm_list::current_file( uint32_t cur_addr ) const
 {
-    string best_filename = "unknown function";
+    string best_filename = "unknown file";
     uint32_t dif = INT32_MAX;
     for( const auto& f_dict : _file_and_line_to_addr )
     {

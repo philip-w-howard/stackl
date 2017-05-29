@@ -5,9 +5,6 @@ using std::runtime_error;
 using std::stringstream;
 #include "string_utils.h"
 
-#include <iostream>
-using std::cout;
-
 abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 {
     add_ast( filename );
@@ -15,8 +12,6 @@ abstract_syntax_tree::abstract_syntax_tree( const string& filename )
 
 void abstract_syntax_tree::add_ast( const string& filename )
 {
-    cout << "Loading symbols for " << filename << std::endl;
-
     rapidxml::file<char> xml_file( filename.c_str() );
     xml_document<char> doc;
     doc.parse<0>( xml_file.data() );

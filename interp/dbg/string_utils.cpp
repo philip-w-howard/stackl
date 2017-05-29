@@ -90,16 +90,17 @@ uint32_t string_utils::strip_indirection( string& var )
 int32_t string_utils::to_int( const string& text )
 {
     int32_t addr;
+
     if( string_utils::begins_with( text, "0x" ) )
     {
         if( !string_utils::is_number( text, 16, &addr ) )
         {
-            throw runtime_error( "Not a number" );
+            throw runtime_error( "Value is not a number" );
         }
     }
     else if( !string_utils::is_number( text, 10, &addr ) )
     {
-        throw runtime_error( "Not a number" );
+        throw runtime_error( "Value is not a number" );
     }
 
     return addr;
