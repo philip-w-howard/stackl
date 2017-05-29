@@ -1,22 +1,12 @@
 #RELEASE  = ~/stackl_rel
 RELEASE  = ~/bin
 # RELEASE  = release
-EXTRA_INCLUDES = \
-	   system.h \
-	   opcode_defs.h \
-	   dma_term.h \
-	   disk.h \
-
-INCLUDES = machine_def.h \
-	   syscodes.h \
-	   pio_term.h \
-	   timer.h \
 
 GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
 
 .PHONY: compiler interp utils libraries
 
-all: version compiler interp libraries utils includes execs 
+all: version compiler interp libraries utils execs 
 
 release: all
 	( [ ! -e $(RELEASE)/library ] && mkdir $(RELEASE)/library ) || true 
@@ -75,17 +65,4 @@ execs: compiler interp utils
 	cp interp/stackl .
 	cp utils/copy2disk .
 	cp utils/makedisk .
-
-includes: libraries
-	cp interp/syscodes.h library
-	cp interp/machine_def.h library
-	cp interp/pio_term.h library
-	cp interp/timer.h library
-
-extra_includes: compiler interp 
-	cp interp/syscodes.h .
-	cp interp/opcode_defs.h .
-	cp interp/pio_term.h .
-	cp interp/dma_term.h .
-	cp interp/disk.h .
 

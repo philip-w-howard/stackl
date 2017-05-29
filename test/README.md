@@ -61,7 +61,7 @@ Makefile?
 38) Type casts
 39) Test that pre-inc doesn't mess up the stack
 40) Test trap handlers
-
+49) Test gen_io device
 
 
 n) use interrupt to test stack behavior for
