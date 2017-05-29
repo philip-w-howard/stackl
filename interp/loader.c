@@ -11,6 +11,7 @@
 #include "loader.h"
 #include "io_handler.h"
 #include "dma_term.h"
+#include "gen_io.h"
 #include "pio_term_int.h"
 #include "disk.h"
 #include "formatstr.h"
@@ -150,6 +151,10 @@ int Load(const char *filename, int boot)
         else if (boot && strcmp(token, "feature") == 0)
         {
             token = strtok(NULL, delims);
+            if (boot && strcmp(token, "gen_io") == 0)
+            {
+                Gen_IO_Init();
+            }
             if (boot && strcmp(token, "pio_term") == 0)
             {
                 PIO_T_Init();

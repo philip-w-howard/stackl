@@ -1,3 +1,5 @@
+#pragma once
+
 #define EXIT_CALL       1
 #define PRINTI_CALL     2
 #define PRINTS_CALL     3

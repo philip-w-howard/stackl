@@ -5,6 +5,7 @@
 #include "loader.h"
 #include "io_handler.h"
 #include "dma_term.h"
+#include "gen_io.h"
 #include "pio_term_int.h"
 #include "disk.h"
 #include "timer.h"
@@ -18,11 +19,12 @@ static int Memory_Size = 0;
 static int Use_Disk = 0;        // 1
 static int Boot_Disk = 0;       // 1
 static int Use_PIO_Term = 0;    // 1
+static int Use_Gen_IO = 0;    // 1
 static int Use_DMA_Term = 0;
 static int Use_Inp_Instr = 0;
 
 static const char *HELP_STR =
- "stackl [-boot] [-dma_term] [-inp] [-[no]pio_term] [-nodisk]\n"
+ "stackl [-boot] [-dma_term] [-inp] [-gen_io] [-[no]pio_term] [-nodisk]\n"
  "       [-opcodes] [-help] [-version] [-loader]\n"
  "       [-M<mem size>] [-N<num instr>] [-dbg]\n";
 
@@ -41,8 +43,15 @@ void Process_Args(int argc, char **argv)
             }
             else if (strcmp(arg, "dma_term") == 0)
             {
+                Use_Gen_IO = 0;
                 Use_PIO_Term = 0;
                 Use_DMA_Term = 1;
+            }
+            else if (strcmp(arg, "gen_io") == 0)
+            {
+                Use_PIO_Term = 0;
+                Use_DMA_Term = 0;
+                Use_Gen_IO = 1;
             }
             else if (strcmp(arg, "help") == 0)
             {
@@ -67,6 +76,7 @@ void Process_Args(int argc, char **argv)
                 dbg_enable();
             else if (strcmp(arg, "pio_term") == 0)
             {
+                Use_Gen_IO = 0;
                 Use_PIO_Term = 1;
                 Use_DMA_Term = 0;
             }
@@ -101,6 +111,11 @@ int main(int argc, char **argv)
     Init_Machine(Memory_Size);
     Init_IO(Use_Inp_Instr);
     Timer_Init();
+
+    if (Use_Gen_IO)
+    {
+        Gen_IO_Init();
+    }
 
     if (Use_PIO_Term)
     {

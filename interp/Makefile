@@ -11,6 +11,7 @@ OBJS=stackl.o \
 	 pio_term.o \
 	 disk.o \
 	 timer.o \
+	 gen_io.o \
 	 formatstr.o \
 	 struct_decl.o \
 	 variable.o \
