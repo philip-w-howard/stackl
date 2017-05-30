@@ -443,9 +443,8 @@ void stackl_debugger::cmd_watch( string& params, Machine_State* cpu )
         return;
     }
 
-    string name = params; //var_to_string will modify 'params' so we create a copy for lookup/output
-    _watches[name] = var_to_string( cpu, params, false );
-    cout << name <<  " is now being watched.\n";
+    _watches[params] = var_to_string( cpu, params, false );
+    cout << params <<  " is now being watched.\n";
 }
 
 void stackl_debugger::cmd_removewatch( string& params, Machine_State* cpu )
@@ -497,7 +496,7 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
         if( func_ptr != nullptr )
             full_func = func_ptr->to_string();
         else
-            break; //we jumped to a garbage memory location so we're out
+            break; //we jumped to a garbage memory location so we're done
 
         contexts.push_back( std::to_string( ++i ) + ". " + full_func + " at " + cur_file + ":" + std::to_string( cur_line ) );
 
@@ -711,6 +710,24 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
         var_fields[0].erase( 0, 1 );
     }
 
+    //parse arrow operator
+    for( uint32_t i = 0; i < var_fields.size(); ++i )
+    {
+        string field = var_fields[i];
+        size_t idx = field.find_first_of( '-' );
+
+        if( idx != field.length() - 1 && field[idx+1] == '>' ) //'->' operator
+        {
+            field.replace( idx, 2, "." );
+            field.insert( 0, "*" );
+            vector<string> new_fields = string_utils::string_split( field, '.' );
+
+            var_fields.erase( var_fields.begin() + i );
+            var_fields.insert( var_fields.begin() + i, new_fields.begin(), new_fields.end() );
+
+            i = 0;
+        }
+    }
 
     uint32_t indirection = string_utils::strip_indirection( var_fields[0] );
     vector<uint32_t> indexes = string_utils::strip_array_indexes( var_fields[0] );
