@@ -47,16 +47,6 @@ bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res
     return *p == 0;
 }
 
-bool string_utils::is_number( const string& num_text, int32_t base, int64_t* res )
-{
-    char* p;
-    if( res != nullptr )
-        *res = strtoll( num_text.c_str(), &p, base );
-    else
-        strtoll( num_text.c_str(), &p, base );
-    return *p == 0;
-}
-
 bool string_utils::begins_with( const string & input, const string & begin )
 {
     return input.length() >= begin.length() && input.substr( 0, begin.length() ) == begin;
@@ -100,16 +90,17 @@ uint32_t string_utils::strip_indirection( string& var )
 int32_t string_utils::to_int( const string& text )
 {
     int32_t addr;
+
     if( string_utils::begins_with( text, "0x" ) )
     {
         if( !string_utils::is_number( text, 16, &addr ) )
         {
-            throw runtime_error( "Not a number" );
+            throw runtime_error( "Value is not a number" );
         }
     }
     else if( !string_utils::is_number( text, 10, &addr ) )
     {
-        throw runtime_error( "Not a number" );
+        throw runtime_error( "Value is not a number" );
     }
 
     return addr;

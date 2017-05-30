@@ -32,6 +32,7 @@ public:
     string to_string( Machine_State* cpu, uint32_t indent_level = 0, bool prepend_def = false ) const;
     variable deref( uint32_t derefs, Machine_State* cpu ) const;
     variable from_indexes( vector<uint32_t>& indexes, Machine_State* cpu ) const;
+    variable parse_field_access( Machine_State* cpu, string& rhs ) const;
 
     int32_t total_offset( Machine_State* cpu ) const;
 

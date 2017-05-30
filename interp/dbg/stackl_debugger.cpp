@@ -17,6 +17,11 @@ using std::remove_if;
 #include <exception>
 using std::exception;
 
+#ifdef LREADLINE
+    #include <readline/readline.h>
+    #include <readline/history.h>
+#endif
+
 extern "C"
 {
     #include "../vmem.h"
@@ -24,8 +29,6 @@ extern "C"
     #include "../pio_term_int.h"
     #include "../timer.h"
 }
-
-#include "expression.h"
 
 //I tried with the variable name here. I really did.
 //It's the number of seconds that a debug file can be compiled BEFORE the binary is generated.
@@ -52,6 +55,7 @@ stackl_debugger::stackl_debugger( const char* filename ): _binary_name( string_u
             {
                 if( file_exists( filename ) )
                 {
+                    cout << "Loading symbols for " << filename << '\n';
                     _ast.add_ast( filename );
                     check_compile_time( _binary_name, filename );
                 }
@@ -85,7 +89,7 @@ void stackl_debugger::check_compile_time( const string& binaryfile, const string
     else //if we can't find a matching source file then use the binary
         stat( binaryfile.c_str(), &attrib );
 
-    if( attrib.st_mtime > _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA )
+    if( attrib.st_mtime > ( _ast.compile_time( filename ) + MAX_DEBUG_FILE_TIME_DELTA ) )
     {
         string prompt = "Debug file " + filename + " may be out of date. Continue anyways?";
         if( !string_utils::get_yesno( prompt ) )
@@ -134,24 +138,29 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP", "bp" }, "optional[value] - Prints or sets the base pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP", "lp" }, "optional[value] - Prints or sets the limit pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP", "sp" }, "optional[value] - Prints or sets the stack pointer", true) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "- Prints the help text", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "optional[command] - Prints the help text for all commands or the specified one", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_restart, { "restart", "re" }, "- Restarts the program at the beginning", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_watch, { "watch", "w" }, "[var_name|0xaddress] - Breaks the program when the watched variable changes.", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_removewatch, { "removewatch", "rw" }, "[var_name|0xaddress] - Removes a variable from the watchlist.", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_watches, { "watches" }, "- Prints every variable being watched.", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_backtrace, { "backtrace", "callstack", "bt" }, "- Prints the callstack.", false ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "- Moves the framepointer up one context.", false ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one context", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "optional[contexts]- Moves the framepointer up one or passed amount of contexts.", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one or passed amount of contexts", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_clear, { "clear" }, "- Clears the screen", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_printmem, { "printmem", "pm" }, "[address|0xaddress] - Prints memory at the passed address", true ) );
 
     const size_t size = _commands.size();
     for( size_t i = 0; i < size; ++i )
-        for( size_t j = i + 1; j < size; ++j ) //slight optimization by only checking i+1, since previous values have already been compared.
-            if( _commands[i].has_same_name( _commands[j] ) )
+    {
+        for( size_t j = i + 1; j < size; ++j ) //only check i+1, since previous values have already been compared.
+        {
+            if( _commands[i].has_same_trigger( _commands[j] ) )
                 throw runtime_error( _commands[i].to_string() + " has the same name as " + _commands[j].to_string() );
+            if( _commands[i].func() == _commands[j].func() )
+                throw runtime_error( _commands[i].to_string() + " has the same function as " + _commands[j].to_string() );
+        }
+    }
 }
 
 void stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
@@ -171,13 +180,13 @@ void stackl_debugger::cmd_breakpoint( string& params, Machine_State* cpu )
     case SUCCESS:
         final_addr = text_to_addr( params, cpu->IP );
         file_name = _lst.current_file( final_addr );
-        cout << "breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
+        cout << "Breakpoint added at " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
         break;
     case DUPLICATE:
-        cout << "breakpoint already exists on that line.\n";
+        cout << "Breakpoint already exists on that line.\n";
         break;
     case NOT_FOUND:
-        cout << "couldn't find breakpoint location.\n";
+        cout << "Couldn't find breakpoint location.\n";
         break;
     }
 }
@@ -190,20 +199,13 @@ void stackl_debugger::cmd_breakpointi( string& params, Machine_State* cpu )
         return;
     }
 
-    try
-    {
-        int32_t addr = string_utils::to_int( params );
-        if( addr % sizeof( int32_t ) != 0 )
-            cout << "Misaligned instruction pointer.\n";
-        else if( add_breakpoint( addr ) )
-            cout << "Breakpoint added on instruction pointer " << addr << ".\n";
-        else
-            cout << "Breakpoint already exists on instruction pointer " << addr << ".\n";
-    }
-    catch( runtime_error& )
-    {
-        cout << "Enter a valid number.\n";
-    }
+    int32_t addr = string_utils::to_int( params );
+    if( addr % sizeof( int32_t ) != 0 )
+        cout << "Misaligned instruction pointer.\n";
+    else if( add_breakpoint( addr ) )
+        cout << "Breakpoint added on instruction pointer " << addr << ".\n";
+    else
+        cout << "Breakpoint already exists on instruction pointer " << addr << ".\n";
 }
 
 void stackl_debugger::cmd_removebreak( string& params, Machine_State* cpu )
@@ -223,10 +225,10 @@ void stackl_debugger::cmd_removebreak( string& params, Machine_State* cpu )
         case SUCCESS:
             final_addr = text_to_addr( params, cpu->IP );
             file_name = _lst.current_file( final_addr );
-            cout << "breakpoint removed from " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
+            cout << "Breakpoint removed from " << file_name << ':' << _lst.line_of_addr( file_name, final_addr ) << ".\n";
             break;
         case NOT_FOUND:
-            cout << "breakpoint doesnt exist on that line.\n";
+            cout << "Breakpoint doesnt exist on that line.\n";
             break;
         case DUPLICATE:
             cout << "Not sure how you got here.\n";
@@ -243,87 +245,31 @@ void stackl_debugger::cmd_removebreaki( string& params, Machine_State* cpu )
         return;
     }
 
-    try
-    {
-        uint32_t addr = string_utils::to_int( params );
-        if( addr % sizeof( int32_t ) != 0 )
-            cout << "Misaligned instruction pointer.\n";
-        else if( remove_breakpoint( addr ) )
-            cout << "Breakpoint removed from instruction pointer " << addr << ".\n";
-        else
-            cout << "Breakpoint doesn't exist on instruction pointer " << addr << ".\n";
-    }
-    catch( ... )
-    {
-        cout << "Enter a valid number.\n";
-    }
+    uint32_t addr = string_utils::to_int( params );
+    if( addr % sizeof( int32_t ) != 0 )
+        cout << "Misaligned instruction pointer.\n";
+    else if( remove_breakpoint( addr ) )
+        cout << "Breakpoint removed from instruction pointer " << addr << ".\n";
+    else
+        cout << "Breakpoint doesn't exist on instruction pointer " << addr << ".\n";
 }
 
 void stackl_debugger::cmd_print( string& params, Machine_State* cpu )
 {
     if( params.length() == 0 )
-    {
         cout << "Specifiy a variable to print.\n";
-        return;
-    }
-
-    try
-    {
-        string parsed = expression( params ).eval( cpu );
-        cout << var_to_string( cpu, parsed, true ) << '\n';
-    }
-    catch( const exception& err )
-    {
-        cout << err.what() << '\n';
-    }
+    else
+        cout << var_to_string( cpu, params, true ) << '\n';
 }
 
 void stackl_debugger::cmd_printi( string& params, Machine_State* cpu )
 {
-    int32_t addr;
-    if( params.length() == 0 )
-    {
-        addr = cpu->IP;
-    }
-    else
-    {
-        try
-        {
-            addr = string_utils::to_int( params );
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-            return;
-        }
-    }
+    int32_t addr = params.empty() ? cpu->IP : string_utils::to_int( params );
 
     if( addr % sizeof( int32_t ) != 0 )
         cout << "Misaligned instruction pointer.\n";
     else
         cout << opcode_to_string( addr, cpu ) << '\n';
-}
-
-void stackl_debugger::cmd_printmem( string& params, Machine_State* cpu )
-{
-    if( params.empty() )
-    {
-        cout << "You must pass an address to print.\n";
-        return;
-    }
-
-    int32_t addr;
-    try
-    {
-        addr = string_utils::to_int( params );
-    }
-    catch( runtime_error& )
-    {
-        cout << "Enter a valid number.\n";
-        return;
-    }
-
-    cout << Get_Word( cpu, addr ) << '\n';
 }
 
 void stackl_debugger::cmd_continue( string& params, Machine_State* cpu )
@@ -399,122 +345,49 @@ void stackl_debugger::cmd_exit( string& params, Machine_State* cpu )
 void stackl_debugger::cmd_IP( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Instruction Pointer: " << cpu->IP << '\n';
-    }
     else
-    {
-        try
-        {
-            int32_t addr = string_utils::to_int( params );
-            cpu->IP = addr;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->IP = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_FLAG( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Flags: " << cpu->FLAG << '\n';
-    }
     else
-    {
-        try
-        {
-            int32_t val = string_utils::to_int( params );
-            cpu->FLAG = val;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->FLAG = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_FP( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Frame Pointer: " << cpu->FP << '\n';
-    }
     else
-    {
-        try
-        {
-            int32_t addr = string_utils::to_int( params );
-            cpu->FP = addr;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->FP = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_BP( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Base Pointer: " << cpu->BP << '\n';
-    }
     else
-    {
-        try
-        {
-            int32_t addr = string_utils::to_int( params );
-            cpu->BP = addr;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->BP = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_LP( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Limit Pointer: " << cpu->LP << '\n';
-    }
     else
-    {
-        try
-        {
-            int32_t addr = string_utils::to_int( params );
-            cpu->LP = addr;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->LP = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_SP( string& params, Machine_State* cpu )
 {
     if( params.empty() )
-    {
         cout << "Stack Pointer: " << cpu->SP << '\n';
-        return;
-    }
     else
-    {
-        try
-        {
-            int32_t addr = string_utils::to_int( params );
-            cpu->SP = addr;
-        }
-        catch( runtime_error& )
-        {
-            cout << "Enter a valid number.\n";
-        }
-    }
+        cpu->SP = string_utils::to_int( params );
 }
 
 void stackl_debugger::cmd_file( string& params, Machine_State* cpu )
@@ -538,12 +411,22 @@ void stackl_debugger::cmd_func( string& params, Machine_State* cpu )
 
 void stackl_debugger::cmd_help( string& params, Machine_State* cpu )
 {
-    cout << "***********************************************************\n"
-            "Stackl debugger written by Jacob Asmuth for Phil Howard\n"
-            " and the OIT Operating Systems course.\n"
-            "***********************************************************\n\n";
-    for( const debugger_command& cmd : _commands )
-        cout << cmd.to_string() << '\n';
+    if( params.empty() )
+    {
+        cout << "***********************************************************\n"
+                "Stackl debugger written by Jacob Asmuth for Phil Howard\n"
+                " and the OIT Operating Systems course.\n"
+                "***********************************************************\n\n";
+        for( const debugger_command& cmd : _commands )
+            if( ( get_flag( OPCODE_DEBUG ) && cmd.allowed_in_opcode_mode() ) || !get_flag( OPCODE_DEBUG ) )
+                cout << cmd.to_string() << '\n';
+    }
+    else
+    {
+        for( const debugger_command& cmd : _commands )
+            if( cmd.called_by( params ) )
+                cout << cmd.to_string() << '\n';
+    }
 }
 
 void stackl_debugger::cmd_restart( string& params, Machine_State* cpu )
@@ -560,16 +443,8 @@ void stackl_debugger::cmd_watch( string& params, Machine_State* cpu )
         return;
     }
 
-    try
-    {
-        string name = params;
-        _watches[name] = var_to_string( cpu, params, false );
-        cout << name <<  " is now being watched.\n";
-    }
-    catch( const exception& err )
-    {
-        cout << err.what() << '\n';
-    }
+    _watches[params] = var_to_string( cpu, params, false );
+    cout << params <<  " is now being watched.\n";
 }
 
 void stackl_debugger::cmd_removewatch( string& params, Machine_State* cpu )
@@ -582,7 +457,12 @@ void stackl_debugger::cmd_removewatch( string& params, Machine_State* cpu )
 
     auto iter = _watches.find( params );
     if( iter != _watches.end() )
+    {
         _watches.erase( iter );
+        cout << params << " has been removed from the watchlist.\n";
+    }
+    else
+        cout << "Unable to find " << params << " in the watchlist. Type 'watches' to view all watched variables.\n";
 }
 
 void stackl_debugger::cmd_watches( string& params, Machine_State* cpu )
@@ -616,7 +496,7 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
         if( func_ptr != nullptr )
             full_func = func_ptr->to_string();
         else
-            break; //we found a garbage function so we're out
+            break; //we jumped to a garbage memory location so we're done
 
         contexts.push_back( std::to_string( ++i ) + ". " + full_func + " at " + cur_file + ":" + std::to_string( cur_line ) );
 
@@ -632,32 +512,41 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
 void stackl_debugger::cmd_up( string& params, Machine_State* cpu )
 {
     string init_func = get_init_func( cpu );
-    if( _lst.current_func( cpu->IP ) == init_func )
+    uint32_t num_contexts = params.empty() ? 1 : string_utils::to_int( params );
+    string cur_file;
+
+    for( uint32_t i = 0; i < num_contexts; ++i )
     {
-        cout << "You are unable to go up any further.\n";
-        return;
+        if( _lst.current_func( cpu->IP ) == init_func )
+        {
+            cout << "You are unable to go up that far.\n";
+            break;
+        }
+
+        _context_history.push_back( { cpu->IP, cpu->FP } );
+        cpu->IP = Get_Word( cpu, cpu->FP - 8 );
+        cpu->FP = Get_Word( cpu, cpu->FP - 4 );
+        cur_file = _lst.current_file( cpu->IP );
     }
 
-    _context_history.push_back( { cpu->IP, cpu->FP } );
-    cpu->IP = Get_Word( cpu, cpu->FP - 8 );
-    cpu->FP = Get_Word( cpu, cpu->FP - 4 );
-    string cur_file = _lst.current_file( cpu->IP );
     cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
 }
 
 void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
 {
     if( _context_history.empty() )
-    {
-        cout << "Already in the lowest context!\n";
-        return;
-    }
+        throw runtime_error( "Already in the lowest context" );
 
-    context_t context = _context_history.back();
-    _context_history.pop_back();
+    uint32_t num_contexts = params.empty() ? 1 : string_utils::to_int( params );
+    const size_t size = _context_history.size();
+    if( num_contexts > size )
+        throw runtime_error( "Can't go down that many contexts" );
 
+    context_t& context = _context_history[size - num_contexts];
     cpu->IP = context.IP;
     cpu->FP = context.FP;
+
+    _context_history.erase( _context_history.end() - num_contexts, _context_history.end() );
 
     string cur_file = _lst.current_file( cpu->IP );
     cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
@@ -673,7 +562,6 @@ void stackl_debugger::cmd_clear( string& params, Machine_State* cpu )
 {
     system( "clear" );
 }
-
 
 void stackl_debugger::cmd_statics( string& params, Machine_State* cpu )
 {
@@ -716,7 +604,7 @@ string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 
 stackl_debugger::BREAKPOINT_RESULT stackl_debugger::add_breakpoint( const string& break_point_text, uint32_t cur_addr )
 {
-    uint32_t bpl;
+    uint32_t bpl; //break point line
     try
     {
         bpl = text_to_addr( break_point_text, cur_addr );
@@ -738,7 +626,7 @@ stackl_debugger::BREAKPOINT_RESULT stackl_debugger::add_breakpoint( const string
 
 stackl_debugger::BREAKPOINT_RESULT stackl_debugger::remove_breakpoint( const string & break_point_text, uint32_t cur_addr )
 {
-    uint32_t bpl;
+    uint32_t bpl; //break point line
     try
     {
         bpl = text_to_addr( break_point_text, cur_addr );
@@ -804,55 +692,55 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
     else return false;
 }
 
-string stackl_debugger::var_to_string( Machine_State* cpu, string& var_text, bool prepend_def )
+string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text, bool prepend_def )
 {
     int32_t val;
 
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
-        return string_utils::to_hex( val );
+        return string_utils::to_hex( Get_Word( cpu, val ) );
     else if (string_utils::is_number( var_text, 10, &val ) )
-        return std::to_string( val );
-
-    bool address_of = false;
-    if( var_text[0] == '&' )
-    {
-        address_of = true;
-        var_text.erase( 0, 1 );
-    }
+        return std::to_string( Get_Word( cpu, val ) );
 
     vector<string> var_fields = string_utils::string_split( var_text, '.' );
+
+    bool address_of = false;
+    if( var_fields[0][0] == '&' )
+    {
+        address_of = true;
+        var_fields[0].erase( 0, 1 );
+    }
+
+    //parse arrow operator
+    for( uint32_t i = 0; i < var_fields.size(); ++i )
+    {
+        string field = var_fields[i];
+        size_t idx = field.find_first_of( '-' );
+
+        if( idx != field.length() - 1 && field[idx+1] == '>' ) //'->' operator
+        {
+            field.replace( idx, 2, "." );
+            field.insert( 0, "*" );
+            vector<string> new_fields = string_utils::string_split( field, '.' );
+
+            var_fields.erase( var_fields.begin() + i );
+            var_fields.insert( var_fields.begin() + i, new_fields.begin(), new_fields.end() );
+
+            i = 0;
+        }
+    }
 
     uint32_t indirection = string_utils::strip_indirection( var_fields[0] );
     vector<uint32_t> indexes = string_utils::strip_array_indexes( var_fields[0] );
     variable* var = _ast.var( _lst.current_file( cpu->IP ), _lst.current_func( cpu->IP ), var_fields[0] );
 
     if( var == nullptr )
-        throw runtime_error( string( var_text ) + " not found in current scope" );
+        throw runtime_error( string( var_fields[0] ) + " not found in current scope" );
 
     variable res = var->from_indexes( indexes, cpu );
     res = res.deref( indirection, cpu );
 
     for( uint32_t i = 1; i < var_fields.size(); ++i )
-    {
-        if( !res.is_struct() ) //the struct left of the '.' operator
-            throw runtime_error( string( "'" ) + res.definition() + "' is not a struct type." );
-
-        //strip ending brackets and asterisks to get the 'true' var name
-        indirection = string_utils::strip_indirection( var_fields[i] );
-        indexes = string_utils::strip_array_indexes( var_fields[i] );
-
-        //ask the type of the left for the variable object of the guy on the right
-        var = res.decl()->var( var_fields[i] );
-
-        if( var == nullptr )
-            throw runtime_error( string( "'" ) + var_fields[i] + "' is not a field of type '" + res.type() + "'." );
-
-        variable temp = *var; //make a variable of the field on the right and make sure his offset is correct
-        temp.offset( temp.offset() + res.offset() );
-
-        res = temp.from_indexes( indexes, cpu );
-        res = res.deref( indirection, cpu );
-    }
+        res = res.parse_field_access( cpu, var_fields[i] );
 
     if( address_of )
         return std::to_string( res.total_offset( cpu ) );
@@ -929,14 +817,25 @@ void stackl_debugger::query_user( Machine_State* cpu )
     string input;
 
     set_flag( DEBUGGING, true );
+    set_flag( RESUME_EXECUTING, false );
 
      //set to non-blocking so console output works like normal.
-    int32_t console_mode = pio_set_nonblock( 0 );
+    int32_t previous_mode = pio_set_nonblock( 0 );
 
     while( !get_flag( RESUME_EXECUTING ) )
     {
-        cout << "(dbg) ";
-        getline( cin, input );
+        #ifdef LREADLINE
+        {
+            input = readline( "(dbg) " );
+            if( !input.empty() )
+                add_history( input.c_str() );
+        }
+        #else
+        {
+            cout << "(dbg) ";
+            getline( cin, input );
+        }
+        #endif //#ifdef LREADLINE
 
         if( input == "" )
         {
@@ -962,10 +861,14 @@ void stackl_debugger::query_user( Machine_State* cpu )
             if( command.called_by( cmd_txt ) )
             {
                 ran = true;
-                if( get_flag( OPCODE_DEBUG ) && !command.allowed_in_opcode_mode() )
-                    cout << "You can't run this command without debug files available.\n";
-                else
+                try
+                {
                     command.run( params, cpu );
+                }
+                catch( exception& ex )
+                {
+                    cout << "Error: " << ex.what() << '\n';
+                }
                 break; //stop checking for more commands once we find it
             }
         }
@@ -975,13 +878,12 @@ void stackl_debugger::query_user( Machine_State* cpu )
     }
 
     set_flag( DEBUGGING, false );
-    set_flag( RESUME_EXECUTING, false ); //if we get here we've already dropped out of the while loop
     if( get_flag( TIMER ) )
     {
         _start_time = high_resolution_clock::now();
         _instructions_executed = Timer_Current_Time();
     }
-    pio_set_nonblock( console_mode ); //reset console to whatever mode it was previously
+    pio_set_nonblock( previous_mode ); //reset console to whatever mode it was previously
 }
 
 bool stackl_debugger::should_break( Machine_State* cpu )
