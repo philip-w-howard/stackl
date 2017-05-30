@@ -27,6 +27,8 @@ void Machine_Execute();
 void Machine_Check(int code, const char *fmt, ...);
 void Machine_Signal_Interrupt(int from_hw, int32_t vector);
 
+int Machine_Check_Happened();
+
 // Machine check codes
 #define MC_ILLEGAL_INST 0x00000001
 #define MC_ILLEGAL_ADDR 0x00000002

@@ -11,6 +11,7 @@
 
 static Machine_State Regs;
 static pthread_mutex_t Machine_Lock = PTHREAD_MUTEX_INITIALIZER;
+static int g_Machine_Check_Code = 0;
 
 //static FILE *Mem_Log;
 
@@ -23,6 +24,8 @@ void Machine_Check(int code, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
+
+    g_Machine_Check_Code = code;
 
     char format[200];
     sprintf(format, "Machine check: %s\n", fmt);
@@ -104,5 +107,14 @@ void Machine_Signal_Interrupt(int from_hw, int32_t vector)
     if (from_hw) pthread_mutex_lock(&Machine_Lock);
     Regs.FLAG |= FL_I_FIRST_INT << vector;
     if (from_hw) pthread_mutex_unlock(&Machine_Lock);
+}
+
+//***************************************
+int Machine_Check_Happened()
+{
+    int happened = g_Machine_Check_Code;
+    g_Machine_Check_Code = 0;
+
+    return happened;
 }
 
