@@ -14,6 +14,7 @@ release: all
 	cp makedisk $(RELEASE)
 	cp slasm $(RELEASE)
 	cp stackl $(RELEASE)
+	cp stackl_norl $(RELEASE)
 	cp stacklc $(RELEASE)
 	cp library/*.h $(RELEASE)/library
 	cp library/*.sl $(RELEASE)/library
@@ -21,6 +22,7 @@ release: all
 	chmod 755 $(RELEASE)/makedisk
 	chmod 755 $(RELEASE)/slasm
 	chmod 755 $(RELEASE)/stackl
+	chmod 755 $(RELEASE)/stackl_norl
 	chmod 755 $(RELEASE)/stacklc
 	chmod 644 $(RELEASE)/library/*
 clean:
@@ -30,6 +32,7 @@ clean:
 	$(MAKE) -C library clean
 	rm -f slasm
 	rm -f stackl
+	rm -f stackl_norl
 	rm -f stacklc
 	rm -f copy2disk
 	rm -f makedisk
@@ -63,6 +66,7 @@ execs: compiler interp utils
 	cp compiler/stacklc .
 	cp interp/slasm .
 	cp interp/stackl .
+	cp interp/stackl_norl .
 	cp utils/copy2disk .
 	cp utils/makedisk .
 
