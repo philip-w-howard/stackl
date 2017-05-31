@@ -49,10 +49,10 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
     {
         if (address < 0 || (address+WORD_SIZE) > regs->LP - regs->BP)
         {
-            Machine_Check(MC_ILLEGAL_ADDR, 
+            Machine_Check(MC_ILLEGAL_ADDR,
                     "address %d out of bounds\n", address);
             return -1;
-        } 
+        }
 
         address = regs->BP + address;
     }

@@ -1,4 +1,5 @@
 #include "stackl_debugger.h"
+#include "safe_read.h"
 
 #include <signal.h>
 #include <iostream>
@@ -500,8 +501,8 @@ void stackl_debugger::cmd_backtrace( string& params, Machine_State* cpu )
 
         contexts.push_back( std::to_string( ++i ) + ". " + full_func + " at " + cur_file + ":" + std::to_string( cur_line ) );
 
-        ip = Get_Word( cpu, fp - 8 );
-        fp = Get_Word( cpu, fp - 4 );
+        ip = safe_read_word( cpu, fp - 8 );
+        fp = safe_read_word( cpu, fp - 4 );
 
     } while( cur_func != init_func );
 
@@ -524,8 +525,8 @@ void stackl_debugger::cmd_up( string& params, Machine_State* cpu )
         }
 
         _context_history.push_back( { cpu->IP, cpu->FP } );
-        cpu->IP = Get_Word( cpu, cpu->FP - 8 );
-        cpu->FP = Get_Word( cpu, cpu->FP - 4 );
+        cpu->IP = safe_read_word( cpu, cpu->FP - 8 );
+        cpu->FP = safe_read_word( cpu, cpu->FP - 4 );
         cur_file = _lst.current_file( cpu->IP );
     }
 
@@ -584,7 +585,7 @@ inline bool stackl_debugger::get_flag( FLAG flag ) const
 string stackl_debugger::opcode_to_string( uint32_t addr, Machine_State* cpu )
 {
     string res = "";
-    int32_t instr = Get_Word( cpu, addr );
+    int32_t instr = safe_read_word( cpu, addr );
 
     if( (int64_t)instr >= ( (int64_t)sizeof( op_list ) / (int64_t)sizeof( opcode_t ) ) || instr < 0 )
         return "Invalid opcode found.\n";
@@ -697,9 +698,9 @@ string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_tex
     int32_t val;
 
     if( string_utils::begins_with( var_text, "0x" ) && string_utils::is_number( var_text, 16, &val ) )
-        return string_utils::to_hex( Get_Word( cpu, val ) );
+        return string_utils::to_hex( safe_read_word( cpu, val ) );
     else if (string_utils::is_number( var_text, 10, &val ) )
-        return std::to_string( Get_Word( cpu, val ) );
+        return std::to_string( safe_read_word( cpu, val ) );
 
     vector<string> var_fields = string_utils::string_split( var_text, '.' );
 
@@ -975,5 +976,5 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
 //address 12 holds the address of the first function jumped to by the interpreter
 string stackl_debugger::get_init_func( Machine_State* cpu ) const
 {
-    return _lst.current_func( Get_Word( cpu, 12 ) );
+    return _lst.current_func( safe_read_word( cpu, 12 ) );
 }

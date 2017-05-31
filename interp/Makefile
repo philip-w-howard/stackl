@@ -21,6 +21,7 @@ OBJS=stackl.o \
 	 string_utils.o \
 	 debugger_interface.o \
 	 debugger_command.o \
+	 safe_read.o \
 
 all: stackl slasm stackl_norl
 
