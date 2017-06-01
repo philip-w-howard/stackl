@@ -21,6 +21,8 @@ using std::exception;
 #ifdef LREADLINE
     #include <readline/readline.h>
     #include <readline/history.h>
+    static vector<string> possible_matches;
+    #include <cstring>
 #endif
 
 extern "C"
@@ -619,7 +621,7 @@ stackl_debugger::BREAKPOINT_RESULT stackl_debugger::add_breakpoint( const string
     {
         if( add_breakpoint( bpl ) )
             return BREAKPOINT_RESULT::SUCCESS;
-       else
+        else
            return BREAKPOINT_RESULT::DUPLICATE;
     }
     else return BREAKPOINT_RESULT::NOT_FOUND;
@@ -641,7 +643,7 @@ stackl_debugger::BREAKPOINT_RESULT stackl_debugger::remove_breakpoint( const str
     {
         if( remove_breakpoint( bpl ) )
             return BREAKPOINT_RESULT::SUCCESS;
-    else
+        else
             return BREAKPOINT_RESULT::NOT_FOUND;
     }
     else return BREAKPOINT_RESULT::NOT_FOUND;
@@ -692,6 +694,8 @@ bool stackl_debugger::remove_breakpoint( uint32_t addr )
     }
     else return false;
 }
+
+static char __secret[] = { 95,95,32,32,32,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,92,32,92,32,47,32,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,32,86,32,47,32,95,95,95,32,32,32,95,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,32,47,32,47,32,95,32,92,32,124,32,124,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,124,32,124,124,32,40,95,41,32,124,124,32,124,95,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,95,47,32,92,95,95,95,47,32,32,92,95,95,44,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,95,95,32,95,32,32,95,32,95,95,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,47,32,95,96,32,124,124,32,39,95,95,124,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,40,95,124,32,124,124,32,124,32,32,124,32,32,95,95,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,95,95,44,95,124,124,95,124,32,32,32,92,95,95,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,95,32,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,32,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,95,95,32,32,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,95,95,124,124,32,39,95,32,92,32,32,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,32,124,32,124,124,32,32,95,95,47,32,32,32,32,32,32,32,32,95,32,32,32,32,32,32,32,10,32,92,95,95,124,124,95,124,32,124,95,124,32,92,95,95,95,124,32,32,32,32,32,32,32,40,95,41,32,32,32,32,32,32,10,32,95,32,95,95,32,95,95,95,32,32,32,32,95,95,32,95,32,32,32,95,95,32,95,32,32,95,32,32,32,95,95,95,32,10,124,32,39,95,32,96,32,95,32,92,32,32,47,32,95,96,32,124,32,47,32,95,96,32,124,124,32,124,32,47,32,95,95,124,10,124,32,124,32,124,32,124,32,124,32,124,124,32,40,95,124,32,124,124,32,40,95,124,32,124,124,32,124,124,32,40,95,95,32,10,124,95,124,32,124,95,124,32,124,95,124,32,92,95,95,44,95,124,32,92,95,95,44,32,124,124,95,124,32,92,95,95,95,124,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,95,95,47,32,124,32,32,32,32,32,32,32,32,32,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,124,95,95,95,47,32,32,32,32,32,32,32,32,32,32,10,0};
 
 string stackl_debugger::var_to_string( Machine_State* cpu, const string& var_text, bool prepend_def )
 {
@@ -811,7 +815,59 @@ string stackl_debugger::params_from_input( const string& input )
     }
     else return "";
 }
-static char __secret[] = {95,95,32,32,32,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,92,32,92,32,47,32,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,32,86,32,47,32,95,95,95,32,32,32,95,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,32,47,32,47,32,95,32,92,32,124,32,124,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,124,32,124,124,32,40,95,41,32,124,124,32,124,95,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,92,95,47,32,92,95,95,95,47,32,32,92,95,95,44,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,32,95,95,32,95,32,32,95,32,95,95,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,47,32,95,96,32,124,124,32,39,95,95,124,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,40,95,124,32,124,124,32,124,32,32,124,32,32,95,95,47,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,92,95,95,44,95,124,124,95,124,32,32,32,92,95,95,95,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,32,95,32,32,32,32,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,32,32,124,32,124,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,95,95,32,32,32,32,95,95,95,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,95,95,124,124,32,39,95,32,92,32,32,47,32,95,32,92,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,10,124,32,124,95,32,124,32,124,32,124,32,124,124,32,32,95,95,47,32,32,32,32,32,32,32,32,95,32,32,32,32,32,32,32,10,32,92,95,95,124,124,95,124,32,124,95,124,32,92,95,95,95,124,32,32,32,32,32,32,32,40,95,41,32,32,32,32,32,32,10,32,95,32,95,95,32,95,95,95,32,32,32,32,95,95,32,95,32,32,32,95,95,32,95,32,32,95,32,32,32,95,95,95,32,10,124,32,39,95,32,96,32,95,32,92,32,32,47,32,95,96,32,124,32,47,32,95,96,32,124,124,32,124,32,47,32,95,95,124,10,124,32,124,32,124,32,124,32,124,32,124,124,32,40,95,124,32,124,124,32,40,95,124,32,124,124,32,124,124,32,40,95,95,32,10,124,95,124,32,124,95,124,32,124,95,124,32,92,95,95,44,95,124,32,92,95,95,44,32,124,124,95,124,32,92,95,95,95,124,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,95,95,47,32,124,32,32,32,32,32,32,32,32,32,10,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,124,95,95,95,47,32,32,32,32,32,32,32,32,32,32,10,0};
+
+#ifdef LREADLINE
+void stackl_debugger::load_autocompletes( Machine_State* cpu, vector<string>& options )
+{
+    options.clear();
+
+    for( auto& pair: _ast.globals() )
+        options.push_back( pair.first );
+
+    function* cur_func = _ast.func( _lst.current_func( cpu->IP ) );
+    if( cur_func != nullptr )
+        for( const auto& pair: cur_func->locals() )
+            options.push_back( pair.first );
+
+    string cur_file = _lst.current_file( cpu->IP );
+    for( const auto& pair: _ast.statics()[cur_file] )
+        options.push_back( pair.first );
+
+    for( const auto& pair: _ast.functions() )
+        options.push_back( pair.first );
+}
+
+char* possible_option_generator( const char* txt, int32_t isnt_first_call )
+{
+    static int32_t len;
+    static uint32_t size, idx;
+    const char* name;
+    //it's a static variable that is 0 only on the first call of this function for option genration.
+    //I didn't write the interface.
+    if( !isnt_first_call ) // if( is_first_call )
+    {
+        idx = 0;
+        len = strlen( txt );
+        size = possible_matches.size();
+    }
+
+    while( idx < size )
+    {
+        name = possible_matches[idx++].c_str();
+        if( strncmp( name, txt, len ) == 0 )
+            return strdup( name );
+    }
+
+    return NULL;
+}
+
+char ** my_rl_attempted_completion_function( const char* txt, int32_t begin, int32_t end )
+{
+    rl_attempted_completion_over = 1; //don't try to autocomplete with filenames
+    rl_completion_suppress_append = !0; //non-zero value will keep from appending the space after completion
+    return rl_completion_matches( txt, possible_option_generator );
+}
+#endif
 
 void stackl_debugger::query_user( Machine_State* cpu )
 {
@@ -827,7 +883,12 @@ void stackl_debugger::query_user( Machine_State* cpu )
     {
         #ifdef LREADLINE
         {
-            input = readline( "(dbg) " );
+            rl_basic_word_break_characters = " \t\n\"\\'`@$><=;|&{(*";
+            rl_attempted_completion_function = my_rl_attempted_completion_function;
+            load_autocompletes( cpu, possible_matches );
+            char* rl = readline( "(dbg) " ); //readline allocates a copy in memory of the user input
+            input = rl;
+            free( rl );
             if( !input.empty() )
                 add_history( input.c_str() );
         }
@@ -836,7 +897,9 @@ void stackl_debugger::query_user( Machine_State* cpu )
             cout << "(dbg) ";
             getline( cin, input );
         }
-        #endif //#ifdef LREADLINE
+        #endif //LREADLINE
+
+        string_utils::ltrim( input );
 
         if( input == "" )
         {
@@ -953,7 +1016,7 @@ string stackl_debugger::get_nearby_lines( uint32_t cur_addr, int32_t range )
     try
     {
         file.open( cur_file ); //this can throw an exception
-        if( !file.is_open() )
+        if( !file.is_open() ) //it could also not throw an excption but still not be open
             throw 0; //this is kinda dumb... but it keeps us from duplicating the error message?
     }
     catch( ... )

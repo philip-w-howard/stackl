@@ -121,6 +121,9 @@ private:
     //this function populates the _commands field.
     void load_commands();
     vector<debugger_command> _commands;
+    //populates the static autocompletes vector in stackl_debugger.cpp
+    void load_autocompletes( Machine_State* cpu, vector<string>& options );
+    
 
     //each debugger command must have a function that is run when the command is invoked.
     void cmd_breakpoint( string& params, Machine_State* cpu );

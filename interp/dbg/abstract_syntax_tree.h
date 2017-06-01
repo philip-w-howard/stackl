@@ -32,6 +32,7 @@ public:
     string statics_in( const string& filename );
 
     inline unordered_map<string, variable>& globals() { return _globals; }
+    inline unordered_map<string, unordered_map<string, variable>>& statics() { return _statics; }
     inline unordered_map<string, function>& functions() { return _functions; }
     inline unordered_map<string, struct_decl>& struct_decls() { return _struct_decls; }
 
