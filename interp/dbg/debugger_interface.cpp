@@ -1,6 +1,7 @@
 #include "debugger_interface.h"
 #include "stackl_debugger.h"
 #include "string_utils.h"
+
 #include <iostream>
 using std::cout;
 
@@ -59,8 +60,9 @@ int32_t dbg_machine_check( int32_t code, Machine_State* cpu )
 
     if( !dbg->debugging() )
         dbg->query_user( cpu );
+    //else this machine check was generated from something done inside the debugger
 
-    return 1;
+    return 1; //don't call exit, we might want to continue running code
 }
 
 void dbg_enable()

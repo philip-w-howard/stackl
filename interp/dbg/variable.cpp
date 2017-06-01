@@ -9,10 +9,7 @@ using std::runtime_error;
 
 #include "string_utils.h"
 
-extern "C"
-{
-    #include "../vmem.h"
-}
+#include "safe_read.h"
 
 unordered_map<string, size_t> variable::builtins(
 {
@@ -172,7 +169,7 @@ variable variable::deref( uint32_t derefs, Machine_State* cpu ) const
     int32_t addr = total_offset( cpu );
 
     for( uint32_t i = 0; i < derefs; ++i )
-        addr = Get_Word( cpu, addr );
+        addr = safe_read_word( cpu, addr );
 
 
     if( !_global ) //if it's a local variable then return locality to the offset
@@ -223,13 +220,13 @@ variable variable::deref_ptr_from_index( vector<uint32_t>& indexes, Machine_Stat
     if( indexes.size() > _indirection )
         throw runtime_error( "Cannot index pointer on more dimensions than total level of indirection." );
 
-    int32_t addr = Get_Word( cpu, total_offset( cpu ) );
+    int32_t addr = safe_read_word( cpu, total_offset( cpu ) );
     for( uint32_t i = 0; i < indexes.size(); ++i )
     {
         if( _indirection - ( i + 1 ) == 0 ) //if its a deref to a type we have to move along the stack
             addr += indexes[i] * _size;
         else //if it's a deref to a pointer we have to follow the pointer
-            addr = Get_Word( cpu, addr + indexes[i] * sizeof( int32_t ) );
+            addr = safe_read_word( cpu, addr + indexes[i] * sizeof( int32_t ) );
     }
 
     if( !_global ) //if it's a local variable then return locality to the offset
@@ -272,12 +269,12 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
         char v;
 
         if( _indirection == 1 ) //is it a char*
-            addr = Get_Word( cpu, total_offset( cpu ) );
+            addr = safe_read_word( cpu, total_offset( cpu ) );
         else if( _array_ranges.size() == 1 ) //is it a char[]
             addr = total_offset( cpu );
 
         pre += "\"";
-        for( uint32_t i = 0; ( v = Get_Byte( cpu, addr + i ) ) != '\0'; ++i )
+        for( uint32_t i = 0; ( v = safe_read_byte( cpu, addr + i ) ) != '\0'; ++i )
         {
             if( v == '\n' )
                 pre += "\\n";
@@ -292,7 +289,7 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     else if( is_pointer() && !is_array() )
     {
         //return pre + string_utils::to_hex( Get_Word( cpu, total_offset( cpu ) ) );
-        return pre + std::to_string( Get_Word( cpu, total_offset( cpu ) ) );
+        return pre + std::to_string( safe_read_word( cpu, total_offset( cpu ) ) );
     }
     else if( is_array() )
     {
@@ -326,11 +323,11 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     }
     else if( _type == "int" )
     {
-        return pre + std::to_string( Get_Word( cpu, total_offset( cpu ) ) );
+        return pre + std::to_string( safe_read_word( cpu, total_offset( cpu ) ) );
     }
     else if( _type == "char" )
     {
-        return pre + "'" + (char)Get_Byte( cpu, total_offset( cpu ) ) + "'";
+        return pre + "'" + (char)safe_read_byte( cpu, total_offset( cpu ) ) + "'";
     }
     else
         return string( "unable to print type " ) + _type;

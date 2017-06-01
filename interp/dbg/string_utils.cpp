@@ -37,6 +37,12 @@ void string_utils::ltrim( string &s )
     s.erase( s.begin(), std::find_if( s.begin(), s.end(), std::not1( std::ptr_fun<int, int>( std::isspace ) ) ) );
 }
 
+void string_utils::rtrim( string& s )
+{
+    while( std::isspace( s.back() ) )
+        s.pop_back();
+}
+
 bool string_utils::is_number( const string& num_text, int32_t base, int32_t* res )
 {
     char* p;

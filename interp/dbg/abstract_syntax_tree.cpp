@@ -119,7 +119,7 @@ string abstract_syntax_tree::all_locals( const string& func_name )
     if( find_res == _functions.end() )
         return "Couldn't find function " + func_name + ".\n";
 
-    for( auto& var_pair : find_res->second.get_locals() )
+    for( auto& var_pair : find_res->second.locals() )
         ss << var_pair.second.definition() << '\n';
 
     string ret = ss.str();
