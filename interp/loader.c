@@ -122,7 +122,7 @@ int Load(const char *filename, int boot)
         strcpy(string, filename);
         strcat(string, ".slb");
         input = fopen(string, "r");
-        if (input == NULL) return 0;
+        if (input == NULL) return -1;
     }
 
     fgets(string, sizeof(string), input);
@@ -130,7 +130,7 @@ int Load(const char *filename, int boot)
     if (strcmp(token, "stackl") != 0)
     {
         fclose(input);
-        return 0;
+        return -2;
     }
 
     char *version = strtok(NULL, delims);
@@ -191,7 +191,8 @@ int Load(const char *filename, int boot)
             //fprintf(stderr, "Memory overflow while loading\n");
             //exit(-1);
 
-            return -1;
+            fclose(input);
+            return -3;
         }
     }
 
@@ -201,6 +202,7 @@ int Load(const char *filename, int boot)
     dbg_load_info( &cpu, filename );
     Set_Debug_Info( cpu.debugger );
 
+    fclose(input);
     return max_addr;
 }
 

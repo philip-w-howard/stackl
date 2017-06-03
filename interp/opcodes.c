@@ -173,7 +173,7 @@ void Execute(Machine_State *cpu)
     int32_t temp;
     static int num_instructions = 0;
 
-    if (++num_instructions >= Max_Instructions) 
+    if (Max_Instructions != INT_MAX && ++num_instructions >= Max_Instructions) 
     {
         cpu->FLAG |= FL_HALTED;
         return;

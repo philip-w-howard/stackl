@@ -1,7 +1,7 @@
 HALT:
     user mode: trap handler? or Machine Check ISR?
-INP instruction: ISR on completion option
-OUTS instruction: ISR on completion option: async
+
+Complete tests of gen_io device
 
 Machine Checks
     call dbg function to inform debugger that it happened
