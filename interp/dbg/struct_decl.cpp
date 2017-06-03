@@ -1,12 +1,12 @@
 #include "struct_decl.h"
 
-
 struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, struct_decl>& live_type_context ): _size( 0 )
 {
     //get the first symbol and read its 'name' attribute
     _name = struct_node->first_node( "Symbol" )->first_attribute( "name" )->value();
 
-        live_type_context[ _name ] = *this;
+    //need to put outselves in the type context because a struct can contain a pointer to a type of itself
+    live_type_context[_name] = *this;
 
     //get every var decl in the decls list
     for( xml_node<char>* xml_var : struct_node->first_node( "DeclsList" )->all_nodes() )
@@ -15,9 +15,9 @@ struct_decl::struct_decl( xml_node<char>* struct_node, unordered_map<string, str
 
         // need to update ourself and the struct_decl in the context
         _size += var.size();
-        live_type_context[ _name ]._size += var.size();
+        live_type_context[_name]._size += var.size();
         _fields.push_back( var );
-        live_type_context[ _name ]._fields.push_back( var );
+        live_type_context[_name]._fields.push_back( var );
     }
 }
 

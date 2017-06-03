@@ -288,14 +288,18 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     }
     else if( is_pointer() && !is_array() )
     {
-        //return pre + string_utils::to_hex( Get_Word( cpu, total_offset( cpu ) ) );
+        //return pre + string_utils::to_hex( safe_read_word( cpu, total_offset( cpu ) ) );
         return pre + std::to_string( safe_read_word( cpu, total_offset( cpu ) ) );
     }
     else if( is_array() )
     {
         //pre += string_utils::to_hex( total_offset( cpu ) ) + " {\n";
         pre += std::to_string( total_offset( cpu ) ) + " {\n";
+
+        //Initialize a vector with room for one number.
+        // I know this is dumb. It's so that I don't have to make an overload to do essentially this behavior in this one case.
         vector<uint32_t> idx( 1 );
+
         if( _array_ranges.size() == 1 )
         {
             //iterate over the first dimension of our array
@@ -318,7 +322,11 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     else if( _struct_decl != nullptr )
     {
         Machine_State temp_state = *cpu;
-        temp_state.FP += _offset;
+        if( _global )
+            temp_state.FP = _offset; //set it equal
+        else
+            temp_state.FP += _offset; //add it
+
         return pre + "{\n" + _struct_decl->to_string( &temp_state, indent_level + 1 ) + tabs + "}";
     }
     else if( _type == "int" )

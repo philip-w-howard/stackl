@@ -12,7 +12,7 @@ using std::string;
 #include <unordered_map>
 using std::unordered_map;
 
-static unordered_map<int32_t, string> error_messages =
+const static unordered_map<int32_t, string> error_messages =
 {
     { MC_ILLEGAL_INST, "Illegal instruction" },
     { MC_ILLEGAL_ADDR, "Illegal address" },
@@ -26,6 +26,7 @@ int32_t safe_read_word( Machine_State* cpu, int32_t addr )
     Machine_Check_Happened(); //clear the previous machine check state, we don't care about it
     int32_t val = Get_Word( cpu, addr );
     int32_t mch = Machine_Check_Happened();
+
     if( mch == 0 ) //no machine check
         return val;
 
