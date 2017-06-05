@@ -252,6 +252,7 @@ variable variable::parse_field_access( Machine_State* cpu, string& rhs ) const
 
     variable res = *field;
     res._offset += _offset;
+    res._global = _global;
     return res.from_indexes( indexes, cpu ).deref( indirection, cpu );
 }
 

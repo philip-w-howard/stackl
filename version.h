@@ -1,2 +1,2 @@
 #pragma once
-#define VERSION "V0.10.2-56-g2fd0590-dev"
+#define VERSION "V0.10.2-57-g7f2f162-dev"

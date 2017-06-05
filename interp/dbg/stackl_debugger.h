@@ -36,6 +36,7 @@ public:
     inline bool debugging() const { return get_flag( FLAG::DEBUGGING ); }
     inline bool loaded() const { return get_flag( FLAG::LOADED ); }
     inline bool opcode_mode() const { return get_flag( FLAG::OPCODE_DEBUG ); }
+    inline bool debug_new_binary () const { return get_flag( FLAG::DEBUG_NEW_BINARY ); }
     inline string failure_reason() const { return _failure_reason; }
 
 private:
@@ -55,7 +56,8 @@ private:
         STEP_OVER,
         STEP_INTO,
         RESUME_EXECUTING,
-        TIMER
+        TIMER,
+        DEBUG_NEW_BINARY,
     };
 
     void set_flag( FLAG state, bool value );
@@ -123,7 +125,6 @@ private:
     vector<debugger_command> _commands;
     //populates the static autocompletes vector in stackl_debugger.cpp
     void load_autocompletes( Machine_State* cpu, vector<string>& options );
-    
 
     //each debugger command must have a function that is run when the command is invoked.
     void cmd_breakpoint( string& params, Machine_State* cpu );
@@ -145,7 +146,7 @@ private:
     void cmd_BP( string& params, Machine_State* cpu );
     void cmd_LP( string& params, Machine_State* cpu );
     void cmd_SP( string& params, Machine_State* cpu );
-    void cmd_file( string& params, Machine_State* cpu );
+    void cmd_location( string& params, Machine_State* cpu );
     void cmd_program( string& params, Machine_State* cpu );
     void cmd_func( string& params, Machine_State* cpu );
     void cmd_help( string& params, Machine_State* cpu );
@@ -161,6 +162,7 @@ private:
     void cmd_down( string& params, Machine_State* cpu );
     void cmd_timer( string& params, Machine_State* cpu );
     void cmd_clear( string& params, Machine_State* cpu );
+    void cmd_binarydbg( string& params, Machine_State* cpu );
 
     string _binary_name = ""; //the name of the current binary being debugged
     vector<uint32_t> _break_points; //list of instruction pointers to break at

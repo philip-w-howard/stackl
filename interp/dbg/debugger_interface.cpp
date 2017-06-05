@@ -12,19 +12,20 @@ void dbg_load_info( Machine_State* cpu, const char* filename )
     if( !ENABLE )
         return;
 
-    if( cpu->debugger != nullptr )
+    stackl_debugger* debugger = static_cast<stackl_debugger*>( cpu->debugger );
+
+    if( debugger != nullptr )
     { //if a debugger object already exists
-        string prompt = string( filename ) + " is being loaded. Would you like to debug it?";
-        if( string_utils::get_yesno( prompt ) )
+        cout << filename << " is being loaded.\n";
+        if( debugger->debug_new_binary() && string_utils::get_yesno( "Would you like to debug it?" ) )
         { //they want to debug the new binary, delete the current debugger
-            stackl_debugger* debugger = (stackl_debugger*)cpu->debugger;
             cpu->debugger = nullptr;
             delete debugger;
         }
         else return; //they want to keep debugging the existing binary, just stop here.
     }
 
-    stackl_debugger* debugger = new stackl_debugger( filename );
+    debugger = new stackl_debugger( filename );
 
     if( debugger == NULL )
     {
