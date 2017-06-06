@@ -34,7 +34,7 @@ public:
     inline unordered_map<string, variable>& globals() { return _globals; }
     inline unordered_map<string, unordered_map<string, variable>>& statics() { return _statics; }
     inline unordered_map<string, function>& functions() { return _functions; }
-    inline unordered_map<string, struct_decl>& struct_decls() { return _struct_decls; }
+    inline unordered_map<string, unordered_map<string, struct_decl>>& struct_decls() { return _struct_decls; }
 
     inline time_t compile_time( const string& filename ) const { return _compile_times.at( filename ); }
 
@@ -47,9 +47,9 @@ private:
 
     //key = symbol name, value = object with that name
     unordered_map<string, variable> _globals;
-    unordered_map<string, unordered_map<string, variable>> _statics;
+    unordered_map<string, unordered_map<string, variable>> _statics; //per file
     unordered_map<string, function> _functions;
-    unordered_map<string, struct_decl> _struct_decls;
+    unordered_map<string, unordered_map<string, struct_decl>> _struct_decls; //per file
     unordered_map<string, time_t> _compile_times;
 
 };

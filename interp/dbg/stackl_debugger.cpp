@@ -73,6 +73,7 @@ stackl_debugger::stackl_debugger( const char* filename ): _binary_name( string_u
 
         //if we get to this point it's because there were no exceptions thrown above
         set_flag( LOADED, true );
+        set_flag( DEBUG_NEW_BINARY, true );
         cout << "Debugger for " << _binary_name << " loaded. Type 'help' for help.\n";
     }
     catch( exception& ex )
@@ -131,7 +132,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_globals, { "globals", "listglobals" }, "- Print all global variables", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_statics, { "statics", "liststatics" }, "optional[filename] - Print all static variables in specified file or all files.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_funcs, { "funcs", "functions", "listfuncs", "listfunctions" }, "- Print all functions", false ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_file, { "file", "currentfile" }, "- Prints the filename of the currently executing source code", false ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_location, { "loc", "location", "file", "line" }, "- Prints the location of the currently executing source code", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_program, { "program", "binary", "currentprogram", "currentbinary" }, "- Prints the filename of the loaded binary", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_func, { "func", "function", "currentfunc", "currentfunction" }, "- Prints the name of the currently executing function", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_exit, { "exit", "quit", "q" }, "- Exits current program", true ) );
@@ -140,7 +141,7 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_FP, { "FP", "fp" }, "optional[value] - Prints or sets the frame pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_BP, { "BP", "bp" }, "optional[value] - Prints or sets the base pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_LP, { "LP", "lp" }, "optional[value] - Prints or sets the limit pointer", true ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP", "sp" }, "optional[value] - Prints or sets the stack pointer", true) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_SP, { "SP", "sp" }, "optional[value] - Prints or sets the stack pointer", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_help, { "help" }, "optional[command] - Prints the help text for all commands or the specified one", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_nexti, { "ni", "nexti" }, "- Runs the current instruction", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_restart, { "restart", "re" }, "- Restarts the program at the beginning", true ) );
@@ -150,8 +151,9 @@ void stackl_debugger::load_commands()
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_backtrace, { "backtrace", "callstack", "bt" }, "- Prints the callstack.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_up, { "up" }, "optional[contexts]- Moves the framepointer up one or passed amount of contexts.", false ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_down, { "down" }, "- Moves the framepointer down one or passed amount of contexts", false ) );
-    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Enables the timer between breakpoints", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_timer, { "timer" }, "- Toggles the timer between breakpoints", true ) );
     _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_clear, { "clear" }, "- Clears the screen", true ) );
+    _commands.push_back( debugger_command( *this, &stackl_debugger::cmd_binarydbg, { "bindbg", "dbgbin", "binarydebug", "debugbinary" }, "- Toggles the 'want to load a new binary' prompt.", true ) );
 
     const size_t size = _commands.size();
     for( size_t i = 0; i < size; ++i )
@@ -393,9 +395,14 @@ void stackl_debugger::cmd_SP( string& params, Machine_State* cpu )
         cpu->SP = string_utils::to_int( params );
 }
 
-void stackl_debugger::cmd_file( string& params, Machine_State* cpu )
+void stackl_debugger::cmd_location( string& params, Machine_State* cpu )
 {
-    cout << _lst.current_file( cpu->IP ) << '\n';
+    string cur_file = _lst.current_file( cpu->IP );
+    uint32_t line = _lst.line_of_addr( cur_file, cpu->IP );
+    if( line == UINT32_MAX )
+        cout << "Unkown location\n";
+    else
+        cout << cur_file << ':' << line << '\n';
 }
 
 void stackl_debugger::cmd_program( string& params, Machine_State* cpu )
@@ -532,7 +539,9 @@ void stackl_debugger::cmd_up( string& params, Machine_State* cpu )
         cur_file = _lst.current_file( cpu->IP );
     }
 
-    cout << "Now at: " << _lst.current_func( cpu->IP ) << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
+    function* func = _ast.func( _lst.current_func( cpu->IP ) );
+    string function_text = func == nullptr ? "unknown function" : func->to_string();
+    cout << "Now at: " << function_text << " in " << cur_file << ':' << _lst.line_of_addr( cur_file, cpu->IP ) << '\n';
 }
 
 void stackl_debugger::cmd_down( string& params, Machine_State* cpu )
@@ -573,6 +582,13 @@ void stackl_debugger::cmd_statics( string& params, Machine_State* cpu )
     else
         cout << _ast.statics_in( params );
 }
+
+void stackl_debugger::cmd_binarydbg( string& params, Machine_State* cpu )
+{
+    set_flag( DEBUG_NEW_BINARY, !get_flag( DEBUG_NEW_BINARY ) );
+    cout << "Debug new binary prompt " << ( get_flag( DEBUG_NEW_BINARY ) ? "enabled" : "disabled" ) << ".\n";
+}
+
 
 inline void stackl_debugger::set_flag( FLAG flag, bool value )
 {

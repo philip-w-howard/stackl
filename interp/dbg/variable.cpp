@@ -252,6 +252,7 @@ variable variable::parse_field_access( Machine_State* cpu, string& rhs ) const
 
     variable res = *field;
     res._offset += _offset;
+    res._global = _global;
     return res.from_indexes( indexes, cpu ).deref( indirection, cpu );
 }
 
@@ -322,10 +323,8 @@ string variable::to_string( Machine_State* cpu, uint32_t indent_level, bool prep
     else if( _struct_decl != nullptr )
     {
         Machine_State temp_state = *cpu;
-        if( _global )
-            temp_state.FP = _offset; //set it equal
-        else
-            temp_state.FP += _offset; //add it
+        temp_state.FP = total_offset( cpu ); //a struct prints itself relative to the frame pointer
+        //since its fields are offset relative to the start of the struct
 
         return pre + "{\n" + _struct_decl->to_string( &temp_state, indent_level + 1 ) + tabs + "}";
     }

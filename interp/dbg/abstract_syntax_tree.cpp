@@ -71,6 +71,7 @@ void abstract_syntax_tree::load( const string& filename, xml_document<char>& doc
     struct tm tm;
     strptime( time_str, "%Y:%m:%d %H:%M:%S", &tm );
     _compile_times[filename] = timegm( &tm );
+    _struct_decls[filename] = unordered_map<string, struct_decl>();
 
     string c_filename = string_utils::change_ext( filename, ".c" );
 
@@ -81,17 +82,16 @@ void abstract_syntax_tree::load( const string& filename, xml_document<char>& doc
             xml_node<char>* type = node->first_node();
             if( strcmp( type->name(), "StructType" ) == 0 )
             {
-                struct_decl decl( type, _struct_decls );
+                struct_decl decl( type, _struct_decls[filename] );
             }
-
         }
         else if( strcmp( node->name(), "StructType" ) == 0 )
         {
-            struct_decl decl( node, _struct_decls );
+            struct_decl decl( node, _struct_decls[filename] );
         }
         else if( strcmp( node->name(), "VarDecl" ) == 0 )
         {
-            variable var( node, _struct_decls );
+            variable var( node, _struct_decls[filename] );
             if( var.is_static() )
                 _statics[c_filename][var.name()] = var;
             else if( var.is_global() )
@@ -103,7 +103,7 @@ void abstract_syntax_tree::load( const string& filename, xml_document<char>& doc
         {
             if (function::is_definition( node ))
             {
-                function func( node, _struct_decls );
+                function func( node, _struct_decls[filename] );
                 _functions[func.name()] = func;
             }
         }
