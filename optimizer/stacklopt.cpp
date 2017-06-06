@@ -1,13 +1,9 @@
-#include <string>
-#include <vector>
 #include <iostream>
 #include <stdio.h>
-#include <string.h>
 
 #include "lineitem.h"
-
-using std::vector;
-using std::string;
+#include "sourcefile.h"
+#include "popvarind.h"
 
 int main(int argc, char **argv)
 {
@@ -25,20 +21,21 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    vector<LineItem *> inputList;
+    SourceFile inputList;
 
     while (fgets(input_line, sizeof(input_line), input) != NULL)
     {
-        LineItem *line = new LineItem(input_line);
-
-        inputList.push_back(line);
+        inputList.Insert(input_line);
     }
 
     fclose(input);
 
-    for (LineItem* item : inputList)
+    SourceFile outputList;
+    process_popvar(inputList, outputList);
+
+    while (!outputList.EndOfFile())
     {
-        std::cout << item->text();
+        std::cout << outputList.next()->text();
     }
 
     return 0;

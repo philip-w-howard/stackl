@@ -1,4 +1,5 @@
 #include <string>
+#include <string.h>
 using std::string;
 
 static const char *DELIMS = " \t\n\r";
