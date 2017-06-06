@@ -10,10 +10,6 @@ Clean up test suite
 
 Include files for "regular" C code to mimic stackl C code.
 
-Correct struct definition
-    typedef struct ...
-    struct refs with "struct ID"
-
 optimizations:
    ptr[0] -> *ptr
 

@@ -1,10 +1,9 @@
+slasm -opt to optimize
 HALT:
     user mode: trap handler? or Machine Check ISR?
 
 Complete tests of gen_io device
 
-Machine Checks
-    call dbg function to inform debugger that it happened
 Implement virtual memory
     Use bit in FLAG reg
     Need Page Table register
