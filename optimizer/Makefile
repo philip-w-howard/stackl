@@ -1,6 +1,7 @@
 CFLAGS=-Wall -g -c  -O0 -std=c++11
 CPPFLAGS=-Wall -g -c  -O0 -std=c++11
-OBJS= stacklopt.o
+OBJS= stacklopt.o \
+      lineitem.o
 
 all: stacklopt
 

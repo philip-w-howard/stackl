@@ -4,20 +4,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "lineitem.h"
+
 using std::vector;
 using std::string;
-
-typedef char line_t[128];
-
-typedef struct
-{
-    line_t line;
-    line_t line_copy;
-    char *first;
-    char *second;
-} line_info_t;
-
-const char *DELIMS = " \r\n\t";
 
 int main(int argc, char **argv)
 {
@@ -35,24 +25,20 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    vector<line_info_t *> inputList;
+    vector<LineItem *> inputList;
 
     while (fgets(input_line, sizeof(input_line), input) != NULL)
     {
-        line_info_t *line = (line_info_t*)malloc(sizeof(line_info_t));
-        strcpy(line->line, input_line);
-        strcpy(line->line_copy, input_line);
-        line->first = strtok(line->line_copy, DELIMS);
-        line->second = strtok(NULL, DELIMS);
+        LineItem *line = new LineItem(input_line);
 
         inputList.push_back(line);
     }
 
     fclose(input);
 
-    for (line_info_t* item : inputList)
+    for (LineItem* item : inputList)
     {
-        std::cout << item->line;
+        std::cout << item->text();
     }
 
     return 0;
