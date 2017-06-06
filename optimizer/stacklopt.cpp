@@ -2,13 +2,26 @@
 #include <vector>
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 
 using std::vector;
 using std::string;
 
+typedef char line_t[128];
+
+typedef struct
+{
+    line_t line;
+    line_t line_copy;
+    char *first;
+    char *second;
+} line_info_t;
+
+const char *DELIMS = " \r\n\t";
+
 int main(int argc, char **argv)
 {
-    char line[256];
+    char input_line[256];
     if (argc < 2)
     {
         fprintf(stderr, "Must specify an input file\n");
@@ -22,18 +35,24 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    vector<string> inputList;
+    vector<line_info_t *> inputList;
 
-    while (fgets(line, sizeof(line), input) != NULL)
+    while (fgets(input_line, sizeof(input_line), input) != NULL)
     {
+        line_info_t *line = (line_info_t*)malloc(sizeof(line_info_t));
+        strcpy(line->line, input_line);
+        strcpy(line->line_copy, input_line);
+        line->first = strtok(line->line_copy, DELIMS);
+        line->second = strtok(NULL, DELIMS);
+
         inputList.push_back(line);
     }
 
     fclose(input);
 
-    for (string item : inputList)
+    for (line_info_t* item : inputList)
     {
-        std::cout << item;
+        std::cout << item->line;
     }
 
     return 0;
