@@ -42,7 +42,8 @@ class cArrayRef : public cVarRef
     virtual cTypeDecl *GetType()  { return (cTypeDecl*)GetChild(2); }
     cExpr* GetIndex()             { return (cExpr*)GetChild(1); }
     virtual bool IsArrayRef()     { return true; }
-    virtual bool IsStruct()       { return GetType()->ParentType()->IsStruct();}
+    //virtual bool IsStruct()       { return GetType()->ParentType()->IsStruct();}
+    virtual bool IsStruct()       { return GetType()->IsStruct();}
 
     virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 };

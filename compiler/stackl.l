@@ -67,7 +67,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 
 "#include"          BEGIN(INCLUDE);
 <INCLUDE>[ \t]*      /* eat the whitespace */
-<INCLUDE>[^ \t\n]+   { /* got the include file name */
+<INCLUDE>[^ \t\r\n]+   { /* got the include file name */
                     open_input(yytext);
                     BEGIN(INITIAL);
                   }
@@ -80,7 +80,7 @@ identifier      {letter}({letter}|{digit}|"_")*
 <DO_PRAGMA>"feature"    BEGIN(INITIAL); Return(FEATURE);
 <DO_PRAGMA>"library"    BEGIN(INITIAL); Return(LIBRARY);
 <DO_PRAGMA>"stack\_size" BEGIN(INITIAL); Return(STACK_SIZE);
-<DO_PRAGMA>[ \t]+       {}
+<DO_PRAGMA>[ \t\r]+       {}
 <DO_PRAGMA>"\n"         BEGIN(INITIAL);
 <DO_PRAGMA>.            Return(JUNK_TOKEN);   // discard anything not recognized
 
