@@ -73,6 +73,8 @@ class cVarDecl : public cDecl
         mIsGlobal   = false;
         mHasInit    = false;
         mIsConst    = true;
+        mIsStatic   = false;
+        mIsExtern   = false;
     }
 
     void SetInit(cExpr *init) 
