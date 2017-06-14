@@ -32,6 +32,9 @@ class SourceFile
     bool EndOfFile() { return m_index >= m_file.size(); }
 
     size_t current() { return m_index; }
+
+    void Clear() { m_file.clear(); }
+
   protected:
     vector<LineItem *> m_file;
     size_t m_index;
