@@ -40,7 +40,9 @@ opcodes.o: opcodes.c opcode_defs.h
 	gcc $(COPTS) $< -o $@
 
 stackl_debugger.o : stackl_debugger.cpp
-	g++ $(COPTS) $< -o $@ -std=c++11 -DLREADLINE
+	g++ $(COPTS) $< -o $@ -std=c++11 
+# in readline is installed, you can do the following to enable command line editing
+#	g++ $(COPTS) $< -o $@ -std=c++11 -DLREADLINE
 
 stackl_debugger_norl.o : stackl_debugger.cpp
 	g++ $(COPTS) $< -o $@ -std=c++11
@@ -52,7 +54,9 @@ opcode_defs.h: slasm
 	./slasm -defs
 
 stackl: $(OBJS) stackl_debugger.o
-	gcc $(OBJS) stackl_debugger.o -o stackl -lpthread -lstdc++ -lm -lreadline
+	gcc $(OBJS) stackl_debugger.o -o stackl -lpthread -lstdc++ -lm 
+# in readline is installed, you can do the following to enable command line editing
+#	gcc $(OBJS) stackl_debugger.o -o stackl -lpthread -lstdc++ -lm -lreadline
 
 stackl_norl: $(OBJS) stackl_debugger_norl.o 
 	gcc $(OBJS) stackl_debugger_norl.o -o stackl_norl -lpthread -lstdc++ -lm

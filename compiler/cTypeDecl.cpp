@@ -45,6 +45,8 @@ bool cTypeDecl::IsCompatibleWith(cTypeDecl *left, cTypeDecl *right)
             return false;
         }
 
+        // any array is compatible with a void pointer
+        if (ptr->ParentType()->IsVoid()) return true;
         if (ptr->ParentType() == array->ParentType()) return true;
     }
     return false;
