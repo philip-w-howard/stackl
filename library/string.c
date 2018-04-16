@@ -235,3 +235,17 @@ void *memset(void *buff, int val, int size)
 
     return buff;
 }
+
+int memcmp(char *str1, char *str2, int size)
+{
+    int index;
+    int result;
+    while (size--)
+    {
+        result = *str1 - *str2;
+        if (result != 0) return result;
+        str1++;
+        str2++;
+    }
+    return 0;
+}

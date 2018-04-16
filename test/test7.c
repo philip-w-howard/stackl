@@ -137,6 +137,40 @@ int main()
         else
             prints("itostr broken\n");
 
+        xtostr(0x123, buff);
+        if (strcmp("123", buff) == 0)
+            prints("xtostr worked\n");
+        else
+            prints("xtostr broken\n");
+
+        char buff2[20];
+        int ii;
+        for (ii=0; ii<sizeof(buff2); ii++)
+        {
+            buff[ii] = (char)ii;
+        }
+        buff[sizeof(buff2) - 1] = 0;
+        memset(buff2, 0, sizeof(buff2));
+        memcpy(buff2, buff, sizeof(buff2));
+        if (strcmp(buff, buff2) == 0)
+            prints("memcpy worked\n");
+        else
+            prints("memcpy broken\n");
+
+        memset(buff2, 0, sizeof(buff2));
+        buff[sizeof(buff2) / 2] = 0;
+        memcpy(buff2, buff, sizeof(buff2));
+        if (memcmp(buff, buff2, sizeof(buff2)) == 0)
+            prints("memcmp worked\n");
+        else
+            prints("memcmp broken\n");
+
+        buff[sizeof(buff2) / 2 + 1] = 0x7F;
+        if (memcmp(buff, buff2, sizeof(buff2)) > 0)
+            prints("memcmp worked\n");
+        else
+            prints("memcmp broken\n");
+
         return 0;
     }
 
