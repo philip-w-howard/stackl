@@ -208,7 +208,8 @@ void cAstXml::Visit(cStructRef *node)
 }
 void cAstXml::Visit(cStructType *node)
 {
-    DefaultVisit(node, "StructType");
+    string attr = " size=\"" + std::to_string(node->Size()) + "\" ";
+    DefaultVisit(node, "StructType", attr);
 }
 void cAstXml::Visit(cSymbol *node)
 {
