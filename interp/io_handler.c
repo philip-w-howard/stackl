@@ -121,7 +121,7 @@ static void *IO_Processor(void *arg)
             }
 
             io_op |= IO_COMPLETE;
-            fprintf(stderr, "Setting %d to %08X\n", io_blk_addr, io_op);
+            //fprintf(stderr, "Setting %d to %08X\n", io_blk_addr, io_op);
             Abs_Set_Word(io_blk_addr, io_op);
         } else {
             // No data to grab, just release the lock
