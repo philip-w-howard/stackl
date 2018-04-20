@@ -120,7 +120,11 @@ void *Get_Addr(Machine_State *cpu, int32_t address)
 {
     //int value = Get_Word(address);
     address = validate_address(cpu, address, 1);
-    if (address < 0) return NULL;
+    if (address < 0 || address >= Memory_Size) 
+    {
+        Machine_Check(MC_ILLEGAL_ADDR, "address %d out of bounds\n", address);
+        return NULL;
+    }
 
     write_log(address, 0, "Get_Addr");
     return &Memory[address];
