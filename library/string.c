@@ -137,7 +137,12 @@ char *itostr(int value, char *str)
         str[1] = 0;
         return str;
     }
-    
+    else if (value == 0x80000000)
+    {
+        strcpy(str, "-2147483648");
+        return str;
+    }
+
     if (value < 0)
     {
         minus = 1;
