@@ -323,7 +323,7 @@ void Execute(Machine_State *cpu)
             break;
         case HALT_OP:
             DEBUG("HALT");
-            cpu->FLAG |= FL_HALTED;
+            if (check_priv(cpu, "HALT")) cpu->FLAG |= FL_HALTED;
             break;
         case POP_OP:
             DEBUG("POP");
