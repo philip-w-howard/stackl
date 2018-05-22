@@ -5,5 +5,5 @@
 void Loader_Debug();
 int Boot(const char *filename);
 int Boot_From_Disk();
-int Load(const char *filename, int boot);
+int Load(const char *filename, int boot, int bp, int lp);
 int Load_Text(const char *filename);

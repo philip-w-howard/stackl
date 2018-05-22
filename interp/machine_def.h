@@ -19,7 +19,23 @@
 #define FL_INT_DIS      0x0008
 #define FL_VMEM         0x0010
 
+#define FL_MC_MASK      0x0000FF00
+#define FL_MC_SHIFT     8
 #define FL_I_FIRST_INT  0x00010000
 #define FL_I_ALL        0xFFFF0000
 #define FL_I_MACH       0x00010000
 #define FL_I_TRAP       0x00020000
+
+// Machine check codes
+#define MC_ILLEGAL_INST 0x00000001
+#define MC_ILLEGAL_ADDR 0x00000002
+#define MC_HW_FAILURE   0x00000004
+#define MC_HW_WARNING   0x00000008
+#define MC_PROT_INST    0x00000010
+
+// CPU defined vectors
+#define MACHINE_CHECK_VECTOR    0
+#define HW_INTERRUPT_VECTOR     0
+#define TRAP_VECTOR             1
+
+

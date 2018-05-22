@@ -174,7 +174,7 @@ static void *gen_io_thread(void *arg)
                 break;
             case GEN_IO_OP_EXEC:
                 pthread_mutex_unlock(&IO_Q_Lock);
-                status = Load(addr, 0);
+                status = Load(addr, 0, -1, -1);
                 pthread_mutex_lock(&IO_Q_Lock);
                 Gen_IO_Count_Reg = status;
                 Gen_IO_CSR_Reg |= GEN_IO_CSR_DONE;

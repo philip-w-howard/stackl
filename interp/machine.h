@@ -1,9 +1,6 @@
 #pragma once
 #include <stdint.h>
-
-#define MACHINE_CHECK_VECTOR    0
-#define HW_INTERRUPT_VECTOR     0
-#define TRAP_VECTOR             1
+#include "machine_def.h"
 
 typedef void* debug_info;
 
@@ -14,7 +11,7 @@ typedef struct
     int32_t IP;         // Instructino Pionter
     int32_t SP;         // Stack Pointer
     int32_t FP;         // Frame Pointer
-    int32_t FLAG;       // FLAG register (bits defined above)
+    int32_t FLAG;       // FLAG register (bits defined in machine_def.h)
     int32_t IVEC;       // Address if the Interrupt Vector Table
     debug_info debugger;
 } Machine_State;
@@ -29,9 +26,3 @@ void Machine_Signal_Interrupt(int from_hw, int32_t vector);
 
 int Machine_Check_Happened();
 
-// Machine check codes
-#define MC_ILLEGAL_INST 0x00000001
-#define MC_ILLEGAL_ADDR 0x00000002
-#define MC_HW_FAILURE   0x00000004
-#define MC_HW_WARNING   0x00000008
-#define MC_PROT_INST    0x00000010

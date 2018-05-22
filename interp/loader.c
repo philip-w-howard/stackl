@@ -100,7 +100,7 @@ void MemCpy(int32_t addr, char *sptr)
 // Load a binary file (.slb)
 //
 // Returns negative on failure, positive on success
-int Load(const char *filename, int boot)
+int Load(const char *filename, int boot, int bp, int lp)
 {
     int32_t top;
     int32_t value;
@@ -114,8 +114,18 @@ int Load(const char *filename, int boot)
 
     Machine_State cpu;
     Get_Machine_State(&cpu);
-    addr = cpu.BP;
-    top  = cpu.LP;
+
+    cpu.FLAG = 0;   // Want addresses to be absolute
+
+    if (bp < 0)
+        addr = cpu.BP;
+    else
+        addr = bp;
+
+    if (lp < 0)
+        top  = cpu.LP;
+    else
+        top = lp;
 
     if (input == NULL) 
     {
@@ -216,7 +226,7 @@ int Boot(const char *filename)
     cpu.FP = cpu.SP;
     Set_Machine_State(&cpu);
 
-    top = Load(filename, 1);
+    top = Load(filename, 1, -1, -1);
     if (top <= 0) return 1;
 
     Get_Machine_State(&cpu);

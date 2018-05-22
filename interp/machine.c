@@ -25,7 +25,24 @@ void Machine_Check(int code, const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
 
+    //pthread_mutex_lock(&Machine_Lock);
+
     g_Machine_Check_Code = code;
+
+    if (Regs.FLAG & FL_USER_MODE)
+    {
+        // if there's a potentially valid Machine Check ISR,
+        // generate an interrupt instead of exiting
+        if ((Abs_Get_Word(Regs.IVEC) & 0x0003) == 0)
+        {
+            Regs.FLAG |= FL_I_MACH;
+            Regs.FLAG &= ~FL_MC_MASK;
+            Regs.FLAG |= (code << FL_MC_SHIFT) & FL_MC_MASK;
+
+            // return assuming the interrupt sorted things out
+            return;
+        }
+    }
 
     char format[200];
     sprintf(format, "Machine check: %s\n", fmt);
@@ -34,6 +51,8 @@ void Machine_Check(int code, const char *fmt, ...)
     //fprintf(stderr, "%0x %d %d %d %d %d Final State\n",
     //        Regs.FLAG, Regs.BP, Regs.LP, Regs.IP, Regs.SP, Regs.FP);
     if (!dbg_machine_check(code, &Regs)) exit(-1);
+
+    //pthread_mutex_unlock(&Machine_Lock);
 }
 //***************************************
 void Init_Machine(int mem_size)
