@@ -5,7 +5,6 @@ OBJS=stackl.o \
 	 opcodes.o \
 	 machine.o \
 	 vmem.o \
-	 paged_vmem.o \
 	 loader.o \
 	 io_handler.o \
 	 dma_term.o \

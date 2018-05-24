@@ -41,7 +41,7 @@ static void debug_print(int32_t location, const char *fmt, ...)
     va_end(args);
 }
 
-void fatal_version_error()
+static void fatal_version_error()
 {
     fprintf(stderr, ".slb assembled with incompatible version\n");
     fprintf(stderr, "Version must be at least %d.%d\n", 
@@ -49,7 +49,7 @@ void fatal_version_error()
     exit(1);
 }
 
-void compare_version(char *version)
+static void compare_version(char *version)
 {
     static const char *v_delims = "V.-\n";
     char *token;
@@ -78,22 +78,6 @@ void compare_version(char *version)
     {
         fatal_version_error();
     }
-}
-
-void MemCpy(int32_t addr, char *sptr)
-{
-    Machine_State cpu;
-    Get_Machine_State(&cpu);
-
-    while (*sptr)
-    {
-        Set_Byte(&cpu, addr, *sptr);
-        addr++;
-        sptr++;
-    }
-
-    // do one more to get the NULL
-    Set_Byte(&cpu, addr, *sptr);
 }
 
 //*************************************************
