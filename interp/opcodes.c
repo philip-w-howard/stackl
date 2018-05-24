@@ -9,6 +9,7 @@
 #include "opcodes.h"
 #include "machine.h"
 #include "vmem.h"
+#include "paged_vmem.h"
 #include "io_handler.h"
 #include "timer.h"
 
@@ -75,7 +76,7 @@ static int32_t pop(Machine_State *cpu)
     return Get_Word(cpu, cpu->SP);
 }
 //***********************************
-int check_priv(Machine_State *cpu, const char *inst_name)
+static int check_priv(Machine_State *cpu, const char *inst_name)
 {
     if (cpu->FLAG & FL_USER_MODE)
     {
@@ -83,6 +84,35 @@ int check_priv(Machine_State *cpu, const char *inst_name)
                 "%s instruction while not in system mode", inst_name);
         return 0;
     }
+    return 1;
+}
+//***********************************
+// determine if the list of addresses will generate a page fault
+static int check_mem(Machine_State *cpu, int num_addr, ...)
+{
+    va_list args;
+    int addr;
+    int ii;
+
+    if (cpu->FLAG & FL_I_PF) return 0;
+
+    va_start(args, num_addr);
+
+    for (ii=0; ii<num_addr; ii++)
+    {
+        addr = (int)va_arg(args, int);
+
+        // we're only interested in PF, not alignment, 
+        // so pretend all addresses are byte addresses
+        VM_Check_Addr(cpu, addr, 1);
+        if (cpu->FLAG & FL_I_PF) 
+        {
+            va_end(args);
+            return 0;
+        }
+    }
+    va_end(args);
+
     return 1;
 }
 //***************************************

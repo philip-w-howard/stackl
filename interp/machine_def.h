@@ -8,6 +8,7 @@
 #define FP_REG      4
 #define FLAG_REG    5
 #define IVEC_REG    6
+#define VMEM_REG    7
 
 // word size for stackl machine
 #define WORD_SIZE 4
@@ -25,6 +26,7 @@
 #define FL_I_ALL        0xFFFF0000
 #define FL_I_MACH       0x00010000
 #define FL_I_TRAP       0x00020000
+#define FL_I_PF         0x00040000
 
 // Machine check codes
 #define MC_ILLEGAL_INST 0x00000001
@@ -37,5 +39,6 @@
 #define MACHINE_CHECK_VECTOR    0
 #define HW_INTERRUPT_VECTOR     0
 #define TRAP_VECTOR             1
+#define PAGE_FAULT_VECTOR       2
 
 

@@ -12,7 +12,8 @@ typedef struct
     int32_t SP;         // Stack Pointer
     int32_t FP;         // Frame Pointer
     int32_t FLAG;       // FLAG register (bits defined in machine_def.h)
-    int32_t IVEC;       // Address if the Interrupt Vector Table
+    int32_t IVEC;       // Address of the Interrupt Vector Table
+    int32_t VMEM;       // Address of the Page Table
     debug_info debugger;
 } Machine_State;
 

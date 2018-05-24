@@ -18,7 +18,9 @@ static pthread_cond_t  IO_Q_Cond = PTHREAD_COND_INITIALIZER;
 typedef struct
 {
     int32_t io_blk_addr;
-    int32_t  buff;
+    int32_t buff;
+    int32_t bp;
+    int32_t lp;
 } io_op_t;
 
 static io_op_t IO_Q[IO_Q_SIZE];
@@ -48,6 +50,8 @@ static void *IO_Processor(void *arg)
 {
     int32_t io_blk_addr;
     int32_t io_op;
+    int32_t bp;
+    int32_t lp;
     int32_t status;
     char *addr;
 
@@ -68,6 +72,8 @@ static void *IO_Processor(void *arg)
             // pthread_mutex_lock(&IO_Q_Lock);
             io_blk_addr = IO_Q[IO_Q_Tail].io_blk_addr;
             addr        = Abs_Get_Addr( IO_Q[IO_Q_Tail].buff );
+            bp          = IO_Q[IO_Q_Tail].bp;
+            lp          = IO_Q[IO_Q_Tail].lp;
 
             IO_Q_Tail++;
             IO_Q_Tail %= IO_Q_SIZE;
@@ -99,7 +105,7 @@ static void *IO_Processor(void *arg)
                         scanf("%d", (int32_t *)addr);
                         break;
                     case EXEC_CALL:
-                        status = Load( (char *)addr, 0, -1, -1);
+                        status = Load( (char *)addr, 0, bp, lp);
                         if (status <= 0) io_op |= IO_ERROR;
                         Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                         break;
@@ -121,7 +127,6 @@ static void *IO_Processor(void *arg)
             }
 
             io_op |= IO_COMPLETE;
-            //fprintf(stderr, "Setting %d to %08X\n", io_blk_addr, io_op);
             Abs_Set_Word(io_blk_addr, io_op);
         } else {
             // No data to grab, just release the lock
@@ -171,6 +176,8 @@ void Schedule_IO(Machine_State *cpu, int32_t io_blk_addr)
 
     IO_Q[IO_Q_Head].io_blk_addr = io_blk_addr;
     IO_Q[IO_Q_Head].buff        = Get_Word(cpu, io_blk_addr + WORD_SIZE);
+    IO_Q[IO_Q_Head].bp          = cpu->BP;
+    IO_Q[IO_Q_Head].lp          = cpu->LP;
 
     op = Get_Word(cpu, io_blk_addr);
     op &= ~IO_FLAGS;
