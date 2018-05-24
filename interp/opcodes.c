@@ -9,7 +9,6 @@
 #include "opcodes.h"
 #include "machine.h"
 #include "vmem.h"
-#include "paged_vmem.h"
 #include "io_handler.h"
 #include "timer.h"
 
@@ -88,7 +87,8 @@ static int check_priv(Machine_State *cpu, const char *inst_name)
 }
 //***********************************
 // determine if the list of addresses will generate a page fault
-static int check_mem(Machine_State *cpu, int num_addr, ...)
+// FIX THIS: should be static, but haven't inserted calls yet
+int check_mem(Machine_State *cpu, int num_addr, ...)
 {
     va_list args;
     int addr;

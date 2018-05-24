@@ -18,3 +18,4 @@ int32_t Abs_Get_Byte(int32_t address);
 void Abs_Set_Byte(int32_t address, int32_t value);
 void *Abs_Get_Addr(int32_t address);
 
+int VM_Check_Addr(Machine_State *regs, int32_t address, int is_byte);

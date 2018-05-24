@@ -85,29 +85,15 @@ void Set_Debug_Info(debug_info debugger)
 void Get_Machine_State(Machine_State *cpu)
 {
     pthread_mutex_lock(&Machine_Lock);
-    if (Regs.FLAG & FL_USER_MODE)
-    {
-        Machine_Check(MC_PROT_INST, "Protected instruction exception");
-    }
-    else
-    {
-        memcpy(cpu, &Regs, sizeof(Regs));
-        pthread_mutex_unlock(&Machine_Lock);
-    }
+    memcpy(cpu, &Regs, sizeof(Regs));
+    pthread_mutex_unlock(&Machine_Lock);
 }
 //***************************************
 void Set_Machine_State(Machine_State *cpu)
 {
     pthread_mutex_lock(&Machine_Lock);
-    if (Regs.FLAG & FL_USER_MODE) 
-    {
-        Machine_Check(MC_PROT_INST, "Protected instruction exception");
-    }
-    else
-    {
-        memcpy(&Regs, cpu, sizeof(Regs));
-        pthread_mutex_unlock(&Machine_Lock);
-    }
+    memcpy(&Regs, cpu, sizeof(Regs));
+    pthread_mutex_unlock(&Machine_Lock);
 }
 //***************************************
 void Machine_Execute()

@@ -162,3 +162,18 @@ void *Abs_Get_Addr(int32_t address)
 {
     return Get_Addr(NULL, address);
 }
+//***************************************
+int VM_Check_Addr(Machine_State *regs, int32_t address, int is_byte)
+{
+    if ((regs->FLAG & (FL_USER_MODE|FL_VMEM) ) == (FL_USER_MODE|FL_VMEM))
+    {
+        if (regs->VMEM <= 0) 
+        {
+            Machine_Check(MC_ILLEGAL_ADDR, "VMEM reg invalid while in VM mode");
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
