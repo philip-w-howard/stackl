@@ -47,7 +47,9 @@ static int validate_address(Machine_State *regs, int32_t address, int is_char)
 
     if (regs != NULL && (regs->FLAG & FL_USER_MODE))
     {
-        if (address < 0 || (address+WORD_SIZE) > regs->LP - regs->BP)
+        int size = 1;
+        if (!is_char) size = WORD_SIZE;
+        if (address < 0 || (address+size) > regs->LP - regs->BP)
         {
             Machine_Check(MC_ILLEGAL_ADDR,
                     "address %d out of bounds\n", address);

@@ -1,5 +1,5 @@
-RELEASE  = ~/stackl_rel
-#RELEASE  = ~/bin
+#RELEASE  = ~/stackl_rel
+RELEASE  = ~/bin
 # RELEASE  = release
 
 GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")

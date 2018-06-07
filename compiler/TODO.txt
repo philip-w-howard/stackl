@@ -4,8 +4,6 @@ function return types
     validate the type of thing in return statement
     Don't force return 0 at end of functions
 
-Implement machine check interrupt vector. User mode machine checks trap, OS mode machine checks halt.
-
 figure out gcc generating dependencies
 
 const optimizations

@@ -3,18 +3,14 @@ HALT:
     user mode: trap handler? or Machine Check ISR?
     >> it now machine checks to vector zero
 
+Add host disk IO to gen_io
+
 Complete tests of gen_io device
-Test of INP EXEC: same program, but checks for user mode vs. sys mode
-    set BP, LP after INP instruction, before wait loop to make sure INP 
-    instruction saves them
 
 Implement virtual memory
     Use bit in FLAG reg
     Need Page Table register
     Need Page Fault interrupt
-Machine Check handler
-    >> user mode: trap
-    >> system mode: halt
 
 Better documentation of INP instruction including error codes
 
