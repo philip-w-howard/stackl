@@ -2,8 +2,6 @@
 RELEASE  = ~/bin
 # RELEASE  = release
 
-GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
-
 .PHONY: compiler interp utils libraries
 
 all: version.h compiler interp libraries utils execs 
@@ -47,8 +45,7 @@ clean:
 	rm -f test/*.lst
 
 version.h: .git/refs/heads
-	echo "#pragma once" > version.h
-	echo "#define VERSION \"$(GIT_VERSION)\"" >> version.h
+	checkversion
 
 compiler: version.h interp
 	$(MAKE) -C compiler
