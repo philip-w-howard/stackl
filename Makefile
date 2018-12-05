@@ -6,7 +6,7 @@ GIT_VERSION = $(shell git describe --always --tags --dirty="-dev")
 
 .PHONY: compiler interp utils libraries
 
-all: version compiler interp libraries utils execs 
+all: version.h compiler interp libraries utils execs 
 
 release: all
 	( [ ! -e $(RELEASE)/library ] && mkdir $(RELEASE)/library ) || true 
@@ -46,20 +46,20 @@ clean:
 	rm -f test/*.dbg
 	rm -f test/*.lst
 
-version: .git/refs/heads
+version.h: .git/refs/heads
 	echo "#pragma once" > version.h
 	echo "#define VERSION \"$(GIT_VERSION)\"" >> version.h
 
-compiler: version interp
+compiler: version.h interp
 	$(MAKE) -C compiler
 
-interp:  version
+interp:  version.h
 	$(MAKE) -C interp
 
 libraries: compiler execs
 	$(MAKE) -C library
 
-utils:  version
+utils:  version.h
 	$(MAKE) -C utils
 
 execs: compiler interp utils
