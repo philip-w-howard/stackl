@@ -4,7 +4,7 @@ RELEASE  = ~/bin
 
 .PHONY: compiler interp utils libraries
 
-all: version.h compiler interp libraries utils execs 
+all: version compiler interp libraries utils execs 
 
 release: all
 	( [ ! -e $(RELEASE)/library ] && mkdir $(RELEASE)/library ) || true 
@@ -44,19 +44,19 @@ clean:
 	rm -f test/*.dbg
 	rm -f test/*.lst
 
-version.h: .git/refs/heads
+version: 
 	checkversion
 
-compiler: version.h interp
+compiler: version interp
 	$(MAKE) -C compiler
 
-interp:  version.h
+interp:  version
 	$(MAKE) -C interp
 
 libraries: compiler execs
 	$(MAKE) -C library
 
-utils:  version.h
+utils:  version
 	$(MAKE) -C utils
 
 execs: compiler interp utils

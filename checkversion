@@ -1,4 +1,5 @@
 GIT_VERSION="`git describe --always --tags --dirty="-dev"`"
+echo "Checking version against $GIT_VERSION"
 
 grep -sq $GIT_VERSION version.h
 if [ $? -ne 0 ]; then
