@@ -28,11 +28,14 @@ all: stackl slasm stackl_norl
 clean:
 	rm -f $(OBJS)
 	rm -f stackl
+	rm -f stackl_norl
 	rm -f makebin
 	rm -f slasm
 	rm -f slasm.o
 	rm -f rapidxml.o
 	rm -f rapidxml_utils.o
+	rm -f stackl_debugger.o
+	rm -f stackl_debugger_norl.o
 
 opcodes.o: opcodes.c opcode_defs.h
 
