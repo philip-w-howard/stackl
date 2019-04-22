@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for test in `seq 1 54`; do
+for test in `seq 1 55`; do
     test/runt test$test 
 done
 

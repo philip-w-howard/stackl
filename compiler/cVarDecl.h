@@ -21,6 +21,12 @@ class cVarDecl : public cDecl
         // FIX THIS: what about 2-star pointers?
         if (isStruct)
         {
+            if (!type->IsCompleteType())
+            {
+                ThrowSemanticError(name->Name() + " is not a complete type");
+                return;
+            }
+
             if ((type->IsPointer() && (cPointerType*)type->ParentType()->IsStruct()) ||
                  type->IsStruct())
             {}

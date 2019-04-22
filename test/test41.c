@@ -7,7 +7,7 @@ typedef struct test1
     int a;
     int b;
     int c;
-    struct test1 next;
+    struct test1 *next;
 } test2;
 
 test2 global;
@@ -16,9 +16,10 @@ int main()
 {   
     test2 testa;
     struct test1 testb;
+    testa.next = &testb;
     
-    testa.next.a = 12;
-    printi(testa.next.a);
+    testa.next->a = 12;
+    printi(testa.next->a);
     prints("\nTest J201 Complete\n");
     return 0;
 }

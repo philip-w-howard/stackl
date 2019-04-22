@@ -1,26 +1,11 @@
 #include "lex.h"
 #include "cVisitor.h"
 
-void cVisitor::PreVisitAllNodes(cAstNode *node)
-{
-    VisitAllChildren(node);
-
-    node->Visit(this);
-}
-
-void cVisitor::PostVisitAllNodes(cAstNode *node)
-{
-    node->Visit(this);
-
-    VisitAllChildren(node);
-}
-
 void cVisitor::VisitAllChildren(cAstNode *node)
 {
-    cAstNode::iterator it;
-    for (it=node->FirstChild(); it!=node->LastChild(); it++)
+    for (int ii=0; ii<node->NumChildren(); ii++)
     {
-        if ((*it) != nullptr) (*it)->Visit(this);
+        if (node->GetChild(ii) != nullptr) node->GetChild(ii)->Visit(this);
     }
 }
 

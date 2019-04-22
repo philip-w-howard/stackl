@@ -58,6 +58,7 @@ class cStructType : public cTypeDecl
     }
 
     virtual bool IsStruct()         { return true; }
+    virtual bool IsCompleteType()   { return mScope != nullptr; }
     virtual void SetSize(int size)  { mSize = size; }
     virtual int Size()              { return mSize; }
     virtual cSymbol* GetName()      { return (cSymbol*)GetChild(0); }

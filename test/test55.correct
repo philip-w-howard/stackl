@@ -1,0 +1,3 @@
+ERROR: Return statement type is incompatible with function declaration on line 4 of test/test55.c
+ERROR: Return statement type is incompatible with function declaration on line 9 of test/test55.c
+2 Errors in compile

@@ -231,14 +231,6 @@ void cCodeGen::Visit(cFuncCall *node)
         {
             EmitInst("POPARGS " + std::to_string(node->GetParams()->Size()));
         }
-
-        /*
-        for (int ii=0; ii<node->GetParams()->Size()/WORD_SIZE; ii++)
-        {
-            EmitInst("SWAP");
-            EmitInst("POP");
-        }
-        */
     }
 }
 
@@ -304,12 +296,10 @@ void cCodeGen::Visit(cIntExpr *node)
 void cCodeGen::Visit(cParams *node)
 {
     // Visit the children in the reverse order
-    cAstNode::iterator it = node->LastChild(); 
-    do
+    for (int ii=node->NumChildren()-1; ii>=0; ii--)
     {
-        it--;
-        (*it)->Visit(this);
-    } while (it != node->FirstChild());
+        node->GetChild(ii)->Visit(this);
+    }
 }
 
 void cCodeGen::Visit(cPlainVarRef *node)

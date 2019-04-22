@@ -11,6 +11,7 @@ OBJS= scanner.o \
 	 cGenAddr.o \
 	 cCodeGen.o \
 	 cTypeDecl.o \
+	 cSemantics.o \
 
 all: stacklc
 

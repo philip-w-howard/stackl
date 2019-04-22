@@ -28,8 +28,6 @@ void fatal_error(std::string msg);
 class cAstNode
 {
     public:
-        typedef vector<cAstNode*>::iterator iterator;
-
         cAstNode() 
         {
             mSemanticError = false;
@@ -49,16 +47,6 @@ class cAstNode
         void SetChild(int index, cAstNode *child)
         {
             m_children[index] = child;
-        }
-
-        iterator FirstChild()
-        {
-            return m_children.begin();
-        }
-
-        iterator LastChild()
-        {
-            return m_children.end();
         }
 
         bool HasChildren()      { return !m_children.empty(); }

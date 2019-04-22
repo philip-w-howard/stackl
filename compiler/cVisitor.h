@@ -95,7 +95,5 @@ class cVisitor
         virtual void Visit(cVarRef *node);
         virtual void Visit(cWhileStmt *node);
     protected:
-        void PreVisitAllNodes(cAstNode *node);
-        void PostVisitAllNodes(cAstNode *node);
-        void VisitAllChildren(cAstNode *node);
+        virtual void VisitAllChildren(cAstNode *node);
 };

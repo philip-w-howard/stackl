@@ -17,7 +17,9 @@
 
 #include "lex.h"
 #include "cAstXml.h"
+#include "cSemantics.h"
 #include "cSizeOffset.h"
+#include "cCodeGen.h"
 
 #include "../version.h"
 
@@ -157,6 +159,17 @@ int main(int argc, char **argv)
 
     result = process_file(Input_File, &program, &total_errors);
 
+    if (result == 0 && total_errors == 0)
+    {
+        yynerrs = 0;
+
+        cSemantics semantics;
+        semantics.VisitAllNodes(program);
+
+        total_errors += yynerrs;
+    }
+
+    // need to recheck total_errors because semantics checks could add errors
     if (result == 0 && total_errors == 0)
     {
         if (program == NULL)
