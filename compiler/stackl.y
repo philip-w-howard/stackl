@@ -382,19 +382,6 @@ paramspec_list:
 paramspec:  var_decl
             { $$ = $1; }
 
- /*
-arrayspec:  arrayspec '[' INT_VAL ']'
-                            {
-                                $$ = $1;
-                                $1->AddNode($3);
-                            }
-arrayspec:  '[' constant_expression ']'
-            { 
-                $$ = $2->ConstValue(); 
-                //if ($$->HasSemanticError()) YYERROR;
-            }
- */
-
 stmts:      stmts stmt
             { 
                 $$ = $1; $$->AddNode($2); 
@@ -793,7 +780,6 @@ assignment_expression
             }
         | lval '=' asm_stmt
             { $$ = new cAssignExpr($1, $3); }
-            //{ semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         | lval PLUS_EQ expr
             { 
                 $$ = new cAssignExpr($1, new cBinaryExpr($1, '+', $3)); 
