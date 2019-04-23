@@ -252,6 +252,7 @@ void cCodeGen::Visit(cFuncDecl *node)
         node->GetStmts()->Visit(this);
 
         // Force return statement
+        /* This is now taken care of in cSemantic visitor
         if (!node->ReturnType()->IsVoid())
         {
             cReturnStmt *ret = new cReturnStmt(new cIntExpr(0));
@@ -261,6 +262,7 @@ void cCodeGen::Visit(cFuncDecl *node)
         {
             EmitInst("RETURN");
         }
+        */
     }
 }
 

@@ -25,13 +25,16 @@ void cSemantics::Visit(cFuncDecl *node)
     VisitAllChildren(node);
 
     // Force a return statement
-    if (!node->ReturnType()->IsVoid())
+    if (node->IsDefinition())
     {
-        node->AddChild(new cReturnStmt(new cIntExpr(0)));
-    }
-    else
-    {
-        node->AddChild(new cReturnStmt(NULL));
+        if (!node->ReturnType()->IsVoid())
+        {
+            node->GetStmts()->AddChild(new cReturnStmt(new cIntExpr(0)));
+        }
+        else
+        {
+            node->GetStmts()->AddChild(new cReturnStmt(NULL));
+        }
     }
 }
 
