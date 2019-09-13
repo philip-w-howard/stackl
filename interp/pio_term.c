@@ -23,6 +23,8 @@ static volatile int32_t IER_Reg;
 static volatile int32_t IIR_Reg;
 static volatile int32_t XDR_Written;
 
+static volatile int32_t writer_started = 0;
+static volatile int32_t reader_started = 0;
 static void PIO_T_Finish();
 
 //************************************************
@@ -82,6 +84,11 @@ static int kbhit()
 //*************************************
 static void *terminal_output(void *arg)
 {
+    pthread_mutex_lock(&IO_Q_Lock);
+    writer_started = 1;
+    pthread_cond_signal(&IO_Q_Cond);
+    pthread_mutex_unlock(&IO_Q_Lock);
+
     while (IO_Q_Halt_Thread == 0)
     {
         pthread_mutex_lock(&IO_Q_Lock);
@@ -116,6 +123,11 @@ static void *terminal_output(void *arg)
 static void *terminal_input(void *arg)
 {
     int need_interrupt;
+
+    pthread_mutex_lock(&IO_Q_Lock);
+    reader_started = 1;
+    pthread_cond_signal(&IO_Q_Cond);
+    pthread_mutex_unlock(&IO_Q_Lock);
 
     while (IO_Q_Halt_Thread == 0)
     {
@@ -169,6 +181,7 @@ static void set_byte(int32_t id, int32_t addr, int32_t value)
     {
         XDR_Reg = value;
         XDR_Written = 1;
+        IIR_Reg &= ~PIO_T_IID_XMIT;
         pthread_cond_signal(&IO_Q_Cond);
     }
     else if (addr == 1) 
@@ -204,6 +217,13 @@ int PIO_T_Init()
             get_word, get_byte, set_word, set_byte);
 
     atexit(PIO_T_Finish);
+
+    pthread_mutex_lock(&IO_Q_Lock);
+    while ( !reader_started && !writer_started)
+    {
+        pthread_cond_wait(&IO_Q_Cond, &IO_Q_Lock);
+    }
+    pthread_mutex_unlock(&IO_Q_Lock);
 
     return 0;
 }
