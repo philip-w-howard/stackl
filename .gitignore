@@ -7,6 +7,8 @@ interp/slasm.dSYM/Contents/Info.plist
 *.sl
 *.slb
 
+out
+
 copy2disk
 makedisk
 slasm
