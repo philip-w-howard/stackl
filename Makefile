@@ -45,7 +45,7 @@ clean:
 	rm -f test/*.lst
 
 version: 
-	checkversion
+	./checkversion
 
 compiler: version interp
 	$(MAKE) -C compiler
