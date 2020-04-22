@@ -4,6 +4,12 @@ HALT:
     >> it now machine checks to vector zero
 
 Add host disk IO to gen_io
+    open <name> <rwa>
+    close
+    read
+    write
+    dir
+    cd
 
 Complete tests of gen_io device
 

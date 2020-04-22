@@ -52,6 +52,7 @@ char Input_File[200] = "";
 int  Do_Debug = 0;
 int  Do_Ast = 0;
 int  Do_Assembler = 1;
+int  Do_Listing = 0;
 int  Do_Type_Checks = 1;
 void Process_Args(int argc, char **argv)
 {
@@ -74,6 +75,10 @@ void Process_Args(int argc, char **argv)
                 std::cout << "stacklc -c -help -no_types -version "
                             "-yydebug -dbg -ast <file>\n";
                 exit(0);
+            }
+            else if (strcmp(arg, "list") == 0)
+            {
+                Do_Listing = 1;
             }
             else if (strcmp(arg, "no_types") == 0)
             {
@@ -218,6 +223,8 @@ int main(int argc, char **argv)
                 }
             }
             if (Do_Debug) makebin += "-dbg ";
+            if (Do_Listing) makebin += "-list ";
+
             makebin += outfile_name;
 
             result = system(makebin.c_str());
