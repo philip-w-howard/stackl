@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 #include "machine_def.h"
-#include "syscodes.h"
+#include "inp_def.h"
 #include "vmem.h"
 #include "io_handler.h"
 #include "loader.h"
@@ -95,21 +95,21 @@ static void *IO_Processor(void *arg)
             {
                 switch (io_op)
                 {
-                    case GETL_CALL:
+                    case INP_GETL_CALL:
                         fgets((char *)addr, 256, stdin);
                         break;
-                    case GETS_CALL:
+                    case INP_GETS_CALL:
                         scanf("%s", (char *)addr);
                         break;
-                    case GETI_CALL:
+                    case INP_GETI_CALL:
                         scanf("%d", (int32_t *)addr);
                         break;
-                    case EXEC_CALL:
+                    case INP_EXEC_CALL:
                         status = Load( (char *)addr, 0, bp, lp);
                         if (status <= 0) io_op |= IO_ERROR;
                         Abs_Set_Word(io_blk_addr + 2*WORD_SIZE, status);
                         break;
-                    case PRINTS_CALL:
+                    case INP_PRINTS_CALL:
                         while (*addr)
                         {
                             usleep(100); // ~100000 baud
@@ -121,12 +121,12 @@ static void *IO_Processor(void *arg)
                     default:
                         Machine_Check(MC_HW_WARNING | MC_ILLEGAL_INST,
                                 "Invalid IO code: %d", io_op);
-                        io_op |= IO_ERROR;
+                        io_op |= INP_OP_ERROR;
                         break;
                 }
             }
 
-            io_op |= IO_COMPLETE;
+            io_op |= INP_OP_DONE;
             Abs_Set_Word(io_blk_addr, io_op);
         } else {
             // No data to grab, just release the lock

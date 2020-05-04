@@ -1,3 +1,8 @@
+#pragma once
+//******************************************************
+// Constants for accessing the disk device
+//
+
 #define DISK_STATUS    0xD000000
 #define DISK_CMD       0xD000004
 #define DISK_ADDR      0xD000008
@@ -20,5 +25,5 @@
 
 #define DISK_BLOCK_SIZE        1024
 
-int Disk_Init();
-int Disk_Load_Boot_Block();
+int Disk_Init();                        // For internal use by the interpreter
+int Disk_Load_Boot_Block();             // For internal use by the interpreter

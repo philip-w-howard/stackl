@@ -3,7 +3,7 @@ INCLUDES = pio_term.h \
 	   timer.h \
 	   gen_io.h \
 	   disk.h \
-	   syscodes.h \
+	   inp_def.h \
 	   machine_def.h \
 
 SLS = string.sl \
@@ -30,7 +30,7 @@ gen_io.h : $(INTERP_DIR)/gen_io.h
 disk.h : $(INTERP_DIR)/disk.h
 	cp $< $@
 
-syscodes.h : $(INTERP_DIR)/syscodes.h
+inp_def.h : $(INTERP_DIR)/inp_def.h
 	cp $< $@
 
 machine_def.h : $(INTERP_DIR)/machine_def.h
