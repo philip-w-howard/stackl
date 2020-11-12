@@ -121,7 +121,7 @@ int Load(const char *filename, int boot, int bp, int lp)
 
     fgets(string, sizeof(string), input);
     token = strtok(string, delims);
-    if (strcmp(token, "stackl") != 0)
+    if (token == NULL || strcmp(token, "stackl") != 0)
     {
         fclose(input);
         return -2;
