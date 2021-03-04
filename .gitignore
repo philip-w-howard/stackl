@@ -25,4 +25,5 @@ library/machine_def.h
 library/pio_term.h
 library/syscodes.h
 library/timer.h
+library/inp_def.h
 version.h
