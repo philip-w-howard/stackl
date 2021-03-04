@@ -3,14 +3,7 @@
 
 #pragma feature inp
 #include <machine_def.h>
-#include <syscodes.h>
-
-typedef struct
-{
-    int op;
-    char *buff;
-    int status;
-} io_blk_t;
+#include <inp_def.h>
 
 //**************************************
 void syscall(int op, char *buff)
@@ -30,10 +23,10 @@ void do_systrap(int op, char *buff)
     }
     else if (op == 1)
     {
-        io_blk.op = PRINTS_CALL;
-        io_blk.buff = asm2("PUSHREG", BP_REG);
-        io_blk.buff += (int)buff;
-        io_blk.status = 0;
+        io_blk.op = INP_PRINTS_CALL;
+        io_blk.param1 = asm2("PUSHREG", BP_REG);
+        io_blk.param1 += (int)buff;
+        io_blk.param2 = 0;
 
         asm("INP", &io_blk);
         while (io_blk.op >= 0)
@@ -65,9 +58,9 @@ int system_startup()
     asm2("POPREG", BP_REG, bp);
 
     // Load user.slb into memory
-    io_blk.op = EXEC_CALL;
-    io_blk.buff = "test/test54";
-    io_blk.status = 0;
+    io_blk.op = INP_EXEC_CALL;
+    io_blk.param1 = "test/test54";
+    io_blk.param2 = 0;
     asm("INP", &io_blk);
 
     // change the BP to make sure the INP instruction saved it
@@ -81,13 +74,13 @@ int system_startup()
     asm2("POPREG", BP_REG, bp);
 
     // Set the LP leaving 1000 bytes of stack space
-    stack_size = io_blk.status;
-    high_mem = io_blk.status + *stack_size;
+    stack_size = io_blk.param2;
+    high_mem = io_blk.param2 + *stack_size;
     asm2("POPREG", LP_REG, high_mem);
 
     // Set SP and FP
     // NOTE: FP must be set LAST!
-    high_mem = io_blk.status + 4 - bp;
+    high_mem = io_blk.param2 + 4 - bp;
     asm("DUP", high_mem);
     asm2("POPREG", FP_REG);
     asm2("POPREG", SP_REG);
