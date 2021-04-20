@@ -164,6 +164,12 @@ int main(int argc, char **argv)
 
     result = process_file(Input_File, &program, &total_errors);
 
+    if (result == 0 && total_errors == 0 && program == NULL)
+    {
+        semantic_error("Source produced no output ", 0);
+        exit(-2);
+    }
+
     if (result == 0 && total_errors == 0)
     {
         yynerrs = 0;
@@ -177,12 +183,6 @@ int main(int argc, char **argv)
     // need to recheck total_errors because semantics checks could add errors
     if (result == 0 && total_errors == 0)
     {
-        if (program == NULL)
-        {
-            semantic_error("Source produced no output ", 0);
-            exit(-2);
-        }
-
         cSizeOffset sizer;
         sizer.VisitAllNodes(program);
 
