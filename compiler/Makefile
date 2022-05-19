@@ -1,4 +1,24 @@
-COPTS=-Wall -g -c  -O0 -std=c++11
+#########################################################
+# Makefile for the stacklc compiler
+#
+# Note: there is a dependency on ../interp/opcode_def.h that isn't explicitly
+#       stated in this makefile. The interpreter must be built before
+#       the compiler
+
+CFLAGS=-Wall -g -c  -O0 -std=c++11
+SOURCES= cAstXml.cpp \
+	cBinaryExpr.cpp \
+	cCodeGen.cpp \
+	cDecl.cpp \
+	cGenAddr.cpp \
+	cSemantics.cpp \
+	cSizeOffset.cpp \
+	cSymbolTable.cpp \
+	cTypeDecl.cpp \
+	cVisitor.cpp \
+	codegen.cpp \
+	stacklc.cpp \
+
 OBJS= scanner.o \
 	 parser.o \
 	 cSymbolTable.o \
@@ -13,7 +33,9 @@ OBJS= scanner.o \
 	 cTypeDecl.o \
 	 cSemantics.o \
 
-all: stacklc
+.PHONY: all clean depend
+
+all: depend stacklc
 
 clean:
 	rm -f $(OBJS)
@@ -22,27 +44,29 @@ clean:
 	rm -f parser.h
 	rm -f stacklc
 	rm -f out
+	rm -f depend.mk
 
-.cpp.o:
-	g++ $(COPTS) $? -o $@
+depend: depend.mk
 
-parser.o: parser.c
-	g++ $(COPTS) $? -o $@ -DYYDEBUG=1
+include depend.mk
 
-.c.o:
-	g++ $(COPTS) $? -o $@
+depend.mk: parser.h $(SOURCES)
+	gcc -MM $(SOURCES) > depend.mk
+
+parser.o: parser.h
+	g++ $(CFLAGS) parser.c -o $@ -DYYDEBUG=1
 
 stacklc.o: stacklc.cpp parser.o scanner.o 
-	g++ $(COPTS) stacklc.cpp -o $@
+	g++ $(CFLAGS) stacklc.cpp -o $@
 
-scanner.c: stackl.l parser.c
+scanner.c: stackl.l parser.h
 	flex -o scanner.c stackl.l
 
-parser.c: stackl.y
+parser.h: stackl.y
 	bison --defines=parser.h stackl.y -o parser.c
 
 scanner.o: scanner.c 
-	g++ $(COPTS) -Wno-sign-compare scanner.c -o $@
+	g++ $(CFLAGS) -Wno-sign-compare scanner.c -o $@
 
 stacklc: $(OBJS)
 	g++ $(OBJS) -o stacklc

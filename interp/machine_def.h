@@ -39,6 +39,5 @@
 #define MACHINE_CHECK_VECTOR    0
 #define HW_INTERRUPT_VECTOR     0
 #define TRAP_VECTOR             1
-#define PAGE_FAULT_VECTOR       2
 
 

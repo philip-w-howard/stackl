@@ -558,7 +558,6 @@ void Execute(Machine_State *cpu)
             break;
         case PUSHREG_OP:
             DEBUG("PUSHREG %d", GET_INTVAL(IP,1));
-            //check_priv(cpu, "SAVEREG");
             temp = GET_INTVAL(IP,1);
             INC(IP,2);
             switch (temp)

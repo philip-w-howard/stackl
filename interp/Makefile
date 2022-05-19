@@ -1,5 +1,6 @@
 VPATH:=dbg
-COPTS=-Wall -g -c -O0 -pthread 
+CFLAGS=-Wall -g -c -O0 -pthread
+
 COPTS2=-Wall -g -c -O0 -Wno-deprecated-declarations -pthread
 OBJS=stackl.o \
 	 opcodes.o \
@@ -23,10 +24,27 @@ OBJS=stackl.o \
 	 debugger_command.o \
 	 safe_read.o \
 
-all: stackl slasm stackl_norl
+SOURCES=disk.c \
+	dma_term.c \
+	formatstr.c \
+	gen_io.c \
+	io_handler.c \
+	loader.c \
+	machine.c \
+	opcodes.c \
+	pio_term.c \
+	slasm.c \
+	stackl.c \
+	timer.c \
+	vmem.c \
+
+.PHONY: all clean depend
+
+all: depend stackl slasm stackl_norl
 
 clean:
 	rm -f $(OBJS)
+	rm -f depend.mk
 	rm -f stackl
 	rm -f stackl_norl
 	rm -f makebin
@@ -39,19 +57,23 @@ clean:
 
 opcodes.o: opcodes.c opcode_defs.h
 
-.c.o:
-	gcc $(COPTS) $< -o $@
-
 stackl_debugger.o : stackl_debugger.cpp
-	g++ $(COPTS) $< -o $@ -std=c++11 
+	g++ $(CFLAGS) $< -o $@ -std=c++11 
 # in readline is installed, you can do the following to enable command line editing
-#	g++ $(COPTS) $< -o $@ -std=c++11 -DLREADLINE
+#	g++ $(CFLAGS) $< -o $@ -std=c++11 -DLREADLINE
 
 stackl_debugger_norl.o : stackl_debugger.cpp
-	g++ $(COPTS) $< -o $@ -std=c++11
+	g++ $(CFLAGS) $< -o $@ -std=c++11
+
+include depend.mk
+
+depend: depend.mk
+
+depend.mk: $(SOURCES)
+	gcc -MM $(SOURCES) > depend.mk
 
 .cpp.o:
-	g++ $(COPTS) $< -o $@ -std=c++11
+	g++ $(CFLAGS) $< -o $@ -std=c++11
 
 opcode_defs.h: slasm
 	./slasm -defs
