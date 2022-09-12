@@ -57,6 +57,7 @@ class cCodeGen : public cVisitor
         virtual void Visit(cVarDecl *node);
         //virtual void Visit(cVarRef *node);
         virtual void Visit(cWhileStmt *node);
+        virtual void Visit(cTernaryExpr *node);
 
 
         void EmitInst(std::string inst, std::string label);

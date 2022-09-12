@@ -52,3 +52,4 @@ void cVisitor::Visit(cUnaryExpr *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cVarDecl *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cVarRef *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cWhileStmt *node)          { VisitAllChildren(node); }
+void cVisitor::Visit(cTernaryExpr *node)        { VisitAllChildren(node); }

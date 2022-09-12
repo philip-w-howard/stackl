@@ -243,6 +243,9 @@ void cAstXml::Visit(cVarRef *node){
 void cAstXml::Visit(cWhileStmt *node){
     DefaultVisit(node, "While");
 }
+void cAstXml::Visit(cTernaryExpr *node){
+    DefaultVisit(node, "TernaryExpr");
+}
 
 std::string cAstXml::EscapeBrackets(std::string text)
 {

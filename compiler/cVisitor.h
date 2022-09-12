@@ -43,6 +43,7 @@ class cUnaryExpr;
 class cVarDecl;
 class cVarRef;
 class cWhileStmt;
+class cTernaryExpr;
 
 class cVisitor
 {
@@ -94,6 +95,7 @@ class cVisitor
         virtual void Visit(cVarDecl *node);
         virtual void Visit(cVarRef *node);
         virtual void Visit(cWhileStmt *node);
+        virtual void Visit(cTernaryExpr *node);
     protected:
         virtual void VisitAllChildren(cAstNode *node);
 };

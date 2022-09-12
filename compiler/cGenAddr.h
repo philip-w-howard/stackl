@@ -50,6 +50,7 @@ class cGenAddr : public cVisitor
         //virtual void Visit(cVarDecl *node);
         //virtual void Visit(cVarRef *node);
         //virtual void Visit(cWhileStmt *node);
+        //virtual void Visit(cTernaryExpr *node);
     protected:
         cCodeGen* m_CodeGen;
 };

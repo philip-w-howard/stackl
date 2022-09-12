@@ -123,3 +123,4 @@ void cGenAddr::Visit(cStructRef *node)
 //void cGenAddr::Visit(cVarDecl *node)            { VisitAllChildren(node); }
 //void cGenAddr::Visit(cVarRef *node)             { VisitAllChildren(node); }
 //void cGenAddr::Visit(cWhileStmt *node)          { VisitAllChildren(node); }
+//void cGenAddr::Visit(cTernaryExpr *node)        { VisitAllChildren(node); }

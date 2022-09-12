@@ -52,6 +52,7 @@
 #include "cVarDecl.h"
 #include "cVarRef.h"
 #include "cWhileStmt.h"
+#include "cTernaryExpr.h"
 
 #include "cSymbolTable.h"
 #include "parser.h"

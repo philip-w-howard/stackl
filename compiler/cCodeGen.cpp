@@ -579,6 +579,21 @@ void cCodeGen::Visit(cWhileStmt *node)
     EmitLabel(end_loop);
 }
 
+void cCodeGen::Visit(cTernaryExpr *node)
+{
+    std::string if_label = GenerateLabel();
+    std::string else_label = GenerateLabel();
+
+    EmitLineNumber(node);
+    node->GetCondition()->Visit(this);
+    EmitInst("JUMPE", if_label);
+    node->GetTrue()->Visit(this);
+    EmitInst("JUMP", else_label);
+    EmitLabel(if_label);
+    node->GetFalse()->Visit(this);
+    EmitLabel(else_label);
+}
+
 //*****************************************
 // Emit an instruction
 void cCodeGen::EmitInst(string inst, string label)

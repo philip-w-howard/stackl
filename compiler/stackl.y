@@ -754,9 +754,8 @@ logical_or_expression
 conditional_expression
         : logical_or_expression     { $$ = $1; }
         | logical_or_expression '?' expr ':' conditional_expression
-            { 
-              semantic_error("conditional ternary expression not implemented", yylineno);
-              YYERROR; 
+            {
+                $$ = new cTernaryExpr($1, $3, $5);
             }
 
 constant_expression
