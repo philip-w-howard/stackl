@@ -18,12 +18,14 @@ class cSemantics : public cVisitor
         //virtual void Visit(cAstNode *node);
         //virtual void Visit(cBaseDeclNode *node);
         //virtual void Visit(cBinaryExpr *node);
+        virtual void Visit(cBreakStmt *node);
+        virtual void Visit(cContinueStmt *node);
         //virtual void Visit(cDecl *node);
         //virtual void Visit(cDeclsList *node);
-        //virtual void Visit(cDoWhileStmt *node);
+        virtual void Visit(cDoWhileStmt *node);
         //virtual void Visit(cExpr *node);
         //virtual void Visit(cExprStmt *node);
-        //virtual void Visit(cForStmt *node);
+        virtual void Visit(cForStmt *node);
         //virtual void Visit(cFuncCall *node);
         virtual void Visit(cFuncDecl *node);
         //virtual void Visit(cIfStmt *node);
@@ -50,7 +52,7 @@ class cSemantics : public cVisitor
         //virtual void Visit(cUnaryExpr *node);
         //virtual void Visit(cVarDecl *node);
         //virtual void Visit(cVarRef *node);
-        //virtual void Visit(cWhileStmt *node);
+        virtual void Visit(cWhileStmt *node);
     protected:
         cTypeDecl *m_funcReturnType;
 };

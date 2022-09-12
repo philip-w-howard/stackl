@@ -17,7 +17,9 @@ void cVisitor::Visit(cAssignExpr *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cAstNode *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cBaseDeclNode *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cBinaryExpr *node)         { VisitAllChildren(node); }
+void cVisitor::Visit(cBreakStmt *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cCastExpr *node)           { VisitAllChildren(node); }
+void cVisitor::Visit(cContinueStmt *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cDecl *node)               { VisitAllChildren(node); }
 void cVisitor::Visit(cDeclsList *node)          { VisitAllChildren(node); }
 void cVisitor::Visit(cDoWhileStmt *node)        { VisitAllChildren(node); }

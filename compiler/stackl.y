@@ -48,8 +48,8 @@
 %token STATIC VOLATILE EXTERN
 %token  VOID
 %token  DO FOR WHILE IF ELSE SWITCH CASE GOTO
-%token  BREAK CONTINUE
 %token  TYPEDEF STRUCT
+%token  BREAK CONTINUE
 %token  RETURN
 %token  JUNK_TOKEN
 %token  EQ NE GE LE
@@ -446,9 +446,15 @@ stmt:       decl
                 if ($$->HasSemanticError()) YYERROR;
             }
         |   BREAK ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+            {
+                $$ = new cBreakStmt();
+                if ($$->HasSemanticError()) YYERROR;
+            }
         |   CONTINUE ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+            {
+                $$ = new cContinueStmt();
+                if ($$->HasSemanticError()) YYERROR; 
+            }
         |   GOTO IDENTIFIER ';'
             { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   asm_stmt ';'

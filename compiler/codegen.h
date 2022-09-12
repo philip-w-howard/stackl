@@ -11,7 +11,7 @@
 
 #include <fstream>
 #include <string>
-#include "../interp/opcode_def.h"
+#include "../interp/opcode_defs.h"
 
 #error "codegen functionality moved to cCodeGen"
 
