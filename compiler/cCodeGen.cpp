@@ -507,6 +507,22 @@ void cCodeGen::Visit(cStructRef *node)
 
 //void cCodeGen::Visit(cStructType *node)
 //void cCodeGen::Visit(cSymbol *node)             { VisitAllChildren(node); }
+
+void cCodeGen::Visit(cTernaryExpr *node)
+{
+    std::string if_label = GenerateLabel();
+    std::string else_label = GenerateLabel();
+
+    EmitLineNumber(node);
+    node->GetCondition()->Visit(this);
+    EmitInst("JUMPE", if_label);
+    node->GetTrue()->Visit(this);
+    EmitInst("JUMP", else_label);
+    EmitLabel(if_label);
+    node->GetFalse()->Visit(this);
+    EmitLabel(else_label);
+}
+
 //void cCodeGen::Visit(cTypeDecl *node)           { VisitAllChildren(node); }
 
 void cCodeGen::Visit(cUnaryExpr *node)
@@ -577,21 +593,6 @@ void cCodeGen::Visit(cWhileStmt *node)
     node->GetStmt()->Visit(this);
     EmitInst("JUMP", start_loop);
     EmitLabel(end_loop);
-}
-
-void cCodeGen::Visit(cTernaryExpr *node)
-{
-    std::string if_label = GenerateLabel();
-    std::string else_label = GenerateLabel();
-
-    EmitLineNumber(node);
-    node->GetCondition()->Visit(this);
-    EmitInst("JUMPE", if_label);
-    node->GetTrue()->Visit(this);
-    EmitInst("JUMP", else_label);
-    EmitLabel(if_label);
-    node->GetFalse()->Visit(this);
-    EmitLabel(else_label);
 }
 
 //*****************************************
