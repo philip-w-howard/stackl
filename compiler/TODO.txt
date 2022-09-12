@@ -2,8 +2,6 @@ check return statements in functions
 
 switch statements
 function pointers
-break
-continue
 goto/label
 ternary operator
 
