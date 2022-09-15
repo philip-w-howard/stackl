@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stack>
+#include <unordered_map>
 #include "cVisitor.h"
 
 class cSemantics : public cVisitor
@@ -55,4 +57,12 @@ class cSemantics : public cVisitor
         //virtual void Visit(cWhileStmt *node);
     protected:
         cTypeDecl *m_funcReturnType;
+
+        std::stack<std::unordered_map<std::string, int>> m_funcLabelStack;
+        void IncreaseFunctionScope();
+        void DecreaseFunctionScope();
+        bool InFunctionScope();
+        bool LabelExists(std::string label);
+        void SetLabelLine(std::string label, int lineNumber);
+        int GetLabelLine(std::string label);
 };
