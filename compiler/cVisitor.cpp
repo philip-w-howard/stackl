@@ -26,8 +26,10 @@ void cVisitor::Visit(cExprStmt *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cForStmt *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cFuncCall *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cFuncDecl *node)           { VisitAllChildren(node); }
+void cVisitor::Visit(cGotoStmt *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cIfStmt *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cIntExpr *node)            { VisitAllChildren(node); }
+void cVisitor::Visit(cLabeledStmt *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cNopStmt *node)            { VisitAllChildren(node); }
 void cVisitor::Visit(cParams *node)             { VisitAllChildren(node); }
 void cVisitor::Visit(cPlainVarRef *node)        { VisitAllChildren(node); }

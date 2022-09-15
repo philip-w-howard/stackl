@@ -60,6 +60,11 @@ cSymbol *cSymbolTable::Insert(cSymbol *symbol)
     return symbol;
 }
 //*******************************************
+void cSymbolTable::Remove(cSymbol *symbol)
+{
+    mScope->Remove(symbol);
+}
+//*******************************************
 cSymbol *cSymbolTable::InsertRoot(cSymbol *symbol)
 {
     cScope *scope = mScope;
