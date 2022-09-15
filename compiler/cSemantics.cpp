@@ -6,28 +6,7 @@
 #include <unordered_map>
 
 using std::string;
-
-//************************************
-// function label scope helper data
-typedef std::unordered_map<string, int> FunctionLabelScope;
-static std::stack<FunctionLabelScope> sFunctionLabelStack;
-
-static void IncreaseFunctionScope() { sFunctionLabelStack.emplace(FunctionLabelScope{}); }
-static void DecreaseFunctionScope()
-{
-    for (auto label : sFunctionLabelStack.top())
-    {
-        if (label.second != -1)
-            semantic_error("Reference to undefined label \"" + label.first + "\"", label.second);
-    }
-    sFunctionLabelStack.pop();
-}
-
-static bool InFunctionScope()                                   { return !sFunctionLabelStack.empty(); }
-static bool LabelExists(std::string label)                      { return sFunctionLabelStack.top().find(label) != sFunctionLabelStack.top().end(); }
-static bool IsLabelMissing(std::string label)                   { return LabelExists(label) && sFunctionLabelStack.top().find(label)->second > 0; }
-static void SetMissingLabel(std::string label, int lineNumber)  { sFunctionLabelStack.top()[label] = lineNumber; }
-static void SetFoundLabel(std::string label)                    { sFunctionLabelStack.top()[label] = -1; }
+using FunctionLabelScope = std::unordered_map<string, int>;
 
 //***********************************
 cSemantics::cSemantics() : cVisitor()
@@ -73,7 +52,7 @@ void cSemantics::Visit(cGotoStmt *node)
     }
     else if (!LabelExists(node->GetLabel()))
     {
-        SetMissingLabel(node->GetLabel(), node->LineNumber());
+        SetLabelLine(node->GetLabel(), node->LineNumber());
     }
 }
 
@@ -83,13 +62,13 @@ void cSemantics::Visit(cLabeledStmt *node)
     {
         semantic_error("Label \"" + node->GetLabel() + "\" declared outside of function body", node->LineNumber());
     }
-    else if (LabelExists(node->GetLabel()) && !IsLabelMissing(node->GetLabel()))
+    else if (LabelExists(node->GetLabel()) && GetLabelLine(node->GetLabel()) == -1)
     {
         semantic_error("Duplicate label \"" + node->GetLabel() + "\"", node->LineNumber());
     }
     else
     {
-        SetFoundLabel(node->GetLabel());
+        SetLabelLine(node->GetLabel(), -1);
     }
     VisitAllChildren(node);
 }
@@ -115,3 +94,20 @@ void cSemantics::Visit(cReturnStmt *node)
             node->LineNumber());
     }
 }
+
+//***********************************
+void cSemantics::IncreaseFunctionScope() { m_funcLabelStack.emplace(FunctionLabelScope{}); }
+void cSemantics::DecreaseFunctionScope()
+{
+    for (auto label : m_funcLabelStack.top())
+    {
+        if (label.second != -1)
+            semantic_error("Reference to undefined label \"" + label.first + "\"", label.second);
+    }
+    m_funcLabelStack.pop();
+}
+
+bool cSemantics::InFunctionScope()                          { return !m_funcLabelStack.empty(); }
+bool cSemantics::LabelExists(string label)                  { return m_funcLabelStack.top().find(label) != m_funcLabelStack.top().end(); }
+void cSemantics::SetLabelLine(string label, int lineNumber) { m_funcLabelStack.top()[label] = lineNumber; }
+int cSemantics::GetLabelLine(string label)                  { return InFunctionScope() ? m_funcLabelStack.top().find(label)->second : -2; }
