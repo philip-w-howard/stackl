@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stack>
 
 #include "../interp/machine_def.h"
 
@@ -10,6 +11,8 @@
 #include "../version.h"
 
 using std::string;
+
+static std::stack<string> sFuncStack;
 
 const int cCodeGen::STACKL_WORD_SIZE = WORD_SIZE;
 
@@ -249,7 +252,9 @@ void cCodeGen::Visit(cFuncDecl *node)
             EmitInst("ADJSP", adj_size);
         }
 
+        sFuncStack.push(node->GetFuncName());
         node->GetStmts()->Visit(this);
+        sFuncStack.pop();
 
         // Force return statement
         /* This is now taken care of in cSemantic visitor
@@ -264,6 +269,11 @@ void cCodeGen::Visit(cFuncDecl *node)
         }
         */
     }
+}
+
+void cCodeGen::Visit(cGotoStmt *node)
+{
+    EmitInst("JUMP", GenerateGotoLabel(node->GetLabel()));
 }
 
 void cCodeGen::Visit(cIfStmt *node)
@@ -291,6 +301,12 @@ void cCodeGen::Visit(cIfStmt *node)
 void cCodeGen::Visit(cIntExpr *node)
 {
     EmitInst("PUSH", node->ConstValue());
+}
+
+void cCodeGen::Visit(cLabeledStmt *node)
+{
+    EmitLabel(GenerateGotoLabel(node->GetLabel()));
+    node->GetStmt()->Visit(this);
 }
 
 //void cCodeGen::Visit(cNopStmt *node)
@@ -601,13 +617,19 @@ void cCodeGen::EmitInst(string inst)
 }
 
 //*****************************************
-// Generate a unique label for GOTO statements
+// Generate a unique label for JUMP statements
 string cCodeGen::GenerateLabel()
 {
     m_Next_Label++;
     string label("$$LABEL_");
     label += std::to_string(m_Next_Label);
     return label;
+}
+//*****************************************
+// Generate a unique label for GOTO statements
+string cCodeGen::GenerateGotoLabel(string label)
+{
+    return "$$LABEL_" + sFuncStack.top() + "_" + label;
 }
 //*****************************************
 void cCodeGen::EmitStringLit(string str, string label)

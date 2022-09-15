@@ -4,7 +4,6 @@ switch statements
 function pointers
 break
 continue
-goto/label
 ternary operator
 
 Make a proper pre-processor
