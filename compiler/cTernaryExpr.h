@@ -19,8 +19,8 @@ class cTernaryExpr : public cExpr
             }
         }
 
-        virtual bool IsConst()      { return GetTrue()->IsConst() && GetFalse()->IsConst(); }
-        virtual int ConstValue()    
+        virtual bool IsConst()      { return GetCondition()->IsConst() && GetTrue()->IsConst() && GetFalse()->IsConst(); }
+        virtual int ConstValue()
         { 
             if (!IsConst()) return 0;
             return GetCondition()->ConstValue() 
