@@ -756,6 +756,7 @@ conditional_expression
         | logical_or_expression '?' expr ':' conditional_expression
             {
                 $$ = new cTernaryExpr($1, $3, $5);
+                if ($$->HasSemanticError()) YYERROR;
             }
 
 constant_expression
