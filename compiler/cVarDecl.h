@@ -90,6 +90,11 @@ class cVarDecl : public cDecl
             ThrowSemanticError("Cannot initialize arrays or structs");
             return;
         }
+        if (!cTypeDecl::IsCompatibleWith(GetType(), init->GetType()))
+        {
+            ThrowSemanticError("Variable initialized with incompatible type");
+            return;
+        }
         SetChild(3, init); 
         mHasInit = true;
     }
