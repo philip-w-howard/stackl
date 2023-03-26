@@ -27,3 +27,7 @@ library/syscodes.h
 library/timer.h
 library/inp_def.h
 version.h
+
+compiler/depend.mk
+interp/depend.mk
+
