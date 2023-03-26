@@ -46,6 +46,7 @@
 #include "cStructRef.h"
 #include "cStructType.h"
 #include "cSymbol.h"
+#include "cTernaryExpr.h"
 #include "cTypeDecl.h"
 #include "cTypedef.h"
 #include "cUnaryExpr.h"

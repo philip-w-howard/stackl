@@ -118,6 +118,7 @@ void cGenAddr::Visit(cStructRef *node)
 }
 //void cGenAddr::Visit(cStructType *node)         { VisitAllChildren(node); }
 //void cGenAddr::Visit(cSymbol *node)             { VisitAllChildren(node); }
+//void cGenAddr::Visit(cTernaryExpr *node)        { VisitAllChildren(node); }
 //void cGenAddr::Visit(cTypeDecl *node)           { VisitAllChildren(node); }
 //void cGenAddr::Visit(cUnaryExpr *node)          { VisitAllChildren(node); }
 //void cGenAddr::Visit(cVarDecl *node)            { VisitAllChildren(node); }

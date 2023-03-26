@@ -11,6 +11,8 @@ int main()
     else
         asm("OUTS", "if-else works\n");
 
+    asm("OUTS", (1 ? (0 ? "ternary 2 broken\n" : "ternary works\n") : "ternary 1 broken\n"));
+
     return 0;
 }
 

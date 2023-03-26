@@ -46,6 +46,7 @@ class cSemantics : public cVisitor
         //virtual void Visit(cStructRef *node);
         //virtual void Visit(cStructType *node);
         //virtual void Visit(cSymbol *node);
+        //virtual void Visit(cTernaryExpr *node);
         //virtual void Visit(cTypeDecl *node);
         //virtual void Visit(cUnaryExpr *node);
         //virtual void Visit(cVarDecl *node);

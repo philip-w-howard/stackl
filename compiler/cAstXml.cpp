@@ -217,6 +217,9 @@ void cAstXml::Visit(cSymbol *node)
     attr += " seq=\"" + std::to_string(node->GetSeq()) + "\" ";
     DefaultVisit(node, "Symbol", attr);
 }
+void cAstXml::Visit(cTernaryExpr *node){
+    DefaultVisit(node, "TernaryExpr");
+}
 void cAstXml::Visit(cTypeDecl *node)
 {
     DefaultVisit(node, "TypeDecl");
