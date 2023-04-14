@@ -1,6 +1,6 @@
 #pragma once
 //**************************************************
-// syscodes.h
+// inp_def.h
 //
 // Defines the operation codes used by the INP instruction
 //
