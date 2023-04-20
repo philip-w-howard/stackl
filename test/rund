@@ -1,15 +1,25 @@
-stacklc test/$1.c 
+source=$1
+shift
+./stacklc -c test/$source.c 2> out
 RETVAL=$?
-[ $RETVAL -ne 0 ] && echo $1 FAILED
-[ $RETVAL -ne 0 ] && exit $RETVAL
+if [ $RETVAL -eq 0 ]
+then
+    ./slasm test/$source.sl $@
+    RETVAL=$?
+    [ $RETVAL -ne 0 ] && echo $source FAILED
+    [ $RETVAL -ne 0 ] && exit $RETVAL
 
-stackl test/$1.sl > out
-RETVAL=$?
-[ $RETVAL -ne 0 ] && echo $1 FAILED && exit $RETVAL
+    ./stackl test/$source >  out
+    RETVAL=$?
+    [ $RETVAL -ne 0 ] && echo $source FAILED && exit $RETVAL
+fi
 
-diff -qbwB out test/$1.correct
+diff -qbwB out test/$source.correct
 RETVAL=$?
-[ $RETVAL -eq 0 ] && echo $1 PASSED
-[ $RETVAL -ne 0 ] && diff -qbwB out test/$1.correct
-[ $RETVAL -ne 0 ] && echo $1 FAILED
+[ $RETVAL -eq 0 ] && echo $source PASSED
+if [ $RETVAL -ne 0 ] 
+then
+    diff -bwB out test/$source.correct 
+    echo $source FAILED
+fi
 exit $RETVAL

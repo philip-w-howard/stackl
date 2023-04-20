@@ -16,7 +16,6 @@ SOURCES= cAstXml.cpp \
 	cSymbolTable.cpp \
 	cTypeDecl.cpp \
 	cVisitor.cpp \
-	codegen.cpp \
 	stacklc.cpp \
 
 OBJS= scanner.o \

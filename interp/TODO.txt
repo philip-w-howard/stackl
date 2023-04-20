@@ -1,6 +1,3 @@
-add io_blk_t to <syscodes.h>
-add bit definitions to <syscodes.h>
-
 slasm -opt to optimize
 HALT:
     user mode: trap handler? or Machine Check ISR?
@@ -21,5 +18,4 @@ Implement virtual memory
     Need Page Table register
     Need Page Fault interrupt
 
-Better documentation of INP instruction including error codes
 
