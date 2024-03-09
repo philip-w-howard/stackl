@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -351,45 +352,56 @@ static void make_def_file()
 
 static void Process_Args(int argc, char **argv)
 {
-    int ii;
-    for (ii=1; ii<argc; ii++)
+    static struct option long_opts[] = {
+        {"defs",        no_argument, 0, 'd'},
+        {"debug",       no_argument, 0, 'g'},
+        {"dbg",         no_argument, 0, 'g'},
+        {"help",        no_argument, 0, 'h'},
+        {"list",        no_argument, 0, 'l'},
+        {"memory",      required_argument, 0, 'M'},
+        {"version",     no_argument, 0, 'v'},
+        {0, 0, 0, 0}
+    };
+
+    static char *single_opts = "dghlM:v";
+    int opt;
+    int opt_index;
+
+    opt = getopt_long_only(argc, argv, single_opts, long_opts, &opt_index);
+    while (opt != -1)
     {
-        if (argv[ii][0] == '-')
+        switch (opt)
         {
-            char *arg = &argv[ii][1];
-            if (strcmp(arg, "defs") == 0)
-            {
+            case 'd':
                 make_def_file();
                 exit(0);
-            }
-            else if (strcmp(arg, "help") == 0)
-            {
+                break;
+            case 'g':
+                g_Make_Debug_Listing = 1;
+                break;
+            case 'h':
                 printf("%s", HELP_STR);
                 exit(0);
-            }
-            else if (strcmp(arg, "dbg") == 0)
-                g_Make_Debug_Listing = 1;
-            else if (strcmp(arg, "list") == 0)
+                break;
+            case 'l':
                 g_Make_Listing = 1;
-            else if (argv[ii][1] == 'M')
-                g_Memory_Size = atoi(&argv[ii][2]);
-            else if (strcmp(arg, "version") == 0)
-            {
+                break;
+            case 'M':
+                g_Memory_Size = atoi(optarg);
+                break;
+            case 'v':
                 printf("slasm %s %s %s\n", VERSION, __DATE__, __TIME__);
                 exit(0);
-            }
-            else
-            {
-                fprintf(stderr, "Unrecognized option %s\n", argv[ii]);
-                fprintf(stderr, "%s", HELP_STR);
-                exit(-1);
-            }
+                break;
         }
-        else
-        {
-            // assume input file name
-            Add_File(argv[ii]);
-        }
+
+        opt = getopt_long_only(argc, argv, single_opts, long_opts, &opt_index);
+    }
+
+    for (int ii=optind; ii<argc; ii++)
+    {
+        // assume input file name
+        Add_File(argv[ii]);
     }
 }
 
