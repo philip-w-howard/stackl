@@ -96,12 +96,13 @@ void Process_Args(int argc, char **argv)
             case 'c':
                 Do_Assembler = 0;
                 break;
-            case 'd':
+            case 'g':
                 Do_Debug = 1;
                 Do_Ast = 1;
                 break;
             case 'h':
                 printf("%s\n", HELP_MSG);
+                exit(0);
                 break;
             case 'l':
                 Do_Listing = 1;
@@ -173,8 +174,6 @@ int main(int argc, char **argv)
 
     set_include_path();
     Process_Args(argc, argv);
-
-//    std::streambuf *cout_buf = std::cout.rdbuf();
 
     if (strlen(Input_File) == 0)
     {
