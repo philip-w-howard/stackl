@@ -62,8 +62,10 @@ void cGenAddr::Visit(cFuncCall *node)
     fatal_error("Attempted to get the address of a funciton");
 }
 //void cGenAddr::Visit(cFuncDecl *node)           { VisitAllChildren(node); }
+//void cGenAddr::Visit(cGotoStmt *node)           { VisitAllChildren(node); }
 //void cGenAddr::Visit(cIfStmt *node)             { VisitAllChildren(node); }
 //void cGenAddr::Visit(cIntExpr *node)            { VisitAllChildren(node); }
+//void cGenAddr::Visit(cLabeledStmt *node)        { VisitAllChildren(node); }
 //void cGenAddr::Visit(cNopStmt *node)            { VisitAllChildren(node); }
 //void cGenAddr::Visit(cParams *node)             { VisitAllChildren(node); }
 void cGenAddr::Visit(cPlainVarRef *node)

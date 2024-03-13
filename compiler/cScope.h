@@ -29,6 +29,12 @@ class cScope
         mSymTab[name] = symbol;
     }
 
+    // Remove a symbol from the table.
+    void Remove(cSymbol *symbol)
+    {
+        mSymTab.erase(symbol->Name());
+    }
+
     // Look for a symbol. Returns NULL if symbol is not found.
     cSymbol *Lookup(std::string name)
     {
