@@ -52,6 +52,8 @@ void cGenAddr::Visit(cArrayRef *node)
 //void cGenAddr::Visit(cAstNode *node)            { VisitAllChildren(node); }
 //void cGenAddr::Visit(cBaseDeclNode *node)       { VisitAllChildren(node); }
 //void cGenAddr::Visit(cBinaryExpr *node)         { VisitAllChildren(node); }
+//void cGenAddr::Visit(cBreakStmt *node)          { VisitAllChildren(node); }
+//void cGenAddr::Visit(cContinueStmt *node)       { VisitAllChildren(node); }
 //void cGenAddr::Visit(cDecl *node)               { VisitAllChildren(node); }
 //void cGenAddr::Visit(cDeclsList *node)          { VisitAllChildren(node); }
 //void cGenAddr::Visit(cExpr *node)               { VisitAllChildren(node); }
