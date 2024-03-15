@@ -7,6 +7,7 @@ using std::string;
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <cstdint>
 
 class string_utils
 {
