@@ -8,15 +8,16 @@ INCLUDES = pio_term.h \
 
 SLS = string.sl \
       sysio.sl \
+	  ctype.sl \
 
 all: $(INCLUDES) $(SLS)
 
-clean: 
+clean:
 	rm -f *.sl
 	rm -f $(INCLUDES)
 
 %.sl : %.c
-	../stacklc -c $? 
+	../stacklc -c $?
 
 pio_term.h : $(INTERP_DIR)/pio_term.h
 	cp $< $@
