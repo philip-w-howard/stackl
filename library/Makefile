@@ -8,8 +8,8 @@ INCLUDES = pio_term.h \
 
 SLS = string.sl \
       sysio.sl \
-	  ctype.sl \
-	  stdio.sl \
+      ctype.sl \
+      stdio.sl \
 
 all: $(INCLUDES) $(SLS)
 

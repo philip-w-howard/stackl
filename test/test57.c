@@ -2,9 +2,6 @@
 #include <ctype.h> // everything else
 #include <stdio.h> // puts
 
-// int tolower(int c);
-// int toupper(int c);
-
 void print_properties(int c) {
     if (isalpha(c))
     {
