@@ -1,7 +1,6 @@
 // This tests the ctype.h and stdio.h
 #include <ctype.h> // everything else
 #include <stdio.h> // puts
-#include <string.h>
 
 // int tolower(int c);
 // int toupper(int c);
