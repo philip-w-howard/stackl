@@ -15,27 +15,27 @@ int isblank(int c)
 }
 int iscntrl(int c)
 {
-    return 0 <= c && c < 32
+    return 0x00 <= c && c <= 0x1f || c == 0x7f;
 }
 int isdigit(int c)
 {
-    return 47 < c && c < 58;
+    return '0' <= c && c <= '9';
 }
 int isgraph(int c)
 {
-    return 32 < c;
+    return 32 < c && c != 0x7f;
 }
 int islower(int c)
 {
-    return 96 < c && c < 123;
+    return 'a' <= c && c <= 'z';
 }
 int isprint(int c)
 {
-    return 31 < c;
+    return 32 <= c && c != 0x7f;
 }
 int ispunct(int c)
 {
-    return !isspace(c) && !isalnum(c);
+    return isprint(c) && !isspace(c) && !isalnum(c);
 }
 int isspace(int c)
 {
@@ -43,13 +43,13 @@ int isspace(int c)
 }
 int isupper(int c)
 {
-    return 64 < c && c < 91;
+    return 'A' <= c && c <= 'Z';
 }
 int tolower(int c)
 {
     if (isupper(c))
     {
-        return c - 32;
+        return c + 32;
     }
     return c;
 }
@@ -57,7 +57,7 @@ int toupper(int c)
 {
     if (islower(c))
     {
-        return c + 32;
+        return c - 32;
     }
     return c;
 }

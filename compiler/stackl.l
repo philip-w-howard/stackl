@@ -23,6 +23,7 @@ extern char Include_Path[PATH_MAX];
 int process_once();
 static int process_eof();
 static int process_string_lit();
+static int process_simple_esc(int c);
 static int do_return(int val);
 static int proc_identifier(const char *name);
 static void open_input(char *name);
@@ -142,23 +143,23 @@ identifier      {letter}({letter}|{digit}|"_")*
 "struct"                    Return(STRUCT);
 "return"                    Return(RETURN);
 {integer}                   yylval.int_val = atoi(yytext); Return(INT_VAL);
-{hexint}                    { yylval.int_val = (int)strtol(yytext, NULL, 0); 
+{hexint}                    { yylval.int_val = (int)strtol(yytext, NULL, 0);
                                 Return(INT_VAL);
                             }
-                                
-"'"."'"                      yylval.int_val = yytext[1]; Return(INT_VAL); 
-"'\\n'"                      yylval.int_val = '\n'; Return(INT_VAL);
+
+"'\\"."'"                   Return(process_simple_esc(yytext[2]));
+"'"."'"                     yylval.int_val = yytext[1]; Return(INT_VAL);
 {identifier}                Return(proc_identifier(yytext));
 .                           Return(JUNK_TOKEN);   // discard anything not recognized
 
 %%
 
-// process identifiers: 
+// process identifiers:
 // determine if it is a type, var, or new
 static int proc_identifier(const char *name)
 {
     yylval.symbol = symbolTableRoot->Lookup(name);
-    if (yylval.symbol == nullptr) 
+    if (yylval.symbol == nullptr)
     {
         yylval.symbol = new cSymbol(name);
     } else {
@@ -169,7 +170,7 @@ static int proc_identifier(const char *name)
         // FIX THIS: var refs should be returned, but
         // Is_Const for the varref should be detectable
         /*
-        if (decl->IsVar() && decl->GetVar()->IsConst()) 
+        if (decl->IsVar() && decl->GetVar()->IsConst())
         {
             yylval.int_val = decl->GetVar()->GetInit()->ConstValue();
             return INT_VAL;
@@ -222,6 +223,52 @@ static int do_return(int val)
     //if (Do_Debug) fprintf(stderr, "Scanned '%s': %d\n", yytext, val);
     return val;
 }
+
+// (6.4.4.4) simple-escape-sequence:
+//      \’ \" \? \\ \a
+//      \b \f \n \r \t \v
+static int process_simple_esc(int c)
+{
+    switch (c)
+    {
+    case '\'':
+        yylval.int_val = '\'';
+        break;
+    case '\"':
+        yylval.int_val = '\"';
+        break;
+    case '\?':
+        yylval.int_val = '\?';
+        break;
+    case '\\':
+        yylval.int_val = '\\';
+        break;
+    case 'a':
+        yylval.int_val = '\a';
+        break;
+    case 'b':
+        yylval.int_val = '\b';
+        break;
+    case 'f':
+        yylval.int_val = '\f';
+        break;
+    case 'n':
+        yylval.int_val = '\n';
+        break;
+    case 'r':
+        yylval.int_val = '\r';
+        break;
+    case 't':
+        yylval.int_val = '\t';
+        break;
+    case 'v':
+        yylval.int_val = '\v';
+        break;
+    default:
+        return JUNK_TOKEN;
+    }
+    return INT_VAL;
+}
 static int process_string_lit()
 {
     // need to trim the quotes off
@@ -246,7 +293,7 @@ int process_once()
 static int process_eof()
 {
     File_Def file_item;
-    if (FileList.empty()) 
+    if (FileList.empty())
     {
         return 1;
     }
