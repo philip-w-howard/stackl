@@ -147,8 +147,8 @@ identifier      {letter}({letter}|{digit}|"_")*
                                 Return(INT_VAL);
                             }
 
-"'\\"."'"                   Return(process_simple_esc(yytext[2]));
 "'"."'"                     yylval.int_val = yytext[1]; Return(INT_VAL);
+"'\\"."'"                   Return(process_simple_esc(yytext[2]));
 {identifier}                Return(proc_identifier(yytext));
 .                           Return(JUNK_TOKEN);   // discard anything not recognized
 

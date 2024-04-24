@@ -1,118 +1,32 @@
 // This tests the ctype.h and stdio.h
 #include <ctype.h> // everything else
-#include <stdio.h> // puts
+#include <sysio.h> // prints
+
+void print_property(char* prop, int hasprop)
+{
+    prints(prop);
+    if (hasprop)
+    {
+        prints(":1\n");
+    }
+    else
+    {
+        prints(":0\n");
+    }
+}
 
 void print_properties(int c) {
-    if (isalpha(c))
-    {
-        char *property = "is alpha";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not alpha";
-        puts(property);
-    }
-    if (isalnum(c))
-    {
-        char *property = "is alnum";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not alnum";
-        puts(property);
-    }
-    if (islower(c))
-    {
-        char *property = "is lower";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is lower";
-        puts(property);
-    }
-    if (isupper(c))
-    {
-        char *property = "is upper";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not upper";
-        puts(property);
-    }
-    if (isblank(c))
-    {
-        char *property = "is blank";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not blank";
-        puts(property);
-    }
-    if (iscntrl(c))
-    {
-        char *property = "is cntrl";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not cntrl";
-        puts(property);
-    }
-    if (isdigit(c))
-    {
-        char *property = "is digit";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not digit";
-        puts(property);
-    }
-    if (isgraph(c))
-    {
-        char *property = "is graph";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not graph";
-        puts(property);
-    }
-    if (isprint(c))
-    {
-        char *property = "is print";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not print";
-        puts(property);
-    }
-    if (ispunct(c))
-    {
-        char *property = "is punctuation";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not punctuation";
-        puts(property);
-    }
-    if (isspace(c))
-    {
-        char *property = "is space";
-        puts(property);
-    }
-    else
-    {
-        char *property = "is not space";
-        puts(property);
-    }
+    print_property("isalnum", isalnum(c));
+    print_property("isalpha", isalpha(c));
+    print_property("isblank", isblank(c));
+    print_property("iscntrl", iscntrl(c));
+    print_property("isdigit", isdigit(c));
+    print_property("isgraph", isgraph(c));
+    print_property("islower", islower(c));
+    print_property("isprint", isprint(c));
+    print_property("ispunct", ispunct(c));
+    print_property("isspace", isspace(c));
+    print_property("isupper", isupper(c));
 }
 
 int main() {
@@ -122,23 +36,25 @@ int main() {
         char buff[2];
         buff[0] = (char)toupper(ascii_char);
         buff[1] = 0;
-        puts(buff);
+        prints(buff);
+        prints("\n");
         ascii_char++;
     }
     ascii_char = 'A';
-    while (ascii_char <= 'Z')
+    while(ascii_char <= 'Z')
     {
         char buff[2];
         buff[0] = (char)tolower(ascii_char);
         buff[1] = 0;
-        puts(buff);
+        prints(buff);
+        prints("\n");
         ascii_char++;
     }
     ascii_char = 0;
     while (ascii_char <= 127)
     {
         print_properties(ascii_char);
-        puts("================");
+        prints("================\n");
         ascii_char++;
     }
     return 0;
