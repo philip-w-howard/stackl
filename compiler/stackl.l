@@ -54,7 +54,7 @@ punctuation     [(){}\[\];,\.?:]
 operator        [+\-*/%=&|~!^]
 integer         0|([1-9][0-9]*)
 hexint          0(x|X)([0-9a-fA-F])+
-identifier      {letter}({letter}|{digit}|"_")*
+identifier      ("_"|{letter})({letter}|{digit}|"_")*
 %%
 
 "//"(.)*$                   {}
