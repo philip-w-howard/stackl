@@ -7,7 +7,7 @@
 %}
 
 %locations
-%error-verbose
+%define parse.error verbose
 
 %union{
     int                 int_val;
@@ -47,7 +47,7 @@
 
 %token STATIC VOLATILE EXTERN
 %token  VOID
-%token  DO FOR WHILE IF ELSE SWITCH CASE GOTO
+%token  DO FOR WHILE IF ELSE SWITCH CASE DEFAULT GOTO
 %token  BREAK CONTINUE
 %token  TYPEDEF STRUCT
 %token  RETURN
@@ -111,6 +111,7 @@
 %type <expr>            assignment_expression
 %type <expr>            expr
 %type <expr>            asm_stmt
+%type <stmt>            labeled_stmt
 
 %type <expr>            lval
 %%
@@ -450,8 +451,10 @@ stmt:       decl
         |   CONTINUE ';'
             { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
         |   GOTO IDENTIFIER ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+            { $$ = new cGotoStmt($2); }
         |   asm_stmt ';'
+            { $$ = $1; }
+        |   labeled_stmt
             { $$ = $1; }
 
 asm_stmt : ASM '(' string_lit ')' 
@@ -460,7 +463,7 @@ asm_stmt : ASM '(' string_lit ')'
                 if ($$->HasSemanticError()) YYERROR;
             }
         | ASM '(' string_lit ',' params ')'
-            { 
+            {
                 $$ = new cAsmNode($3, $5); 
                 if ($$->HasSemanticError()) YYERROR;
             }
@@ -474,6 +477,14 @@ asm_stmt : ASM '(' string_lit ')'
                 $$ = new cAsmNode($3, $5->ConstValue(), $7); 
                 if ($$->HasSemanticError()) YYERROR;
             }
+
+labeled_stmt: IDENTIFIER ':' stmt
+            { $$ = new cLabeledStmt($1, $3); }
+        |   CASE constant_expression ':' stmt
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+        |   DEFAULT ':' stmt
+            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+
 lval:     unary_expression
             { $$ = $1; }
 params:     params',' assignment_expression

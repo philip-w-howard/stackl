@@ -25,6 +25,9 @@ class cSymbolTable
     // the preexisting symbol. Otherwise, return new symbol
     cSymbol *Insert(cSymbol *symbol);
 
+    // Remove a symbol from the table
+    void Remove(cSymbol *symbol);
+
     // Insert in the root symbol table
     cSymbol *InsertRoot(cSymbol *symbol);
 
