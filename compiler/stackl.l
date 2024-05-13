@@ -89,6 +89,10 @@ identifier      ("_"|{letter})({letter}|{digit}|"_")*
 {quote}{not_quote}*{quote}  { return process_string_lit(); }
 {punctuation}               Return(yytext[0]);
 {operator}                  Return(yytext[0]);
+"<:"                        Return('[');
+":>"                        Return(']');
+"<%"                        Return('{');
+"%>"                        Return('}');
 "&&"                        Return(AND);
 "||"                        Return(OR);
 "=="                        Return(EQ);
