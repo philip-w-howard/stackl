@@ -1,3 +1,6 @@
 #pragma once
 
-#define NULL 0
+typedef int     ptrdiff_t;
+typedef int     wchar_t;
+
+#define NULL    0

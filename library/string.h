@@ -1,5 +1,6 @@
 #pragma once
 #pragma library "<string.sl>"
+#include <stddef.h>
 
 int strlen(char *str);
 char * strcpy(char *dest, char *src);
