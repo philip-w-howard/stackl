@@ -38,5 +38,5 @@ typedef int             intmax_t;
 #define INTPTR_MAX      2147483647
 
 // Limits of greatest-width integer types
-#define INTMAX_MIN       -2147483648
-#define INTMAX_MAX       2147483647
+#define INTMAX_MIN      -2147483648
+#define INTMAX_MAX      2147483647
