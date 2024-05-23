@@ -1,5 +1,6 @@
 #pragma once
 #pragma library "<string.sl>"
+#include <stddef.h>
 
 int strlen(char *str);
 char * strcpy(char *dest, char *src);
@@ -12,4 +13,4 @@ char *itostr(int value, char *str);
 char *xtostr(int value, char *str);
 void *memcpy(void *dest, void *src, int size);
 void *memset(void *buff, int val, int size);
-void *memcmp(void *dest, void *src, int size);
+int memcmp(void *dest, void *src, int size);
