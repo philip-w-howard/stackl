@@ -1,3 +1,3 @@
-ERROR: Return statement type is incompatible with function declaration on line 4 of test/test55.c
-ERROR: Return statement type is incompatible with function declaration on line 9 of test/test55.c
+test/test55.c:4: error: Return statement type is incompatible with function declaration
+test/test55.c:9: error: Return statement type is incompatible with function declaration
 2 Errors in compile

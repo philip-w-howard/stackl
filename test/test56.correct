@@ -1,2 +1,2 @@
-ERROR: Source produced no output  on line 0 of test/test56.c
+test/test56.c:0: error: Source produced no output
 
