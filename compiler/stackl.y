@@ -845,8 +845,8 @@ expr: assignment_expression
 
 int yyerror(const char *msg)
 {
-    std::cerr << "ERROR: " << msg << " at symbol "
-        << yytext << " on line " << yylineno << " of " << yycurrentfile << "\n";
+    std::cerr << yycurrentfile << ":" << yylineno << ": error: "
+        << msg << " at symbol " << yytext << "\n";
 
     return 0;
 }
