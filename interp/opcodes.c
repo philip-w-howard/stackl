@@ -248,13 +248,29 @@ void Execute(Machine_State *cpu)
             break;
         case DIVIDE_OP:
             DEBUG("DIVIDE");
-            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) / GET_INTVAL(SP, -1)));
+            if (GET_INTVAL(SP, -1) != 0)
+            {
+                SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) / GET_INTVAL(SP, -1)));
+            }
+            else
+            {
+                Machine_Check(MC_DIVIDE_ZERO,
+                        "Divide by zero at %d\n", cpu->IP);
+            }
             INC(SP, -1);
             INC(IP, 1);
             break;
         case MOD_OP:
             DEBUG("MOD");
-            SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) % GET_INTVAL(SP, -1)));
+            if (GET_INTVAL(SP, -1) != 0)
+            {
+                SET_INTVAL(SP, -2, (GET_INTVAL(SP, -2) % GET_INTVAL(SP, -1)));
+            }
+            else
+            {
+                Machine_Check(MC_DIVIDE_ZERO,
+                        "Divide by zero at %d\n", cpu->IP);
+            }
             INC(SP, -1);
             INC(IP, 1);
             break;

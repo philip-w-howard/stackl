@@ -34,6 +34,7 @@
 #define MC_HW_FAILURE   0x00000004
 #define MC_HW_WARNING   0x00000008
 #define MC_PROT_INST    0x00000010
+#define MC_DIVIDE_ZERO  0x00000020
 
 // CPU defined vectors
 #define MACHINE_CHECK_VECTOR    0
