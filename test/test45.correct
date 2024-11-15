@@ -1,2 +1,2 @@
-ERROR: lval must be a variable that's not a struct nor an array on line 20 of test/test45.c
+test/test45/c:20: error: lval must be a variable that's not a struct nor an array
 1 Errors in compile
