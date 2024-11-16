@@ -198,16 +198,16 @@ static void interrupt(Machine_State *cpu, int is_trap)
     cpu->IP = Get_Word(cpu, cpu->IVEC + vector*WORD_SIZE);
 }
 
-int rotate_left(int value, int count)
+static int rotate_left(int value, int count)
 {
     int shiftc = count % 32;
     int mask = ~(0xffffffff << shiftc);
     return (value << shiftc) | (mask & (value >> (32 - shiftc)));
 }
 
-int rotate_right(int value, int count)
+static int rotate_right(int value, int count)
 {
-    return rotate_right(value, -count);
+    return rotate_left(value, -count);
 }
 
 //***************************************
@@ -683,13 +683,13 @@ void Execute(Machine_State *cpu)
             INC(IP,1);
             break;
         case ROL_OP:
-            DEBUG("SHIFTL");
+            DEBUG("ROL");
             SET_INTVAL(SP, -2, rotate_left(GET_INTVAL(SP, -2), GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
             break;
         case ROR_OP:
-            DEBUG("SHIFTR");
+            DEBUG("ROR");
             SET_INTVAL(SP, -2, rotate_right(GET_INTVAL(SP, -2), GET_INTVAL(SP, -1)));
             INC(SP, -1);
             INC(IP, 1);
