@@ -75,6 +75,8 @@ static opcode_t op_list[] =
     {"trace_off", 0},
     {"clid", 0},
     {"seid", 0},
+    {"rol", 0},
+    {"ror", 0},
     {"illegal", 0}
 };
 

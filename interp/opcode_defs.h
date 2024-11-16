@@ -53,4 +53,6 @@
 #define TRACE_OFF_OP 52
 #define CLID_OP 53
 #define SEID_OP 54
-#define ILLEGAL_OP 55
+#define ROL_OP 55
+#define ROR_OP 56
+#define ILLEGAL_OP 57
