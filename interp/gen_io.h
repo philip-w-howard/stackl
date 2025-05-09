@@ -2,10 +2,10 @@
 //****************************************************
 // Bit definitions for the Generic IO device
 //
-#define GEN_IO_CSR      0x0C000000      // Control/Status register
-#define GEN_IO_BUFF     0x0C000004      // Buffer address register
-#define GEN_IO_SIZE     0x0C000008      // Buffer size register
-#define GEN_IO_COUNT    0x0C00000C      // Number of characters sent
+#define GEN_IO_CSR      0x0B000000      // Control/Status register
+#define GEN_IO_BUFF     0x0B000004      // Buffer address register
+#define GEN_IO_SIZE     0x0B000008      // Buffer size register
+#define GEN_IO_COUNT    0x0B00000C      // Number of characters sent
 
 #define GEN_IO_CSR_IE   0x00010000      // Interrupt enable
 #define GEN_IO_CSR_INT  0x00020000      // Interrupt occurred
