@@ -2,6 +2,10 @@ BUGS
 
 TODO
 
+JMPUSER should set USER and clear INTERRUPT
+
+document machine check bits in FLAG reg
+
 Clean up test suite
     Get rid of useless tests
     Comment block indicating purpose of test

@@ -2,7 +2,6 @@ check return statements in functions
 
 switch statements
 function pointers
-goto/label
 ternary operator
 
 Make a proper pre-processor

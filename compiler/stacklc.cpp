@@ -7,6 +7,7 @@
 // Date: 2/20/2015
 //
 //*******************************************************
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,51 +57,76 @@ int  Do_Listing = 0;
 int  Do_Type_Checks = 1;
 void Process_Args(int argc, char **argv)
 {
-    for (int ii=1; ii<argc; ii++)
+    static struct option long_opts[] = {
+        {"ast",         no_argument, 0, 'a'},
+        {"compile",     no_argument, 0, 'c'},
+        {"debug",       no_argument, 0, 'g'},
+        {"dbg",         no_argument, 0, 'g'},
+        {"help",        no_argument, 0, 'h'},
+        {"list",        no_argument, 0, 'l'},
+        {"no_types",    no_argument, 0, 'n'},
+        {"version",     no_argument, 0, 'v'},
+        {"yydebug",     no_argument, 0, 'y'},
+        {0, 0, 0, 0}
+    };
+
+    static char* HELP_MSG = (char *)
+        "  -a --ast         output the AST\n"
+        "  -c --compile     compile, but do not run the assembler\n"
+        "  -g --dbg --debug Create output for the debugger\n"
+        "  -h --help        Print this help message then exit\n"
+        "  -l --list        Create listing file\n"
+        "  -n --no_types    Skip type checks\n"
+        "  -v --version     Print version then exit\n"
+        "  -y --yydebug     Enable the yydebug of the parser\n"
+        ;
+
+    static char *single_opts = (char*)"acghlnvy";
+    int opt;
+    int opt_index;
+
+    opt = getopt_long_only(argc, argv, single_opts, long_opts, &opt_index);
+    while (opt != -1)
     {
-        if (argv[ii][0] == '-')
+        switch (opt)
         {
-            char *arg = &argv[ii][1];
-            if (strcmp(arg, "ast") == 0)
+            case 'a':
                 Do_Ast = 1;
-            else if (strcmp(arg, "c") == 0)
+                break;
+            case 'c':
                 Do_Assembler = 0;
-            else if (strcmp(arg, "dbg") == 0)
-            {
+                break;
+            case 'g':
                 Do_Debug = 1;
                 Do_Ast = 1;
-            }
-            else if (strcmp(arg, "help") == 0)
-            {
-                std::cout << "stacklc -c -help -no_types -version "
-                            "-yydebug -dbg -ast <file>\n";
+                break;
+            case 'h':
+                printf("%s\n", HELP_MSG);
                 exit(0);
-            }
-            else if (strcmp(arg, "list") == 0)
-            {
+                break;
+            case 'l':
                 Do_Listing = 1;
-            }
-            else if (strcmp(arg, "no_types") == 0)
-            {
+                break;
+            case 'n':
                 Do_Type_Checks = 0;
-            }
-                
-            else if (strcmp(arg, "version") == 0)
-            {
+                break;
+            case 'v':
                 std::cout << "stacklc " << VERSION << " " <<__DATE__ << " " 
                     << __TIME__ << std::endl;
                 exit(0);
-            }
-            else if (strcmp(arg, "yydebug") == 0)
+                break;
+            case 'y':
                 yydebug = 1;
-            else
-                std::cerr << "Unrecognized option '" << argv[ii] << "'" << std::endl;
+                break;
         }
-        else
-        {
-            // assume input file name
-            strcpy(Input_File, argv[ii]);
-        }
+        opt = getopt_long_only(argc, argv, single_opts, long_opts, &opt_index);
+    }
+
+    // handle arguments without "-". Namely the filename
+    if (optind < argc)
+    {
+        // assume input file name
+        strcpy(Input_File, argv[optind]);
     }
 }
 
@@ -148,8 +174,6 @@ int main(int argc, char **argv)
 
     set_include_path();
     Process_Args(argc, argv);
-
-//    std::streambuf *cout_buf = std::cout.rdbuf();
 
     if (strlen(Input_File) == 0)
     {
