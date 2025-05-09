@@ -18,6 +18,20 @@ int main() {
     printx(result);
     prints("\n");
 
+    // test full rol semantics
+    asm("push 4294901760"); // push 0xffff0000
+    asm("push 16");
+    result = asm("rol");
+    printx(result);
+    prints("\n");
+
+    // test ror semantics
+    asm("push 65535"); // push 0x0000ffff
+    asm("push 16");
+    result = asm("rol");
+    printx(result);
+    prints("\n");
+
     // test rol semantics
     asm("push 4294901760"); // push 0xffff0000
     asm("push 8");
@@ -26,7 +40,7 @@ int main() {
     prints("\n");
     
     // test ror semantics
-    asm("push 65535"); // push 0xffff0000
+    asm("push 65535"); // push 0x0000ffff
     asm("push 8");
     result = asm("rol");
     printx(result);
