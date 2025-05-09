@@ -92,6 +92,14 @@ void cAstXml::Visit(cBinaryExpr *node)
     string attr = " op=\"" + node->OpToString() + "\" ";
     DefaultVisit(node, "BinaryExpr", attr);
 }
+void cAstXml::Visit(cBreakStmt *node)
+{
+    DefaultVisit(node, "BreakStmt");
+}
+void cAstXml::Visit(cContinueStmt *node)
+{
+    DefaultVisit(node, "ContinueStmt");
+}
 void cAstXml::Visit(cDecl *node)
 {
     DefaultVisit(node, "Decl");

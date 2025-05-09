@@ -447,9 +447,15 @@ stmt:       decl
                 if ($$->HasSemanticError()) YYERROR;
             }
         |   BREAK ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+            {
+                $$ = new cBreakStmt();
+                if ($$->HasSemanticError()) YYERROR;
+            }
         |   CONTINUE ';'
-            { semantic_error("Not implemented " + std::to_string(__LINE__), yylineno); }
+            {
+                $$ = new cContinueStmt();
+                if ($$->HasSemanticError()) YYERROR; 
+            }
         |   GOTO IDENTIFIER ';'
             { $$ = new cGotoStmt($2); }
         |   asm_stmt ';'
