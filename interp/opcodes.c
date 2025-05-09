@@ -200,9 +200,9 @@ static void interrupt(Machine_State *cpu, int is_trap)
 
 static int rotate_left(int value, int count)
 {
-    int shiftc = count % 32;
-    int mask = ~(0xffffffff << shiftc);
-    return (value << shiftc) | (mask & (value >> (32 - shiftc)));
+    count %= 32;
+    int mask = ~(0xffffffff << count);
+    return (value << count) | (mask & (value >> (32 - count)));
 }
 
 static int rotate_right(int value, int count)
