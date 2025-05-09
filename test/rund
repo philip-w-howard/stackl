@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 source=$1
 shift
 ./stacklc -c test/$source.c 2> out
