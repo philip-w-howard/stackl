@@ -5,16 +5,23 @@ int main()
     ii = 0;
     while (ii < 3)
     {
-        prints("while loop\n");
+        prints("while loop 1\n");
         ii = ii + 1;
-		continue;
-		prints("failed\n");
     }
-	
-	ii = 0;
-	while (ii < 3)
-	{
-		prints("while loop\n");
-		break;
-	}
+
+    ii = 0;
+    while (ii < 3)
+    {
+        prints("while loop 2\n");
+        ii = ii + 1;
+        continue;
+        prints("failed\n");
+    }
+
+    ii = 0;
+    while (ii < 3)
+    {
+        prints("while loop 3\n");
+        break;
+    }
 }
