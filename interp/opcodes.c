@@ -197,6 +197,21 @@ static void interrupt(Machine_State *cpu, int is_trap)
     // ISR is at vector
     cpu->IP = Get_Word(cpu, cpu->IVEC + vector*WORD_SIZE);
 }
+
+//***********************************
+static int rotate_left(int value, int count)
+{
+    count %= 32;
+    int mask = ~(0xffffffff << count);
+    return (value << count) | (mask & (value >> (32 - count)));
+}
+
+//***********************************
+static int rotate_right(int value, int count)
+{
+    return rotate_left(value, -count);
+}
+
 //***************************************
 void Execute(Machine_State *cpu)
 {
@@ -668,6 +683,18 @@ void Execute(Machine_State *cpu)
         case TRACE_OFF_OP:
             Do_Debug = 0;
             INC(IP,1);
+            break;
+        case ROL_OP:
+            DEBUG("ROL");
+            SET_INTVAL(SP, -2, rotate_left(GET_INTVAL(SP, -2), GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
+            break;
+        case ROR_OP:
+            DEBUG("ROR");
+            SET_INTVAL(SP, -2, rotate_right(GET_INTVAL(SP, -2), GET_INTVAL(SP, -1)));
+            INC(SP, -1);
+            INC(IP, 1);
             break;
         default:
             Machine_Check(MC_ILLEGAL_INST,
