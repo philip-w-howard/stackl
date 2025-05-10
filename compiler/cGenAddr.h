@@ -19,6 +19,8 @@ class cGenAddr : public cVisitor
         //virtual void Visit(cAstNode *node);
         //virtual void Visit(cBaseDeclNode *node);
         //virtual void Visit(cBinaryExpr *node);
+        //virtual void Visit(cBreakStmt *node);
+        //virtual void Visit(cContinueStmt *node);
         //virtual void Visit(cDecl *node);
         //virtual void Visit(cDeclsList *node);
         //virtual void Visit(cExpr *node);
@@ -26,8 +28,10 @@ class cGenAddr : public cVisitor
         //virtual void Visit(cForStmt *node);
         virtual void Visit(cFuncCall *node);
         //virtual void Visit(cFuncDecl *node);
+        //virtual void Visit(cGotoStmt *node);
         //virtual void Visit(cIfStmt *node);
         //virtual void Visit(cIntExpr *node);
+        //virtual void Visit(cLabeledStmt *node);
         //virtual void Visit(cNopStmt *node);
         //virtual void Visit(cParams *node);
         virtual void Visit(cPlainVarRef *node);

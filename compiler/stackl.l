@@ -120,6 +120,7 @@ identifier      ("_"|{letter})({letter}|{digit}|"_")*
 "#define"                   Return(DEFINE);
 "volatile"                  Return(VOLATILE);
 "break"                     Return(BREAK);
+"continue"                  Return(CONTINUE);
 "case"                      Return(CASE);
 "if"                        Return(IF);
 "else"                      Return(ELSE);

@@ -52,6 +52,8 @@ void cGenAddr::Visit(cArrayRef *node)
 //void cGenAddr::Visit(cAstNode *node)            { VisitAllChildren(node); }
 //void cGenAddr::Visit(cBaseDeclNode *node)       { VisitAllChildren(node); }
 //void cGenAddr::Visit(cBinaryExpr *node)         { VisitAllChildren(node); }
+//void cGenAddr::Visit(cBreakStmt *node)          { VisitAllChildren(node); }
+//void cGenAddr::Visit(cContinueStmt *node)       { VisitAllChildren(node); }
 //void cGenAddr::Visit(cDecl *node)               { VisitAllChildren(node); }
 //void cGenAddr::Visit(cDeclsList *node)          { VisitAllChildren(node); }
 //void cGenAddr::Visit(cExpr *node)               { VisitAllChildren(node); }
@@ -62,8 +64,10 @@ void cGenAddr::Visit(cFuncCall *node)
     fatal_error("Attempted to get the address of a funciton");
 }
 //void cGenAddr::Visit(cFuncDecl *node)           { VisitAllChildren(node); }
+//void cGenAddr::Visit(cGotoStmt *node)           { VisitAllChildren(node); }
 //void cGenAddr::Visit(cIfStmt *node)             { VisitAllChildren(node); }
 //void cGenAddr::Visit(cIntExpr *node)            { VisitAllChildren(node); }
+//void cGenAddr::Visit(cLabeledStmt *node)        { VisitAllChildren(node); }
 //void cGenAddr::Visit(cNopStmt *node)            { VisitAllChildren(node); }
 //void cGenAddr::Visit(cParams *node)             { VisitAllChildren(node); }
 void cGenAddr::Visit(cPlainVarRef *node)

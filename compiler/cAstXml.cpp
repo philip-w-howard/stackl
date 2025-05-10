@@ -92,6 +92,14 @@ void cAstXml::Visit(cBinaryExpr *node)
     string attr = " op=\"" + node->OpToString() + "\" ";
     DefaultVisit(node, "BinaryExpr", attr);
 }
+void cAstXml::Visit(cBreakStmt *node)
+{
+    DefaultVisit(node, "BreakStmt");
+}
+void cAstXml::Visit(cContinueStmt *node)
+{
+    DefaultVisit(node, "ContinueStmt");
+}
 void cAstXml::Visit(cDecl *node)
 {
     DefaultVisit(node, "Decl");
@@ -121,6 +129,11 @@ void cAstXml::Visit(cFuncDecl *node)
     string attr = " localsize=\"" + std::to_string(node->GetSize()) + "\" ";
     DefaultVisit(node, "FuncDecl", attr);
 }
+void cAstXml::Visit(cGotoStmt *node)
+{
+    string attr = " label=\"" + node->GetLabel() + "\" ";
+    DefaultVisit(node, "GotoStmt", attr);
+}
 void cAstXml::Visit(cIfStmt *node)
 {
     DefaultVisit(node, "IfStmt");
@@ -129,6 +142,11 @@ void cAstXml::Visit(cIntExpr *node)
 {
     string attr = " value=\"" + std::to_string(node->ConstValue()) +"\" ";
     DefaultVisit(node, "IntExpr", attr);
+}
+void cAstXml::Visit(cLabeledStmt *node)
+{
+    string attr = " label=\"" + node->GetLabel() + "\" ";
+    DefaultVisit(node, "LabeledStmt", attr);
 }
 void cAstXml::Visit(cNopStmt *node)
 {

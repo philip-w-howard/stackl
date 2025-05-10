@@ -1,3 +1,0 @@
-test/regress
-
-test/runc test21 < test/test21.input

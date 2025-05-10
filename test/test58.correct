@@ -1,0 +1,3 @@
+ERROR: Continue statement not within a loop on line 6 of test/test58.c
+ERROR: Break statement not within a loop or switch on line 8 of test/test58.c
+2 Errors in compile

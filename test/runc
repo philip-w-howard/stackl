@@ -1,3 +1,0 @@
-test/runt $1 
-RETVAL=$?
-exit $RETVAL

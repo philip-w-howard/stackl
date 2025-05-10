@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stack>
+#include <unordered_map>
 #include "cVisitor.h"
 
 class cSemantics : public cVisitor
@@ -18,16 +20,20 @@ class cSemantics : public cVisitor
         //virtual void Visit(cAstNode *node);
         //virtual void Visit(cBaseDeclNode *node);
         //virtual void Visit(cBinaryExpr *node);
+        virtual void Visit(cBreakStmt *node);
+        virtual void Visit(cContinueStmt *node);
         //virtual void Visit(cDecl *node);
         //virtual void Visit(cDeclsList *node);
-        //virtual void Visit(cDoWhileStmt *node);
+        virtual void Visit(cDoWhileStmt *node);
         //virtual void Visit(cExpr *node);
         //virtual void Visit(cExprStmt *node);
-        //virtual void Visit(cForStmt *node);
+        virtual void Visit(cForStmt *node);
         //virtual void Visit(cFuncCall *node);
         virtual void Visit(cFuncDecl *node);
+        virtual void Visit(cGotoStmt *node);
         //virtual void Visit(cIfStmt *node);
         //virtual void Visit(cIntExpr *node);
+        virtual void Visit(cLabeledStmt *node);
         //virtual void Visit(cNopStmt *node);
         //virtual void Visit(cParams *node);
         //virtual void Visit(cPlainVarRef *node);
@@ -51,7 +57,15 @@ class cSemantics : public cVisitor
         //virtual void Visit(cUnaryExpr *node);
         //virtual void Visit(cVarDecl *node);
         //virtual void Visit(cVarRef *node);
-        //virtual void Visit(cWhileStmt *node);
+        virtual void Visit(cWhileStmt *node);
     protected:
         cTypeDecl *m_funcReturnType;
+
+        std::stack<std::unordered_map<std::string, int>> m_funcLabelStack;
+        void IncreaseFunctionScope();
+        void DecreaseFunctionScope();
+        bool InFunctionScope();
+        bool LabelExists(std::string label);
+        void SetLabelLine(std::string label, int lineNumber);
+        int GetLabelLine(std::string label);
 };
