@@ -198,6 +198,7 @@ static void interrupt(Machine_State *cpu, int is_trap)
     cpu->IP = Get_Word(cpu, cpu->IVEC + vector*WORD_SIZE);
 }
 
+//***********************************
 static int rotate_left(int value, int count)
 {
     count %= 32;
@@ -205,6 +206,7 @@ static int rotate_left(int value, int count)
     return (value << count) | (mask & (value >> (32 - count)));
 }
 
+//***********************************
 static int rotate_right(int value, int count)
 {
     return rotate_left(value, -count);
