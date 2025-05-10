@@ -42,7 +42,7 @@ int main() {
     // test ror semantics
     asm("push 65535"); // push 0x0000ffff
     asm("push 8");
-    result = asm("rol");
+    result = asm("ror");
     printx(result);
     prints("\n");
 }
