@@ -12,4 +12,4 @@ char *itostr(int value, char *str);
 char *xtostr(int value, char *str);
 void *memcpy(void *dest, void *src, int size);
 void *memset(void *buff, int val, int size);
-void *memcmp(void *dest, void *src, int size);
+int memcmp(void *s1, void *s2, int n);
