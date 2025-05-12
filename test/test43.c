@@ -2,7 +2,6 @@
 #include <string.h>
 #include <sysio.h>
 
-#define NULL 0
 int COUNT; // total num nodes added
 typedef struct node
 {

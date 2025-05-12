@@ -3,8 +3,6 @@
 #include <string.h>
 #include <sysio.h>
 
-#define NULL 0
-
 typedef struct tag_name {
    int a;
    struct tag_name *next;

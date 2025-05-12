@@ -3,8 +3,6 @@
 #include <string.h>
 #include <sysio.h>
 
-#define NULL 0
-
 typedef struct test1 
 {
     int a;
