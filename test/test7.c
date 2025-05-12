@@ -12,7 +12,7 @@ int main()
     printx(x);
     prints("\n");
 
-    x = 0xFEDC;
+    x = 0xFEDC0000;
     printx(x);
     prints("\n");
 
