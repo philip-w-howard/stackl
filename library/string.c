@@ -170,10 +170,8 @@ char *itostr(int value, char *str)
 char *xtostr(int value, char *str)
 {
     char *ptr;
-    int minus;
     int digit;
 
-    minus = 0;
     ptr = str;
     if (value == 0)
     {
@@ -181,14 +179,8 @@ char *xtostr(int value, char *str)
         str[1] = 0;
         return str;
     }
-    
-    if (value < 0)
-    {
-        minus = 1;
-        value = -value;
-    }
 
-    while (value > 0)
+    while (value != 0)
     {
         digit = value & 0x000F;
         if (digit < 10)
@@ -197,13 +189,9 @@ char *xtostr(int value, char *str)
             *ptr = (char)(digit + 'A' - 10);
         ptr++;
         value >>= 4;
+        value &= 0x0FFFFFFF;
     }
 
-    if (minus) 
-    {
-        *ptr = '-';
-        ptr++;
-    }
     *ptr = 0;
 
     strrev(str);
@@ -241,11 +229,14 @@ void *memset(void *buff, int val, int size)
     return buff;
 }
 
-int memcmp(char *str1, char *str2, int size)
+int memcmp(void *s1, void *s2, int n)
 {
+    char *str1 = (char*)s1;
+    char *str2 = (char*)s2;
+    
     int index;
     int result;
-    while (size--)
+    while (n--)
     {
         result = *str1 - *str2;
         if (result != 0) return result;
